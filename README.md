@@ -58,6 +58,9 @@ JAVA, MYSQL, MYBATIS, SPRING BOOT, CSS3, HTML5, BOOTSTRAP, JAVASCRIPT, JQUERY
 * 영화 상세
 * 영화 리뷰 작성 및 게시판
 
+### 매점 페이지
+* 스낵 및 음료 구매
+
 ### 고객센터
 * 1대 1 문의 및 공지사항
 * 글 작성, 읽기, 수정, 삭제(CRUD)
