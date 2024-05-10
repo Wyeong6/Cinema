@@ -25,7 +25,7 @@
 JAVA, MYSQL, MYBATIS, SPRING BOOT, CSS3, HTML5, BOOTSTRAP, JAVASCRIPT, JQUERY
 ```
 
-## 주요 기능
+## 💡 주요 기능
 
 ### 로그인
 * DB값 검증
