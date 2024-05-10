@@ -40,7 +40,7 @@ JAVA, MYSQL, MYBATIS, SPRING BOOT, CSS3, HTML5, BOOTSTRAP, JAVASCRIPT, JQUERY
 
 ### 영화 예매
 * 영화 선택(날짜 지정)
-* 영화관 선택(도시명/동명/지점 선택) 및 시간 선택 
+* 영화관(도시명/동명/지점 선택) 상영 시간표
 * 좌석 선택
 * 결제 페이지
 * 예매 완료
@@ -48,6 +48,15 @@ JAVA, MYSQL, MYBATIS, SPRING BOOT, CSS3, HTML5, BOOTSTRAP, JAVASCRIPT, JQUERY
 ### 메인 페이지
 * Youtube API 연동
 * 메인 포스터(영화) 이미지 슬라이드(CSS)
+* 영화 검색
+
+### 영화 차트
+* 현재 상영작(예매율 순)
+* 상영 예정작(예매율 순)
+
+### 영화 상세 페이지
+* 영화 상세
+* 영화 리뷰 작성 및 게시판
 
 ### 고객센터
 * 1대 1 문의 및 공지사항
