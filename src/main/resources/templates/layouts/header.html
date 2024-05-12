@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block th:fragment="header">
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+<!--        &lt;!&ndash; Bootstrap core CSS &ndash;&gt;-->
+<!--        <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">-->
+
+<!--        &lt;!&ndash; Custom styles for this template &ndash;&gt;-->
+<!--        <link th:href="@{/css/simple-sidebar.css}" rel="stylesheet">-->
+
+<!--        &lt;!&ndash; Bootstrap core JavaScript &ndash;&gt;-->
+<!--        <script th:src="@{/vendor/jquery/jquery.min.js}"></script>-->
+<!--        <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>-->
+
+    </head>
+    <body>
+        <div sec:authorize="hasRole('USER')"><span sec:authentication="name" /> 님 환영합니다. </div>
+        <div sec:authorize="hasRole('ADMIN')">Has ADMIN Role</div>
+    </body>
+</th:block>
+
+</html>
