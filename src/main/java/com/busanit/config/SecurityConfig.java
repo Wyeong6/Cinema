@@ -27,9 +27,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequestConfigurer -> authorizeHttpRequestConfigurer
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**").permitAll()
-                        //.requestMatchers("/board/**").permitAll() // /board/** 를 제외한 나머지는 모두 인증작업을 거친다
-                        .requestMatchers("/", "/member/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/", "/member/**", "/**").permitAll() // 모든 사용자에게 허용 (수정예정) /** 부분 수정하기(개발하기 편하려고 다 오픈한거임)
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN 에게만 허용 (수정예정) admin 전부를 거부하는건 너무 광범위함 보안에 취약해지는듯 관리자 페이지를 전부 구현하면 해당 페이지만 거부해야겠음
+                        .anyRequest().authenticated() // 나머지 요청은 인증된 사용자만 접근 가능
                 ) // 인증별 권한 설정
 
                 .formLogin(formLoginConfigurer -> formLoginConfigurer

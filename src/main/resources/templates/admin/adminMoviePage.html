@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<th:block layout:fragment="content">
+    <body>
+
+        <div class="admin_container">
+            <div class="after-head d-flex section-text-white position-relative">
+                <div class="d-background" data-image-src="" data-parallax="scroll"></div>
+                <div class="d-background bg-black-80"></div>
+                <div class="top-block top-inner container">
+                    <div class="top-block-content">
+                        <h1 class="section-title">Admin Page</h1>
+                    </div>
+                </div>
+            </div>
+
+            <section class="section-line">
+                <div class="addMovie">
+                    <div class="section-head">
+                        <h2 class="section-title text-uppercase">Add Movie</h2>
+                    </div>
+                    <form action="/admin/addMovie" method="post">
+                        <div class="row form-grid">
+                            <div class="col-12">
+                                <div class="input-view-flat input-group">
+                                    <input class="form-control" name="title" placeholder="Title" type="text"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="input-view-flat input-group">
+                                    <input class="form-control" name="time" placeholder="When" type="text"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="input-view-flat input-group">
+                                    <input class="form-control" name="place" placeholder="Where" type="text"/>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="px-5 btn btn-theme" type="submit">입력 완료</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="removeMovie">
+                    <div class="section-head">
+                        <h2 class="section-title text-uppercase">Remove Movie</h2>
+                    </div>
+                    <form action="/admin/deleteMovie" method="post">
+                        <div class="row form-grid">
+                            <div class="col-12">
+                                <div class="input-view-flat input-group">
+                                    <input class="form-control" name="num" placeholder="Movie Number" type="text"/>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="input-view-flat input-group">
+                                    <input class="form-control" name="title" placeholder="Movie Title" type="text"/>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="px-5 btn btn-theme" type="submit">삭제</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+    </body>
+</th:block>
+</html>

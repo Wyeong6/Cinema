@@ -91,7 +91,7 @@ public class MemberController {
 
     @GetMapping("/modify")
     public String modify(){
-        return "member/modifyForm";
+        return "member/memberModifyForm";
     }
 
     @PostMapping("/modify")
