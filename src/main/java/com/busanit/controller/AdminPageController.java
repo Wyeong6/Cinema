@@ -15,4 +15,9 @@ public class AdminPageController {
     public String movie(){
         return "admin/adminMoviePage";
     }
+
+    @PostMapping("/help")
+    public String help(){
+        return "admin/adminHelpPage";
+    }
 }
