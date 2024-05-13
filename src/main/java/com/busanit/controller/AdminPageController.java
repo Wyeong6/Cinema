@@ -16,6 +16,11 @@ public class AdminPageController {
         return "admin/adminMoviePage";
     }
 
+    @PostMapping("/member")
+    public String memberManagement(){
+        return "admin/adminMemberManagementPage";
+    }
+
     @PostMapping("/help")
     public String help(){
         return "admin/adminHelpPage";
