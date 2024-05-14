@@ -104,7 +104,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         }
     }
 
-    public void updatePassword(String password, String email){
-        memberRepository.updatePassword(password, email);
+    public void updatePasswordAndAge(String password, String age, String email){
+        memberRepository.updatePasswordAndAge(password, age, email);
     }
 }

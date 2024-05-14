@@ -30,7 +30,7 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
         if(oAuth2MemberDTO.isSocial() && (passwordEncoder.matches("1111",encodePassword) || oAuth2MemberDTO.getAge().equals("1"))){
             log.info("비밀번호 변경해야함");
 
-            response.sendRedirect("/member/modify");
+            response.sendRedirect("/member/modifySocialInfo");
             return;
         } else { // 패스워드가 1111이 아닐때
             response.sendRedirect("/");

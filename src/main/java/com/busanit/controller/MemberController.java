@@ -1,5 +1,6 @@
 package com.busanit.controller;
 
+import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.entity.Member;
@@ -46,12 +47,10 @@ public class MemberController {
 
     @PostMapping("/new")
     public String register(@Valid MemberRegFormDTO regFormDTO, BindingResult bindingResult, Model model){
-
         // 에러가 있으면 회원 가입 페이지로 이동
         if(bindingResult.hasErrors()){
             return "member/join";
         }
-
         try{
             memberService.saveMember(Member.createMember(regFormDTO, passwordEncoder));
         } catch(IllegalStateException e) {
@@ -73,12 +72,10 @@ public class MemberController {
     // 관리자 회원가입(삭제예정)
     @PostMapping("/new2")
     public String register2(@Valid MemberRegFormDTO regFormDTO, BindingResult bindingResult, Model model){
-
         // 에러가 있으면 회원 가입 페이지로 이동
         if(bindingResult.hasErrors()){
             return "member/join2";
         }
-
         try{
             memberService.saveMember(Member.createMember2(regFormDTO, passwordEncoder));
         } catch(IllegalStateException e) {
@@ -89,15 +86,37 @@ public class MemberController {
         return "redirect:/member/login";
     }
 
+    // password 수정
     @GetMapping("/modify")
-    public String modify(){
-        return "member/memberModifyPass";
+    public String modifyPassword(){
+        return "member/memberPasswordModify";
     }
 
-    @PostMapping("/modifySocialMember")
-    public String modify(String password, @AuthenticationPrincipal OAuth2MemberDTO oAuth2MemberDTO){
+    @PostMapping("/modify")
+    public String modifyPassword(String password, @AuthenticationPrincipal Object principal) {
+        // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
+        if (principal instanceof OAuth2MemberDTO) {
+            OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
+            // socialMemberDTO를 사용하여 처리
+            memberService.updatePassword(passwordEncoder.encode(password), oAuth2MemberDTO.getEmail());
+        } else if (principal instanceof FormMemberDTO) {
+            FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
+            // formMemberDTO를 사용하여 처리
+            memberService.updatePassword(passwordEncoder.encode(password), formMemberDTO.getEmail());
+        }
+        return "redirect:/";
+    }
+
+    // 소셜 로그인 특정 조건(비밀번호 재설정x or 나이 재설정x)일때 뜨는 페이지
+    @GetMapping("/modifySocialInfo")
+    public String modifySocialInfo(){
+        return "member/memberSocialInfoModify";
+    }
+
+    @PostMapping("/modifySocialInfo")
+    public String modifySocialInfo(String password, String age, @AuthenticationPrincipal OAuth2MemberDTO oAuth2MemberDTO){
         // @AuthenticationPrincipal - 현재 로그인한 사용자 객체를 파라미터(인자)에 주입할 수 있음
-        customOAuth2UserDetailsService.updatePassword(passwordEncoder.encode(password),
+        customOAuth2UserDetailsService.updatePasswordAndAge(passwordEncoder.encode(password), age,
                 oAuth2MemberDTO.getEmail());
         return "redirect:/";
     }

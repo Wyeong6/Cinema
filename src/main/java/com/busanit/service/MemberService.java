@@ -51,4 +51,8 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
 
         return dto;
     }
+
+    public void updatePassword(String password, String email){
+        memberRepository.updatePassword(password, email);
+    }
 }
