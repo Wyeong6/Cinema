@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!--결제 프로그램 쓰려면 jquery 필요-->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
+    <script>
+        function requestPay() {
+            // const self = this;
+            // if(self.price == null || self.price == '') {
+            //     alert("금액을 입력하세요.")
+            // } else if(self.contractformcheck == false) {
+            //     alert("이용약관에 동의 해주세요.")
+            // } else {
+            IMP.init("imp78827210"); // 고객사 식별코드 /*에이피아이 삭제예정*/
+            IMP.request_pay({
+                pg: "html5_inicis", //"{PG사 코드}.{상점 ID}",
+                pay_method: "card",
+                merchant_uid: `payment-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
+                name: "삼백", // 주문명
+                amount: 10, // 결제 금액
+                buyer_email: "test@test.com",
+                buyer_name: "구매자",
+                buyer_tel: "010-0000-0000",
+                m_redirect_url: '/payment/complete'
+            }, function(rsp) {
+                // let result = "";
+                if(rsp.success) {
+                    var msg = "결제가 완료되었습니다.";
+                    msg += "고유ID : " + rsp.imp_uid;
+                    msg += "상점 거래ID : " + rsp.merchant_uid;
+                    msg += "결제 금액 : " + rsp.paid_amount;
+                    msg += "카드 승인번호 : " + rsp.apply_num;
+                    $.ajax({
+                        type: "GET",
+                        url: "payment/complete",
+                        data: {
+                            "amount": money
+                        },
+                    });
+
+                    // result = "0";
+                    //
+                    // const form = new FormData();
+                    // form.append("impuid", rsp.imp_uid)
+                    // form.append("merchantuid", rsp.merchant_uid)
+                    // form.append("paidamount", rsp.amount)
+                    // form.append("applynum", rsp.apply_num)
+                    // form.append("email", rsp.buyer_email)
+                    //
+                    // console.log(form)
+
+                    // self.$axios.post("http://localhost:8080/payment/complete" + rsp.email, form)
+                    //     .then(function(res) {
+                    //         if(res.status === 200) {
+                    //             console.log(res)
+                    //             self.close();
+                    //             window.location.reload(true);
+                    //         }
+                    //     });
+                } else {
+                    var msg = "결제에 실패하였습니다.";
+                    msg += "에러내용 : " + rsp.error_msg;
+                    msg += "메인화면으로 돌아갑니다."
+                    // result = "1";
+                    // self.contractformcheck = false;
+                    // self.formattedPrice = "";
+                    // self.price = 0;
+                    // self.isPlaceholderVisible = true;
+                }
+                // if(result === "0") {
+                //     alert("성공")
+                // }
+                // self.contractformcheck = false
+                alert(msg);
+                document.location.href = "/" // alert창 확인 후 이동할 url
+            });
+        }
+    </script>
+</head>
+
+<th:block layout:fragment="content">
+    <body>
+    <div class="p-3">
+        <h1>결제 기능 test</h1>
+    </div>
+
+    <button onclick="requestPay()">결제하기</button>
+
+
+    </body>
+</th:block>
+</html>
