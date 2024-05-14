@@ -1,13 +1,11 @@
 package com.busanit.controller;
 
-import com.busanit.entity.Movie;
 import com.busanit.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,6 +16,6 @@ public class MovieController {
     @GetMapping("/movies/test")
     public void getMovies() throws IOException {
         movieService.fetchAndStoreMoviesNowPlaying();
-        movieService.fetchAndStoreMoviesRuntime();
+//        movieService.fetchAndStoreMoviesRuntime();
     }
 }

@@ -23,4 +23,9 @@ public class MovieDTO {
     private String certifications;
     private String stillCut;
     private String video;
+    private String posterPath;
+    private String backdropPath;
+
+
+
 }

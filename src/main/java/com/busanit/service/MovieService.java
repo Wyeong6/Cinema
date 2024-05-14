@@ -1,12 +1,11 @@
 package com.busanit.service;
 
 import com.busanit.domain.MovieDTO;
-import com.busanit.entity.Movie;
+import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MovieRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -112,30 +110,29 @@ public class MovieService {
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processRuntimeResponse(responseBody);
+//                processRuntimeResponse(responseBody);
             }
         }
     }
 
-    private void processRuntimeResponse(String responseBody) throws IOException {
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        MovieDTO movieDTO = new MovieDTO();
-        movieDTO.setId(jsonNode.get("id").asLong());
-        movieDTO.setRuntime(jsonNode.get("runtime").asText());
-
-        JsonNode genresNode = jsonNode.get("genres");
-
-//        String genresString = StreamSupport.stream(genresNode.spliterator(), false)
-//                .map(genreNode -> genreNode.get("name").asText())
-//                .collect(Collectors.joining(", "));
-//        movieDTO.setGenres(genresString);
-
-        Movie movie = movieRepository.findById(movieDTO.getId())
-                .orElse(new Movie());
-        movie.setMovieId(movieDTO.getId());
-        movie.setRuntime(movieDTO.getRuntime());
-        movieRepository.save(movie);
-    }
+//    private void processRuntimeResponse(String responseBody) throws IOException {
+//        JsonNode jsonNode = objectMapper.readTree(responseBody);
+//        MovieDTO movieDTO = new MovieDTO();
+//        movieDTO.setId(jsonNode.get("id").asLong());
+//        movieDTO.setRuntime(jsonNode.get("runtime").asText());
+//
+//        JsonNode genresNode = jsonNode.get("genres");
+//
+////        String genresString = StreamSupport.stream(genresNode.spliterator(), false)
+////                .map(genreNode -> genreNode.get("name").asText())
+////                .collect(Collectors.joining(", "));
+////        movieDTO.setGenres(genresString);
+//
+//        Movie movie = movieRepository.findById(movieDTO.getId())
+//                .orElse(new Movie());
+//        movie.setMovieId(movieDTO.getId());
+//        movieRepository.save(movie);
+//    }
 
 
     public List<Movie> getAllMovies() {

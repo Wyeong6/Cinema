@@ -1,6 +1,6 @@
 package com.busanit.repository;
 
-import com.busanit.entity.Movie;
+import com.busanit.entity.movie.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MovieRepository extends JpaRepository<Movie, Long> {
