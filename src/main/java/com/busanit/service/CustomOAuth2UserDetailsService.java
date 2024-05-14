@@ -47,9 +47,10 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         String email = null;
         if(clientName.equals("Google")){
             email = getGoogleEmail(paramMap);
-        }else if(clientName.equals("naver")){
-            email = getNaverEmail(paramMap);
         }
+//        else if(clientName.equals("naver")){
+//            email = getNaverEmail(paramMap);
+//        }
 
         return generateDTO(email, paramMap);
     }
@@ -76,25 +77,27 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
             // id = 이메일 주소 / 패스워드는 1111
             Member member = Member.builder()
                     .name(email)
-                    .password(passwordEncoder.encode("1111"))
                     .email(email)
-                    .social(true)
+                    .password(passwordEncoder.encode("1111"))
+                    .age("1")
                     .role(Role.USER)
+                    .social(true)
+                    .grade_code(4)
                     .build();
 
             // DB에 회원정보 저장(회원가입 처리)
             memberRepository.save(member);
 
             OAuth2MemberDTO oAuth2MemberDTO = new OAuth2MemberDTO(
-                    email, "1111", email, true,
+                    email, "1111", email, true, "1",
                     Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")));
             oAuth2MemberDTO.setAttr(paramMap);
 
             return oAuth2MemberDTO;
-        }else { // 이미 가입된 회원은 기존 정보를 반환
+        } else { // 이미 가입된 회원은 기존 정보를 반환
             Member member = result.get();
             OAuth2MemberDTO oAuth2MemberDTO = new OAuth2MemberDTO(
-                    member.getName(), member.getPassword(), member.getEmail(), member.isSocial(),
+                    member.getName(), member.getPassword(), member.getEmail(), member.isSocial(), member.getAge(),
                     Arrays.asList(new SimpleGrantedAuthority("ROLE_" + member.getRole())));
 
             return oAuth2MemberDTO;

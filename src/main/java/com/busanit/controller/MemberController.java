@@ -91,10 +91,10 @@ public class MemberController {
 
     @GetMapping("/modify")
     public String modify(){
-        return "member/memberModifyForm";
+        return "member/memberModifyPass";
     }
 
-    @PostMapping("/modify")
+    @PostMapping("/modifySocialMember")
     public String modify(String password, @AuthenticationPrincipal OAuth2MemberDTO oAuth2MemberDTO){
         // @AuthenticationPrincipal - 현재 로그인한 사용자 객체를 파라미터(인자)에 주입할 수 있음
         customOAuth2UserDetailsService.updatePassword(passwordEncoder.encode(password),

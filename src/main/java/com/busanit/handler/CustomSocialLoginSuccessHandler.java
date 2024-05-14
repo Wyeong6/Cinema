@@ -26,14 +26,14 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
 
         log.info("@@ encodePassword @@" + encodePassword);
 
-        // 소셜 로그인이고 회원의 패스워드가 1111 이면 비밀번호 변경 처리
-        if(oAuth2MemberDTO.isSocial() && passwordEncoder.matches("1111",encodePassword)){
+        // 소셜 로그인이고 회원의 패스워드가 1111 이거나 나이가 1이면 비밀번호, 나이 변경 처리
+        if(oAuth2MemberDTO.isSocial() && (passwordEncoder.matches("1111",encodePassword) || oAuth2MemberDTO.getAge().equals("1"))){
             log.info("비밀번호 변경해야함");
 
             response.sendRedirect("/member/modify");
             return;
         } else { // 패스워드가 1111이 아닐때
-            response.sendRedirect("/board/list");
+            response.sendRedirect("/");
         }
 
     }

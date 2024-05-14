@@ -41,12 +41,12 @@ public class SecurityConfig {
                         .successHandler(authenticationFormLoginSuccessHandler())
                 ) // loginForm and login Process setting
 
-//                .oauth2Login(OAuth2LoginConfigurer -> OAuth2LoginConfigurer
-//                        .loginPage("/member/login")
-//                        .failureUrl("/member/login/error")
-////                        .defaultSuccessUrl("/board/list")
-//                        .successHandler(authenticationSocialLoginSuccessHandler())
-//                )   // social login setting
+                .oauth2Login(OAuth2LoginConfigurer -> OAuth2LoginConfigurer
+                        .loginPage("/member/login")
+                        .failureUrl("/member/login/error")
+//                        .defaultSuccessUrl("/board/list")
+                        .successHandler(authenticationSocialLoginSuccessHandler())
+                )   // social login setting
 
                 .logout(logoutConfigurer -> logoutConfigurer
                         .logoutUrl("/member/logout")
