@@ -58,22 +58,39 @@
 <body>
 
 <div id="loginpage1"> <!--class="form-control"는 부트스트랩 사용-->
-    <form role="form" method="post" action="/member/login">
+    <form role="form" id="loginForm" method="post" action="/member/login">
         <input type="text" name="email" id="inputUsername1" class="form-control" placeholder="Email" required>
         <input type="password" name="password" id="inputPassword1" class="form-control" aria-describedby="passwordHelpBlock" placeholder="Password" required>
         <p th:if="${loginErrorMsg}" class="error" th:text="${loginErrorMsg}"></p>
+        <div style="padding-top: 15px;">
+            <label for="checkidbox">
+                <input class="form-check-input" type="checkbox" name="save_check" value="Y" th:checked="${cookieCheck}" id="checkIdBox">
+                아이디 기억하기
+            </label>
+        </div>
         <input type="submit" id="inputloginsubmit" class="form-control" value="로그인">
     </form>
 </div>
 <nav id="loginpage2">
-<!--    <input type="button" class="button_id" value="GOOGLE" onclick="location.href='/oauth2/authorization/google'">-->
-<!--    |-->
+    <input type="button" class="button_id" value="GOOGLE" onclick="location.href='/oauth2/authorization/google'">
+    |
 <!--    <input type="button" class="button_passward" value="NAVER" onclick="location.href='/oauth2/authorization/naver'">-->
 <!--    |-->
     <input type="button" class="button_join" value="회원가입" onclick="location.href='/member/new'">
+    |
     <input type="button" class="button_join" value="관리자추가" onclick="location.href='/member/new2'"> <!-- 관리자추가 버튼 (삭제예정) -->
 </nav>
 
+<script>
+    // 아이디 기억하기 기능 구현
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+        var checkIdBox = document.getElementById("checkIdBox");
+        if (checkIdBox.checked) {
+            var username = document.getElementById("inputUsername1").value;
+            document.cookie = "checkIdBox=" + username + "; expires=Thu, 01 Jan 2030 00:00:00 UTC; path=/";
+        }
+    });
+</script>
 
 </body>
 </html>

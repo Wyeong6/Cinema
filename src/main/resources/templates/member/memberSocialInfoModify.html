@@ -93,15 +93,17 @@
 <body>
 
 <div id="joinpage1">
-    <h1 id="inputview">비밀번호 변경</h1>
-    <form role="form" method="post" action="/member/modify">
+    <h5 id="inputview">비밀번호 / 나이를 재설정 해주세요</h5>
+    <form role="form" method="post" action="/member/modifySocialInfo">
         <div>
             <input type="password" name="password" id="inputPassword1" class="form-control" aria-describedby="passwordHelpBlock" placeholder="비밀번호">
         </div>
         <div>
             <input type="password" name="password2" id="inputPassword2" class="form-control" aria-describedby="passwordHelpBlock" placeholder="비밀번호를 한번 더 입력해주세요.">
         </div>
-
+        <div>
+            <input type="text" name="age" id="inputAge" class="form-control" placeholder="나이">
+        </div>
         <input type="submit" id="inputSubmit"  class="form-control" value="변경">
     </form>
 </div>

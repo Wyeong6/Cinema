@@ -16,18 +16,21 @@ public class OAuth2MemberDTO extends User implements OAuth2User {
     private String id;
     private String email;
     private String password;
+    private String age;
+    private Integer grade_code;
     private boolean social;
     private Role role;
     private Map<String, Object> attr;   // 소셜 로그인 정보
 
     public OAuth2MemberDTO(String username, String password, String email,
-                           boolean social,
+                           boolean social, String age,
                            Collection<? extends GrantedAuthority> authorities){
         super(username, password, authorities);
         this.id = username;
         this.password = password;
         this.email = email;
         this.social = social;
+        this.age = age;
     }
 
     @Override
