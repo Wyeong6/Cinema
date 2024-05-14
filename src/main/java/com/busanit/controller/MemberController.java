@@ -6,6 +6,9 @@ import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.entity.Member;
 import com.busanit.service.CustomOAuth2UserDetailsService;
 import com.busanit.service.MemberService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/member")
@@ -37,6 +41,24 @@ public class MemberController {
 
         return "member/login";
     }
+
+//    @PostMapping("/login")
+//    public String login(@RequestParam String email, @RequestParam String password, HttpServletRequest request, HttpServletResponse response) {
+//        // 아이디 기억하기 체크 여부 확인
+//        boolean checkIdBox = request.getParameter("checkIdBox") != null;
+//
+//        // 로그인 처리
+//
+//        // 아이디 기억하기가 체크된 경우, 쿠키에 아이디 저장
+//        if (checkIdBox) {
+//            Cookie cookie = new Cookie("checkIdBox", email);
+//            cookie.setMaxAge(30 * 24 * 60 * 60); // 30일 동안 유지
+//            cookie.setPath("/");
+//            response.addCookie(cookie);
+//        }
+//
+//        return "redirect:/";
+//    }
 
     @GetMapping("/new")
     public String register(Model model){
