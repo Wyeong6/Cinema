@@ -86,6 +86,10 @@
             <p th:if="${errorMessage}" th:text="${errorMessage}" class="errorMessage"></p> <!-- 이미 가입된 회원입니다 에러 메시지 출력 -->
         </div>
         <div>
+            <input type="text" th:field="*{age}" id="inputUserAge1" class="form-control" placeholder="나이">
+            <p th:if="${#fields.hasErrors('age')}" th:errors="*{age}" class="fieldError">입력 오류</p>
+        </div>
+        <div>
             <input type="password" th:field="*{password}" id="inputPassword1" class="form-control" aria-describedby="passwordHelpBlock" placeholder="비밀번호">
             <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="fieldError">입력 오류</p>
         </div>

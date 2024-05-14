@@ -1,6 +1,5 @@
 package com.busanit.controller;
 
-import com.busanit.domain.PaymentDTO;
 import com.busanit.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,7 +14,7 @@ public class PaymentController {
 
     @PostMapping("/test") /*이름 수정예정*/
     public String payTest() {
-        return "payment/pay";
+        return "payment/test_pay";
     }
 
     @GetMapping("/complete")

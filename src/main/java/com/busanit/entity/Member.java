@@ -3,6 +3,7 @@ package com.busanit.entity;
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -28,12 +29,17 @@ public class Member extends BaseEntity{
 
     private String password;
 
+    private String age;
+
     //Role 값을 String 값으로 저장
     @Enumerated(EnumType.STRING)
     private Role role;
 
     // 소셜 로그인 여부
     private boolean social;
+
+    @Column(nullable = false)
+    private Integer grade_code;
 
     // 일반 폼 회원 생성
     public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder){
@@ -42,8 +48,10 @@ public class Member extends BaseEntity{
                 .name(regFormDTO.getName())
                 .email(regFormDTO.getEmail())
                 .password(password)
+                .age(regFormDTO.getAge())
                 .role(Role.USER)
                 .social(false)
+                .grade_code(4)
                 .build();
     }
 
@@ -54,8 +62,10 @@ public class Member extends BaseEntity{
                 .name(regFormDTO.getName())
                 .email(regFormDTO.getEmail())
                 .password(password)
+                .age(regFormDTO.getAge())
                 .role(Role.ADMIN)
                 .social(false)
+                .grade_code(1)
                 .build();
     }
 
