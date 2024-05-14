@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -14,8 +15,9 @@ public class MovieController {
 
     private final MovieService movieService;
 
-//    @GetMapping("/movies/test")
-//    public List<Movie> getMovies() {
-//        return movieService.getAllMovie();
-//    }
+    @GetMapping("/movies/test")
+    public void getMovies() throws IOException {
+        movieService.fetchAndStoreMoviesNowPlaying();
+        movieService.fetchAndStoreMoviesRuntime();
+    }
 }

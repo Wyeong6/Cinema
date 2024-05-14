@@ -1,22 +1,28 @@
 package com.busanit.service;
 
+import com.busanit.domain.MovieDTO;
 import com.busanit.entity.Movie;
 import com.busanit.repository.MovieRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MovieService {
 
     private final OkHttpClient client = new OkHttpClient();
@@ -44,8 +50,14 @@ public class MovieService {
     // 이건 쉽게 해결가능 JPA레파지토리 save의 특성(값이있으면 update, 없으면 save)을 이용해서 영화 id에 대한 검증을 실시한후
     // 데이터베이스에 save시키는 방향으로 수정하면 쉽게 해결가능함
 
+
+
+
+
+    /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
+
     @Scheduled(cron = "0 0 * * * *") // 1시간마다 메소드 실행
-    public void fetchAndStoreMovies() throws IOException {
+    public void fetchAndStoreMoviesNowPlaying() throws IOException {
         int totalPages = fetchTotalPages();
         for (int page = 1; page <= totalPages; page++) {
             String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
@@ -56,8 +68,6 @@ public class MovieService {
             }
         }
     }
-
-
 
 
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
@@ -75,20 +85,62 @@ public class MovieService {
         JsonNode results = jsonNode.get("results");
         if (results.isArray()) {
             for (JsonNode node : results) {
-                Movie movie = new Movie();
-                movie.setMovieId(node.get("id").asLong());
-                movie.setTitle(node.get("title").asText());
-                movie.setOverview(node.get("overview").asText());
-                // 필드 추가해야함 지금은 Movie 엔티티(테이블) 이 안만들어져서 임시로 해둠 - 김우영
+                MovieDTO movieDTO = objectMapper.treeToValue(node, MovieDTO.class);
+                Movie movie = movieRepository.findById(movieDTO.getId()).orElse(new Movie());
+                movie.setMovieId(movieDTO.getId());
+                movie.setTitle(movieDTO.getTitle());
+                movie.setOverview(movieDTO.getOverview());
                 movieRepository.save(movie);
             }
         }
     }
 
+    // API에서 받아온 현재상영목록 리스트에서 모든 영화 ID 추출하는 메서드 (나중에 다른 api 데이터들도 영화id를 기준으로 데이터를가져오기때문에 씀)
+    public List<Long> getAllMovieIds() {
+        List<Movie> movies = movieRepository.findAll();
+        return movies.stream().map(Movie::getMovieId).collect(Collectors.toList());
+    }
+
+    /* 영화 현재상영목록 리스트 가져오는 API 및 저장 끝 */
+
+
+
+    public void fetchAndStoreMoviesRuntime() throws IOException {
+        List<Long> movieIds = getAllMovieIds();
+        for(Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/"+ movieId + "?language=ko-KR&api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processRuntimeResponse(responseBody);
+            }
+        }
+    }
+
+    private void processRuntimeResponse(String responseBody) throws IOException {
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        MovieDTO movieDTO = new MovieDTO();
+        movieDTO.setId(jsonNode.get("id").asLong());
+        movieDTO.setRuntime(jsonNode.get("runtime").asText());
+
+        JsonNode genresNode = jsonNode.get("genres");
+
+//        String genresString = StreamSupport.stream(genresNode.spliterator(), false)
+//                .map(genreNode -> genreNode.get("name").asText())
+//                .collect(Collectors.joining(", "));
+//        movieDTO.setGenres(genresString);
+
+        Movie movie = movieRepository.findById(movieDTO.getId())
+                .orElse(new Movie());
+        movie.setMovieId(movieDTO.getId());
+        movie.setRuntime(movieDTO.getRuntime());
+        movieRepository.save(movie);
+    }
+
+
     public List<Movie> getAllMovies() {
         return movieRepository.findAll();
     }
-
 
 
 }
