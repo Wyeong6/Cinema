@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns="http://www.w3.org/1999/html"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns="http://www.w3.org/1999/html">
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>로그인</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    <script src="include/jquery-3.7.1.min.js"></script>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/jquery/jquery-3.7.1.min.js"></script>
 
     <style>
         body {
             background-color: silver;
         }
+
         [id^="input"] {
             margin-top: 10px;
             padding: 5px;
@@ -22,8 +26,19 @@
             margin-left: auto;
             margin-right: auto;
         }
-        #loginpage1, #loginpage2 {
+
+        #loginpage1 {
             margin: 50px 50px 50px 50px;
+            text-align: center;
+        }
+
+        #loginpage2 {
+            margin: 50px 50px 5px 50px;
+            text-align: center;
+        }
+
+        #loginpage3 {
+            margin: 5px 50px 50px 50px;
             text-align: center;
         }
 
@@ -46,8 +61,8 @@
     </style>
     <script>
 
-        $(document).ready(function(){
-            $(".hlogo").click(function(){
+        $(document).ready(function () {
+            $(".hlogo").click(function () {
                 location.href = "index.html";
             })
         });
@@ -58,39 +73,91 @@
 <body>
 
 <div id="loginpage1"> <!--class="form-control"는 부트스트랩 사용-->
-    <form role="form" id="loginForm" method="post" action="/member/login">
-        <input type="text" name="email" id="inputUsername1" class="form-control" placeholder="Email" required>
-        <input type="password" name="password" id="inputPassword1" class="form-control" aria-describedby="passwordHelpBlock" placeholder="Password" required>
-        <p th:if="${loginErrorMsg}" class="error" th:text="${loginErrorMsg}"></p>
+    <h1>로그인 페이지</h1>
+    <form action="/member/login" id="loginForm" method="post" role="form">
+        <input class="form-control" id="inputUsername1" name="email" placeholder="Email" required type="text">
+        <input aria-describedby="passwordHelpBlock" class="form-control" id="inputPassword1" name="password"
+               placeholder="Password" required type="password">
+        <p class="error" th:if="${loginErrorMsg}" th:text="${loginErrorMsg}"></p>
         <div style="padding-top: 15px;">
-            <label for="checkidbox">
-                <input class="form-check-input" type="checkbox" name="save_check" value="Y" th:checked="${cookieCheck}" id="checkIdBox">
+            <label for="checkIdBox">
+                <input class="form-check-input" id="checkIdBox" name="save_check" th:checked="${cookieCheck}" type="checkbox"
+                       value="Y">
                 아이디 기억하기
             </label>
         </div>
-        <input type="submit" id="inputloginsubmit" class="form-control" value="로그인">
+        <input class="form-control" id="inputloginsubmit" type="submit" value="로그인">
     </form>
 </div>
 <nav id="loginpage2">
-    <input type="button" class="button_id" value="GOOGLE" onclick="location.href='/oauth2/authorization/google'">
+    <input class="button_id" onclick="location.href='/oauth2/authorization/google'" type="button" value="GOOGLE">
     |
-<!--    <input type="button" class="button_passward" value="NAVER" onclick="location.href='/oauth2/authorization/naver'">-->
-<!--    |-->
-    <input type="button" class="button_join" value="회원가입" onclick="location.href='/member/new'">
+    <!--    <input type="button" class="button_passward" value="NAVER" onclick="location.href='/oauth2/authorization/naver'">-->
+    <!--    |-->
+    <input class="button_join" onclick="location.href='/member/new'" type="button" value="회원가입">
     |
-    <input type="button" class="button_join" value="관리자추가" onclick="location.href='/member/new2'"> <!-- 관리자추가 버튼 (삭제예정) -->
+    <input class="button_join" onclick="location.href='/member/new2'" type="button" value="관리자추가">
+    <!-- 관리자추가 버튼 (삭제예정) -->
+</nav>
+<nav id="loginpage3">
+    <input class="button_id" onclick="location.href='/member/findId'" type="button" value="ID 찾기">
+    |
+    <input class="button_id" onclick="location.href='/member/findPassword'" type="button" value="Password 찾기">
 </nav>
 
+</body>
 <script>
-    // 아이디 기억하기 기능 구현
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
+    // 페이지 로드 시 실행되는 함수
+    window.onload = function () {
+        // checkIdBox 쿠키에서 아이디 값을 가져옴
+        var username = getCookie("checkIdBox");
+
+        // 가져온 아이디 값을 아이디 입력 필드에 채움
+        if (username) {
+            document.getElementById("inputUsername1").value = username;
+            document.getElementById("checkIdBox").checked = true; // 쿠키가 있으면 체크박스를 체크 상태로 설정
+        }
+    };
+
+    // 쿠키 값을 가져오는 함수
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", function (event) {
         var checkIdBox = document.getElementById("checkIdBox");
+        var username = document.getElementById("inputUsername1").value;
+        // 서버로부터 받은 응답
+        var responseData = {
+            email: username,
+            // 세션에 데이터를 더 넣을 순 있는데 로그인시에 저장될 데이터는 email뿐이라 email만 넣어둠
+        };
+
+        // 세션 스토리지에 사용자 정보 저장
+        sessionStorage.setItem("userInfo", JSON.stringify(responseData));
+
+        // // 다른 곳에서 세션 스토리지 사용자 정보 가져오기 예시
+        // var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+        // console.log(userInfo.email);    // "test@test.com"
+
+        // 아이디 기억하기 쿠키 기능 구현(유효기간 7일로 설정해둠)
         if (checkIdBox.checked) {
-            var username = document.getElementById("inputUsername1").value;
-            document.cookie = "checkIdBox=" + username + "; expires=Thu, 01 Jan 2030 00:00:00 UTC; path=/";
+            document.cookie = "checkIdBox=" + username + "; expires=" + new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) + "; path=/";
+        } else {
+            // 체크 해제한 경우 쿠키 삭제
+            document.cookie = "checkIdBox=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         }
     });
 </script>
-
-</body>
 </html>

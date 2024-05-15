@@ -8,7 +8,7 @@
     <title>회원가입</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    <script src="include/jquery-3.7.1.min.js"></script>
+    <script src="/jquery/jquery-3.7.1.min.js"></script>
 
     <style>
         body {
@@ -27,6 +27,7 @@
         }
         #joinpage1 {
             margin: 50px 50px 50px 50px;
+            text-align: center;
         }
         #label1 {
             cursor: pointer;
@@ -75,6 +76,7 @@
 <body>
 
 <div id="joinpage1">
+    <h1>회원가입 페이지</h1>
     <form role="form" method="post" action="/member/new" th:object="${memberRegFormDTO}">
         <div>
             <input type="text" th:field="*{name}" id="inputUsername1" class="form-control" placeholder="이름">
@@ -86,7 +88,7 @@
             <p th:if="${errorMessage}" th:text="${errorMessage}" class="errorMessage"></p> <!-- 이미 가입된 회원입니다 에러 메시지 출력 -->
         </div>
         <div>
-            <input type="text" th:field="*{age}" id="inputUserAge1" class="form-control" placeholder="나이">
+            <input type="text" th:field="*{age}" id="inputUserAge1" class="form-control" placeholder="생년월일(ex 240101)">
             <p th:if="${#fields.hasErrors('age')}" th:errors="*{age}" class="fieldError">입력 오류</p>
         </div>
         <div>
