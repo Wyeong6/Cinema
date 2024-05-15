@@ -10,14 +10,11 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MovieDTO {
 
-
-
     private Long id;
     private String title;
     private String poster;
     private String overview;
     private String runtime;
-    private String releaseDate;
     private String genres;
     private String score;
     private String certifications;
@@ -25,7 +22,4 @@ public class MovieDTO {
     private String video;
     private String posterPath;
     private String backdropPath;
-
-
-
 }

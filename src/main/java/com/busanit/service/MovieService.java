@@ -1,11 +1,19 @@
 package com.busanit.service;
-
 import com.busanit.domain.MovieDTO;
+import com.busanit.domain.MovieDetailDTO;
+import com.busanit.domain.MovieStillCutDTO;
 import com.busanit.entity.movie.Movie;
+import com.busanit.entity.movie.MovieDetail;
+import com.busanit.entity.movie.MovieStillCut;
+import com.busanit.repository.MovieDetailRepository;
 import com.busanit.repository.MovieRepository;
+import com.busanit.repository.MovieStillCutRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -15,16 +23,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MovieService {
 
     private final OkHttpClient client = new OkHttpClient();
     private final MovieRepository movieRepository;
+    private final MovieDetailRepository movieDetailRepository;
+    private final MovieStillCutRepository movieStillCutRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${TMDB.apiKey}")
@@ -103,41 +115,87 @@ public class MovieService {
 
 
 
-    public void fetchAndStoreMoviesRuntime() throws IOException {
+    public void fetchAndStoreMoviesRuntimeAndReleaseData() throws IOException {
         List<Long> movieIds = getAllMovieIds();
         for(Long movieId : movieIds) {
             String url = "https://api.themoviedb.org/3/movie/"+ movieId + "?language=ko-KR&api_key=" + apiKey;
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-//                processRuntimeResponse(responseBody);
+//                processRuntimeAndRealeasDataResponse(responseBody);
             }
         }
     }
 
-//    private void processRuntimeResponse(String responseBody) throws IOException {
-//        JsonNode jsonNode = objectMapper.readTree(responseBody);
-//        MovieDTO movieDTO = new MovieDTO();
-//        movieDTO.setId(jsonNode.get("id").asLong());
-//        movieDTO.setRuntime(jsonNode.get("runtime").asText());
-//
-//        JsonNode genresNode = jsonNode.get("genres");
-//
-////        String genresString = StreamSupport.stream(genresNode.spliterator(), false)
-////                .map(genreNode -> genreNode.get("name").asText())
-////                .collect(Collectors.joining(", "));
-////        movieDTO.setGenres(genresString);
-//
-//        Movie movie = movieRepository.findById(movieDTO.getId())
-//                .orElse(new Movie());
-//        movie.setMovieId(movieDTO.getId());
-//        movieRepository.save(movie);
-//    }
+    public void fetchAndStoreMovieRuntimeAndReleaseData() throws IOException {
+        List<Long> movieIds = getAllMovieIds();
+        for (Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/" + movieId + "?language=ko-KR&api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processRuntimeAndReleaseDataResponse(responseBody);
+            }
+        }
+    }
+
+    public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
+        MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
+        MovieDetail movieDetail = new MovieDetail();
+        movieDetail.setReleaseDate(movieDetailDTO.getRelease_date());
+        movieDetail.setRuntime(movieDetailDTO.getRuntime());
+        movieDetailRepository.save(movieDetail);
+    }
+
+//    https://api.themoviedb.org/3/movie/653346?language=ko-KR&api_key=547e2cd4d0e26e68fb907dafef4f90ac
+
+    public void fetchAndStoreMovieStillCuts() throws IOException {
+
+        List<Long> movieIds = getAllMovieIds();
+        for (Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/images?include_image_language=kr%2Cnull&language=KR&api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processStillCutsResponse(responseBody);
+            }
+        }
+    }
+
+    public void processStillCutsResponse(String responseBody) throws IOException {
+        MovieStillCutDTO movieStillCutDTO = objectMapper.readValue(responseBody, MovieStillCutDTO.class);
+
+//        List<String> filePaths = new ArrayList<>();
+        if (movieStillCutDTO.getBackdrops() != null) {
+            for (MovieStillCutDTO.ImageDTO backdrop : movieStillCutDTO.getBackdrops()) {
+                saveSingleStillCut(movieStillCutDTO.getId(), backdrop.getFile_path());
+            }
+        }
+        if (movieStillCutDTO.getPosters() != null) {
+            for (MovieStillCutDTO.ImageDTO poster : movieStillCutDTO.getPosters()) {
+                saveSingleStillCut(movieStillCutDTO.getId(), poster.getFile_path());
+            }
+        }
+
+    }
+
+    private void saveSingleStillCut(Long movieId, String filePath) {
+        Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + movieId));
+        MovieStillCut movieStillCut = movieStillCutRepository.findById(movieId).orElse(new MovieStillCut());
+        movieStillCut.setMovieStillCutId(movieId);
+        movieStillCut.setStillCuts(filePath); // 여기서는 각각의 filePath를 별도로 저장합니다.
+        movie.addStillCut(movieStillCut);
+        movieStillCutRepository.save(movieStillCut);
+        movieRepository.save(movie);
+    }
 
 
     public List<Movie> getAllMovies() {
         return movieRepository.findAll();
     }
+
+
+
 
 
 }

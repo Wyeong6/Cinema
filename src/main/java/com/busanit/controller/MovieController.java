@@ -17,5 +17,7 @@ public class MovieController {
     public void getMovies() throws IOException {
         movieService.fetchAndStoreMoviesNowPlaying();
 //        movieService.fetchAndStoreMoviesRuntime();
+        movieService.fetchAndStoreMovieRuntimeAndReleaseData();
+        movieService.fetchAndStoreMovieStillCuts();
     }
 }

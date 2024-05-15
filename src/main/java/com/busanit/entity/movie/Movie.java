@@ -27,16 +27,31 @@ public class Movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
+
+
     //영화 상세보기 관계
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_detail_id")
     private MovieDetail movieDetail;
+
+
     //이미지 관계
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<MovieImage> images;
 
+    //영화 스틸컷 관계
+    @ManyToMany
+    @JoinTable(name = "stillCuts",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "movie_still_cut_id"))
+    private List<MovieStillCut> stillCuts;
 
     //----------------얀관메서드
+
+    public void addStillCut(MovieStillCut stillCut) {
+        this.stillCuts.add(stillCut);
+        stillCut.getMovies().add(this);
+    }
 
     //장르추가
     public void addGenre(Genre genre) {
