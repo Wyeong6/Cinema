@@ -52,6 +52,10 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.coobird/thumbnailator
     implementation 'net.coobird:thumbnailator:0.4.20'
+
+    // 난수 생성
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+
 }
 
 tasks.named('test') {

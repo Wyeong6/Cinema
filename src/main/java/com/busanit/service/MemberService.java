@@ -18,18 +18,18 @@ import java.util.Optional;
 public class MemberService implements UserDetailsService { /* UserDetailsService 로그인을 위한 처리 */
     private final MemberRepository memberRepository;
 
-    public void saveMember(Member member){
+    public void saveMember(Member member) {
         // 회원 중복 체크
         validateDuplicateMember(member);
         memberRepository.save(member);
     }
 
     // 회원 중복 체크
-    private void validateDuplicateMember(Member member){
+    private void validateDuplicateMember(Member member) {
         Optional<Member> findMember = memberRepository.findByEmail(member.getEmail());
 
         // isPresent() - Optional 객체가 값을 가지고 있으면 true, 없으면 false 반환
-        if(findMember.isPresent()){
+        if (findMember.isPresent()) {
             throw new IllegalStateException("이미 가입된 회원입니다.");
         }
     }
@@ -38,7 +38,7 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<Member> findMember = memberRepository.findByEmail(email);
 
-        if(!findMember.isPresent()){
+        if (!findMember.isPresent()) {
             throw new UsernameNotFoundException(email);
         }
 
@@ -53,10 +53,18 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
     }
 
     // 아이디(이메일) 찾기
-    public String findUserEmail(String name, String age) { return memberRepository.findUserEmail(name, age); }
+    public String findUserEmail(String name, String age) {
+        return memberRepository.findUserEmail(name, age);
+    }
+
+    // 비밀번호 찾기
+    public boolean findUserPassword(String name, String age, String email) {
+        Long count = memberRepository.findUserPassword(name, age, email);
+        return count > 0; // count가 0보다 크면 true, 그렇지 않으면 false 반환
+    }
 
     // 비밀번호 수정
-    public void updatePassword(String password, String email){
+    public void updatePassword(String password, String email) {
         memberRepository.updatePassword(password, email);
     }
 

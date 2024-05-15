@@ -6,11 +6,9 @@ import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.entity.Member;
 import com.busanit.service.CustomOAuth2UserDetailsService;
 import com.busanit.service.MemberService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -19,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/member")
@@ -90,16 +87,36 @@ public class MemberController {
         return "redirect:/member/login";
     }
 
-    // 아이디 찾기
+    // 아이디(이메일) 찾기
     @GetMapping("/findId")
     public String findId() { return "member/findId"; }
 
     @PostMapping("/findId")
     public String findId(String name, String age, Model model) {
         String beforeMasking = memberService.findUserEmail(name, age);
-        model.addAttribute("findId", memberService.maskingEmail(beforeMasking));
+        model.addAttribute("findInfo", memberService.maskingEmail(beforeMasking));
 
-        return "member/findIdResult";
+        return "member/findResult";
+    }
+
+    // 아이디(이메일) 찾기
+    @GetMapping("/findPassword")
+    public String findPassword() { return "member/findPassword"; }
+
+    @PostMapping("/findPassword")
+    public String findPassword(String name, String age, String email, Model model) {
+        boolean findPassword = memberService.findUserPassword(name, age, email);
+
+        if (findPassword) { // 해당 정보값을 가진 사용자가 존재
+            String newPwd = RandomStringUtils.randomAlphanumeric(10);
+            memberService.updatePassword(passwordEncoder.encode(newPwd), email);
+            model.addAttribute("findInfo", newPwd);
+            model.addAttribute("newPassword", "true");
+        } else { // 해당 정보값을 가진 사용자가 존재하지 않음
+            model.addAttribute("findInfo", null);
+        }
+
+        return "member/findResult";
     }
 
     // password 수정

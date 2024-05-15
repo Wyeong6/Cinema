@@ -63,13 +63,18 @@
 <body>
 
 <div id="loginpage1"> <!--class="form-control"는 부트스트랩 사용-->
-    <h1>아이디 찾기</h1>
+    <h1>Result</h1>
     <div class="result-box">
-        <div th:if="${findId == null}">
+        <div th:if="${findInfo == null}">
             <p class="inquiry">조회결과가 없습니다.</p>
         </div>
-        <div th:if="${findId != null}">
-            <p th:text="${findId}"></p>
+        <div th:if="${findInfo != null && newPassword == null}">
+            <p th:text="${findInfo}"></p>
+        </div>
+        <div th:if="${findInfo != null && newPassword != null}">
+            <h3>임시 비밀번호가 발급되었습니다.</h3>
+            <p th:text="${findInfo}"></p>
+            <h5>안전을 위해 비밀번호를 변경해 주세요.</h5>
         </div>
     </div>
 </div>

@@ -17,6 +17,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m.email FROM Member m WHERE m.name = :name AND m.age = :age")
     String findUserEmail(String name, String age);
 
+    // 제공된 정보값과 일치하는 비밀번호가 있는지 검사
+    @Query("SELECT COUNT(m) FROM Member m WHERE m.name = :name AND m.age = :age AND m.email = :email")
+    Long findUserPassword(String name, String age, String email);
+
     // 비밀번호 수정
     @Modifying
     @Transactional
