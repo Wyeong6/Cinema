@@ -42,24 +42,6 @@ public class MemberController {
         return "member/login";
     }
 
-//    @PostMapping("/login")
-//    public String login(@RequestParam String email, @RequestParam String password, HttpServletRequest request, HttpServletResponse response) {
-//        // 아이디 기억하기 체크 여부 확인
-//        boolean checkIdBox = request.getParameter("checkIdBox") != null;
-//
-//        // 로그인 처리
-//
-//        // 아이디 기억하기가 체크된 경우, 쿠키에 아이디 저장
-//        if (checkIdBox) {
-//            Cookie cookie = new Cookie("checkIdBox", email);
-//            cookie.setMaxAge(30 * 24 * 60 * 60); // 30일 동안 유지
-//            cookie.setPath("/");
-//            response.addCookie(cookie);
-//        }
-//
-//        return "redirect:/";
-//    }
-
     @GetMapping("/new")
     public String register(Model model){
         model.addAttribute("memberRegFormDTO", new MemberRegFormDTO());
@@ -106,6 +88,18 @@ public class MemberController {
         }
 
         return "redirect:/member/login";
+    }
+
+    // 아이디 찾기
+    @GetMapping("/findId")
+    public String findId() { return "member/findId"; }
+
+    @PostMapping("/findId")
+    public String findId(String name, String age, Model model) {
+        String beforeMasking = memberService.findUserEmail(name, age);
+        model.addAttribute("findId", memberService.maskingEmail(beforeMasking));
+
+        return "member/findIdResult";
     }
 
     // password 수정

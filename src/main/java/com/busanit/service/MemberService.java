@@ -52,7 +52,19 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         return dto;
     }
 
+    // 아이디(이메일) 찾기
+    public String findUserEmail(String name, String age) { return memberRepository.findUserEmail(name, age); }
+
+    // 비밀번호 수정
     public void updatePassword(String password, String email){
         memberRepository.updatePassword(password, email);
+    }
+
+    // 개인정보(이메일) masking
+    public String maskingEmail(String email) {
+        if (email == null) return null;
+        if (email.length() <= 3) return email; // 길이가 3 이하인 경우 그대로 반환
+        String maskedPart = email.substring(3).replaceAll(".", "*"); // 앞 3자리를 제외한 나머지를 '*'로 마스킹
+        return email.substring(0, 3) + maskedPart;
     }
 }
