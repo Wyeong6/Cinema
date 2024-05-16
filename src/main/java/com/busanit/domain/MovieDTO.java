@@ -72,8 +72,6 @@ public class MovieDTO {
 
         return movieDTO;
     }
-
-
 //    public static MovieDTO convertToDTO(Movie movie){
 //        return MovieDTO.builder()
 //                .id(movie.getMovieId())
