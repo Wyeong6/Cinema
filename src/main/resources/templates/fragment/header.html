@@ -1,42 +1,53 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cinemacast</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/custom.css" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/nav.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<!-- Header -->
+<div id="header">
+    <h1 class="logo" style="font-size: 2em;"><a href="index.html">CINEMACAST</a></h1>
 
-<th:block th:fragment="header">
-    <head>
+    <!-- info -->
+    <div id="info">
+        <ul>
+            <li><a href="signup.html">회원가입</a></li>
+            <li><a href="login.html">로그인</a></li>
+            <li><a href="#">장바구니</a></li>
+        </ul>
+    </div>
 
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
+    <!-- Nav -->
+    <nav id="nav">
+        <ul>
+            <li>
+                <a href="#">영화</a>
+                <ul>
+                    <li><a href="movie_list_full.html">영화 전체보기</a></li>
+                    <li><a href="movie_list_now.html">현재 상영작</a></li>
+                    <li><a href="movie_list_comming.html">상영 예정작</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">예매</a>
+                <ul>
+                    <li><a href="#">예매</a></li>
+                    <li><a href="#">상영 시간표</a></li>
+                </ul>
+            </li>
+            <li><a href="left-sidebar.html">이벤트</a></li>
+            <!--								<li><a href="right-sidebar.html">Right Sidebar</a></li>-->
+            <li><a href="movie_list_now.html">공지사항</a></li>
+        </ul>
+    </nav>
 
-<!--        &lt;!&ndash; Bootstrap core CSS &ndash;&gt;-->
-<!--        <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">-->
-
-<!--        &lt;!&ndash; Custom styles for this template &ndash;&gt;-->
-<!--        <link th:href="@{/css/simple-sidebar.css}" rel="stylesheet">-->
-
-<!--        &lt;!&ndash; Bootstrap core JavaScript &ndash;&gt;-->
-<!--        <script th:src="@{/vendor/jquery/jquery.min.js}"></script>-->
-<!--        <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>-->
-
-    </head>
-    <body>
-        <div sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다. </div>
-        <div sec:authorize="hasRole('ADMIN')">Hello ADMIN</div>
-
-        <div sec:authorize="hasRole('ADMIN')">
-            <form action="/admin/movie" method="post">
-                <button type="submit">영화 관리자 페이지로 이동</button>
-            </form>
-            <form action="/admin/member" method="post">
-                <button type="submit">멤버 관리자 페이지로 이동</button>
-            </form>
-            <form action="/admin/help" method="post">
-                <button type="submit">고객센터 관리자 페이지로 이동</button>
-            </form>
-        </div>
-    </body>
-</th:block>
-
+</div>
+</body>
 </html>

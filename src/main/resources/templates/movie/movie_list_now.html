@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<!--
+	Helios by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Cinemacast</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/static/css/main.css" />
+		<link rel="stylesheet" href="/static/css/custom.css" />
+		<link rel="stylesheet" href="/static/css/nav.css" />
+		<noscript><link rel="stylesheet" href="/static/css/noscript.css" /></noscript>
+	</head>
+	<body class="no-sidebar is-preload">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+			<header data-include-path="./header.html"></header>
+
+			<!-- Main movie_list 한 페이지에 16개 정도되게 해주세요 -->
+				<div class="wrapper style1 movie_list">
+
+					<div class="container">
+						<article id="main" class="special">
+							<header>
+								<h2><a href="#">현재 상영작</a></h2>
+								<p>
+									Morbi convallis lectus malesuada sed fermentum dolore amet
+								</p>
+							</header>
+						</article>
+						<hr />
+						<div class="row">
+							<article class="col-3 col-12-mobile special">
+								<a href="#" class="image featured"><img src="/static/css/images/pic07.jpg" alt="" /></a>
+								<header>
+									<h3><a href="#">Gravida aliquam penatibus</a></h3>
+								</header>
+								<p>
+
+								</p>
+							</article>
+							<article class="col-3 col-12-mobile special">
+								<a href="#" class="image featured"><img src="/static/css/images/pic08.jpg" alt="" /></a>
+								<header>
+									<h3><a href="#">Sed quis rhoncus placerat</a></h3>
+								</header>
+								<p>
+
+								</p>
+							</article>
+							<article class="col-3 col-12-mobile special">
+								<a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+								<header>
+									<h3><a href="#">Magna laoreet et aliquam</a></h3>
+								</header>
+								<p>
+
+								</p>
+							</article>
+							<article class="col-3 col-12-mobile special">
+								<a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+								<header>
+									<h3><a href="#">Magna laoreet et aliquam</a></h3>
+								</header>
+								<p>
+
+								</p>
+							</article>
+							<article class="col-3 col-12-mobile special">
+								<a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+								<header>
+									<h3><a href="#">Magna laoreet et aliquam</a></h3>
+								</header>
+								<p>
+
+								</p>
+							</article>
+							<article class="col-3 col-12-mobile special">
+								<a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+								<header>
+									<h3><a href="#">Magna laoreet et aliquam</a></h3>
+								</header>
+								<p>
+
+								</p>
+							</article>
+							<article class="col-3 col-12-mobile special">
+								<a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+								<header>
+									<h3><a href="#">Magna laoreet et aliquam</a></h3>
+								</header>
+								<p>
+
+								</p>
+							</article>
+							<article class="col-3 col-12-mobile special">
+								<a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+								<header>
+									<h3><a href="#">Magna laoreet et aliquam</a></h3>
+								</header>
+								<p>
+
+								</p>
+							</article>
+						</div>
+					</div>
+
+				</div>
+
+			<footer data-include-path="footer.html"></footer>
+
+		</div>
+
+		<!-- Scripts -->
+			<script src="/static/js/jquery.min.js"></script>
+			<script src="/static/js/jquery.dropotron.min.js"></script>
+			<script src="/static/js/jquery.scrolly.min.js"></script>
+			<script src="/static/js/jquery.scrollex.min.js"></script>
+			<script src="/static/js/browser.min.js"></script>
+			<script src="/static/js/breakpoints.min.js"></script>
+			<script src="/static/js/util.js"></script>
+			<script src="/static/js/main.js"></script>
+
+		<script>
+			// include.js
+			window.addEventListener('load', function() {
+				var allElements = document.getElementsByTagName('*');
+				Array.prototype.forEach.call(allElements, function(el) {
+					var includePath = el.dataset.includePath;
+					if (includePath) {
+						var xhttp = new XMLHttpRequest();
+						xhttp.onreadystatechange = function () {
+							if (this.readyState == 4 && this.status == 200) {
+								el.outerHTML = this.responseText;
+							}
+						};
+						xhttp.open('GET', includePath, true);
+						xhttp.send();
+					}
+				});
+			});
+		</script>
+
+	</body>
+</html>

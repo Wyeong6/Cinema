@@ -136,7 +136,6 @@ public class MovieService {
     private void processMovieData(JsonNode node) throws IOException {
         // JSON 노드를 MovieDTO로 변환
         MovieDTO movieDTO = objectMapper.treeToValue(node, MovieDTO.class);
-        System.out.println("TEST 무비 디티오의 ID = " + movieDTO.getId() );
         Movie movie = getOrCreateMovie(movieDTO);
         updateMovieWithDTOInfo(movie, movieDTO);
 

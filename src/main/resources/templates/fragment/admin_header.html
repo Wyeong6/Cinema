@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block th:fragment="header">
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+<!--        &lt;!&ndash; Bootstrap core CSS &ndash;&gt;-->
+<!--        <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">-->
+
+<!--        &lt;!&ndash; Custom styles for this template &ndash;&gt;-->
+<!--        <link th:href="@{/css/simple-sidebar.css}" rel="stylesheet">-->
+
+<!--        &lt;!&ndash; Bootstrap core JavaScript &ndash;&gt;-->
+<!--        <script th:src="@{/vendor/jquery/jquery.min.js}"></script>-->
+<!--        <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>-->
+
+    </head>
+    <body>
+        <div sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다. </div>
+        <div sec:authorize="hasRole('ADMIN')">Hello ADMIN</div>
+
+        <div sec:authorize="hasRole('ADMIN')">
+            <form action="/admin/movie" method="post">
+                <button type="submit">영화 관리자 페이지로 이동</button>
+            </form>
+            <form action="/admin/member" method="post">
+                <button type="submit">멤버 관리자 페이지로 이동</button>
+            </form>
+            <form action="/admin/help" method="post">
+                <button type="submit">고객센터 관리자 페이지로 이동</button>
+            </form>
+        </div>
+    </body>
+</th:block>
+
+</html>

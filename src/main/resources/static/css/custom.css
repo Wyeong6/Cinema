@@ -1,0 +1,146 @@
+@font-face {
+    font-family: 'MyCustomFont';
+    src: url('/assets/css/font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
+}
+
+.logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 2% 0 0 42%;
+    font-family: 'MyCustomFont', sans-serif;
+    z-index: 9999999;
+}
+
+#info {
+    position: absolute;
+    top: 2%;
+    right:1em;
+    width: auto;
+    height: 37px;
+    z-index: 9999;
+}
+
+#info ul {
+    display: flex;
+    justify-content: space-between;
+    list-style-type: none;
+}
+
+#info ul li {
+    font-size: 13px;
+    margin-right: 10px;
+}
+
+/* 메인 페이지 */
+#img_btn {
+    position: absolute;
+    top: 40%;
+    right: 1%;
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+}
+
+#img_btn .btn {
+    background: none;
+    font-size: 0.8em;
+    padding: 0.65em 1em 0.65em 1em;
+}
+#img_btn .clicked {
+    color: #df7366;
+    font-size: 2em;
+}
+
+#img_btn .btn:hover {
+    color: #df7366;
+    font-size: 1em;
+}
+.carousel .section_title {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8em 2em 8em;
+}
+.carousel article {
+    position: relative; /* <article> 요소에 상대 위치 지정 */
+    display: inline-block; /* 요소들이 인라인으로 나타나도록 설정 */
+}
+.carousel .overlay-img {
+    width: 7em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* 겹쳐진 이미지가 위에 표시되도록 설정 */
+    margin-top: 8em;
+}
+.carousel .ten {
+    width: 5em;
+    margin-top: 9em;
+    margin-left: 1em;
+}
+.carousel header > p {
+    font-size: 1em;
+    margin-bottom: 0;
+}
+.carousel header > p > img {
+    width: 1em;
+}
+.carousel .button_box {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5em 1.5em 0;
+    z-index: 99999;
+}
+.carousel .button_box .reservation_btn {
+    background: #df7366;
+    color: #fff;
+}
+.carousel .button_box .get_btn {
+    background: #555555;
+    z-index: 99999;
+}
+#features article {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#features header > p {
+    font-size: 0.8em;
+    margin-bottom: 1em;
+}
+#features .more_btn {
+    text-align: right;
+}
+
+/* 상세 페이지 */
+.wrapper .container #main img {
+    width: 100%
+}
+#get_header {
+    display: flex;
+    justify-content: flex-start;
+}
+#get_header .movie_info {
+    width: 55%;
+    margin-left: 5%;
+}
+#get_header .movie_data_box {
+    margin-top: 50%;
+    display: flex;
+    justify-content: space-between;
+}
+#get_header .movie_data {
+    margin-right: 5%;
+}
+#stillcut h2 {
+    margin-bottom: 2%;
+}
+/* 현재 상영작 페이지*/
+.movie_list {
+    padding: 4em 0 6em 0;
+    height: auto;
+}
+.movie_list hr {
+    top:0;
+    margin-bottom: 4em;
+}
