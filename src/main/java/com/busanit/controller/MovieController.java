@@ -25,6 +25,7 @@ public class MovieController {
 //        movieService.fetchAndStoreMoviesRuntime();
         movieService.fetchAndStoreMovieRuntimeAndReleaseData();
         movieService.fetchAndStoreMovieStillCuts();
+        movieService.fetchAndStoreCertificationData();
     }
 //    @CrossOrigin(origins = "http://localhost:3000")
 //    @GetMapping("/api/movies")
