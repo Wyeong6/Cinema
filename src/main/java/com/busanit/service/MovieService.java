@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -144,7 +145,9 @@ public class MovieService {
         MovieDetail movieDetail = new MovieDetail();
         movieDetail.setReleaseDate(movieDetailDTO.getRelease_date());
         movieDetail.setRuntime(movieDetailDTO.getRuntime());
+
         movieDetailRepository.save(movieDetail);
+
     }
 
 //    https://api.themoviedb.org/3/movie/653346?language=ko-KR&api_key=547e2cd4d0e26e68fb907dafef4f90ac
@@ -181,8 +184,8 @@ public class MovieService {
 
     private void saveSingleStillCut(Long movieId, String filePath) {
         Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + movieId));
-        MovieStillCut movieStillCut = movieStillCutRepository.findById(movieId).orElse(new MovieStillCut());
-        movieStillCut.setMovieStillCutId(movieId);
+        MovieStillCut movieStillCut = new MovieStillCut();
+//        movieStillCut.setMovieStillCutId(movieId);
         movieStillCut.setStillCuts(filePath); // 여기서는 각각의 filePath를 별도로 저장합니다.
         movie.addStillCut(movieStillCut);
         movieStillCutRepository.save(movieStillCut);

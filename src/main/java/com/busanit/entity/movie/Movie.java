@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,7 +31,7 @@ public class Movie {
 
 
     //영화 상세보기 관계
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_detail_id")
     private MovieDetail movieDetail;
 
@@ -44,7 +45,7 @@ public class Movie {
     @JoinTable(name = "stillCuts",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_still_cut_id"))
-    private List<MovieStillCut> stillCuts;
+    private List<MovieStillCut> stillCuts = new ArrayList<>();
 
     //----------------얀관메서드
 
