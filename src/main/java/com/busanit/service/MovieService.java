@@ -9,17 +9,12 @@ import com.busanit.repository.MovieDetailRepository;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.MovieStillCutRepository;
 import com.busanit.entity.movie.Genre;
-import com.busanit.entity.movie.Movie;
-import com.busanit.entity.movie.MovieDetail;
 import com.busanit.entity.movie.MovieImage;
 import com.busanit.repository.GenreRepository;
-import com.busanit.repository.MovieDetailRepository;
-import com.busanit.repository.MovieRepository;
 import com.busanit.util.GenreUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,12 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -288,7 +279,11 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-
+    public List<MovieDTO> getHotMovies(){
+        List<Movie> movieList = movieRepository.findAllByOrderByMovieDetailPopularityDesc();
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
 
 }

@@ -39,6 +39,7 @@
                                 <p><b>장르 : </b>genres</p>
                                 <p><b>상영시간 : </b>runtime</p>
                                 <p><b>감독 : </b>director <b>각본 : </b>writer</p>
+
                                 <div class="movie_data_box">
                                     <div class="movie_data">
                                         <h4>누적 관객수</h4>
@@ -56,6 +57,7 @@
                             </div>
 
                         </div>
+                        <div id="movie-info"></div>
                         <p>
                             Commodo id natoque malesuada sollicitudin elit suscipit. Curae suspendisse mauris posuere accumsan massa
                             posuere lacus convallis tellus interdum. Amet nullam fringilla nibh nulla convallis ut venenatis purus
@@ -130,13 +132,13 @@
                 <h2>StillCut</h2>
                 <div class="row">
                     <article class="col-4 col-12-mobile special">
-                        <a href="#" class="image featured"><img src="images/pic07.jpg" alt="" /></a>
+                        <a href="#" class="image featured"><img src="/static/css/images/pic07.jpg" alt="" /></a>
                     </article>
                     <article class="col-4 col-12-mobile special">
-                        <a href="#" class="image featured"><img src="images/pic08.jpg" alt="" /></a>
+                        <a href="#" class="image featured"><img src="/static/css/images/pic08.jpg" alt="" /></a>
                     </article>
                     <article class="col-4 col-12-mobile special">
-                        <a href="#" class="image featured"><img src="images/pic09.jpg" alt="" /></a>
+                        <a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
                     </article>
                 </div>
             </div>
@@ -148,14 +150,14 @@
 </div>
 
 <!-- Scripts -->
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/js/jquery.dropotron.min.js"></script>
-<script src="assets/js/jquery.scrolly.min.js"></script>
-<script src="assets/js/jquery.scrollex.min.js"></script>
-<script src="assets/js/browser.min.js"></script>
-<script src="assets/js/breakpoints.min.js"></script>
-<script src="assets/js/util.js"></script>
-<script src="assets/js/main.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/jquery.dropotron.min.js"></script>
+<script src="/static/js/jquery.scrolly.min.js"></script>
+<script src="/static/js/jquery.scrollex.min.js"></script>
+<script src="/static/js/browser.min.js"></script>
+<script src="/static/js/breakpoints.min.js"></script>
+<script src="/static/js/util.js"></script>
+<script src="/static/js/main.js"></script>
 
 <script>
     // include.js
@@ -175,7 +177,97 @@
             }
         });
     });
+
+    const options = {
+        method: 'GET',
+        headers: {
+            accept: 'application/json',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
+        }
+    };
+
+    async function fetchMovieCredits() {
+        try {
+            const response = await fetch('https://api.themoviedb.org/3/movie/1011985/credits?language=ko-KR', options);
+            const data = await response.json();
+
+            // 영화 정보를 담을 요소 생성
+            const movieInfoDiv = document.getElementById('movie-info');
+            movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
+            movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
+
+            // 출연진 정보 출력 (이미지 포함)
+            data.cast.slice(0, 5).forEach(cast => {
+                const castDiv = createPersonDiv(cast.name, cast.profile_path);
+                movieInfoDiv.appendChild(castDiv); // castDiv를 movieInfoDiv에 추가
+            });
+
+            // 감독 정보 출력 (이미지 포함)
+            const director = data.crew.find(person => person.job === 'Director');
+            if (director) {
+                const directorDiv = createPersonDiv(director.name, director.profile_path, true);
+                movieInfoDiv.appendChild(directorDiv); // directorDiv를 movieInfoDiv에 추가
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // 인물 정보와 이미지를 담은 div 생성 함수
+    function createPersonDiv(name, profilePath, isDirector = false) {
+        const personDiv = document.createElement('div'); // 새로운 div 생성
+        personDiv.style.margin = '5px'; // 간격 설정
+
+        const p = document.createElement('p');
+        p.innerHTML = isDirector ? `<b>감독 : </b>${name}` : name;
+        p.style.fontSize = '15px'; // 글자 크기 작게 설정
+
+        const img = document.createElement('img');
+        img.src = `https://image.tmdb.org/t/p/w200${profilePath}`; // 이미지 경로 설정
+        img.alt = `${name}'s profile image`;
+        img.style.width = '40px';
+        img.style.height = 'auto'; // 높이를 자동으로 설정
+
+        personDiv.appendChild(p);
+        personDiv.appendChild(img);
+
+        return personDiv;
+    }
+
+    fetchMovieCredits();
+
+    const api = {
+        method: 'GET',
+        headers: {
+            accept: 'application/json',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
+        }
+    };
+
+
+
+
 </script>
+
+
+<div th:each="movie, iterStat : ${movies}">
+    <div>
+        <h2>영화 번호: <span th:text="${movie.id}">영화 번호</span></h2>
+        <h3>영화 이름: <span th:text="${movie.title}">영화 이름</span></h3>
+        <p>영화 설명: <span th:text="${movie.overview}">영화 설명</span></p>
+        <p>영화 장르: <span th:text="${#strings.listJoin(movie.genres, ', ')}">영화 장르</span></p>
+        <p>영화 평점: <span th:text="${movie.voteAverage}">영화 평점</span></p>
+        <p>인기도: <span th:text="${movie.popularity}">인기도</span></p>
+        <div th:if="${movie.video}">
+            <p>영화 비디오:</p>
+            <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p>영화 배경사진:</p>
+        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경사진" />
+        <p>영화 포스터:</p>
+        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.posterPath}}" alt="포스터" />
+    </div>
+</div>
 
 </body>
 </html>
