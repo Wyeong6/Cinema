@@ -11,18 +11,18 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.List;
 
-@RestController
+//@RestController
 @RequiredArgsConstructor
 public class MovieController {
 
     private final MovieService movieService;
 
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/api/movies")
-    public ResponseEntity<List<MovieDTO>> getMovies() throws IOException {
-        movieService.fetchAndStoreMoviesNowPlaying();
-        List<MovieDTO> movies = movieService.getAllMovies();
-
-        return ResponseEntity.ok(movies);
-    }
+//    @CrossOrigin(origins = "http://localhost:3000")
+//    @GetMapping("/api/movies")
+//    public ResponseEntity<List<MovieDTO>> getMovies() throws IOException {
+//        movieService.fetchAndStoreMoviesNowPlaying();
+//        List<MovieDTO> movies = movieService.getAllMovies();
+//
+//        return ResponseEntity.ok(movies);
+//    }
 }
