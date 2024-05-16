@@ -1,7 +1,13 @@
 package com.busanit.service;
-
 import com.busanit.domain.MovieDTO;
 import com.busanit.domain.MovieDetailDTO;
+import com.busanit.domain.MovieStillCutDTO;
+import com.busanit.entity.movie.Movie;
+import com.busanit.entity.movie.MovieDetail;
+import com.busanit.entity.movie.MovieStillCut;
+import com.busanit.repository.MovieDetailRepository;
+import com.busanit.repository.MovieRepository;
+import com.busanit.repository.MovieStillCutRepository;
 import com.busanit.entity.movie.Genre;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieDetail;
@@ -13,6 +19,8 @@ import com.busanit.util.GenreUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -32,19 +40,27 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MovieService {
 
     private final OkHttpClient client = new OkHttpClient();
     private final MovieRepository movieRepository;
-    private final GenreRepository genreRepository;
     private final MovieDetailRepository movieDetailRepository;
+    private final MovieStillCutRepository movieStillCutRepository;
+    private final GenreRepository genreRepository;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${TMDB.apiKey}")
     private String apiKey;
 
-
     /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
+
+    // API에서 받아온 현재상영목록 리스트에서 모든 영화 ID 추출하는 메서드 (나중에 다른 api 데이터들도 영화id를 기준으로 데이터를가져오기때문에 씀)
+    public List<Long> getAllMovieIds() {
+        List<Movie> movies = movieRepository.findAll();
+        return movies.stream().map(Movie::getMovieId).collect(Collectors.toList());
+    }
 
     @Scheduled(cron = "0 0 * * * *") // 1시간마다 메소드 실행
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
@@ -120,6 +136,7 @@ public class MovieService {
     private void processMovieData(JsonNode node) throws IOException {
         // JSON 노드를 MovieDTO로 변환
         MovieDTO movieDTO = objectMapper.treeToValue(node, MovieDTO.class);
+        System.out.println("TEST 무비 디티오의 ID = " + movieDTO.getId() );
         Movie movie = getOrCreateMovie(movieDTO);
         updateMovieWithDTOInfo(movie, movieDTO);
 
@@ -132,10 +149,8 @@ public class MovieService {
         movieDetail.setVoteAverage(movieDTO.getVoteAverage());
         movieDetail.setPopularity(movieDTO.getPopularity());
         movie.setMovieDetail(movieDetail);
-
         // 장르 정보 처리
         processGenreData(movie, movieDTO);
-
         // 영화 이미지 정보 처리
         processImageData(node, movie);
     }
@@ -181,8 +196,73 @@ public class MovieService {
                             return genreRepository.save(newGenre); // 데이터베이스에 저장
                         });
                 movie.addGenre(genre); // 영화에 장르 추가
+
             }
         }
+    }
+
+
+    public void fetchAndStoreMovieRuntimeAndReleaseData() throws IOException {
+        List<Long> movieIds = getAllMovieIds();
+        for (Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/" + movieId + "?language=ko-KR&api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processRuntimeAndReleaseDataResponse(responseBody);
+            }
+        }
+    }
+
+    public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
+        MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
+        Movie movie = movieRepository.findById(movieDetailDTO.getId()).orElse(new Movie());
+        MovieDetail movieDetail = getOrCreateMovieDetail(movie);
+        movieDetail.setReleaseDate(movieDetailDTO.getRelease_date());
+        movieDetail.setRuntime(movieDetailDTO.getRuntime());
+        movieDetailRepository.save(movieDetail);
+    }
+
+//    https://api.themoviedb.org/3/movie/653346?language=ko-KR&api_key=547e2cd4d0e26e68fb907dafef4f90ac
+
+    public void fetchAndStoreMovieStillCuts() throws IOException {
+
+        List<Long> movieIds = getAllMovieIds();
+        for (Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/images?include_image_language=kr%2Cnull&language=KR&api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processStillCutsResponse(responseBody);
+            }
+        }
+    }
+
+    public void processStillCutsResponse(String responseBody) throws IOException {
+        MovieStillCutDTO movieStillCutDTO = objectMapper.readValue(responseBody, MovieStillCutDTO.class);
+
+//        List<String> filePaths = new ArrayList<>();
+        if (movieStillCutDTO.getBackdrops() != null) {
+            for (MovieStillCutDTO.ImageDTO backdrop : movieStillCutDTO.getBackdrops()) {
+                saveSingleStillCut(movieStillCutDTO.getId(), backdrop.getFile_path());
+            }
+        }
+        if (movieStillCutDTO.getPosters() != null) {
+            for (MovieStillCutDTO.ImageDTO poster : movieStillCutDTO.getPosters()) {
+                saveSingleStillCut(movieStillCutDTO.getId(), poster.getFile_path());
+            }
+        }
+
+    }
+
+    private void saveSingleStillCut(Long movieId, String filePath) {
+        Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + movieId));
+        MovieStillCut movieStillCut = new MovieStillCut();
+//        movieStillCut.setMovieStillCutId(movieId);
+        movieStillCut.setStillCuts(filePath); // 여기서는 각각의 filePath를 별도로 저장합니다.
+        movie.addStillCut(movieStillCut);
+        movieStillCutRepository.save(movieStillCut);
+        movieRepository.save(movie);
     }
 
     // MovieImage 객체 생성 및 posterPath 설정
@@ -208,5 +288,8 @@ public class MovieService {
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+
+
 
 }

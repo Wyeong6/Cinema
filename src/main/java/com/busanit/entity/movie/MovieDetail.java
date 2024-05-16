@@ -14,24 +14,22 @@ public class MovieDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movieDetailId;
-
     //상영시간
-    private int runtime;
+    private String runtime;
     //개봉일
-    private LocalDate releaseDate;
+    private String releaseDate;
+    //심의등급
+    private String certification;
     //평점
     private double voteAverage;
     //비디오
     private String video;
-    //스틸컷
-    private String stillCut;
-    //심의등급
-    private String certificationName;
     //인기
     private String popularity;
 
     //영화 엔티티와 일대일 관계
-    @OneToOne(mappedBy = "movieDetail",fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id")
     private Movie movie;
 
 

@@ -11,7 +11,6 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 public class Movie {
 
@@ -35,25 +34,40 @@ public class Movie {
     private List<Genre> genres = new ArrayList<>();
 
     //영화 상세보기 관계
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_detail_id")
     private MovieDetail movieDetail;
+
 
     //이미지 관계
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private List<MovieImage> images;
 
+    //영화 스틸컷 관계
+    @ManyToMany
+    @JoinTable(name = "stillCuts",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "movie_still_cut_id"))
+    private List<MovieStillCut> stillCuts = new ArrayList<>();
 
-    //----------------연관메서드
+
+    public void addStillCut(MovieStillCut stillCut) {
+        this.stillCuts.add(stillCut);
+        stillCut.getMovies().add(this);
+    }
+
     //장르추가
     public void addGenre(Genre genre) {
         this.genres.add(genre);
         genre.getMovies().add(this);
     }
     // 영화 상세 설정
+
     public void setMovieDetail(MovieDetail movieDetail) {
         this.movieDetail = movieDetail;
-        movieDetail.setMovie(this);
+        if (movieDetail != null) {
+            movieDetail.setMovie(this);
+        }
     }
     //이미지 추가
     public void addImage(MovieImage image) {
