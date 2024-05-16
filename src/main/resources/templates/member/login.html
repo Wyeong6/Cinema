@@ -110,8 +110,8 @@
 
         // 가져온 아이디 값을 아이디 입력 필드에 채움
         if(username) {
-            document.getElementById("inputUsername1").value = username;
-            document.getElementById("checkIdBox").checked = true; // 쿠키가 있으면 체크박스를 체크 상태로 설정
+            document.getElementById("email_login").value = username;
+            document.getElementById("remember_email").checked = true; // 쿠키가 있으면 체크박스를 체크 상태로 설정
         }
     };
 
@@ -133,7 +133,7 @@
 
     document.getElementById("loginForm").addEventListener("submit", function(event) {
         var checkIdBox = document.getElementById("remember_email");
-        var username = document.getElementById("email").value;
+        var username = document.getElementById("email_login").value;
         // 서버로부터 받은 응답
         var responseData = {
             email: username,

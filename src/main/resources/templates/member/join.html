@@ -26,6 +26,7 @@
 
             $("#modal_essential_chk").click(function(event) {
                 if($(this).prop("checked")) { // 체크박스가 체크되었을 때만 실행
+                    $("#essential_chk").prop("checked", true);
                     $("#essential_modal").css("display", "none"); // 모달 닫기
                     $("#modal_overlay").css("display", "none"); // 모달 배경 숨기기
                 }
@@ -38,6 +39,7 @@
 
             $("#modal_optional_chk").click(function(event) {
                 if($(this).prop("checked")) { // 체크박스가 체크되었을 때만 실행
+                    $("#optional_chk").prop("checked", true);
                     $("#optional_modal").css("display", "none"); // 모달 닫기
                     $("#modal_overlay").css("display", "none"); // 모달 배경 숨기기
                 }
