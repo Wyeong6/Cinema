@@ -137,18 +137,51 @@ form{
             box-shadow: 0 0 0 rgba(233, 30, 99, 0);
         }
     }
-    #find {
-        width: 92.5%;
-        margin: 0 auto;
-        margin-top: 1em;
-        display: flex;
-        justify-content: space-between;
-    }
-    .find_link {
-        background: none;
-        border: none;
-        color: #fff;
-    }
+}
+.terms-container {
+    width: 90%;
+    margin: 0 auto;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    display: flex;
+    flex-direction: row;
+    align-items: center; /* 수직 가운데 정렬을 위해 */
+}
+.terms-container .terms_show {
+    height: 5%;
+    margin-left: 3%; /* 버튼과 label 사이의 간격 조정 */
+    background: #c4c3ca;
+    border: none;
+    border-radius: 5px;
+}
+.terms-container input[type="checkbox"] {
+    margin-left: 50%;
+}
+
+.terms-container label {
+    color:#fff;
+}
+
+#sign_action {
+    width: 92.5%;
+    margin: 0 auto;
+    margin-top: 2em;
+    display: flex;
+    justify-content: space-between;
+}
+#find {
+    float: left;
+    display: flex;
+    flex-direction: row;
+}
+.find_link {
+    background: none;
+    border: none;
+    color: #fff;
+}
+.remember_email label {
+    color: #fff;
+    font-size: 14px;
 }
 
 .separator{
@@ -236,4 +269,58 @@ footer{
             color: #c4c3ca;
         }
     }
+}
+
+#modal_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 투명한 검은색 배경 */
+    backdrop-filter: blur(5px); /* 배경 블러 효과 */
+    z-index: 999; /* 모달보다 위에 표시되도록 z-index 설정 */
+    display: none; /* 초기에는 숨겨짐 */
+}
+
+/* 모달 창 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999999;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 80%;
+    overflow: auto;
+    background: #eeeeee;
+    border-radius: 30px;
+}
+
+.modal h1 {
+    margin: 50px 0 30px 0;
+    color: #1f1920;
+    font-size: 30px;
+}
+.modal_content {
+    width: 80%;
+    height: 70%;
+    margin: 0 auto;
+}
+.modal_content textarea {
+    width: 100%;
+    height: 80%; /* 원하는 높이로 조절하세요 */
+    resize: none; /* 사용자가 크기를 조절하지 못하도록 설정 */
+    border: none;
+    background: #eeeeee;
+    font-size: 15px;
+    user-select: none; /* 텍스트 선택을 비활성화하여 수정을 방지 */
+    overflow-y: scroll; /* 세로 스크롤만 표시되도록 설정 */
+}
+
+.modal_terms_agree {
+    margin-top: 5%;
+    display: flex;
+    justify-content: space-between;
 }

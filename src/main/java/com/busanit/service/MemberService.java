@@ -52,6 +52,9 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         return dto;
     }
 
+    // 사용자 email 로 member_id 찾기
+    public Long findUserIdx(String email) { return memberRepository.findUserIdx(email); }
+
     // 아이디(이메일) 찾기
     public String findUserEmail(String name, String age) {
         return memberRepository.findUserEmail(name, age);

@@ -1,105 +1,249 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns:layout="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    <script src="/jquery/jquery-3.7.1.min.js"></script>
-
-    <style>
-        body {
-            background-color: silver;
-        }
-        [id^="input"], #joincheck, p {
-            margin-top: 10px;
-            padding: 5px;
-            width: 300px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        #joincheck {
-            border: 1px solid white;
-        }
-        #joinpage1 {
-            margin: 50px 50px 50px 50px;
-            text-align: center;
-        }
-        #label1 {
-            cursor: pointer;
-        }
-        .hlogo {
-            width: 150px;
-            height: 30px;
-            cursor: pointer;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 10px;
-        }
-
-
-    </style>
-
+    <title>CINEMACAST</title>
+    <link href="/static/assets/css/login.css" rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        // function userSubmit() {
-        //     var cpw1 = document.getElementById("inputPassword1").value;
-        //     var cpw2 = document.getElementById("inputPassword2").value;
-        //
-        //     if (cpw1 != cpw2) {
-        //         alert("비밀번호가 일치하지 않습니다.")
-        //         return false;
-        //     } else {}
-        // };
+        $(document).ready(function() {
 
-        $(document).ready(function(){
-            $("#textbuttoncheck1").on(click, function(){
-                $("#check1").on(checked);
+            let reset = $("#reset");
+
+            //----------- reset ---------------------
+            reset.on("click", function(e) {
+                e.preventDefault();
+                $(this).parent().parent().siblings("form")
+                    .find(".input__block").find(".input").val("");
+                $(this).parent().parent().siblings("form")
+                    .find(".terms-container").find("input").val("");
             })
-        });
 
+            $("#modal_show1").click(function() {
+                $("#essential_modal").css("display", "block");
+                $("#modal_overlay").css("display", "block");
+            });
+
+            $("#modal_essential_chk").click(function(event) {
+                if($(this).prop("checked")) { // 체크박스가 체크되었을 때만 실행
+                    $("#essential_modal").css("display", "none"); // 모달 닫기
+                    $("#modal_overlay").css("display", "none"); // 모달 배경 숨기기
+                }
+            });
+
+            $("#modal_show2").click(function() {
+                $("#optional_modal").css("display", "block");
+                $("#modal_overlay").css("display", "block");
+            });
+
+            $("#modal_optional_chk").click(function(event) {
+                if($(this).prop("checked")) { // 체크박스가 체크되었을 때만 실행
+                    $("#optional_modal").css("display", "none"); // 모달 닫기
+                    $("#modal_overlay").css("display", "none"); // 모달 배경 숨기기
+                }
+            });
+        });
     </script>
 
+    <!--에러 메세지-->
     <script layout:fragment="javascript" th:inline="javascript">
-        $(document).ready(function(){
+        $(document).ready(function() {
             const errorMessage = [[${errorMessage}]];
-            if(errorMessage != null){
+            if(errorMessage != null) {
                 alert(errorMessage);
             }
         });
     </script>
+
+    <!-- css -->
+    <style>
+        .fieldError, .errorMessage {
+            color: white;
+        }
+    </style>
+
 </head>
 <body>
+<div class="container">
+    <!-- Heading -->
+    <h1>SIGN UP</h1>
 
-<div id="joinpage1">
-    <h1>회원가입 페이지</h1>
-    <form role="form" method="post" action="/member/new" th:object="${memberRegFormDTO}">
-        <div>
-            <input type="text" th:field="*{name}" id="inputUsername1" class="form-control" placeholder="이름">
-            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="fieldError">입력 오류</p>
+    <ul class="links">
+        <li>
+            <a href="#" id="signin"></a>
+        </li>
+        <li>
+            <a href="#" id="signup"></a>
+        </li>
+        <li>
+            <a href="#" id="reset">RESET</a>
+        </li>
+    </ul>
+
+    <!-- Form -->
+    <form action="/member/new" id="signup_form" method="post" th:object="${memberRegFormDTO}">
+        <!-- email input -->
+        <div class="first-input input__block first-input__block">
+            <input class="input" id="email_signup" placeholder="Email" th:field="*{email}" type="email"/>
+            <p class="fieldError" th:errors="*{email}" th:if="${#fields.hasErrors('email')}">입력 오류</p>
+            <p class="errorMessage" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+            <!-- 이미 가입된 회원입니다 에러 메시지 출력 -->
         </div>
-        <div>
-            <input type="email" th:field="*{email}" class="form-control" id="inputEmail1" placeholder="이메일">
-            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="fieldError">입력 오류</p>
-            <p th:if="${errorMessage}" th:text="${errorMessage}" class="errorMessage"></p> <!-- 이미 가입된 회원입니다 에러 메시지 출력 -->
+        <!-- password input -->
+        <div class="input__block">
+            <input class="input" id="password_signup" placeholder="Password" th:field="*{password}" type="password"/>
+            <p class="fieldError" th:errors="*{password}" th:if="${#fields.hasErrors('password')}">입력 오류</p>
         </div>
-        <div>
-            <input type="text" th:field="*{age}" id="inputUserAge1" class="form-control" placeholder="생년월일(ex 240101)">
-            <p th:if="${#fields.hasErrors('age')}" th:errors="*{age}" class="fieldError">입력 오류</p>
+        <!-- repeat password input -->
+        <div class="input__block">
+            <input class="input repeat__password" id="repeat__password_signup" placeholder="Repeat password"
+                   type="password"/>
         </div>
-        <div>
-            <input type="password" th:field="*{password}" id="inputPassword1" class="form-control" aria-describedby="passwordHelpBlock" placeholder="비밀번호">
-            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="fieldError">입력 오류</p>
+        <div class="input__block">
+            <input class="input name" id="name" placeholder="Name" th:field="*{name}" type="text"/>
+            <p class="fieldError" th:errors="*{name}" th:if="${#fields.hasErrors('name')}">입력 오류</p>
         </div>
-        <input type="submit" id="inputSubmit"  class="form-control" value="회원가입">
+        <div class="input__block">
+            <input class="input birth" id="birth" placeholder="Birth Date ex) 240101" th:field="*{age}" type="text"/>
+            <p class="fieldError" th:errors="*{age}" th:if="${#fields.hasErrors('age')}">입력 오류</p>
+        </div>
+        <div class="terms-container">
+            <label>개인정보 수집 및 이용동의(필수)</label>
+            <button id="modal_show1" type="button">약관 보기</button>
+            <input checked id="essential_chk" name="checkedTermsE" type="checkbox"/>
+        </div>
+        <div class="terms-container">
+            <label>마케팅 이용동의(선택)</label>
+            <button id="modal_show2" type="button">약관 보기</button>
+            <input id="optional_chk" name="checkedTermsS" style="margin-left: 60.5%" type="checkbox"/>
+        </div>
+        <!-- sign in button -->
+        <button class="signin__btn" type="submit">
+            Sign up
+        </button>
     </form>
+
+    <!-- separator -->
+    <div class="separator">
+        <p>OR</p>
+    </div>
+    <!-- google button -->
+    <button class="google_btn">
+        <i class="fa fa-google"><img alt="구글 아이콘" src="/static/images/google-logo.png"/></i>
+        Sign in with Google
+    </button>
+    <!-- naver button -->
+    <button class="naver_btn">
+        <i class="fa fa-github"><img alt="네이버 아이콘" src="/static/images/naver-logo.png"/></i>
+        Sign in with Naver (미구현)
+    </button>
 </div>
 
+<footer>
+    <p>
+        Thank you for watching
+    </p>
+</footer>
 
+<!-- 배경 블러 효과를 위한 요소 -->
+<div id="modal_overlay"></div>
 
+<div class="modal" id="essential_modal">
+    <h1>예매 사이트 개인정보 수집 및 이용동의서</h1>
+    <div class="modal_content">
+        <p>이용자의 소중한 개인정보를 보호하기 위하여, 본 예매 사이트는 관련 법령과 개인정보 보호 정책에 따라 이용자의 개인정보를 <br/>
+            안전하게 처리하고 관리하고자 합니다. 이에 본 사이트는 아래와 같은 내용으로 이용자의 개인정보를 수집 및 이용하고자 합니다.</p>
+        <label>
+            <textarea>
+1. 수집하는 개인정보 항목
+
+성명
+생년월일
+신용카드 정보 (선택)
+주소 (선택)
+
+2. 개인정보의 수집 및 이용목적
+
+본 사이트는 다음과 같은 목적을 위해 개인정보를 수집하고 이용합니다:
+
+영화 예매 및 관람 관련 서비스 제공
+예매 및 결제 관련 업무 처리
+고객상담 및 문의 응대
+서비스 제공에 관한 통지 및 정보 전달
+법령 및 이용약관 위반 행위에 대한 조사 및 대응
+3. 개인정보의 보유 및 이용기간
+
+이용자의 개인정보는 수집 및 이용목적이 달성된 후에는 지체 없이 파기됩니다. 단, 관련 법령에 따라 일정 기간 동안 보존될 수 있습니다.
+
+4. 개인정보의 제3자 제공
+
+본 사이트는 이용자의 개인정보를 제3자에게 제공하지 않습니다. 단, 아래의 경우에는 예외로 합니다:
+
+이용자의 동의가 있는 경우
+관련 법령에 의거하거나 법령의 규정에 따라 수사기관 등에 제공이 요구되는 경우
+5. 개인정보의 파기절차 및 방법
+
+이용자의 개인정보는 수집 및 이용목적이 달성된 후에는 지체 없이 파기됩니다. 파기절차 및 방법은 다음과 같습니다:
+
+파기절차: 이용자가 제공한 정보는 목적 달성 후 즉시 파기됩니다.
+파기방법: 종이에 출력된 개인정보는 분쇄기로 분쇄하거나 소각하고, 전자적 파일 형태로 저장된 개인정보는 기록을 재생할 수 없는 기술적 방법을 사용하여 삭제합니다.
+6. 개인정보의 안전성 확보 조치
+
+본 사이트는 이용자의 개인정보 보호를 위해 다음과 같은 기술적, 관리적, 물리적 보안 조치를 취하고 있습니다:
+
+개인정보에 대한 접근 제한
+보안 프로그램 설치 및 운영
+해킹 등에 대비한 대책
+            </textarea>
+            <div class="modal_terms_agree">
+                <label for="modal_essential_chk">위와 같은 내용을 확인하고 동의합니다.</label>
+                <input id="modal_essential_chk" type="checkbox"/>
+            </div>
+        </label>
+    </div>
+</div>
+
+<div class="modal" id="optional_modal">
+    <h1>예매 사이트 마케팅 이용동의</h1>
+    <div class="modal_content">
+        <p>이용자의 소중한 개인정보를 보호하기 위하여, 본 예매 사이트는 관련 법령과 개인정보 보호 정책에 따라 이용자의 개인정보를 <br/>
+            안전하게 처리하고 관리하고자 합니다. 이에 본 사이트는 아래와 같은 내용으로 이용자의 개인정보를 수집 및 이용하고자 합니다.</p>
+        <label>
+            <textarea>
+개인정보 수집 및 이용:
+
+가. 수집 항목: 이름, 연락처, 이메일 주소 등
+
+나. 수집 목적: 영화 예매 서비스 제공 및 이용자 식별
+
+다. 보유 및 이용 기간: 서비스 이용 종료 시까지
+
+라. 제 3자 제공: 법령에 의한 경우를 제외하고 제 3자에게 제공하지 않음
+
+마케팅 정보 수신:
+
+가. 이메일, SMS 등의 수단으로 [영화 예매 사이트명]의 프로모션, 할인 정보, 이벤트 소식 등을 받음에 동의합니다.
+
+나. 동의 여부에 관계 없이 필수적인 서비스 공지 및 정보는 제외됩니다.
+
+정보의 제공 및 수정:
+
+가. 제공한 정보의 정확성은 본인 책임이며, 변경이 있는 경우 즉시 수정해야 합니다.
+
+나. 정보 수정은 마이페이지 또는 고객센터를 통해 가능합니다.
+
+동의 철회:
+
+가. 마케팅 정보 수신 동의는 언제든지 철회할 수 있습니다.
+
+나. 동의 철회는 마이페이지 내 설정 또는 고객센터를 통해 가능합니다.
+            </textarea>
+            <div class="modal_terms_agree">
+                <label for="modal_optional_chk">위와 같은 내용을 확인하고 동의합니다.</label>
+                <input id="modal_optional_chk" type="checkbox"/>
+            </div>
+        </label>
+    </div>
+</div>
 </body>
 </html>
