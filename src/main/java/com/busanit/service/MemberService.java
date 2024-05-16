@@ -75,4 +75,5 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         String maskedPart = email.substring(3).replaceAll(".", "*"); // 앞 3자리를 제외한 나머지를 '*'로 마스킹
         return email.substring(0, 3) + maskedPart;
     }
+
 }

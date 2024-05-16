@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+>
+
+<th:block layout:fragment="content">
+    <head>
+        <meta charset="UTF-8">
+        <title>Notice Details</title>
+    </head>
+    <body>
+    <div th:fragment="noticeDetails">
+        <h2>Notice Details</h2>
+        <table>
+            <tr>
+                <td>Number:</td>
+                <td th:text="${notice.id}"></td>
+            </tr>
+            <tr>
+                <td>Title:</td>
+                <td th:text="${notice.title}"></td>
+            </tr>
+            <tr>
+                <td>Registration Date:</td>
+                <td th:text="${notice.regDate}"></td>
+            </tr>
+            <tr>
+                <td>View Count:</td>
+                <td th:text="${notice.viewCount}"></td>
+            </tr>
+        </table>
+
+        <div>
+            <span th:if="${previousNotice != null}">
+                <a th:href="@{/cs/notice/{id}(id=${previousNotice.id})}">다음글</a>
+            </span>
+        <br>
+            <span th:if="${nextNotice != null}">
+            <a th:href="@{/cs/notice/{id}(id=${nextNotice.id})}">이전글</a>
+        </span>
+        </div>
+
+        <div>
+            <a href="/cs/notice">Back to Notice List</a>
+        </div>
+    </div>
+    </body>
+</th:block>
+</html>

@@ -47,8 +47,8 @@ public class MovieDTO {
         movieDTO.setOverview(movie.getOverview());
 
         // 이미지의 배경 및 포스터 경로
-        movieDTO.setBackdropPath(movie.getImages().getFirst().getBackdropPath());
-        movieDTO.setPosterPath(movie.getImages().getFirst().getPosterPath());
+        movieDTO.setBackdropPath(movie.getImages().get(1).getBackdropPath());
+        movieDTO.setPosterPath(movie.getImages().get(1).getPosterPath());
 
         // Optional을 사용하여 MovieDetail이 null인 경우를 처리
         //비디오, 인기 , 평점
