@@ -116,8 +116,7 @@ public class MovieService {
         }
         // 비디오 키를 찾을 수 없는 경우 null을 반환합니다.
         return null;
-    }
-    private void processResponse(String responseBody) throws IOException {
+    }    private void processResponse(String responseBody) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
@@ -281,6 +280,10 @@ public class MovieService {
 
         movieRepository.save(movie);
     }
+
+
+
+
 
     public List<MovieDTO> getAllMovies() {
 
