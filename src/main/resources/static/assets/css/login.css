@@ -324,3 +324,79 @@ footer{
     display: flex;
     justify-content: space-between;
 }
+
+/* find_email */
+#sign_action {
+    width: 92.5%;
+    margin: 0 auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+#sign_action p, a {
+    color: #fafafa;
+}
+#sign_action div:nth-child(2) {
+    display: flex;
+    justify-content: space-between;
+}
+#sign_action div:nth-child(2) p {
+    margin-left: 10px;
+}
+.result {
+    width: 92%;
+    margin: 0 auto;
+    padding: 2em;
+    background: rgba(255, 255, 255);
+    border-radius: 20px;
+    text-align: center;
+}
+.result h3 {
+    font-size: 30px;
+    color: #3B353C;
+}
+.result div {
+    width: 60%;
+    margin: 0 auto;
+}
+.result .find_email, .signup_date {
+    display: flex;
+    flex-direction: row;
+}
+.result p {
+    font-size: 20px;
+    color: #3B353C;
+    text-align: left;
+    margin-block-end: 0.2em;
+}
+.result .button {
+    width: 30%;
+    font-size: 20px;
+    padding: 1em;
+    margin-top: 2em;
+    border-radius: 50px;
+    border: none;
+    color: #3B353C;
+}
+.result button.btn1 {
+    background: #2B252C;
+    color: #fafafa;
+}
+.result button.btn1:hover {
+    background: #3B353C
+}
+.result button.btn2 {
+    background: #df7366;
+    color: #fafafa;
+}
+.result button.btn2:hover {
+    background: #ef8376;
+}
+.result .password_flex {
+    display: flex;
+    flex-direction: row;
+    width: 37%;
+}
+.success_result_email, .success_result_password,
+.fail_result_email, .fail_result_password{
+    display: none;
+}

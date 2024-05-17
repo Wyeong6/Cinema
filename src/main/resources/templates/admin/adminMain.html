@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{layout/layout}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
+<!--xmlns:sec="http://www.thymeleaf.org/extras/spring-security"-->
 
 <body>
 <div sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다.</div>
