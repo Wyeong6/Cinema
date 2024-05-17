@@ -83,6 +83,8 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
                     .role(Role.USER)
                     .social(true)
                     .grade_code(4)
+                    .checkedTermsE(true)
+                    .checkedTermsS(false)
                     .build();
 
             // DB에 회원정보 저장(회원가입 처리)
@@ -90,7 +92,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
             OAuth2MemberDTO oAuth2MemberDTO = new OAuth2MemberDTO(
                     email, "1111", email, true, "1",
-                    Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")));
+                    Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")), true, false);
             oAuth2MemberDTO.setAttr(paramMap);
 
             return oAuth2MemberDTO;
@@ -98,7 +100,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
             Member member = result.get();
             OAuth2MemberDTO oAuth2MemberDTO = new OAuth2MemberDTO(
                     member.getName(), member.getPassword(), member.getEmail(), member.isSocial(), member.getAge(),
-                    Arrays.asList(new SimpleGrantedAuthority("ROLE_" + member.getRole())));
+                    Arrays.asList(new SimpleGrantedAuthority("ROLE_" + member.getRole())), member.getCheckedTermsE(), member.getCheckedTermsS());
 
             return oAuth2MemberDTO;
         }

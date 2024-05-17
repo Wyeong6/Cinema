@@ -13,6 +13,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 중복 회원 검사
     Optional<Member> findByEmail(String email);
 
+    // 사용자 email 로 member_id 찾기
+    @Query("SELECT m.id FROM Member m WHERE m.email = :email")
+    Long findUserIdx(String email);
+
     // 아이디(이메일) 찾기
     @Query("SELECT m.email FROM Member m WHERE m.name = :name AND m.age = :age")
     String findUserEmail(String name, String age);

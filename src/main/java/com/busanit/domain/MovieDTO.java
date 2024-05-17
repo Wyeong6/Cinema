@@ -12,9 +12,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MovieDTO {
 
@@ -47,8 +45,8 @@ public class MovieDTO {
         movieDTO.setOverview(movie.getOverview());
 
         // 이미지의 배경 및 포스터 경로
-//        movieDTO.setBackdropPath(movie.getImages().getFirst().getBackdropPath());
-//        movieDTO.setPosterPath(movie.getImages().getFirst().getPosterPath());
+        movieDTO.setBackdropPath(movie.getImages().get(0).getBackdropPath());
+        movieDTO.setPosterPath(movie.getImages().get(0).getPosterPath());
 
         // Optional을 사용하여 MovieDetail이 null인 경우를 처리
         //비디오, 인기 , 평점
@@ -71,6 +69,11 @@ public class MovieDTO {
         movieDTO.setGenres(genreNames);
 
         return movieDTO;
+    }
+
+    public MovieDTO(Long id, String title) {
+        this.id = id;
+        this.title = title;
     }
 //    public static MovieDTO convertToDTO(Movie movie){
 //        return MovieDTO.builder()

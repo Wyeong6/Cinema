@@ -9,17 +9,12 @@ import com.busanit.repository.MovieDetailRepository;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.MovieStillCutRepository;
 import com.busanit.entity.movie.Genre;
-import com.busanit.entity.movie.Movie;
-import com.busanit.entity.movie.MovieDetail;
 import com.busanit.entity.movie.MovieImage;
 import com.busanit.repository.GenreRepository;
-import com.busanit.repository.MovieDetailRepository;
-import com.busanit.repository.MovieRepository;
 import com.busanit.util.GenreUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,17 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class MovieService {
 
     private final OkHttpClient client = new OkHttpClient();
@@ -116,8 +106,7 @@ public class MovieService {
         }
         // 비디오 키를 찾을 수 없는 경우 null을 반환합니다.
         return null;
-    }
-    private void processResponse(String responseBody) throws IOException {
+    }    private void processResponse(String responseBody) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
@@ -136,7 +125,6 @@ public class MovieService {
     private void processMovieData(JsonNode node) throws IOException {
         // JSON 노드를 MovieDTO로 변환
         MovieDTO movieDTO = objectMapper.treeToValue(node, MovieDTO.class);
-        System.out.println("TEST 무비 디티오의 ID = " + movieDTO.getId() );
         Movie movie = getOrCreateMovie(movieDTO);
         updateMovieWithDTOInfo(movie, movieDTO);
 
@@ -214,6 +202,7 @@ public class MovieService {
         }
     }
 
+
     public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
         MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
         Movie movie = movieRepository.findById(movieDetailDTO.getId()).orElse(new Movie());
@@ -282,9 +271,51 @@ public class MovieService {
         movieRepository.save(movie);
     }
 
-    public List<MovieDTO> getAllMovies() {
+    public void fetchAndStoreCertificationData() throws IOException {
+        List<Long> movieIds = getAllMovieIds(); // 모든 movie ID를 가져오는 메서드
+        for (Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/release_dates?api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processCertificationResponse(responseBody, movieId);
+            }
+        }
+    }
 
-        List<Movie> movieList = movieRepository.findAll();
+    public void processCertificationResponse(String responseBody, Long movieId) throws IOException {
+        MovieDetailDTO.ReleaseDatesDTO releaseDatesDTO = objectMapper.readValue(responseBody, MovieDetailDTO.ReleaseDatesDTO.class);
+
+        String certification = releaseDatesDTO.getResults().stream()
+                .filter(result -> "KR".equals(result.getIso_3166_1()))
+                .flatMap(result -> result.getRelease_dates().stream())
+                .map(MovieDetailDTO.ReleaseDateInfo::getCertification)
+                .findFirst()
+                .orElse(null);
+
+        if ("".equals(certification)) {
+            certification = "-";
+        } else if ("18".equals(certification)) {
+            certification = "18세 이상 관람가";
+        } else if ("15".equals(certification)) {
+            certification = "15세 이상 관람가";
+        } else if ("12".equals(certification)) {
+            certification = "12세 이상 관람가";
+        } else if ("ALL".equals(certification)||"All".equals(certification)) {
+            certification = "전체 관람가";
+        }
+
+
+        if (certification != null) {
+            Movie movie = movieRepository.findById(movieId).orElse(new Movie());
+            MovieDetail movieDetail = getOrCreateMovieDetail(movie);
+            movieDetail.setCertification(certification); // MovieDetail에 certification 세팅
+            movieDetailRepository.save(movieDetail);
+        }
+    }
+
+    public List<MovieDTO> getHotMovies(){
+        List<Movie> movieList = movieRepository.findAllByOrderByMovieDetailPopularityDesc();
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }

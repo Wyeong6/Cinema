@@ -8,13 +8,13 @@ import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
-@Table(name="member")
+@Table(name = "member")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member extends BaseEntity{
+public class Member extends BaseTimeEntity {
 
     @Id
     @Column(name = "member_id")
@@ -41,8 +41,12 @@ public class Member extends BaseEntity{
     @Column(nullable = false)
     private Integer grade_code;
 
+    private Boolean checkedTermsE;
+
+    private Boolean checkedTermsS;
+
     // 일반 폼 회원 생성
-    public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder){
+    public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {
         String password = passwordEncoder.encode(regFormDTO.getPassword());
         return Member.builder()
                 .name(regFormDTO.getName())
@@ -52,11 +56,13 @@ public class Member extends BaseEntity{
                 .role(Role.USER)
                 .social(false)
                 .grade_code(4)
+                .checkedTermsE(regFormDTO.getCheckedTermsE() != null ? regFormDTO.getCheckedTermsE() : true) // 회원가입시 약관에 동의한 것으로 간주함
+                .checkedTermsS(regFormDTO.getCheckedTermsS() != null ? regFormDTO.getCheckedTermsS() : false)
                 .build();
     }
 
     // 관리자 생성
-    public static Member createMember2(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder){
+    public static Member createMember2(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {
         String password = passwordEncoder.encode(regFormDTO.getPassword());
         return Member.builder()
                 .name(regFormDTO.getName())
@@ -66,6 +72,8 @@ public class Member extends BaseEntity{
                 .role(Role.ADMIN)
                 .social(false)
                 .grade_code(1)
+                .checkedTermsE(true)
+                .checkedTermsS(false)
                 .build();
     }
 
