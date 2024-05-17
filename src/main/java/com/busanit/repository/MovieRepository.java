@@ -1,8 +1,13 @@
 package com.busanit.repository;
 
 import com.busanit.entity.movie.Movie;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface MovieRepository extends JpaRepository<Movie, Long> {
-    // Movie 엔티티 만들어야함. 지금은 임시로 만들어둔것 ( 테이블 제작중!! )
+    //    @EntityGraph(attributePaths = {"movieDetail", "genre", "movieImage", "movieStillCut"})
+    List<Movie> findAll();
 }

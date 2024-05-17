@@ -316,8 +316,6 @@ public class MovieService {
         }
 
 
-
-
         if (certification != null) {
             Movie movie = movieRepository.findById(movieId).orElse(new Movie());
             MovieDetail movieDetail = getOrCreateMovieDetail(movie);
