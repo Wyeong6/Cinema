@@ -237,5 +237,16 @@
         </label>
     </div>
 </div>
+
+<!--필수 약관 미동의시 가입제한-->
+<script>
+    document.getElementById("signup_form").addEventListener("submit", function(event) {
+        var essentialChk = document.getElementById("essential_chk");
+        if(!essentialChk.checked) {
+            event.preventDefault(); // 폼 제출 방지
+            alert('개인정보 수집 및 이용 동의는 필수입니다.');
+        }
+    });
+</script>
 </body>
 </html>
