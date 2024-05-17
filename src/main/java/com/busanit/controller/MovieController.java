@@ -22,7 +22,8 @@ public class MovieController {
     public String getDetailMovies(Model model) throws IOException {
         movieService.fetchAndStoreMoviesNowPlaying();
         movieService.fetchAndStoreMovieRuntimeAndReleaseData();
-//        movieService.fetchAndStoreMovieStillCuts();
+        movieService.fetchAndStoreMovieStillCuts();
+        movieService.fetchAndStoreCertificationData();
 
         List<MovieDTO> movies = movieService.getHotMovies();
         model.addAttribute("movies", movies);
@@ -31,11 +32,11 @@ public class MovieController {
         return "main";
     }
 
-    @GetMapping("/test")
-    public String test(Model model) {
-        List<Movie> movies = movieRepository.findAll();
-        model.addAttribute("movies", movies);
-        return "test";
-    }
+//    @GetMapping("/test")
+//    public String test(Model model) {
+//        List<Movie> movies = movieRepository.findAll();
+//        model.addAttribute("movies", movies);
+//        return "test";
+//    }
 }
 

@@ -6,14 +6,15 @@
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
+
+<html lang="en" xmlns:layout="http://www.w3.org/1999/xhtml">
 <head>
     <title>CinemaCast</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="/static/css/custom.css" />
-    <link rel="stylesheet" href="/static/css/main.css" />
-    <noscript><link rel="stylesheet" href="/static/css/noscript.css" /></noscript>
+    <link rel="stylesheet" href="/assets/css/custom.css" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 </head>
@@ -26,7 +27,7 @@
         <!-- Inner -->
         <div class="inner">
             <header>
-                <h1><a href="/" id="movie_title">Movie Title</a></h1>
+                <h1><a href="../static/index.html" id="movie_title">Movie Title</a></h1>
                 <hr />
                 <p>Another fine freebie by HTML5 UP</p>
             </header>
@@ -38,8 +39,8 @@
         <!-- info -->
         <div id="info">
             <ul>
-                <li><a href="/member/new">회원가입</a></li>
-                <li><a href="/member/login">로그인</a></li>
+                <li><a href="/templates/member/signup.html">회원가입</a></li>
+                <li><a href="/templates/member/login.html">로그인</a></li>
                 <li><a href="#">장바구니</a></li>
             </ul>
         </div>
@@ -50,9 +51,9 @@
                 <li>
                     <a href="#">영화</a>
                     <ul>
-                        <li><a href="movie_list_full.html">영화 전체보기</a></li>
-                        <li><a href="movie_list_now.html">현재 상영작</a></li>
-                        <li><a href="movie_list_comming.html">상영 예정작</a></li>
+                        <li><a href="/templates/movie/movie_list_full.html">영화 전체보기</a></li>
+                        <li><a href="/templates/movie/movie_list_now.html">현재 상영작</a></li>
+                        <li><a href="/templates/movie/movie_list_comming.html">상영 예정작</a></li>
                     </ul>
                 </li>
                 <li>
@@ -93,141 +94,26 @@
     <section class="carousel">
         <div class="section_title">
             <h2>Weekly Hot Movies</h2>
-            <p><a href="movie_list_now.html">more</a></p>
+            <p><a href="/templates/movie/moviemovie_list_now.html">more</a></p>
         </div>
-        <div class="reel">
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic01.jpg" alt="" /></a>
-                <img src="images/one.png" alt="one" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Pulvinar sagittis congue</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
-                <img src="images/two.png" alt="two" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Fermentum sagittis proin</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic03.jpg" alt="" /></a>
-                <img src="images/three.png" alt="three" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic04.jpg" alt="" /></a>
-                <img src="images/four.png" alt="four" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Ultrices urna sit lobortis</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic05.jpg" alt="" /></a>
-                <img src="images/five.png" alt="five" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Varius magnis sollicitudin</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic01.jpg" alt="" /></a>
-                <img src="images/six.png" alt="six" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Pulvinar sagittis congue</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
-                <img src="images/seven.png" alt="seven" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Fermentum sagittis proin</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic03.jpg" alt="" /></a>
-                <img src="images/eight.png" alt="eight" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic04.jpg" alt="" /></a>
-                <img src="images/nine.png" alt="nine" class="overlay-img" />
-                <header>
-                    <h3><a href="#">Ultrices urna sit lobortis</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="images/pic05.jpg" alt="" /></a>
-                <img src="images/ten.png" alt="ten" class="overlay-img ten" />
-                <header>
-                    <h3><a href="#">Varius magnis sollicitudin</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-        </div>
+        <span th:each="movie, iterStat : ${movies}" th:if="${iterStat.index < 10}" class="reel">
+<!--            <div th:each="movie, iterStat : ${movies}" style="display: inline-block;">-->
+<!--                <span th:if="${iterStat.index < 10}">-->
+                    <article>
+                        <a href="#" class="image featured"><img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경 사진" /></a>
+                        <img src="/images/2.png" alt="one" class="overlay-img" />
+                        <header>
+                            <h3><a th:href="@{'/movie/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
+                            <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
+                        </header>
+                        <div class="button_box">
+                            <button class="reservation_btn">예매하기</button>
+                            <button class="get_btn"><a th:href="@{'/movie_get/' + ${movie.id}}">상세보기</a></button>
+                        </div>
+                    </article>
+<!--                </span>-->
+<!--            </div>-->
+        </span>
     </section>
 
     <!-- Comming Soon -->
@@ -239,10 +125,10 @@
         <div class="reel">
 
             <article>
-                <a href="#" class="image featured"><img src="images/pic01.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic01.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Pulvinar sagittis congue</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -251,10 +137,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic02.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Fermentum sagittis proin</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -263,10 +149,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="images/pic03.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic03.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -275,10 +161,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="images/pic04.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic04.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Ultrices urna sit lobortis</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -287,10 +173,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="images/pic05.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic05.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Varius magnis sollicitudin</a></h3>
-                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -299,10 +185,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="/static/css/images/pic01.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic01.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Fermentum sagittis proin</a></h3>
-                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -311,10 +197,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="/static/css/images/pic02.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic02.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Fermentum sagittis proin</a></h3>
-                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -323,10 +209,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="/static/css/images/pic03.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic03.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -335,10 +221,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="/static/css/images/pic04.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic04.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Ultrices urna sit lobortis</a></h3>
-                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -347,10 +233,10 @@
             </article>
 
             <article>
-                <a href="#" class="image featured"><img src="/static/css/images/pic05.jpg" alt="" /></a>
+                <a href="#" class="image featured"><img src="/images/pic05.jpg" alt="" /></a>
                 <header>
                     <h3><a href="#">Varius magnis sollicitudin</a></h3>
-                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -402,7 +288,7 @@
             </header>
             <div class="row">
                 <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/static/css/images/pic07.jpg" alt="" /></a>
+                    <a href="#" class="image featured"><img src="/images/pic07.jpg" alt="" /></a>
                     <header>
                         <h3><a href="#">Gravida aliquam penatibus</a></h3>
                     </header>
@@ -411,7 +297,7 @@
                     </p>
                 </article>
                 <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/static/css/images/pic08.jpg" alt="" /></a>
+                    <a href="#" class="image featured"><img src="/images/pic08.jpg" alt="" /></a>
                     <header>
                         <h3><a href="#">Sed quis rhoncus placerat</a></h3>
                     </header>
@@ -420,7 +306,7 @@
                     </p>
                 </article>
                 <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+                    <a href="#" class="image featured"><img src="/images/pic09.jpg" alt="" /></a>
                     <header>
                         <h3><a href="#">Magna laoreet et aliquam</a></h3>
                     </header>
@@ -429,7 +315,7 @@
                     </p>
                 </article>
                 <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/static/css/images/pic07.jpg" alt="" /></a>
+                    <a href="#" class="image featured"><img src="/images/pic07.jpg" alt="" /></a>
                     <header>
                         <h3><a href="#">Gravida aliquam penatibus</a></h3>
                     </header>
@@ -438,7 +324,7 @@
                     </p>
                 </article>
                 <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/static/css/images/pic08.jpg" alt="" /></a>
+                    <a href="#" class="image featured"><img src="/images/pic08.jpg" alt="" /></a>
                     <header>
                         <h3><a href="#">Sed quis rhoncus placerat</a></h3>
                     </header>
@@ -447,7 +333,7 @@
                     </p>
                 </article>
                 <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+                    <a href="#" class="image featured"><img src="/images/pic09.jpg" alt="" /></a>
                     <header>
                         <h3><a href="#">Magna laoreet et aliquam</a></h3>
                     </header>
@@ -546,22 +432,22 @@
                     </header>
                     <div class="row gtr-25">
                         <div class="col-6">
-                            <a href="#" class="image fit"><img src="/static/css/images/pic10.jpg" alt="" /></a>
+                            <a href="#" class="image fit"><img src="/images/pic10.jpg" alt="" /></a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="image fit"><img src="/static/css/images/pic11.jpg" alt="" /></a>
+                            <a href="#" class="image fit"><img src="/images/pic11.jpg" alt="" /></a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="image fit"><img src="/static/css/images/pic12.jpg" alt="" /></a>
+                            <a href="#" class="image fit"><img src="/images/pic12.jpg" alt="" /></a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="image fit"><img src="/static/css/images/pic13.jpg" alt="" /></a>
+                            <a href="#" class="image fit"><img src="/images/pic13.jpg" alt="" /></a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="image fit"><img src="/static/css/images/pic14.jpg" alt="" /></a>
+                            <a href="#" class="image fit"><img src="/images/pic14.jpg" alt="" /></a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="image fit"><img src="/static/css/images/pic15.jpg" alt="" /></a>
+                            <a href="#" class="image fit"><img src="/images/pic15.jpg" alt="" /></a>
                         </div>
                     </div>
                 </section>
@@ -603,14 +489,14 @@
 </div>
 
 <!-- Scripts -->
-<script src="/static/js/jquery.min.js"></script>
-<script src="/static/js/jquery.dropotron.min.js"></script>
-<script src="/static/js/jquery.scrolly.min.js"></script>
-<script src="/static/js/jquery.scrollex.min.js"></script>
-<script src="/static/js/browser.min.js"></script>
-<script src="/static/js/breakpoints.min.js"></script>
-<script src="/static/js/util.js"></script>
-<script src="/static/js/main.js"></script>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/jquery.dropotron.min.js"></script>
+<script src="/assets/js/jquery.scrolly.min.js"></script>
+<script src="/assets/js/jquery.scrollex.min.js"></script>
+<script src="/assets/js/browser.min.js"></script>
+<script src="/assets/js/breakpoints.min.js"></script>
+<script src="/assets/js/util.js"></script>
+<script src="/assets/js/main.js"></script>
 
 <p>---------------------------------------------------인기순 ------------------------------</p>
 <div th:each="movie, iterStat : ${movies}">
@@ -621,10 +507,10 @@
         <p>영화 장르: <span th:text="${#strings.listJoin(movie.genres, ', ')}">영화 장르</span></p>
         <p>영화 평점: <span th:text="${movie.voteAverage}">영화 평점</span></p>
         <p>인기도: <span th:text="${movie.popularity}">인기도</span></p>
-<!--        <div th:if="${movie.video}">-->
-<!--            <p>영화 비디오:</p>-->
-<!--            <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>-->
-<!--        </div>-->
+        <!--        <div th:if="${movie.video}">-->
+        <!--            <p>영화 비디오:</p>-->
+        <!--            <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>-->
+        <!--        </div>-->
         <p>영화 배경사진:</p>
         <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경사진" />
         <p>영화 포스터:</p>

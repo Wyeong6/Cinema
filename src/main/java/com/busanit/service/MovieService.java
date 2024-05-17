@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -254,21 +255,42 @@ public class MovieService {
         movieRepository.save(movie);
     }
 
-    // MovieImage 객체 생성 및 posterPath 설정
-    private void processImageData(JsonNode node, Movie movie) {
 
-        MovieImage movieImage = new MovieImage();
-        // API 응답에서 poster_path 값 추출 및 설정
+    private void processImageData(JsonNode node, Movie movie) {
+        // DB에서 movie를 찾습니다.
+        Optional<Movie> optionalMovie = movieRepository.findById(movie.getMovieId());
+        Movie existingMovie;
+
+        if (optionalMovie.isPresent()) {
+            // 영화가 존재하면 해당 영화 객체를 사용합니다.
+            existingMovie = optionalMovie.get();
+        } else {
+            // 영화가 존재하지 않으면 함수를 종료합니다.
+            System.out.println("해당 ID의 영화가 존재하지 않습니다.");
+            return;
+        }
+
+        // API 응답에서 poster_path 및 backdrop_path 값 추출
         String posterPath = node.get("poster_path").asText();
         String backdropPath = node.get("backdrop_path").asText();
 
-        movieImage.setPosterPath(posterPath);
-        movieImage.setBackdropPath(backdropPath);
+        // 이미지 중복 검사
+        if (!existingMovie.hasImage(posterPath, backdropPath)) {
+            MovieImage movieImage = new MovieImage();
+            movieImage.setPosterPath(posterPath);
+            movieImage.setBackdropPath(backdropPath);
 
-        // MovieImage를 movie 인스턴스에 연결
-        movie.addImage(movieImage);
+            // MovieImage를 existingMovie 인스턴스에 연결
+            existingMovie.addImage(movieImage);
 
-        movieRepository.save(movie);
+            // 수정된 movie를 저장
+            movieRepository.save(existingMovie);
+            System.out.println("새로운 이미지가 저장되었습니다.");
+        } else {
+            // 이미 해당 이미지가 존재하면 함수를 종료합니다.
+            System.out.println("이미 해당 이미지가 존재합니다. 함수를 종료합니다.");
+            return;
+        }
     }
 
     public void fetchAndStoreCertificationData() throws IOException {
