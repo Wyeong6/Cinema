@@ -14,6 +14,13 @@ public class PaginationUtil {
         // Calculate page numbers to display
         List<Integer> pageNumbers = calculatePageNumbers(page, totalPages);
         model.addAttribute("pageNumbers", pageNumbers);
+
+        // Add navigation attributes
+        model.addAttribute("firstPage", 1);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("previousPage", calculatePreviousPage(page));
+        model.addAttribute("nextPage", calculateNextPage(page, totalPages));
+
     }
 
     public static List<Integer> calculatePageNumbers(int currentPage, int totalPages) {
@@ -38,5 +45,13 @@ public class PaginationUtil {
         }
 
         return pageNumbers;
+    }
+
+    private static int calculatePreviousPage(int currentPage) {
+        return Math.max(1, currentPage - 1);
+    }
+
+    private static int calculateNextPage(int currentPage, int totalPages) {
+        return Math.min(totalPages, currentPage + 1);
     }
 }
