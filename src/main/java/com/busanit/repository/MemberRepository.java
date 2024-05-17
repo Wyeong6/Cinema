@@ -4,8 +4,10 @@ import com.busanit.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -19,7 +21,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // 아이디(이메일) 찾기
     @Query("SELECT m.email FROM Member m WHERE m.name = :name AND m.age = :age")
-    String findUserEmail(String name, String age);
+    List<String> findUserEmails(@Param("name") String name, @Param("age") String age);
+//    String findUserEmail(String name, String age);
 
     // 제공된 정보값과 일치하는 비밀번호가 있는지 검사
     @Query("SELECT COUNT(m) FROM Member m WHERE m.name = :name AND m.age = :age AND m.email = :email")
