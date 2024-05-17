@@ -20,17 +20,21 @@ public class OAuth2MemberDTO extends User implements OAuth2User {
     private Integer grade_code;
     private boolean social;
     private Role role;
-    private Map<String, Object> attr;   // 소셜 로그인 정보
+    private Map<String, Object> attr; // 소셜 로그인 정보
+    private Boolean checkedTermsE; // 약관 필수
+    private Boolean checkedTermsS; // 약관 선택
 
     public OAuth2MemberDTO(String username, String password, String email,
                            boolean social, String age,
-                           Collection<? extends GrantedAuthority> authorities){
+                           Collection<? extends GrantedAuthority> authorities, boolean checkedTermsE, boolean checkedTermsS){
         super(username, password, authorities);
         this.id = username;
         this.password = password;
         this.email = email;
         this.social = social;
         this.age = age;
+        this.checkedTermsE = checkedTermsE;
+        this.checkedTermsS = checkedTermsS;
     }
 
     @Override
