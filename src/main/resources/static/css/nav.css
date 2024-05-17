@@ -1,0 +1,55 @@
+#nav ul {
+    position: relative; /* 자식 요소의 위치를 상대적으로 설정 */
+    overflow: visible; /* 부모 요소의 영역을 벗어나더라도 자식 요소를 보이도록 설정 */
+}
+
+#nav ul ul {
+    display: none;
+    width: 1000%; /* 부모 요소의 너비의 2배로 설정 */
+    position: absolute;
+    top: 100%; /* 기준점에서의 위치 계산 */
+    left: -40%;
+    padding: 30px 0; /* 서브 메뉴의 상하 패딩 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    z-index: 1; /* 상위에 표시되도록 설정 */
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s; /* 투명도와 시각성 변화에 대한 전환 설정 */
+    opacity: 0; /* 초기에는 투명하게 설정 */
+    visibility: hidden; /* 초기에는 보이지 않도록 설정 */
+}
+
+#nav ul li:hover > ul {
+    display: flex;
+    opacity: 1; /* 마우스가 호버될 때 투명도를 1로 변경하여 나타나도록 함 */
+    visibility: visible; /* 마우스가 호버될 때 보이도록 함 */
+    transition-delay: 0s; /* transition-delay 초기화 */
+}
+
+#nav ul ul:hover {
+    opacity: 1; /* 마우스가 하위 메뉴 위에 있을 때 투명도를 1로 유지하여 사라지지 않도록 함 */
+    visibility: visible; /* 마우스가 하위 메뉴 위에 있을 때 보이도록 함 */
+    transition-delay: 0s; /* transition-delay 초기화 */
+}
+
+#nav ul li {
+    position: relative;
+}
+
+#nav ul ul li {
+    display: block;
+    width: auto;
+}
+
+#nav ul ul li a {
+    text-decoration: none;
+    color: #c4c3ca;
+    padding: 8px 16px;
+    font-size: 0.8em; /* 작은 글꼴 크기 조정 */
+    transition: color 0.3s ease;
+}
+
+#nav ul ul li a:hover {
+    color: #FFF;
+    font-weight: 700;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}

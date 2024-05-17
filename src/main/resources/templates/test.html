@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:each="movie : ${movies}">
+    <h2 th:text="'Movie Title = ' + ${movie.title}"></h2>
+    <p th:text="'Movie Overview = ' + ${movie.overview}"></p>
+    <p th:text="'Movie ID = ' + ${movie.movieId}"></p>
+
+    <p th:text="'Movie VoteAverage = ' + ${movie.movieDetail.voteAverage}"></p>
+    <div th:each="'Movie Genres = ' + ${movie.genres}">
+<!--        <span th:text="${}"></span>-->
+    </div>
+    <div th:each="image : ${movie.movieImage}">
+        <img th:src="${image.imageUrl}" />
+    </div>
+</div>
+</body>
+</html>

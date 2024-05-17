@@ -1,11 +1,707 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}" >
 
-<th:block layout:fragment="content">
-    <div class="p-3">
-        <h1>메인 페이지</h1>
+<!DOCTYPE HTML>
+
+<!--
+	Helios by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+    <title>CinemaCast</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <noscript><link rel="stylesheet" href="/static/css/noscript.css" /></noscript>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+<body class="homepage is-preload">
+<div id="page-wrapper">
+
+    <!-- Header -->
+    <div id="header">
+        <h1 class="logo" style="font-size: 2em;">CINEMACAST</h1>
+        <!-- Inner -->
+        <div class="inner">
+            <header>
+                <h1><a href="index.html" id="movie_title">Movie Title</a></h1>
+                <hr />
+                <p>Another fine freebie by HTML5 UP</p>
+            </header>
+            <footer>
+                <a href="#banner" class="button circled scrolly">예매</a>
+            </footer>
+        </div>
+
+        <!-- info -->
+        <div id="info">
+            <ul>
+                <li><a href="signup.html">회원가입</a></li>
+                <li><a href="login.html">로그인</a></li>
+                <li><a href="#">장바구니</a></li>
+            </ul>
+        </div>
+
+        <!-- Nav -->
+        <nav id="nav">
+            <ul>
+                <li>
+                    <a href="#">영화</a>
+                    <ul>
+                        <li><a href="movie_list_full.html">영화 전체보기</a></li>
+                        <li><a href="movie_list_now.html">현재 상영작</a></li>
+                        <li><a href="movie_list_comming.html">상영 예정작</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">예매</a>
+                    <ul>
+                        <li><a href="#">예매</a></li>
+                        <li><a href="#">상영 시간표</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">이벤트</a></li>
+                <!--								<li><a href="right-sidebar.html">Right Sidebar</a></li>-->
+                <li><a href="#">공지사항</a></li>
+            </ul>
+        </nav>
+
+        <div id="img_btn">
+            <button class="btn clicked" onclick="">1</button>
+            <button class="btn" onclick="">2</button>
+            <button class="btn" onclick="">3</button>
+            <button class="btn" onclick="">4</button>
+            <button class="btn" onclick="">5</button>
+        </div>
+
     </div>
-</th:block>
+
+    <!-- Banner -->
+    <section id="banner">
+        <header>
+            <h2>Hi. You're looking at <strong>Helios</strong>.</h2>
+            <p>
+                A (free) responsive site template by <a href="http://html5up.net">HTML5 UP</a>.
+                Built with HTML5/CSS3 and released under the <a href="http://html5up.net/license">CCA</a> license.
+            </p>
+        </header>
+    </section>
+
+    <!-- Weekly Hot Movies -->
+    <section class="carousel">
+        <div class="section_title">
+            <h2>Weekly Hot Movies</h2>
+            <p><a href="movie_list_now.html">more</a></p>
+        </div>
+        <div class="reel">
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic01.jpg" alt="" /></a>
+                <img src="images/one.png" alt="one" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Pulvinar sagittis congue</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
+                <img src="images/two.png" alt="two" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Fermentum sagittis proin</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic03.jpg" alt="" /></a>
+                <img src="images/three.png" alt="three" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Sed quis rhoncus placerat</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic04.jpg" alt="" /></a>
+                <img src="images/four.png" alt="four" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Ultrices urna sit lobortis</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic05.jpg" alt="" /></a>
+                <img src="images/five.png" alt="five" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Varius magnis sollicitudin</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic01.jpg" alt="" /></a>
+                <img src="images/six.png" alt="six" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Pulvinar sagittis congue</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
+                <img src="images/seven.png" alt="seven" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Fermentum sagittis proin</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic03.jpg" alt="" /></a>
+                <img src="images/eight.png" alt="eight" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Sed quis rhoncus placerat</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic04.jpg" alt="" /></a>
+                <img src="images/nine.png" alt="nine" class="overlay-img" />
+                <header>
+                    <h3><a href="#">Ultrices urna sit lobortis</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic05.jpg" alt="" /></a>
+                <img src="images/ten.png" alt="ten" class="overlay-img ten" />
+                <header>
+                    <h3><a href="#">Varius magnis sollicitudin</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Comming Soon -->
+    <section class="carousel">
+        <div class="section_title">
+            <h2>Comming Soon</h2>
+            <p><a href="movie_list_comming.html">more</a></p>
+        </div>
+        <div class="reel">
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic01.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Pulvinar sagittis congue</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Fermentum sagittis proin</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic03.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Sed quis rhoncus placerat</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic04.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Ultrices urna sit lobortis</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="images/pic05.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Varius magnis sollicitudin</a></h3>
+                    <p><img src="images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="/static/css/images/pic01.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Fermentum sagittis proin</a></h3>
+                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="/static/css/images/pic02.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Fermentum sagittis proin</a></h3>
+                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="/static/css/images/pic03.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Sed quis rhoncus placerat</a></h3>
+                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="/static/css/images/pic04.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Ultrices urna sit lobortis</a></h3>
+                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+            <article>
+                <a href="#" class="image featured"><img src="/static/css/images/pic05.jpg" alt="" /></a>
+                <header>
+                    <h3><a href="#">Varius magnis sollicitudin</a></h3>
+                    <p><img src="/static/css/images/clock.png" alt="clock"/> runtime</p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Main -->
+    <!--				<div class="wrapper style2">-->
+
+    <!--					<article id="main" class="container special">-->
+    <!--						<a href="#" class="image featured"><img src="images/pic06.jpg" alt="" /></a>-->
+    <!--						<header>-->
+    <!--							<h2><a href="#">Sed massa imperdiet magnis</a></h2>-->
+    <!--							<p>-->
+    <!--								Sociis aenean eu aenean mollis mollis facilisis primis ornare penatibus aenean. Cursus ac enim-->
+    <!--								pulvinar curabitur morbi convallis. Lectus malesuada sed fermentum dolore amet.-->
+    <!--							</p>-->
+    <!--						</header>-->
+    <!--						<p>-->
+    <!--							Commodo id natoque malesuada sollicitudin elit suscipit. Curae suspendisse mauris posuere accumsan massa-->
+    <!--							posuere lacus convallis tellus interdum. Amet nullam fringilla nibh nulla convallis ut venenatis purus-->
+    <!--							sit arcu sociis. Nunc fermentum adipiscing tempor cursus nascetur adipiscing adipiscing. Primis aliquam-->
+    <!--							mus lacinia lobortis phasellus suscipit. Fermentum lobortis non tristique ante proin sociis accumsan-->
+    <!--							lobortis. Auctor etiam porttitor phasellus tempus cubilia ultrices tempor sagittis. Nisl fermentum-->
+    <!--							consequat integer interdum integer purus sapien. Nibh eleifend nulla nascetur pharetra commodo mi augue-->
+    <!--							interdum tellus. Ornare cursus augue feugiat sodales velit lorem. Semper elementum ullamcorper lacinia-->
+    <!--							natoque aenean scelerisque.-->
+    <!--						</p>-->
+    <!--						<footer>-->
+    <!--							<a href="#" class="button">Continue Reading</a>-->
+    <!--						</footer>-->
+    <!--					</article>-->
+
+    <!--				</div>-->
+
+    <!-- Features -->
+    <div class="wrapper style1">
+
+        <section id="features" class="container special">
+            <header>
+                <h2>스낵 스토어</h2>
+                <p>달콤한 맛과 바삭한 식감이 어우러진 팝콘 한 컵, 영화의 재미를 더 높여줄 거예요.<br />
+                    지금 바로 팝콘을 주문하고, 당신의 영화관 체험을 더욱 완벽하게 즐겨보세요!</p>
+                <p class="more_btn"><a href="#">more</a></p>
+            </header>
+            <div class="row">
+                <article class="col-4 col-12-mobile special">
+                    <a href="#" class="image featured"><img src="/static/css/images/pic07.jpg" alt="" /></a>
+                    <header>
+                        <h3><a href="#">Gravida aliquam penatibus</a></h3>
+                    </header>
+                    <p>
+                        8,000원
+                    </p>
+                </article>
+                <article class="col-4 col-12-mobile special">
+                    <a href="#" class="image featured"><img src="/static/css/images/pic08.jpg" alt="" /></a>
+                    <header>
+                        <h3><a href="#">Sed quis rhoncus placerat</a></h3>
+                    </header>
+                    <p>
+                        4,000원
+                    </p>
+                </article>
+                <article class="col-4 col-12-mobile special">
+                    <a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+                    <header>
+                        <h3><a href="#">Magna laoreet et aliquam</a></h3>
+                    </header>
+                    <p>
+                        10,000원
+                    </p>
+                </article>
+                <article class="col-4 col-12-mobile special">
+                    <a href="#" class="image featured"><img src="/static/css/images/pic07.jpg" alt="" /></a>
+                    <header>
+                        <h3><a href="#">Gravida aliquam penatibus</a></h3>
+                    </header>
+                    <p>
+                        8,000원
+                    </p>
+                </article>
+                <article class="col-4 col-12-mobile special">
+                    <a href="#" class="image featured"><img src="/static/css/images/pic08.jpg" alt="" /></a>
+                    <header>
+                        <h3><a href="#">Sed quis rhoncus placerat</a></h3>
+                    </header>
+                    <p>
+                        4,000원
+                    </p>
+                </article>
+                <article class="col-4 col-12-mobile special">
+                    <a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
+                    <header>
+                        <h3><a href="#">Magna laoreet et aliquam</a></h3>
+                    </header>
+                    <p>
+                        10,000원
+                    </p>
+                </article>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+
+                <!-- Tweets -->
+                <section class="col-4 col-12-mobile">
+                    <header>
+                        <h2 class="icon brands fa-twitter circled"><span class="label">Tweets</span></h2>
+                    </header>
+                    <ul class="divided">
+                        <li>
+                            <article class="tweet">
+                                Amet nullam fringilla nibh nulla convallis tique ante sociis accumsan.
+                                <span class="timestamp">5 minutes ago</span>
+                            </article>
+                        </li>
+                        <li>
+                            <article class="tweet">
+                                Hendrerit rutrum quisque.
+                                <span class="timestamp">30 minutes ago</span>
+                            </article>
+                        </li>
+                        <li>
+                            <article class="tweet">
+                                Curabitur donec nulla massa laoreet nibh. Lorem praesent montes.
+                                <span class="timestamp">3 hours ago</span>
+                            </article>
+                        </li>
+                        <li>
+                            <article class="tweet">
+                                Lacus natoque cras rhoncus curae dignissim ultricies. Convallis orci aliquet.
+                                <span class="timestamp">5 hours ago</span>
+                            </article>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Posts -->
+                <section class="col-4 col-12-mobile">
+                    <header>
+                        <h2 class="icon solid fa-file circled"><span class="label">Posts</span></h2>
+                    </header>
+                    <ul class="divided">
+                        <li>
+                            <article class="post stub">
+                                <header>
+                                    <h3><a href="#">Nisl fermentum integer</a></h3>
+                                </header>
+                                <span class="timestamp">3 hours ago</span>
+                            </article>
+                        </li>
+                        <li>
+                            <article class="post stub">
+                                <header>
+                                    <h3><a href="#">Phasellus portitor lorem</a></h3>
+                                </header>
+                                <span class="timestamp">6 hours ago</span>
+                            </article>
+                        </li>
+                        <li>
+                            <article class="post stub">
+                                <header>
+                                    <h3><a href="#">Magna tempus consequat</a></h3>
+                                </header>
+                                <span class="timestamp">Yesterday</span>
+                            </article>
+                        </li>
+                        <li>
+                            <article class="post stub">
+                                <header>
+                                    <h3><a href="#">Feugiat lorem ipsum</a></h3>
+                                </header>
+                                <span class="timestamp">2 days ago</span>
+                            </article>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Photos -->
+                <section class="col-4 col-12-mobile">
+                    <header>
+                        <h2 class="icon solid fa-camera circled"><span class="label">Photos</span></h2>
+                    </header>
+                    <div class="row gtr-25">
+                        <div class="col-6">
+                            <a href="#" class="image fit"><img src="/static/css/images/pic10.jpg" alt="" /></a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="image fit"><img src="/static/css/images/pic11.jpg" alt="" /></a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="image fit"><img src="/static/css/images/pic12.jpg" alt="" /></a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="image fit"><img src="/static/css/images/pic13.jpg" alt="" /></a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="image fit"><img src="/static/css/images/pic14.jpg" alt="" /></a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="image fit"><img src="/static/css/images/pic15.jpg" alt="" /></a>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-12">
+
+                    <!-- Contact -->
+                    <section class="contact">
+                        <header>
+                            <h3>Nisl turpis nascetur interdum?</h3>
+                        </header>
+                        <p>Urna nisl non quis interdum mus ornare ridiculus egestas ridiculus lobortis vivamus tempor aliquet.</p>
+                        <ul class="icons">
+                            <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+                            <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+                            <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+                            <li><a href="#" class="icon brands fa-pinterest"><span class="label">Pinterest</span></a></li>
+                            <li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
+                            <li><a href="#" class="icon brands fa-linkedin-in"><span class="label">Linkedin</span></a></li>
+                        </ul>
+                    </section>
+
+                    <!-- Copyright -->
+                    <div class="copyright">
+                        <ul class="menu">
+                            <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/jquery.dropotron.min.js"></script>
+<script src="/static/js/jquery.scrolly.min.js"></script>
+<script src="/static/js/jquery.scrollex.min.js"></script>
+<script src="/static/js/browser.min.js"></script>
+<script src="/static/js/breakpoints.min.js"></script>
+<script src="/static/js/util.js"></script>
+<script src="/static/js/main.js"></script>
+
+<p>---------------------------------------------------인기순 ------------------------------</p>
+<div th:each="movie, iterStat : ${movies}">
+    <div th:if="${iterStat.index < 2}">
+        <h2>영화 번호: <span th:text="${movie.id}">영화 번호</span></h2>
+        <h3>영화 이름: <span th:text="${movie.title}">영화 이름</span></h3>
+        <p>영화 설명: <span th:text="${movie.overview}">영화 설명</span></p>
+        <p>영화 장르: <span th:text="${#strings.listJoin(movie.genres, ', ')}">영화 장르</span></p>
+        <p>영화 평점: <span th:text="${movie.voteAverage}">영화 평점</span></p>
+        <p>인기도: <span th:text="${movie.popularity}">인기도</span></p>
+<!--        <div th:if="${movie.video}">-->
+<!--            <p>영화 비디오:</p>-->
+<!--            <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>-->
+<!--        </div>-->
+        <p>영화 배경사진:</p>
+        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경사진" />
+        <p>영화 포스터:</p>
+        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.posterPath}}" alt="포스터" />
+    </div>
+</div>
+
+<p>---------------------------------------------------개봉 예정작 ------------------------------</p>
+<div id="movies"></div>
+<script>
+    // 비동기 함수로 리팩토링
+    async function fetchMovies() {
+        const options = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
+            }
+        };
+
+        try {
+            const response = await fetch('https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=1', options);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            const today = new Date('2024-05-16');
+            const filteredMovies = data.results.filter(movie => new Date(movie.release_date) > today)
+                .slice(0, 5)
+                .map(movie => ({
+                    genre_ids: movie.genre_ids,
+                    popularity: movie.popularity,
+                    poster_path: movie.poster_path,
+                    title: movie.title,
+                    video: movie.video,
+                    vote_average: movie.vote_average,
+                    vote_count: movie.vote_count,
+                    release_date: movie.release_date
+                }));
+            displayMovies(filteredMovies);
+        } catch (err) {
+            console.error('Fetching movies failed:', err);
+        }
+    }
+
+    function createMovieElement(movie) {
+        const movieEl = document.createElement('div');
+        movieEl.classList.add('movie');
+        movieEl.innerHTML = `
+        <div class="title">${movie.title}</div>
+        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
+        <div>장르 ID: ${movie.genre_ids.join(', ')}</div>
+        <div>인기도: ${movie.popularity}</div>
+        <div>평점: ${movie.vote_average}</div>
+        <div>투표 수: ${movie.vote_count}</div>
+        <div>비디오 유무: ${movie.video ? '있음' : '없음'}</div>
+        <div>개봉 날짜: ${movie.release_date}</div>
+    `;
+        return movieEl;
+    }
+
+    function displayMovies(movies) {
+        const container = document.getElementById('movies');
+        if (!container) {
+            console.error('Element with id "movies" not found.');
+            return;
+        }
+        movies.forEach(movie => {
+            const movieEl = createMovieElement(movie);
+            container.appendChild(movieEl);
+        });
+    }
+
+    // 영화 정보를 가져오는 함수 호출
+    fetchMovies();
+</script>
+
+
+</body>
 </html>
