@@ -1,0 +1,41 @@
+/* faq */
+#home header {
+    width: 100%;
+    display: block;
+}
+#home table.default tr td{
+    font-size: 20px;
+}
+#home table.default tr td:nth-child(2) {
+    width: 5%;
+    position: relative;
+}
+#home table.default tr td:nth-child(2) img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#home_get header {
+    width: 100%;
+    display: block;
+}
+#home_get header h2 {
+    font-size: 1.25em;
+}
+#home_get .row {
+    margin-left: 0;
+    margin-bottom: 1em;
+}
+#home_get .row p {
+    padding: 0 4.5em;
+    font-size: 20px;
+}
+/* 이메일 보내기 contact */
+#contact header {
+    width: 100%;
+    display: block;
+}
+#contact > header > p {
+    font-size: 20px;
+}

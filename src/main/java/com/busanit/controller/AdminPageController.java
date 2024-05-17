@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class AdminPageController {
 
+    @GetMapping("/adminMain")
+    public String adminMain(){
+        return "admin/adminMain";
+    }
+
     @PostMapping("/movie")
     public String movie(){
         return "admin/adminMoviePage";
