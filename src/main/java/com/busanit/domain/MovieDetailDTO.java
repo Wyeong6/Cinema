@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,6 +18,36 @@ public class MovieDetailDTO {
 
     private String runtime;
     private String release_date;
-    private String certification;
+
+
+
+
+
+
+
+
+    // ---- JSON타입의 배열속의 배열속 에있는 데이터들을 추출하기위한 추가적인 DTO;
+    // -- Detail에서만 사용되기때문에 DetailDTO내부에 작성하였음.
+    @Getter
+    @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ReleaseDatesDTO {
+        private List<ReleaseDatesResult> results;
+    }
+
+    @Getter
+    @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ReleaseDatesResult {
+        private String iso_3166_1;
+        private List<ReleaseDateInfo> release_dates;
+    }
+
+    @Getter
+    @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ReleaseDateInfo {
+        private String certification;
+    }
 
 }

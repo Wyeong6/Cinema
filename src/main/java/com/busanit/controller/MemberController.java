@@ -25,35 +25,38 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    //    private final TermsService termsService;
     private final CustomOAuth2UserDetailsService customOAuth2UserDetailsService;
 
     @GetMapping("/login")
-    public String login(){
+    public String login() {
         return "member/login";
     }
 
     @GetMapping("/login/error")
-    public String loginError(Model model){
+    public String loginError(Model model) {
         model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호를 확인해주세요.");
 
         return "member/login";
     }
 
     @GetMapping("/new")
-    public String register(Model model){
+    public String register(Model model) {
         model.addAttribute("memberRegFormDTO", new MemberRegFormDTO());
 
         return "member/join";
     }
 
     @PostMapping("/new")
-    public String register(@Valid MemberRegFormDTO regFormDTO, BindingResult bindingResult, Model model){
+//    public String register(@Valid MemberRegFormDTO regFormDTO, TermsAgreeDTO termsAgreeDTO, BindingResult bindingResult, Model model){
+    public String register(@Valid MemberRegFormDTO regFormDTO, BindingResult bindingResult, Model model) {
         // 에러가 있으면 회원 가입 페이지로 이동
-        if(bindingResult.hasErrors()){
+        if(bindingResult.hasErrors()) {
             return "member/join";
         }
-        try{
+        try {
             memberService.saveMember(Member.createMember(regFormDTO, passwordEncoder));
+//            termsService.saveTerms(termsService.createTermsAgree(regFormDTO, termsAgreeDTO));
         } catch(IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "member/join";
@@ -64,7 +67,7 @@ public class MemberController {
 
     // 관리자 회원가입(삭제예정)
     @GetMapping("/new2")
-    public String register2(Model model){
+    public String register2(Model model) {
         model.addAttribute("memberRegFormDTO2", new MemberRegFormDTO());
 
         return "member/join2";
@@ -72,12 +75,12 @@ public class MemberController {
 
     // 관리자 회원가입(삭제예정)
     @PostMapping("/new2")
-    public String register2(@Valid MemberRegFormDTO regFormDTO, BindingResult bindingResult, Model model){
+    public String register2(@Valid MemberRegFormDTO regFormDTO, BindingResult bindingResult, Model model) {
         // 에러가 있으면 회원 가입 페이지로 이동
-        if(bindingResult.hasErrors()){
+        if(bindingResult.hasErrors()) {
             return "member/join2";
         }
-        try{
+        try {
             memberService.saveMember(Member.createMember2(regFormDTO, passwordEncoder));
         } catch(IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -89,7 +92,9 @@ public class MemberController {
 
     // 아이디(이메일) 찾기
     @GetMapping("/findId")
-    public String findId() { return "member/findId"; }
+    public String findId() {
+        return "member/findId";
+    }
 
     @PostMapping("/findId")
     public String findId(String name, String age, Model model) {
@@ -101,13 +106,15 @@ public class MemberController {
 
     // 아이디(이메일) 찾기
     @GetMapping("/findPassword")
-    public String findPassword() { return "member/findPassword"; }
+    public String findPassword() {
+        return "member/findPassword";
+    }
 
     @PostMapping("/findPassword")
     public String findPassword(String name, String age, String email, Model model) {
         boolean findPassword = memberService.findUserPassword(name, age, email);
 
-        if (findPassword) { // 해당 정보값을 가진 사용자가 존재
+        if(findPassword) { // 해당 정보값을 가진 사용자가 존재
             String newPwd = RandomStringUtils.randomAlphanumeric(10);
             memberService.updatePassword(passwordEncoder.encode(newPwd), email);
             model.addAttribute("findInfo", newPwd);
@@ -121,18 +128,18 @@ public class MemberController {
 
     // password 수정
     @GetMapping("/modify")
-    public String modifyPassword(){
+    public String modifyPassword() {
         return "member/memberPasswordModify";
     }
 
     @PostMapping("/modify")
     public String modifyPassword(String password, @AuthenticationPrincipal Object principal) {
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
-        if (principal instanceof OAuth2MemberDTO) {
+        if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
             // socialMemberDTO를 사용하여 처리
             memberService.updatePassword(passwordEncoder.encode(password), oAuth2MemberDTO.getEmail());
-        } else if (principal instanceof FormMemberDTO) {
+        } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
             // formMemberDTO를 사용하여 처리
             memberService.updatePassword(passwordEncoder.encode(password), formMemberDTO.getEmail());
@@ -142,12 +149,12 @@ public class MemberController {
 
     // 소셜 로그인 특정 조건(비밀번호 재설정x or 나이 재설정x)일때 뜨는 페이지
     @GetMapping("/modifySocialInfo")
-    public String modifySocialInfo(){
+    public String modifySocialInfo() {
         return "member/memberSocialInfoModify";
     }
 
     @PostMapping("/modifySocialInfo")
-    public String modifySocialInfo(String password, String age, @AuthenticationPrincipal OAuth2MemberDTO oAuth2MemberDTO){
+    public String modifySocialInfo(String password, String age, @AuthenticationPrincipal OAuth2MemberDTO oAuth2MemberDTO) {
         // @AuthenticationPrincipal - 현재 로그인한 사용자 객체를 파라미터(인자)에 주입할 수 있음
         customOAuth2UserDetailsService.updatePasswordAndAge(passwordEncoder.encode(password), age,
                 oAuth2MemberDTO.getEmail());

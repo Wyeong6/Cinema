@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class MovieService {
 
     private final OkHttpClient client = new OkHttpClient();
@@ -107,8 +106,7 @@ public class MovieService {
         }
         // 비디오 키를 찾을 수 없는 경우 null을 반환합니다.
         return null;
-    }
-    private void processResponse(String responseBody) throws IOException {
+    }    private void processResponse(String responseBody) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
@@ -204,6 +202,7 @@ public class MovieService {
         }
     }
 
+
     public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
         MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
         Movie movie = movieRepository.findById(movieDetailDTO.getId()).orElse(new Movie());
@@ -272,11 +271,47 @@ public class MovieService {
         movieRepository.save(movie);
     }
 
-    public List<MovieDTO> getAllMovies() {
+    public void fetchAndStoreCertificationData() throws IOException {
+        List<Long> movieIds = getAllMovieIds(); // 모든 movie ID를 가져오는 메서드
+        for (Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/release_dates?api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processCertificationResponse(responseBody, movieId);
+            }
+        }
+    }
 
-        List<Movie> movieList = movieRepository.findAll();
-        return movieList.stream().map(MovieDTO::convertToDTO)
-                .collect(Collectors.toList());
+    public void processCertificationResponse(String responseBody, Long movieId) throws IOException {
+        MovieDetailDTO.ReleaseDatesDTO releaseDatesDTO = objectMapper.readValue(responseBody, MovieDetailDTO.ReleaseDatesDTO.class);
+
+        String certification = releaseDatesDTO.getResults().stream()
+                .filter(result -> "KR".equals(result.getIso_3166_1()))
+                .flatMap(result -> result.getRelease_dates().stream())
+                .map(MovieDetailDTO.ReleaseDateInfo::getCertification)
+                .findFirst()
+                .orElse(null);
+
+        if ("".equals(certification)) {
+            certification = "-";
+        } else if ("18".equals(certification)) {
+            certification = "18세 이상 관람가";
+        } else if ("15".equals(certification)) {
+            certification = "15세 이상 관람가";
+        } else if ("12".equals(certification)) {
+            certification = "12세 이상 관람가";
+        } else if ("ALL".equals(certification)||"All".equals(certification)) {
+            certification = "전체 관람가";
+        }
+
+
+        if (certification != null) {
+            Movie movie = movieRepository.findById(movieId).orElse(new Movie());
+            MovieDetail movieDetail = getOrCreateMovieDetail(movie);
+            movieDetail.setCertification(certification); // MovieDetail에 certification 세팅
+            movieDetailRepository.save(movieDetail);
+        }
     }
 
     public List<MovieDTO> getHotMovies(){
@@ -284,6 +319,8 @@ public class MovieService {
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+
 
 
 }
