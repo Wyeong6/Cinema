@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member extends BaseEntity {
+public class Member extends BaseTimeEntity {
 
     @Id
     @Column(name = "member_id")
@@ -56,8 +56,8 @@ public class Member extends BaseEntity {
                 .role(Role.USER)
                 .social(false)
                 .grade_code(4)
-                .checkedTermsE(regFormDTO.getCheckedTermsE())
-                .checkedTermsS(regFormDTO.getCheckedTermsS())
+                .checkedTermsE(regFormDTO.getCheckedTermsE() != null ? regFormDTO.getCheckedTermsE() : true) // 회원가입시 약관에 동의한 것으로 간주함
+                .checkedTermsS(regFormDTO.getCheckedTermsS() != null ? regFormDTO.getCheckedTermsS() : false)
                 .build();
     }
 
