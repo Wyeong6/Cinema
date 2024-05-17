@@ -4,7 +4,7 @@
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
+<html lang="">
 <head>
     <title>Notice</title>
     <meta charset="utf-8"/>
@@ -51,12 +51,20 @@
                 </table>
                 <div class="paging_btn">
                     <ul>
+                        <a th:href="@{/cs/notice(page=${1})}"
+                           th:onclick="${currentPage == 1} ? 'return false;'"><< &emsp;</a>
+                        <a th:href="@{/cs/notice(page=${currentPage - 1})}"
+                            th:onclick="${currentPage == 1} ? 'return false;'">&lt; &emsp;</a>
                         <li th:each="pageNum : ${pageNumbers}">
                             <a th:href="@{/cs/notice(page=${pageNum}, size=${size})}"
                                th:text="${pageNum}"
-                               th:onclick="${pageNum == currentPage} ? 'return false;'"
-                            ></a>
+                               th:onclick="${pageNum == currentPage} ? 'return false;'"></a>
                         </li>
+                        <a th:href="@{/cs/notice(page=${currentPage + 1})}"
+                           th:onclick="${currentPage == totalPages} ? 'return false;'">&gt;</a>
+                        <span></span>
+                        <a th:href="@{/cs/notice(page=${totalPages})}"
+                           th:onclick="${currentPage == totalPages} ? 'return false;'">>></a>
                     </ul>
                 </div>
             </div>
@@ -81,13 +89,13 @@
 <script>
     // include.js
     window.addEventListener('load', function () {
-        var allElements = document.getElementsByTagName('*');
+        const allElements = document.getElementsByTagName('*');
         Array.prototype.forEach.call(allElements, function (el) {
-            var includePath = el.dataset.includePath;
+            const includePath = el.dataset.includePath;
             if (includePath) {
-                var xhttp = new XMLHttpRequest();
+                const xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
+                    if (this.readyState === 4 && this.status === 200) {
                         el.outerHTML = this.responseText;
                     }
                 };
