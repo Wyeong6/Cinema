@@ -180,7 +180,7 @@ input, select, textarea {
 		font-style: italic;
 	}
 
-	p, ul, ol, dl, table {
+	p, ul, ol, dl {
 		margin-bottom: 1em;
 	}
 
