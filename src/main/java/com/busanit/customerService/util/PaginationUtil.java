@@ -7,20 +7,15 @@ import java.util.List;
 public class PaginationUtil {
 
     public static void addPaginationAttributes(Model model, int page, int size, int totalPages) {
+        model.addAttribute("firstPage", 1);
+        model.addAttribute("previousPage", calculatePreviousPage(page));
+        model.addAttribute("nextPage", calculateNextPage(page, totalPages));
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);
         model.addAttribute("size", size);
 
-        // Calculate page numbers to display
         List<Integer> pageNumbers = calculatePageNumbers(page, totalPages);
         model.addAttribute("pageNumbers", pageNumbers);
-
-        // Add navigation attributes
-        model.addAttribute("firstPage", 1);
-        model.addAttribute("lastPage", totalPages);
-        model.addAttribute("previousPage", calculatePreviousPage(page));
-        model.addAttribute("nextPage", calculateNextPage(page, totalPages));
-
     }
 
     public static List<Integer> calculatePageNumbers(int currentPage, int totalPages) {
