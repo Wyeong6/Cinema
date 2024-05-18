@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,7 +71,23 @@ public class MovieService {
             }
         }
     }
-
+    public List<MovieDTO> fetchAndStoreUpcoming() throws IOException {
+        List<MovieDTO> upcomingMovies = new ArrayList<>();
+        for (int page = 1; page <= 8; page++) {
+            String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                JsonNode results = objectMapper.readTree(response.body().string()).get("results");
+                results.forEach(node -> {
+                    String posterPath = node.get("poster_path").asText(null);
+                    if (posterPath != null && !posterPath.isEmpty()) {
+                        upcomingMovies.add(objectMapper.convertValue(node, MovieDTO.class));
+                    }
+                });
+            }
+        }
+        return upcomingMovies;
+    }
 
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";

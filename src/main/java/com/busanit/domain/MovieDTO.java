@@ -26,6 +26,7 @@ public class MovieDTO {
     private String releaseDate;
     private String certifications;
     private String video;
+    @JsonProperty("poster_path")
     private String posterPath;
     private String backdropPath;
     private String popularity;

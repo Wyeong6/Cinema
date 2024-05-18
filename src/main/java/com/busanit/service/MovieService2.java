@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -65,6 +66,8 @@ public class MovieService2 {
         }
     }
 
+
+
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
         Request request = new Request.Builder().url(url).build();
@@ -87,6 +90,8 @@ public class MovieService2 {
             }
         }
     }
+
+
 
     // JSON 응답에서 results 배열을 추출
     private JsonNode getResultsFromResponse(String responseBody) throws IOException {
