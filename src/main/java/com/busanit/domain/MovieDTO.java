@@ -2,6 +2,7 @@ package com.busanit.domain;
 
 import com.busanit.entity.movie.Genre;
 import com.busanit.entity.movie.Movie;
+import com.busanit.entity.movie.MovieStillCut;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -24,7 +25,6 @@ public class MovieDTO {
     @JsonProperty("release_date")
     private String releaseDate;
     private String certifications;
-    private String stillCut;
     private String video;
     private String posterPath;
     private String backdropPath;
@@ -34,7 +34,7 @@ public class MovieDTO {
     @JsonProperty("genre_ids")
     private List<Integer> genreIds;
     private List<String> Genres;
-
+    private List<String> stillCutPaths;
 
     public static MovieDTO convertToDTO(Movie movie){
         MovieDTO movieDTO = new MovieDTO();
@@ -54,6 +54,9 @@ public class MovieDTO {
             movieDTO.setPopularity(detail.getPopularity());
             movieDTO.setVoteAverage(detail.getVoteAverage());
             movieDTO.setVideo(detail.getVideo());
+            movieDTO.setReleaseDate(detail.getReleaseDate());
+            movieDTO.setRuntime(detail.getRuntime());
+            movieDTO.setCertifications(detail.getCertification());
         });
 
         // MovieDetail이 null인 경우의 대체값 설정
@@ -62,25 +65,29 @@ public class MovieDTO {
             movieDTO.setVideo(null);
         }
 
+        Optional.ofNullable(movie.getStillCuts()).ifPresent(stillCuts -> {
+            List<String> stillCutPaths = stillCuts.stream()
+                    .map(MovieStillCut::getStillCuts) // getImagePath 대신 실제 필드명을 사용해야 함
+                    .collect(Collectors.toList());
+            movieDTO.setStillCutPaths(stillCutPaths);
+        });
+
         // 장르 이름 추출 및 설정
-        List<String> genreNames = movie.getGenres().stream()
-                .map(Genre::getGenreName) // Genre 객체에서 이름 추출
-                .collect(Collectors.toList());
-        movieDTO.setGenres(genreNames);
+        Optional.ofNullable(movie.getGenres()).ifPresent(Genres ->{
+            List<String> genreNames = Genres.stream()
+                    .map(Genre::getGenreName) // Genre 객체에서 이름 추출
+                    .collect(Collectors.toList());
+            movieDTO.setGenres(genreNames);
+
+        });
+
+//        // 장르 이름 추출 및 설정
+//        List<String> genreNames = movie.getGenres().stream()
+//                .map(Genre::getGenreName) // Genre 객체에서 이름 추출
+//                .collect(Collectors.toList());
+//        movieDTO.setGenres(genreNames);
 
         return movieDTO;
     }
-
-    public MovieDTO(Long id, String title) {
-        this.id = id;
-        this.title = title;
-    }
-//    public static MovieDTO convertToDTO(Movie movie){
-//        return MovieDTO.builder()
-//                .id(movie.getMovieId())
-//                .title(movie.getTitle())
-//                .overview(movie.getOverview())
-//                .build();
-//    }
 
 }
