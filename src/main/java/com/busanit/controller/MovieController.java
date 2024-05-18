@@ -4,19 +4,23 @@ import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MovieRepository;
 import com.busanit.service.MovieService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
 import java.util.List;
 
-
+//@RestController
 @Controller
 @RequiredArgsConstructor
 public class MovieController {
 
-    private final MovieRepository movieRepository;
     private final MovieService movieService2;
 
     @Transactional
@@ -27,19 +31,44 @@ public class MovieController {
         movieService2.fetchAndStoreMovieStillCuts();
         movieService2.fetchAndStoreCertificationData();
 
+        //비디오가 있는 인기순영화
         List<MovieDTO> videoMovies = movieService2.getVideoMovies();
         model.addAttribute("videoMovies", videoMovies);
 
+        //모든 영화
         List<MovieDTO> allMovies = movieService2.getAll();
         model.addAttribute("allMovies", allMovies);
 
+        //인기순
         List<MovieDTO> hotMovies = movieService2.getHotMovies();
         model.addAttribute("hotMovies", hotMovies);
 
-
+        List<MovieDTO> upcomingMovies = movieService2.fetchAndStoreUpcoming();
+        model.addAttribute("upcomingMovies", upcomingMovies);
 
         return "main";
     }
+
+    //현재 상영작페이지
+    @GetMapping("/nowMovie")
+    public String nowMovie(Model model){
+        List<MovieDTO> allMovies = movieService2.getAll();
+        model.addAttribute("allMovies", allMovies);
+
+        return "movie/movie_list_now";
+    }
+
+    //개봉예정 페이지
+    @GetMapping("/comingMove")
+    public String hotMove(Model model) throws IOException {
+
+        List<MovieDTO> upcomingMovies = movieService2.fetchAndStoreUpcoming();
+        model.addAttribute("upcomingMovies", upcomingMovies);
+        return "movie/movie_list_comming";
+    }
+}
+
+
 
 //    @GetMapping("/test")
 //    public String test(Model model) {
@@ -47,5 +76,5 @@ public class MovieController {
 //        model.addAttribute("movies", movies);
 //        return "test";
 //    }
-}
+
 

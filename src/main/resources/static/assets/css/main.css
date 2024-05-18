@@ -1801,6 +1801,7 @@ input, select, textarea {
 			margin: 0 0 1em 0;
 		}
 
+
 		.image.left {
 			float: left;
 			margin: 0 2em 2em 0;
@@ -2787,6 +2788,11 @@ input, select, textarea {
 			.image.featured {
 				margin: 0 0 2em 0;
 			}
+
+		/*.img-resize {*/
+		/*	width: 100px; !* 원하는 너비로 설정 *!*/
+		/*	height: auto; !* 비율 유지 *!*/
+		/*}*/
 
 			.image.left {
 				margin: 0 1em 1em 0;
