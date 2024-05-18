@@ -102,24 +102,20 @@
             <h2>Weekly Hot Movies</h2>
             <p><a href="/templates/movie/moviemovie_list_now.html">more</a></p>
         </div>
-        <span th:each="movie, iterStat : ${movies}" th:if="${iterStat.index < 10}" class="reel">
-<!--            <div th:each="movie, iterStat : ${movies}" style="display: inline-block;">-->
-<!--                <span th:if="${iterStat.index < 10}">-->
-                    <article>
-                        <a href="#" class="image featured"><img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경 사진" /></a>
-                        <img src="/images/2.png" alt="one" class="overlay-img" />
-                        <header>
-                            <h3><a th:href="@{'/movie/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
-                            <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
-                        </header>
-                        <div class="button_box">
-                            <button class="reservation_btn">예매하기</button>
-                            <button class="get_btn"><a th:href="@{'/movie_get/' + ${movie.id}}">상세보기</a></button>
-                        </div>
-                    </article>
-<!--                </span>-->
-<!--            </div>-->
-        </span>
+        <div class="reel">
+            <article th:each="movie, iterStat : ${hotMovies}" th:if="${iterStat.index < 10}" >
+                <a href="#" class="image featured"><img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경 사진" /></a>
+                <img src="/images/2.png" alt="one" class="overlay-img" />
+                <header>
+                    <h3><a th:href="@{'/movie/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
+                    <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
+                </header>
+                <div class="button_box">
+                    <button class="reservation_btn">예매하기</button>
+                    <button class="get_btn"><a th:href="@{'/movie_get/' + ${movie.id}}">상세보기</a></button>
+                </div>
+            </article>
+        </div>
     </section>
 
     <!-- Comming Soon -->
@@ -130,125 +126,6 @@
         </div>
         <div class="reel">
 
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic01.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Pulvinar sagittis congue</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic02.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Fermentum sagittis proin</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic03.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic04.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Ultrices urna sit lobortis</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic05.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Varius magnis sollicitudin</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic01.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Fermentum sagittis proin</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic02.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Fermentum sagittis proin</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic03.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic04.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Ultrices urna sit lobortis</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
-
-            <article>
-                <a href="#" class="image featured"><img src="/images/pic05.jpg" alt="" /></a>
-                <header>
-                    <h3><a href="#">Varius magnis sollicitudin</a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> runtime</p>
-                </header>
-                <div class="button_box">
-                    <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a href="/templates/movie/movie_get.html">상세보기</a></button>
-                </div>
-            </article>
 
         </div>
     </section>
@@ -492,6 +369,111 @@
         </div>
     </div>
 
+    <script>
+        // 비동기 함수로 리팩토링
+        async function fetchMovies() {
+            const options = {
+                method: 'GET',
+                headers: {
+                    accept: 'application/json',
+                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
+                }
+            };
+
+            const today = new Date();
+            let allFilteredMovies = [];
+
+            try {
+                for (let page = 1; page <= 8; page++) {
+                    const response = await fetch(`https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=${page}`, options);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    const filteredMovies = data.results.filter(movie => new Date(movie.release_date) > today)
+                        .map(movie => ({
+                            genre_ids: movie.genre_ids,
+                            popularity: movie.popularity,
+                            poster_path: movie.poster_path,
+                            title: movie.title,
+                            video: movie.video,
+                            vote_average: movie.vote_average,
+                            vote_count: movie.vote_count,
+                            release_date: movie.release_date
+                        }));
+                    allFilteredMovies = allFilteredMovies.concat(filteredMovies);
+                }
+                displayMovies(allFilteredMovies);
+            } catch (err) {
+                console.error('Fetching movies failed:', err);
+            }
+        }
+        let movieCreationCount = 0;
+        function createMovieElement(movie) {
+            // movieCreationCount가 10보다 작을 때만 요소 생성 로직 실행
+            if (movieCreationCount < 10) {
+            const movieEl = document.createElement('div');
+            movieEl.classList.add('movie');
+            movieEl.innerHTML = `
+        <article>
+          <a href="#" class="image featured"><img src="https://image.tmdb.org/t/p/w200${movie.poster_path}" alt="배경 사진" /></a>
+          <img src="/images/2.png" alt="one" class="overlay-img" />
+          <header>
+            <h3><a href="/movie/${movie.id}"><span>${movie.title}</span></a></h3>
+            <p><img src="/images/clock.png" alt="clock"/> <span>${movie.runtime || '정보 없음'}</span></p>
+          </header>
+          <div class="button_box">
+            <button class="reservation_btn">예매하기</button>
+            <button class="get_btn"><a href="/movie_get/${movie.id}">상세보기</a></button>
+          </div>
+        </article>
+    `;
+            return movieEl;
+        }
+
+        // <div className="reel">
+        //     <article th:each="movie, iterStat : ${hotMovies}" th:if="${iterStat.index < 10}">
+        //         <a href="#" className="image featured"><img
+        //             th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경 사진"/></a>
+        //         <img src="/images/2.png" alt="one" className="overlay-img"/>
+        //         <header>
+        //             <h3><a th:href="@{'/movie/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
+        //             <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
+        //         </header>
+        //         <div className="button_box">
+        //             <button className="reservation_btn">예매하기</button>
+        //             <button className="get_btn"><a th:href="@{'/movie_get/' + ${movie.id}}">상세보기</a></button>
+        //         </div>
+        //     </article>
+        // </div>
+        // <div class="title">${movie.title}</div>
+        // <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
+        // <div>장르 ID: ${movie.genre_ids.join(', ')}</div>
+        // <div>인기도: ${movie.popularity}</div>
+        // <div>평점: ${movie.vote_average}</div>
+        // <div>투표 수: ${movie.vote_count}</div>
+        // <div>비디오 유무: ${movie.video ? '있음' : '없음'}</div>
+        // <div>개봉 날짜: ${movie.release_date}</div>
+
+        // 영화 데이터를 화면에 표시하는 함수
+        function displayMovies(movies) {
+            // "Coming Soon" 섹션의 <div class="reel"> 요소를 선택합니다.
+            const comingSoonReel = document.querySelectorAll('.carousel .reel')[1];
+
+
+            // 영화 정보를 담은 HTML 요소들을 생성하고, "Coming Soon" 섹션에 추가합니다.
+            movies.forEach(movie => {
+                const movieElement = createMovieElement(movie);
+                comingSoonReel.appendChild(movieElement);
+            });
+        }
+
+        // 영화 정보를 가져오는 함수 호출
+        fetchMovies();
+
+
+    </script>
+
 </div>
 
 <!-- Scripts -->
@@ -526,74 +508,58 @@
 
 <p>---------------------------------------------------개봉 예정작 ------------------------------</p>
 <div id="movies"></div>
+
+<table>
+<tr th:each="movie : ${videoMovies}">
+    <td th:text="${movie.title}"> </td>
+    <td><img th:src="@{|https://image.tmdb.org/t/p/w200${movie.backdropPath}|}" alt="배경사진" /></td>
+    <td th:if="${movie.video}">
+        <p>영화 비디오:</p>
+        <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen></iframe>
+    </td>
+</tr>
+</table>
+<p>------------------------------이미지클릭 하면 비디오재생----------------------------------</p>
+<table class="table">
+    <tr th:each="movie : ${videoMovies}">
+        <td th:text="${movie.title}"></td>
+        <td>
+            <img th:src="@{|https://image.tmdb.org/t/p/w500${movie.backdropPath}|}" alt="배경사진" class="movie-img" style="cursor: pointer;" th:attr="data-video-id=${movie.video}">        </td>
+    </tr>
+</table>
+<!-- 모달 -->
+<div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <iframe width="100%" height="500px" id="videoFrame" src="" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script>
-    // 비동기 함수로 리팩토링
-    async function fetchMovies() {
-        const options = {
-            method: 'GET',
-            headers: {
-                accept: 'application/json',
-                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
-            }
-        };
 
-        try {
-            const response = await fetch('https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=1', options);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            const today = new Date('2024-05-16');
-            const filteredMovies = data.results.filter(movie => new Date(movie.release_date) > today)
-                .slice(0, 5)
-                .map(movie => ({
-                    genre_ids: movie.genre_ids,
-                    popularity: movie.popularity,
-                    poster_path: movie.poster_path,
-                    title: movie.title,
-                    video: movie.video,
-                    vote_average: movie.vote_average,
-                    vote_count: movie.vote_count,
-                    release_date: movie.release_date
-                }));
-            displayMovies(filteredMovies);
-        } catch (err) {
-            console.error('Fetching movies failed:', err);
-        }
-    }
-
-    function createMovieElement(movie) {
-        const movieEl = document.createElement('div');
-        movieEl.classList.add('movie');
-        movieEl.innerHTML = `
-        <div class="title">${movie.title}</div>
-        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
-        <div>장르 ID: ${movie.genre_ids.join(', ')}</div>
-        <div>인기도: ${movie.popularity}</div>
-        <div>평점: ${movie.vote_average}</div>
-        <div>투표 수: ${movie.vote_count}</div>
-        <div>비디오 유무: ${movie.video ? '있음' : '없음'}</div>
-        <div>개봉 날짜: ${movie.release_date}</div>
-    `;
-        return movieEl;
-    }
-
-    function displayMovies(movies) {
-        const container = document.getElementById('movies');
-        if (!container) {
-            console.error('Element with id "movies" not found.');
-            return;
-        }
-        movies.forEach(movie => {
-            const movieEl = createMovieElement(movie);
-            container.appendChild(movieEl);
+    $(document).ready(function(){
+        $('.movie-img').click(function(){
+            var videoId = $(this).data('video-id');
+            // YouTube 동영상 ID를 사용하여 URL 생성, 자동 재생을 위해 '?autoplay=1' 추가
+            var videoSrc = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+            $('#videoFrame').attr('src', videoSrc);
+            $('#videoModal').modal('show');
         });
-    }
 
-    // 영화 정보를 가져오는 함수 호출
-    fetchMovies();
+        // 모달이 닫힐 때 영상 정지
+        $('#videoModal').on('hidden.bs.modal', function (e) {
+            $('#videoFrame').attr('src', '');
+        });
+    });
 </script>
-
 
 </body>
 </html>

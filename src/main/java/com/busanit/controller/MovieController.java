@@ -5,6 +5,7 @@ import com.busanit.repository.MovieRepository;
 import com.busanit.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.io.IOException;
@@ -16,17 +17,25 @@ import java.util.List;
 public class MovieController {
 
     private final MovieRepository movieRepository;
-    private final MovieService movieService;
+    private final MovieService movieService2;
 
+    @Transactional
     @GetMapping("/movies/Main")
     public String getDetailMovies(Model model) throws IOException {
-        movieService.fetchAndStoreMoviesNowPlaying();
-        movieService.fetchAndStoreMovieRuntimeAndReleaseData();
-        movieService.fetchAndStoreMovieStillCuts();
-        movieService.fetchAndStoreCertificationData();
+        movieService2.fetchAndStoreMoviesNowPlaying();
+        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
+        movieService2.fetchAndStoreMovieStillCuts();
+        movieService2.fetchAndStoreCertificationData();
 
-        List<MovieDTO> movies = movieService.getHotMovies();
-        model.addAttribute("movies", movies);
+        List<MovieDTO> videoMovies = movieService2.getVideoMovies();
+        model.addAttribute("videoMovies", videoMovies);
+
+        List<MovieDTO> allMovies = movieService2.getAll();
+        model.addAttribute("allMovies", allMovies);
+
+        List<MovieDTO> hotMovies = movieService2.getHotMovies();
+        model.addAttribute("hotMovies", hotMovies);
+
 
 
         return "main";
