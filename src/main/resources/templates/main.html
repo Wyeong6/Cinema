@@ -104,12 +104,12 @@
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 10}" >
-                <a href="#" class="image featured">
+                <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
                     <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="173" height="250" />
                 </a>
                 <img src="/images/2.png" alt="one" class="overlay-img" />
                 <header>
-                    <h3><a th:href="@{'/movie/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
+                    <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
                     <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
                 </header>
                 <div class="button_box">
@@ -543,6 +543,18 @@
             $('#videoFrame').attr('src', '');
         });
     });
+
+    // 영화 포스터를 클릭했을 때
+    document.querySelectorAll('.image.featured').forEach(function(element) {
+        element.addEventListener('click', function(event) {
+            // 클릭된 영화의 ID를 가져와서 상세보기 페이지 URL을 생성
+            var movieId = element.getAttribute('data-movie-id');
+            var detailPageUrl = '/movie/' + movieId;
+            // 상세보기 페이지로 이동
+            window.location.href = detailPageUrl;
+        });
+    });
+
 </script>
 
 </body>

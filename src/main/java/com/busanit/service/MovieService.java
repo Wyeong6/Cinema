@@ -273,6 +273,9 @@ public class MovieService {
     }
 
     private void saveSingleStillCut(Long movieId, String filePath) {
+        if (movieStillCutRepository.existsByMovies_movieIdAndStillCuts(movieId, filePath)) {
+            return; // 스틸컷 중복체크
+        }
         Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + movieId));
         MovieStillCut movieStillCut = new MovieStillCut();
 //        movieStillCut.setMovieStillCutId(movieId);
@@ -375,6 +378,13 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
         Pageable topFive = PageRequest.of(0, 5);
         List<Movie> movieList = movieRepository.findByVideoTrueOrderByPopularityDesc(topFive);
 
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 영화 상세보기
+    public List<MovieDTO> getMovieDetailInfo(Long movieID) {
+        Optional<Movie> movieList = movieRepository.findById(movieID);
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }

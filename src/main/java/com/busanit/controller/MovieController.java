@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,6 +67,21 @@ public class MovieController {
         model.addAttribute("upcomingMovies", upcomingMovies);
         return "movie/movie_list_comming";
     }
+
+    @GetMapping("/movies/{movieId}")
+    public String movieDetailinfo(@PathVariable("movieId") Long movidId, Model model) {
+        List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(movidId);
+        model.addAttribute("movieInfos", movieInfos);
+        return "movie/movie_get";
+    }
+
+    @GetMapping("/movies/get")
+    public String test(Model model) {
+        return "movie/movie_get";
+    }
+
+
+
 }
 
 
