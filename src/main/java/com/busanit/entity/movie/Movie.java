@@ -1,6 +1,7 @@
 package com.busanit.entity.movie;
 
 
+import com.busanit.entity.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
@@ -13,9 +14,8 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Movie {
-
-
 
     @Id
     private Long movieId;
@@ -39,7 +39,6 @@ public class Movie {
     @JoinColumn(name = "movie_detail_id")
     private MovieDetail movieDetail;
 
-
     //이미지 관계
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private List<MovieImage> images;
@@ -51,6 +50,16 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "movie_still_cut_id"))
     private List<MovieStillCut> stillCuts = new ArrayList<>();
 
+    //댓글 관계
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    private List<Comment> comment = new ArrayList<>();
+
+    public void addComment(Comment comment){
+        this.comment.add(comment);
+        if(comment != null){
+            comment.setMovie(this);
+        }
+    }
 
     public void addStillCut(MovieStillCut stillCut) {
         this.stillCuts.add(stillCut);
@@ -74,11 +83,4 @@ public class Movie {
         this.images.add(image);
         image.setMovie(this);
     }
-
-    //--------------- 생성자
-    public Movie() {
-        this.images = new ArrayList<>();
-    }
-
-
 }

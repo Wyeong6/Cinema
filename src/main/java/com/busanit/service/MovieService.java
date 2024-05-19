@@ -273,6 +273,9 @@ public class MovieService {
     }
 
     private void saveSingleStillCut(Long movieId, String filePath) {
+        if (movieStillCutRepository.existsByMovies_movieIdAndStillCuts(movieId, filePath)) {
+            return; // 스틸컷 중복체크
+        }
         Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + movieId));
         MovieStillCut movieStillCut = new MovieStillCut();
 //        movieStillCut.setMovieStillCutId(movieId);
@@ -358,7 +361,11 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
             movieDetailRepository.save(movieDetail);
         }
     }
-
+//    public List<MovieDTO> getAll() {
+//        List<Movie> movieList = movieRepository.findAll();
+//        // MapStruct를 사용한 변환
+//        return MovieMapper.INSTANCE.moviesToMovieDTOs(movieList);
+//    }
     public List<MovieDTO> getAll(){
         List<Movie> movieList = movieRepository.findAll();
         return movieList.stream().map(MovieDTO::convertToDTO)
@@ -375,6 +382,11 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
         Pageable topFive = PageRequest.of(0, 5);
         List<Movie> movieList = movieRepository.findByVideoTrueOrderByPopularityDesc(topFive);
 
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    public List<MovieDTO> getMovieDetailInfo(Long movieID) {
+        Optional<Movie> movieList = movieRepository.findById(movieID);
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
