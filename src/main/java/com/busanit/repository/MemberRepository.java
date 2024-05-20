@@ -39,4 +39,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Transactional
     @Query("UPDATE Member m SET m.password = :password, m.age = :age WHERE m.email = :email")
     void updatePasswordAndAge(String password, String age, String email);
+
 }

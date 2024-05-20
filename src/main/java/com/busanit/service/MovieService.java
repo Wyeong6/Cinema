@@ -20,12 +20,18 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -65,7 +71,23 @@ public class MovieService {
             }
         }
     }
-
+    public List<MovieDTO> fetchAndStoreUpcoming() throws IOException {
+        List<MovieDTO> upcomingMovies = new ArrayList<>();
+        for (int page = 1; page <= 8; page++) {
+            String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                JsonNode results = objectMapper.readTree(response.body().string()).get("results");
+                results.forEach(node -> {
+                    String posterPath = node.get("poster_path").asText(null);
+                    if (posterPath != null && !posterPath.isEmpty()) {
+                        upcomingMovies.add(objectMapper.convertValue(node, MovieDTO.class));
+                    }
+                });
+            }
+        }
+        return upcomingMovies;
+    }
 
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
@@ -107,7 +129,9 @@ public class MovieService {
         }
         // 비디오 키를 찾을 수 없는 경우 null을 반환합니다.
         return null;
-    }    private void processResponse(String responseBody) throws IOException {
+    }
+
+    private void processResponse(String responseBody) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
@@ -137,11 +161,15 @@ public class MovieService {
         movieDetail.setVideo(videoKey);
         movieDetail.setVoteAverage(movieDTO.getVoteAverage());
         movieDetail.setPopularity(movieDTO.getPopularity());
+        movieDetail.setReleaseDate(movieDTO.getReleaseDate());
         movie.setMovieDetail(movieDetail);
+
         // 장르 정보 처리
         processGenreData(movie, movieDTO);
+        movieRepository.save(movie);
         // 영화 이미지 정보 처리
         processImageData(node, movie);
+
     }
 
     // Movie 객체를 MovieDTO 정보로 업데이트
@@ -206,6 +234,7 @@ public class MovieService {
 
     public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
         MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
+        System.out.println("responseBody = " + responseBody);
         Movie movie = movieRepository.findById(movieDetailDTO.getId()).orElse(new Movie());
         MovieDetail movieDetail = getOrCreateMovieDetail(movie);
         movieDetail.setReleaseDate(movieDetailDTO.getRelease_date());
@@ -246,6 +275,9 @@ public class MovieService {
     }
 
     private void saveSingleStillCut(Long movieId, String filePath) {
+        if (movieStillCutRepository.existsByMovies_movieIdAndStillCuts(movieId, filePath)) {
+            return; // 스틸컷 중복체크
+        }
         Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + movieId));
         MovieStillCut movieStillCut = new MovieStillCut();
 //        movieStillCut.setMovieStillCutId(movieId);
@@ -256,42 +288,39 @@ public class MovieService {
     }
 
 
-    private void processImageData(JsonNode node, Movie movie) {
-        // DB에서 movie를 찾습니다.
-        Optional<Movie> optionalMovie = movieRepository.findById(movie.getMovieId());
-        Movie existingMovie;
+private boolean hasImage(List<MovieImage> images, String posterPath, String backdropPath) {
+    for (MovieImage image : images) {
+        if (image.getPosterPath().equals(posterPath) && image.getBackdropPath().equals(backdropPath)) {
+            return true;
+        }
+    }
+    return false;
+}
 
-        if (optionalMovie.isPresent()) {
-            // 영화가 존재하면 해당 영화 객체를 사용합니다.
-            existingMovie = optionalMovie.get();
-        } else {
-            // 영화가 존재하지 않으면 함수를 종료합니다.
+    private void processImageData(JsonNode node, Movie movie) {
+        Optional<Movie> optionalMovie = movieRepository.findById(movie.getMovieId());
+        if (!optionalMovie.isPresent()) {
             System.out.println("해당 ID의 영화가 존재하지 않습니다.");
             return;
         }
+        Movie existingMovie = optionalMovie.get();
 
-        // API 응답에서 poster_path 및 backdrop_path 값 추출
+
         String posterPath = node.get("poster_path").asText();
         String backdropPath = node.get("backdrop_path").asText();
 
-        // 이미지 중복 검사
-        if (!existingMovie.hasImage(posterPath, backdropPath)) {
+        // 서비스 계층에서의 이미지 중복 검사
+        if (!hasImage(existingMovie.getImages(), posterPath, backdropPath)) {
             MovieImage movieImage = new MovieImage();
             movieImage.setPosterPath(posterPath);
             movieImage.setBackdropPath(backdropPath);
 
-            // MovieImage를 existingMovie 인스턴스에 연결
             existingMovie.addImage(movieImage);
 
             // 수정된 movie를 저장
-            movieRepository.save(existingMovie);
-            System.out.println("새로운 이미지가 저장되었습니다.");
-        } else {
-            // 이미 해당 이미지가 존재하면 함수를 종료합니다.
-            System.out.println("이미 해당 이미지가 존재합니다. 함수를 종료합니다.");
-            return;
         }
     }
+
 
     public void fetchAndStoreCertificationData() throws IOException {
         List<Long> movieIds = getAllMovieIds(); // 모든 movie ID를 가져오는 메서드
@@ -335,6 +364,16 @@ public class MovieService {
             movieDetailRepository.save(movieDetail);
         }
     }
+//    public List<MovieDTO> getAll() {
+//        List<Movie> movieList = movieRepository.findAll();
+//        // MapStruct를 사용한 변환
+//        return MovieMapper.INSTANCE.moviesToMovieDTOs(movieList);
+//    }
+    public List<MovieDTO> getAll(){
+        List<Movie> movieList = movieRepository.findAll();
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
     public List<MovieDTO> getHotMovies(){
         List<Movie> movieList = movieRepository.findAllByOrderByMovieDetailPopularityDesc();
@@ -342,7 +381,18 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
+    public List<MovieDTO> getVideoMovies(){
+        Pageable topFive = PageRequest.of(0, 5);
+        List<Movie> movieList = movieRepository.findByVideoTrueOrderByPopularityDesc(topFive);
 
-
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    // 영화 상세보기
+    public List<MovieDTO> getMovieDetailInfo(Long movieID) {
+        Optional<Movie> movieList = movieRepository.findById(movieID);
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
 }

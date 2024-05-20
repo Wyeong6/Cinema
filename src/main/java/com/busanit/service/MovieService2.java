@@ -1,0 +1,332 @@
+package com.busanit.service;
+
+import com.busanit.domain.MovieDTO;
+import com.busanit.domain.MovieDetailDTO;
+import com.busanit.domain.MovieStillCutDTO;
+import com.busanit.entity.movie.*;
+import com.busanit.repository.GenreRepository;
+import com.busanit.repository.MovieDetailRepository;
+import com.busanit.repository.MovieRepository;
+import com.busanit.repository.MovieStillCutRepository;
+import com.busanit.util.GenreUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class MovieService2 {
+
+    private final OkHttpClient client = new OkHttpClient();
+    private final MovieRepository movieRepository;
+    private final MovieDetailRepository movieDetailRepository;
+    private final MovieStillCutRepository movieStillCutRepository;
+    private final GenreRepository genreRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${TMDB.apiKey}")
+    private String apiKey;
+
+    /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
+
+    // API에서 받아온 현재상영목록 리스트에서 모든 영화 ID 추출하는 메서드 (나중에 다른 api 데이터들도 영화id를 기준으로 데이터를가져오기때문에 씀)
+    public List<Long> getAllMovieIds() {
+        List<Movie> movies = movieRepository.findAll();
+        return movies.stream().map(Movie::getMovieId).collect(Collectors.toList());
+    }
+
+    @Scheduled(cron = "0 0 * * * *") // 1시간마다 메소드 실행
+    public void fetchAndStoreMoviesNowPlaying() throws IOException {
+        int totalPages = fetchTotalPages();
+        for (int page = 1; page <= totalPages; page++) {
+            String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processResponse(responseBody);
+            }
+        }
+    }
+
+
+
+    private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
+        String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
+        Request request = new Request.Builder().url(url).build();
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            return jsonNode.get("total_pages").asInt();
+        }
+    }
+
+    //    https://api.themoviedb.org/3/movie/653346?language=ko-KR&api_key=547e2cd4d0e26e68fb907dafef4f90ac
+    public void fetchAndStoreMovieStillCuts() throws IOException {
+        List<Long> movieIds = getAllMovieIds();
+        for (Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/images?include_image_language=kr%2Cnull&language=KR&api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processStillCutsResponse(responseBody);
+            }
+        }
+    }
+
+
+
+    // JSON 응답에서 results 배열을 추출
+    private JsonNode getResultsFromResponse(String responseBody) throws IOException {
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        return jsonNode.get("results");
+    }
+
+    private void processResponse(String responseBody) throws IOException {
+        JsonNode results = getResultsFromResponse(responseBody);
+        if (results.isArray()) {
+            for (JsonNode node : results) {
+                processMovieData(node);
+            }
+        }
+    }
+
+    //------------비디오 키 추출
+    public String fetchMovieVideoKey(int movieId) {
+        // TMDB API URL을 포맷팅하여 생성합니다. 영화 ID와 API 키를 사용
+        String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=ko-KR&api_key=%s", movieId, apiKey);
+        // 요청을 생성
+        Request request = new Request.Builder().url(url).build();
+
+        try (Response response = client.newCall(request).execute()) {
+            // 응답 바디에서 JSON을 파싱하여 결과 배열로
+            JsonNode results = objectMapper.readTree(response.body().string()).get("results");
+            if (results.isArray() && results.size() > 0) {
+                // 첫 번째 비디오 정보를 가져옴
+                JsonNode firstVideo = results.get(0);
+                // 비디오의 키 값을 추출합니다.
+                String videoKey = firstVideo.path("key").asText("");
+                // 키 값이 비어있지 않은 경우, 출력하고 반환합니다.x
+                if (!videoKey.isEmpty()) {
+                    return videoKey;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 비디오 키를 찾을 수 없는 경우 null을 반환합니다.
+        return null;
+    }
+
+
+    private void processMovieData(JsonNode node) throws IOException {
+        // JSON 노드를 MovieDTO로 변환
+        MovieDTO movieDTO = objectMapper.treeToValue(node, MovieDTO.class);
+        Movie movie = getOrCreateMovie(movieDTO);
+        // Movie 객체를 MovieDTO 정보로 업데이트
+        updateMovieWithDTOInfo(movie, movieDTO);
+        // 비디오 키를 가져옴
+        String videoKey = fetchMovieVideoKey(Math.toIntExact(movieDTO.getId()));
+        // 영화 상세 정보를 업데이트하거나 생성
+        MovieDetail movieDetail = getOrCreateMovieDetail(movie);
+        updateMovieDetail(movieDetail, movieDTO, videoKey);
+        movie.setMovieDetail(movieDetail);
+        // 장르 정보 처리 및 영화 저장
+        processGenreData(movie, movieDTO);
+        movieRepository.save(movie);
+        // 영화 이미지 정보 처리
+        processImageData(node, movie);
+    }
+
+    // MovieDetail 객체를 MovieDTO와 비디오 키를 이용해 업데이트
+    private void updateMovieDetail(MovieDetail movieDetail, MovieDTO movieDTO, String videoKey) {
+        movieDetail.setVideo(videoKey);
+        movieDetail.setVoteAverage(movieDTO.getVoteAverage());
+        movieDetail.setPopularity(movieDTO.getPopularity());
+        movieDetail.setReleaseDate(movieDTO.getReleaseDate());
+    }
+
+    // Movie 객체를 MovieDTO 정보로 업데이트
+    private void updateMovieWithDTOInfo(Movie movie, MovieDTO movieDTO) {
+        movie.setMovieId(movieDTO.getId());
+        movie.setTitle(movieDTO.getTitle());
+        movie.setOverview(movieDTO.getOverview());
+    }
+
+    // Movie 객체를 가져오거나 새로 생성
+    private Movie getOrCreateMovie(MovieDTO movieDTO) {
+        return movieRepository.findById(movieDTO.getId()).orElse(new Movie());
+    }
+
+    // MovieDetail 객체를 가져오거나 새로 생성
+    private MovieDetail getOrCreateMovieDetail(Movie movie) {
+        MovieDetail movieDetail = movie.getMovieDetail();
+        if (movieDetail == null || movieDetailRepository.findById(movieDetail.getMovieDetailId()).isEmpty()) {
+            movieDetail = new MovieDetail();
+        }
+        return movieDetail;
+    }
+
+    // 영화 장르 데이터 처리
+    private void processGenreData(Movie movie, MovieDTO movieDTO) {
+        List<Genre> existingGenres = movie.getGenres();
+        Set<String> existingGenreNames = existingGenres.stream()
+                .map(Genre::getGenreName)
+                .collect(Collectors.toSet());
+
+        List<Genre> genresToAdd = movieDTO.getGenreIds().stream()
+                .map(GenreUtils::getGenreName) // ID를 한글 이름으로 변환
+                .distinct() // 중복 제거
+                .filter(genreName -> !existingGenreNames.contains(genreName)) // 이미 존재하지 않는 장르만 필터링
+                .map(this::getOrCreateGenreByName) // 데이터베이스에서 조회하거나 새로 생성
+                .toList();
+
+        genresToAdd.forEach(movie::addGenre); // 영화에 장르 추가
+    }
+
+    // 데이터베이스에서 조회하거나 새로운 장르를 생성하는 메서드
+    private Genre getOrCreateGenreByName(String genreName) {
+        return genreRepository.findByGenreName(genreName)
+                .orElseGet(() -> {
+                    Genre newGenre = new Genre();
+                    newGenre.setGenreName(genreName); // 장르 이름 설정
+                    return genreRepository.save(newGenre); // 데이터베이스에 저장
+                });
+    }
+
+
+    public void processStillCutsResponse(String responseBody) throws IOException {
+        MovieStillCutDTO movieStillCutDTO = objectMapper.readValue(responseBody, MovieStillCutDTO.class);
+
+        // 백드랍과 포스터 이미지 처리를 한 번에 수행
+        Stream.concat(
+                movieStillCutDTO.getBackdrops() != null ? movieStillCutDTO.getBackdrops().stream() : Stream.empty(),
+                movieStillCutDTO.getPosters() != null ? movieStillCutDTO.getPosters().stream() : Stream.empty()
+        ).forEach(imageDTO -> saveSingleStillCut(movieStillCutDTO.getId(), imageDTO.getFile_path()));
+    }
+
+    private void saveSingleStillCut(Long movieId, String filePath) {
+        // 영화 조회 및 예외 처리
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + movieId));
+        // 스틸 컷 생성 및 저장
+        MovieStillCut movieStillCut = new MovieStillCut();
+        movieStillCut.setStillCuts(filePath);
+        movie.addStillCut(movieStillCut);
+        movieStillCutRepository.save(movieStillCut);
+    }
+
+    public void fetchAndStoreCertificationData() throws IOException {
+        List<Long> movieIds = getAllMovieIds(); // 모든 movie ID를 가져오는 메서드
+
+        for (Long movieId : movieIds) {
+            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/release_dates?api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                processCertificationResponse(responseBody, movieId);
+            }
+        }
+    }
+
+    public void processCertificationResponse(String responseBody, Long movieId) throws IOException {
+        MovieDetailDTO.ReleaseDatesDTO releaseDatesDTO = objectMapper.readValue(responseBody, MovieDetailDTO.ReleaseDatesDTO.class);
+
+        String certification = releaseDatesDTO.getResults().stream()
+                .filter(result -> "KR".equals(result.getIso_3166_1()))
+                .flatMap(result -> result.getRelease_dates().stream())
+                .map(MovieDetailDTO.ReleaseDateInfo::getCertification)
+                .findFirst()
+                .orElse(null);
+
+        if ("".equals(certification)) {
+            certification = "-";
+        } else if ("18".equals(certification)) {
+            certification = "18세 이상 관람가";
+        } else if ("15".equals(certification)) {
+            certification = "15세 이상 관람가";
+        } else if ("12".equals(certification)) {
+            certification = "12세 이상 관람가";
+        } else if ("ALL".equals(certification) || "All".equals(certification)) {
+            certification = "전체 관람가";
+        }
+
+        if (certification != null) {
+            Movie movie = movieRepository.findById(movieId).orElse(new Movie());
+            MovieDetail movieDetail = getOrCreateMovieDetail(movie);
+            movieDetail.setCertification(certification); // MovieDetail에 certification 세팅
+        }
+    }
+
+    private boolean hasImage(List<MovieImage> images, String posterPath, String backdropPath) {
+        for (MovieImage image : images) {
+            if (image.getPosterPath().equals(posterPath) && image.getBackdropPath().equals(backdropPath)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void processImageData(JsonNode node, Movie movie) {
+        Optional<Movie> optionalMovie = movieRepository.findById(movie.getMovieId());
+
+        if (!optionalMovie.isPresent()) {
+            System.out.println("해당 ID의 영화가 존재하지 않습니다.");
+            return;
+        }
+
+        Movie existingMovie = optionalMovie.get();
+        String posterPath = node.get("poster_path").asText();
+        String backdropPath = node.get("backdrop_path").asText();
+
+        // 서비스 계층에서의 이미지 중복 검사
+        if (!hasImage(existingMovie.getImages(), posterPath, backdropPath)) {
+            MovieImage movieImage = new MovieImage();
+            movieImage.setPosterPath(posterPath);
+            movieImage.setBackdropPath(backdropPath);
+
+            existingMovie.addImage(movieImage);
+
+            // 수정된 movie를 저장
+        }
+    }
+
+    public List<MovieDTO> getAll() {
+        List<Movie> movieList = movieRepository.findAll();
+
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MovieDTO> getHotMovies() {
+        List<Movie> movieList = movieRepository.findAllByOrderByMovieDetailPopularityDesc();
+
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MovieDTO> getVideoMovies() {
+        Pageable topFive = PageRequest.of(0, 5);
+        List<Movie> movieList = movieRepository.findByVideoTrueOrderByPopularityDesc(topFive);
+
+        return movieList.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
+}
