@@ -4642,6 +4642,8 @@ textarea.form-control-lg {
 }
 .modal-dialog-scrollable .modal-body {
   overflow-y: auto;
+  /*width: 2000px;*/
+  /*height: 1000px;*/
 }
 
 .modal-dialog-centered {

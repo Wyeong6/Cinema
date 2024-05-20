@@ -10,9 +10,10 @@
     <link rel="stylesheet" href="/assets/css/custom.css" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
 </head>
+
 <body class="homepage is-preload">
 <th:block layout:fragment="content">
 <div id="page-wrapper">
@@ -30,8 +31,11 @@
             </header>
             <footer>
                 <a href="#banner" class="button circled scrolly">예매</a>
+                <a  class="videoButton">비디오</a>
             </footer>
         </div>
+
+
 
         <!-- info -->
         <div id="info" th:data-username="${#authentication.name}">
@@ -118,20 +122,7 @@
             </article>
         </div>
     </section>
-    <script>
-        $(document).ready(function() {
-            var memberEmail = $('#info').data('username'); // 사용자 이름 가져오기
-            console.log(memberEmail)
-            $('.movie-detail-link').on('click', function(event) {
-                event.preventDefault(); // 기본 동작 방지
 
-                var movieId = $(this).closest('article').data('movie-id'); // 영화 ID 가져오기
-                var url = '/movies/' + movieId + '?memberEmail=' + encodeURIComponent(memberEmail);
-
-                window.location.href = url; // URL로 이동
-            });
-        });
-    </script>
 
     <!-- Comming Soon -->
     <section class="carousel">
@@ -258,129 +249,98 @@
 
 </div>
 
-<!-- Scripts -->
-<script src="/assets/js/jquery.min.js"></script>
-<script src="/assets/js/jquery.dropotron.min.js"></script>
-<script src="/assets/js/jquery.scrolly.min.js"></script>
-<script src="/assets/js/jquery.scrollex.min.js"></script>
-<script src="/assets/js/browser.min.js"></script>
-<script src="/assets/js/breakpoints.min.js"></script>
-<script src="/assets/js/util.js"></script>
-<script src="/assets/js/main.js"></script>
+    <p>------------------------------이미지클릭 하면 비디오재생----------------------------------</p>
 
-<p>---------------------------------------------------인기순 ------------------------------</p>
-<div th:each="movie, iterStat : ${movies}">
-    <div th:if="${iterStat.index < 2}">
-        <h2>영화 번호: <span th:text="${movie.id}">영화 번호</span></h2>
-        <h3>영화 이름: <span th:text="${movie.title}">영화 이름</span></h3>
-        <p>영화 설명: <span th:text="${movie.overview}">영화 설명</span></p>
-        <p>영화 장르: <span th:text="${#strings.listJoin(movie.genres, ', ')}">영화 장르</span></p>
-        <p>영화 평점: <span th:text="${movie.voteAverage}">영화 평점</span></p>
-        <p>인기도: <span th:text="${movie.popularity}">인기도</span></p>
-        <!--        <div th:if="${movie.video}">-->
-        <!--            <p>영화 비디오:</p>-->
-        <!--            <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>-->
-        <!--        </div>-->
-        <p>영화 배경사진:</p>
-        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경사진" />
-        <p>영화 포스터:</p>
-        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.posterPath}}" alt="포스터" />
-    </div>
-</div>
-
-<p>---------------------------------------------------개봉 예정작 ------------------------------</p>
-<div id="movies"></div>
-
-<table>
-<tr th:each="movie : ${videoMovies}">
-    <td th:text="${movie.title}"> </td>
-    <td><img th:src="@{|https://image.tmdb.org/t/p/w200${movie.posterPath}|}" alt="포스터" /></td>
-    <td th:if="${movie.video}">
-        <p>영화 비디오:</p>
-        <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen></iframe>
-    </td>
-</tr>
-</table>
-<p>------------------------------이미지클릭 하면 비디오재생----------------------------------</p>
-<table class="table">
-    <tr th:each="movie : ${videoMovies}">
-        <td th:text="${movie.title}"></td>
-        <td>
-            <img th:src="@{|https://image.tmdb.org/t/p/w500${movie.backdropPath}|}" alt="배경사진" class="movie-img" style="cursor: pointer;" th:attr="data-video-id=${movie.video}">        </td>
-    </tr>
-</table>
-<!-- 모달 -->
-<div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <iframe width="100%" height="500px" id="videoFrame" src="" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+    <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="videoModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="videoFrame" width="100%" height="600px" src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/assets/vendor/js/bootstrap.js"></script>
+    <script src="/assets/js/jquery.dropotron.min.js"></script>
+    <script src="/assets/js/jquery.scrolly.min.js"></script>
+    <script src="/assets/js/jquery.scrollex.min.js"></script>
+    <script src="/assets/js/browser.min.js"></script>
+    <script src="/assets/js/breakpoints.min.js"></script>
+    <script src="/assets/js/util.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <!-- Scripts -->
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<script>
 
-    $(document).ready(function(){
-        $('.movie-img').click(function(){
-            var videoId = $(this).data('video-id');
-            // YouTube 동영상 ID를 사용하여 URL 생성, 자동 재생을 위해 '?autoplay=1' 추가
-            var videoSrc = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
-            $('#videoFrame').attr('src', videoSrc);
-            $('#videoModal').modal('show');
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            if ($.fn.modal) {
+                console.log('Bootstrap modal is loaded');
+            } else {
+                console.log('Bootstrap modal is NOT loaded');
+            }
         });
+        /*<![CDATA[*/
+        const movies = /*[[${videoMovies}]]*/ [];
+        const movieTitles = movies.map(movie => movie.title);
+        const moviePosters = movies.map(movie => "https://image.tmdb.org/t/p/w1280" + movie.backdropPath);
+        const movieVideos = movies.filter(movie => movie.video).map(movie => "https://www.youtube.com/embed/" + movie.video);
 
-        // 모달이 닫힐 때 영상 정지
-        $('#videoModal').on('hidden.bs.modal', function (e) {
-            $('#videoFrame').attr('src', '');
-        });
-    });
+        /*]]>*/
 
-    // 영화 포스터를 클릭했을 때
-    document.querySelectorAll('.image.featured').forEach(function(element) {
-        element.addEventListener('click', function(event) {
-            // 클릭된 영화의 ID를 가져와서 상세보기 페이지 URL을 생성
-            var movieId = element.getAttribute('data-movie-id');
-            var detailPageUrl = '/movie/' + movieId;
-            // 상세보기 페이지로 이동
-            window.location.href = detailPageUrl;
-        });
-    });
+        console.log(movieTitles);
+        console.log(moviePosters);
+        console.log(movieVideos);
 
-</script>
-<script>
-    const images = [
-        'url("/assets/css/images/main_img1.webp")',
-        'url("/assets/css/images/main_img2.jpeg")',
-        'url("/assets/css/images/main_img3.jpeg")',
-        'url("/assets/css/images/main_img4.jpeg")',
-        'url("/assets/css/images/main_img5.jpeg")'
-    ];
+            $(document).ready(function() {
+            var memberEmail = $('#info').data('username'); // 사용자 이름 가져오기
+            console.log(memberEmail)
+            $('.movie-detail-link').on('click', function(event) {
+            event.preventDefault(); // 기본 동작 방지
 
-    const titles = [
-        "하이큐!! 쓰레기장의 결전",
-        "범죄도시4",
-        "그녀가 죽었다",
-        "혹성탈출:새로운시대",
-        "이프:상상의 친구"
-    ];
+            var movieId = $(this).closest('article').data('movie-id'); // 영화 ID 가져오기
+            var url = '/movies/' + movieId + '?memberEmail=' + encodeURIComponent(memberEmail);
+
+                window.location.href = url; // URL로 이동
+            });
+
+                // 모달 닫기 버튼 클릭 시 모달 닫기
+                $('.close').on('click', function() {
+                    $('#videoModal').modal('hide');
+                });
+            });
+
+
 
     function changeBackgroundAndTitle(index) {
-        const header = document.getElementById('header');
-        const movieTitle = document.getElementById('movie_title');
-        const buttons = document.querySelectorAll('.btn');
+    const header = document.getElementById('header');
+    const movieTitle = document.getElementById('movie_title');
+    const buttons = document.querySelectorAll('.btn');
 
-        // Change background image
-        header.style.backgroundImage = images[index];
+    $('.videoButton').on('click', function () {
+    // const index = $(this).data('index');
+    const videoUrl = movieVideos[index];
+    console.log("videoUrl" + videoUrl)
+    $('#videoFrame').attr('src', videoUrl);
+    $('#videoModal').modal('show');
+    });
 
-        // Change movie title
-        movieTitle.textContent = titles[index];
+            $('#videoModal').on('hidden.bs.modal', function () {
+
+
+
+            });
+
+
+        header.style.backgroundImage = `url(${moviePosters[index]})`;
+
+        movieTitle.textContent = movieTitles [index];
 
         // Update button styles
         buttons.forEach((button, idx) => {
@@ -397,7 +357,28 @@
     });
 </script>
 
+    <p>---------------------------------------------------인기순 ------------------------------</p>
+    <!--<div th:each="movie, iterStat : ${movies}">-->
+    <!--    <div th:if="${iterStat.index < 2}">-->
+    <!--        <h2>영화 번호: <span th:text="${movie.id}">영화 번호</span></h2>-->
+    <!--        <h3>영화 이름: <span th:text="${movie.title}">영화 이름</span></h3>-->
+    <!--        <p>영화 설명: <span th:text="${movie.overview}">영화 설명</span></p>-->
+    <!--        <p>영화 장르: <span th:text="${#strings.listJoin(movie.genres, ', ')}">영화 장르</span></p>-->
+    <!--        <p>영화 평점: <span th:text="${movie.voteAverage}">영화 평점</span></p>-->
+    <!--        <p>인기도: <span th:text="${movie.popularity}">인기도</span></p>-->
+    <!--        &lt;!&ndash;        <div th:if="${movie.video}">&ndash;&gt;-->
+    <!--        &lt;!&ndash;            <p>영화 비디오:</p>&ndash;&gt;-->
+    <!--        &lt;!&ndash;            <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+    <!--        <p>영화 배경사진:</p>-->
+    <!--        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경사진" />-->
+    <!--        <p>영화 포스터:</p>-->
+    <!--        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.posterPath}}" alt="포스터" />-->
+    <!--    </div>-->
+    <!--</div>-->
 
 </th:block>
+
+
 </body>
 </html>

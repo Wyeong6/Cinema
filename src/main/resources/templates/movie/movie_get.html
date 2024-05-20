@@ -344,30 +344,38 @@
         });
     });
 
+
     // 리뷰 작성 모달을 팝업 창으로 열기
     function openReviewModal() {
         const movieId = $('#movieId').val();
-        console.log("movieId" + movieId);
-            window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=600');
+        console.log("movieId: " + movieId);
+        var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=600');
+        var checkWindowClosed = setInterval(function() {
+            if (reviewWindow.closed) {
+                clearInterval(checkWindowClosed);
+                loadComments();
+            }
+        }, 500); // 0.5초마다 상태 확인
     }
 
 //            댓글       --------------------------------------------------
     const loadComments = () => {
         const movieId = $('#movieId').val();
-        console.log(movieId);
+
         $.ajax({
             url: `/movies/${movieId}`,
             method: 'GET',
             dataType: 'json',
             success: (data) => {
+
                 const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
                 reviewsSection.empty(); // 기존 내용을 비웁니다.
-                data.forEach(({memberId, comment, grade}) => {
+                data.forEach(({memberEmail, comment, grade}) => {
                     // 각 댓글마다의 HTML 구조를 생성합니다.
                     const reviewRow = `
                     <tr>
                         <td>
-                            <h4>${memberId}</h4>
+                            <h4>${memberEmail}</h4>
                             <p>${new Date().toISOString().slice(0, 10)}</p>
                             <p>${comment}</p>
                             <p>평점: ${grade}</p>
@@ -387,8 +395,6 @@
         }
         });
     };
-    // 모달을 보여주는 이벤트 핸들러
-    $('#addCommentBtn').click(() => $('#commentModal').modal('show'));
     loadComments();
 
 </script>
