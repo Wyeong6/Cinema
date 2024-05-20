@@ -1,12 +1,7 @@
 package com.busanit.repository;
 
-import com.busanit.domain.MovieDTO;
 import com.busanit.entity.movie.Movie;
-<<<<<<< HEAD
-import org.springframework.data.jpa.repository.EntityGraph;
-=======
 import org.springframework.data.domain.Pageable;
->>>>>>> origin/Wyeong6
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

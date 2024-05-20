@@ -196,7 +196,7 @@ public class MovieService {
     //영화 장르 데이터 처리
     private void processGenreData(Movie movie, MovieDTO movieDTO) {
 
-        Set<Genre> existingGenres = movie.getGenres();
+        List<Genre> existingGenres = movie.getGenres();
 
         for (Integer genreId : movieDTO.getGenreIds()) {
             String genreName = GenreUtils.getGenreName(genreId); // ID를 한글 이름으로 변환
