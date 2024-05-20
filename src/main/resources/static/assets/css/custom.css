@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'MyCustomFont';
-    src: url('/assets/css/font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
+    src: url('/static/assets/css/font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
 
 #header {
@@ -114,12 +114,13 @@
     display: inline-block; /* 요소들이 인라인으로 나타나도록 설정 */
 }
 .carousel .overlay-img {
-    width: 7em;
+    width: 5em;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 1; /* 겹쳐진 이미지가 위에 표시되도록 설정 */
-    margin-top: 8em;
+    margin-left: -5%;
+    margin-top: -5%;
 }
 .carousel .ten {
     width: 5em;
