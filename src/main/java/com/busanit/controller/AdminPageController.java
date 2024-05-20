@@ -1,7 +1,11 @@
 package com.busanit.controller;
 
+import com.busanit.domain.SnackDTO;
+import com.busanit.service.SnackService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminPageController {
+
+    private final SnackService snackService;
 
     @GetMapping("/adminMain")
     public String adminMain(){
@@ -37,6 +43,16 @@ public class AdminPageController {
 
     @GetMapping("/snackRegister")
     public String snackRegister() { return "admin/admin_snack_register"; }
+
+    @PostMapping("/snackRegister")
+    public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            return "admin/admin_snack_register";
+        }
+
+        return "admin/admin_snack_register";
+    }
 
     @PostMapping("/help")
     public String help(){

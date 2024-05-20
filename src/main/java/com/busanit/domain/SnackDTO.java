@@ -1,21 +1,14 @@
-package com.busanit.entity;
+package com.busanit.domain;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.busanit.entity.Snack;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Entity
-@Table(name = "snack")
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Snack extends BaseTimeEntity {
-
-    @Id
-    @Column(name = "snack_item_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long snack_item_id;
+public class SnackDTO {
 
     private String snack_nm; // 스낵명
 
