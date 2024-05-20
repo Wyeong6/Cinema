@@ -21,11 +21,12 @@
 
     <!-- Header -->
     <div id="header">
+        <div class="overlay"></div>
         <h1 class="logo" style="font-size: 2em;">CINEMACAST</h1>
         <!-- Inner -->
         <div class="inner">
             <header>
-                <h1><a href="../static/index.html" id="movie_title">Movie Title</a></h1>
+                <h1><a href="index.html" id="movie_title">Movie Title</a></h1>
                 <hr />
                 <p>Another fine freebie by HTML5 UP</p>
             </header>
@@ -37,17 +38,9 @@
         <!-- info -->
         <div id="info">
             <ul>
-                <li sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다.</li>
-                <li sec:authorize="isAnonymous()">
-                    <a href="/member/new">회원가입</a>
-                </li>
-                <li sec:authorize="isAnonymous()">
-                    <a href="/member/login">로그인</a>
-                </li>
-                <li sec:authorize="isAuthenticated()">
-                    <a href="/member/logout">로그아웃</a>
-                </li>
-                <li><a href="#">장바구니</a></li>
+                <li><a href="signup.html">회원가입</a></li>
+                <li><a href="login.html">로그인</a></li>
+                <li><a href="cart_list.html">장바구니</a></li>
             </ul>
         </div>
 
@@ -57,9 +50,9 @@
                 <li>
                     <a href="#">영화</a>
                     <ul>
-                        <li><a href="/templates/movie/movie_list_full.html">영화 전체보기</a></li>
-                        <li><a href="/templates/movie/movie_list_now.html">현재 상영작</a></li>
-                        <li><a href="/templates/movie/movie_list_comming.html">상영 예정작</a></li>
+                        <li><a href="movie_list_full.html">영화 전체보기</a></li>
+                        <li><a href="movie_list_now.html">현재 상영작</a></li>
+                        <li><a href="movie_list_comming.html">상영 예정작</a></li>
                     </ul>
                 </li>
                 <li>
@@ -69,18 +62,18 @@
                         <li><a href="#">상영 시간표</a></li>
                     </ul>
                 </li>
-                <li><a href="#">이벤트</a></li>
-                <!--								<li><a href="right-sidebar.html">Right Sidebar</a></li>-->
-                <li><a href="#">공지사항</a></li>
+                <li><a href="snack_list.html">스낵 스토어</a></li>
+                <li><a href="event_list.html">이벤트</a></li>
+                <li><a href="notice_list.html">공지사항</a></li>
             </ul>
         </nav>
 
         <div id="img_btn">
-            <button class="btn clicked" onclick="">1</button>
-            <button class="btn" onclick="">2</button>
-            <button class="btn" onclick="">3</button>
-            <button class="btn" onclick="">4</button>
-            <button class="btn" onclick="">5</button>
+            <button class="btn clicked" onclick="changeBackgroundAndTitle(0)">1</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(1)">2</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(2)">3</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(3)">4</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(4)">5</button>
         </div>
 
     </div>
@@ -380,84 +373,7 @@
             </div>
         </div>
     </div>
-
-<!--    <script>-->
-<!--        //개봉예정작-->
-<!--        async function fetchMovies() {-->
-<!--            const options = {-->
-<!--                method: 'GET',-->
-<!--                headers: {-->
-<!--                    accept: 'application/json',-->
-<!--                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'-->
-<!--                }-->
-<!--            };-->
-
-<!--            const today = new Date();-->
-<!--            let allFilteredMovies = [];-->
-
-<!--            try {-->
-<!--                for (let page = 1; page <= 5; page++) {-->
-<!--                    const response = await fetch(`https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=${page}&&region=KR`, options);-->
-<!--                    if (!response.ok) {-->
-<!--                        throw new Error(`HTTP error! status: ${response.status}`);-->
-<!--                    }-->
-<!--                    const data = await response.json();-->
-<!--                    const filteredMovies = data.results.filter(movie => new Date(movie.release_date) > today)-->
-<!--                        .map(movie => ({-->
-<!--                            id: movie.id,-->
-<!--                            genre_ids: movie.genre_ids,-->
-<!--                            popularity: movie.popularity,-->
-<!--                            poster_path: movie.poster_path,-->
-<!--                            title: movie.title,-->
-<!--                            video: movie.video,-->
-<!--                            vote_average: movie.vote_average,-->
-<!--                            vote_count: movie.vote_count,-->
-<!--                            release_date: movie.release_date,-->
-<!--                            runtime: movie.runtime || '정보 없음' // runtime 정보가 없을 경우 '정보 없음'으로 설정-->
-<!--                        }));-->
-<!--                    allFilteredMovies = allFilteredMovies.concat(filteredMovies);-->
-<!--                }-->
-<!--                displayMovies(allFilteredMovies);-->
-<!--            } catch (err) {-->
-<!--                console.error('Fetching movies failed:', err);-->
-<!--            }-->
-<!--        }-->
-
-<!--        let movieCreationCount = 0;-->
-<!--        function createMovieElement(movie) {-->
-<!--            if (movieCreationCount < 10) {-->
-<!--                const movieEl = document.createElement('article');-->
-<!--                movieEl.classList.add('movie');-->
-<!--                movieEl.innerHTML = `-->
-<!--        <a href="#" class="image featured"><img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="배경 사진" width="144" height="216"/></a>-->
-<!--        <img src="/images/2.png" alt="one" class="overlay-img" />-->
-<!--        <header>-->
-<!--            <h3><a href="/movie/${movie.id}"><span>${movie.title}</span></a></h3>-->
-<!--            <p><img src="/images/clock.png" alt="clock"/> <span>${movie.release_date}</span></p>-->
-<!--        </header>-->
-<!--        <div class="button_box">-->
-<!--            <button class="reservation_btn">예매하기</button>-->
-<!--            <button class="get_btn"><a href="/movie_get/${movie.id}">상세보기</a></button>-->
-<!--        </div>-->
-<!--    `;-->
-<!--                movieCreationCount++;-->
-<!--                return movieEl;-->
-<!--            }-->
-<!--        }-->
-<!--        function displayMovies(movies) {-->
-<!--            // 모든 carousel 요소를 선택합니다.-->
-<!--            const carousels = document.querySelectorAll('.carousel');-->
-<!--            // 두 번째 carousel 요소의 reel 요소를 선택합니다.-->
-<!--            const comingSoonReel = carousels[1].querySelector('.reel');-->
-<!--            // 영화 정보를 담은 HTML 요소들을 생성하고, "Coming Soon" 섹션에 추가합니다.-->
-<!--            movies.forEach(movie => {-->
-<!--                const movieElement = createMovieElement(movie);-->
-<!--                comingSoonReel.appendChild(movieElement);-->
-<!--            });-->
-<!--        }-->
-<!--        fetchMovies();-->
-<!--    </script>-->
-
+    <footer data-include-path="footer.html"></footer>
 </div>
 
 <!-- Scripts -->
@@ -556,6 +472,68 @@
     });
 
 </script>
+<script>
+    // include.js
+    window.addEventListener('load', function() {
+        var allElements = document.getElementsByTagName('*');
+        Array.prototype.forEach.call(allElements, function (el) {
+            var includePath = el.dataset.includePath;
+            if (includePath) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        el.outerHTML = this.responseText;
+                    }
+                };
+                xhttp.open('GET', includePath, true);
+                xhttp.send();
+            }
+        });
+    });
+</script>
+<script>
+    const images = [
+        'url("/assets/css/images/main_img1.webp")',
+        'url("/assets/css/images/main_img2.jpeg")',
+        'url("/assets/css/images/main_img3.jpeg")',
+        'url("/assets/css/images/main_img4.jpeg")',
+        'url("/assets/css/images/main_img5.jpeg")'
+    ];
+
+    const titles = [
+        "하이큐!! 쓰레기장의 결전",
+        "범죄도시4",
+        "그녀가 죽었다",
+        "혹성탈출:새로운시대",
+        "이프:상상의 친구"
+    ];
+
+    function changeBackgroundAndTitle(index) {
+        const header = document.getElementById('header');
+        const movieTitle = document.getElementById('movie_title');
+        const buttons = document.querySelectorAll('.btn');
+
+        // Change background image
+        header.style.backgroundImage = images[index];
+
+        // Change movie title
+        movieTitle.textContent = titles[index];
+
+        // Update button styles
+        buttons.forEach((button, idx) => {
+            if (idx === index) {
+                button.classList.add('clicked');
+            } else {
+                button.classList.remove('clicked');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        changeBackgroundAndTitle(0);
+    });
+</script>
+
 
 </body>
 </html>

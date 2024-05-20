@@ -3,6 +3,12 @@
     src: url('/assets/css/font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
 
+#header {
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.5s ease-in-out;
+}
+
 .logo {
     position: absolute;
     top: 0;
@@ -63,6 +69,15 @@
 }
 
 /* 메인 페이지 */
+#header .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
 #img_btn {
     position: absolute;
     top: 40%;
@@ -71,11 +86,14 @@
     flex-direction: column;
     z-index: 999;
 }
-
 #img_btn .btn {
+    color: #fff;
     background: none;
     font-size: 0.8em;
     padding: 0.65em 1em 0.65em 1em;
+    cursor: pointer;
+    border: none;
+    transition: color 0.3s;
 }
 #img_btn .clicked {
     color: #df7366;
@@ -123,11 +141,18 @@
 }
 .carousel .button_box .reservation_btn {
     background: #df7366;
+    font-size: 1em;
     color: #fff;
+    padding: 0.5em 1.4em 0.5em 1.4em;
 }
 .carousel .button_box .get_btn {
+    font-size: 1em;
     background: #555555;
     z-index: 99999;
+    padding: 0.5em 1.4em 0.5em 1.4em;
+}
+.comming_list .button_box {
+    justify-content: center;
 }
 #features article {
     display: flex;
@@ -135,7 +160,7 @@
     align-items: center;
 }
 #features header > p {
-    font-size: 0.8em;
+    font-size: 1.2em;
     margin-bottom: 1em;
 }
 #features .more_btn {
@@ -155,7 +180,7 @@
     margin-left: 5%;
 }
 #get_header .movie_data_box {
-    margin-top: 50%;
+    margin: 30% 0 2% 0;
     display: flex;
     justify-content: space-between;
 }
@@ -209,7 +234,6 @@
     display: flex;
     justify-content: left;
 }
-
 .indicator-line {
     height: 4px;
     background-color: #333;
@@ -217,8 +241,53 @@
     transition: transform 0.1s ease-out;
 }
 
-#stillcut h2 {
-    margin-bottom: 2%;
+#stillcut {
+    padding-top: 2%;
+}
+#stillcut h3 {
+    padding-bottom: 2%;
+    font-size: 40px;
+}
+#reviews header {
+    margin-bottom: 8%;
+    display: flex;
+    justify-content: space-between;
+}
+#reviews .modal_open {
+    background: none;
+    color: #3B353C;
+    padding: 0;
+}
+#reviews p {
+    text-align: left;
+}
+/* 리뷰 모달 */
+#review_modal {
+    margin: 0 auto;
+    width: 80%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+}
+#review_modal h1 {
+    font-size: 1.5em;
+    font-weight: 700;
+}
+#review_modal .form-group {
+    margin: 3% 0;
+}
+#review_modal .button_box {
+    display: flex;
+    justify-content: space-between;
+}
+#review_modal button {
+    width: 48%;
+}
+#review_modal button:nth-child(1) {
+    background: #dddddd;
+    color: #3B353C;
+}
+#review_modal button:first-child:hover {
+    background: #e5e5e5;
 }
 /* 현재 상영작 페이지*/
 .list {
@@ -414,7 +483,7 @@ td p {
     width: 10%;
 }
 .wrapper .container #cart_list_section .delete_td img {
-    width: 80%;
+    width: 30%;
 }
 #main .button_box {
     margin-top: 3.5em;
@@ -477,4 +546,106 @@ article#pay > button {
     bottom: 0;
     border-radius: 0;
     font-size: 30px;
+}
+/* 개인정보수정 - edit_personal_info */
+.edit_info tr td:nth-child(1) {
+    width: 20%;
+}
+.edit_info tr td:nth-child(2) {
+    width: 80%;
+}
+.edit_info tr td:nth-child(2) input {
+    width: 80%;
+    border: 1px solid #aaaaaa;
+}
+.edit_info tr td:nth-child(2) button {
+    font-size: 18px;
+    margin-left: 10px;
+    padding: 0.4em 1em 0.4em 1em;
+    background: #e5e5e5;
+    color: #3B353C;
+}
+.edit_info tr td:nth-child(2) ul li {
+    font-size: 15px;
+}
+.edit_info tr:nth-child(3) td:nth-child(2) div p {
+    text-align: left;
+    font-size: 15px;
+    display: none;
+}
+.info_submit_box {
+    margin-top: 1.5em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.info_submit_box button {
+    font-size: 20px;
+}
+.info_submit_box button:first-child {
+    margin-right: 20px;
+    background: #dddddd;
+    color: #3B353C;
+}
+.info_submit_box button:first-child:hover {
+    background: #e5e5e5;
+}
+
+/* 상세 페이지 css 조정*/
+/* 스틸컷 article 크기 조정 */
+.special {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
+
+.special img {
+    max-width: 100%;
+    max-height: 100%;
+}
+/* 스틸컷의 more 눌렀을때 더나오게하는거 관련 css */
+.hidden {
+    display: none;
+}
+
+/* 이미지클릭시 띄우는 모달 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 60px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
 }

@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.util.List;
@@ -74,7 +76,11 @@ public class MovieController {
         return "movie/movie_get";
     }
 
-
+    // 리뷰작성 모달
+    @RequestMapping("/review")
+    public String reviewPopup() {
+        return "movie/review_modal";
+    }
 
 }
 

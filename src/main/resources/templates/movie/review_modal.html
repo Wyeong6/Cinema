@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<!--
+	Helios by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+  <title>Cinemacast</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="/assets/css/custom.css" />
+  <script src="/jquery/jquery-3.7.1.min.js"></script>
+  <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+</head>
+<body>
+<!-- review-modal.html -->
+<div id="review_modal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+  <div role="document">
+    <div >
+      <div >
+        <h1 id="reviewModalLabel">관람평 작성하기</h1>
+      </div>
+      <div>
+        <form id="reviewForm">
+          <h3 style="margin-top: 5px">movie title</h3>
+          <div class="form-group">
+            <label for="reviewContent">내용</label>
+            <textarea class="form-control" id="reviewContent" rows="3" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="reviewRating">평점</label>
+            <select class="form-control" id="reviewRating" required>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+          </div>
+          <div class="button_box">
+            <button type="reset" class="btn btn-primary">취소</button>
+            <button type="submit" class="btn btn-primary">제출</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
