@@ -21,96 +21,105 @@
 </head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
-<div id="page-wrapper">
+    <div id="page-wrapper">
 
-    <!-- Header -->
-    <header data-include-path="header.html"></header>
+        <!-- Header -->
+        <header data-include-path="header.html"></header>
 
-    <div class="wrapper style1 snack_list list">
+        <div class="wrapper style1 snack_list list">
 
-        <div class="container">
-            <article class="special" id="main">
-                <header>
-                    <h2><a href="#">스낵 스토어</a></h2>
-                    <p>
-                        Morbi convallis lectus malesuada sed fermentum dolore amet
-                    </p>
-                </header>
-            </article>
-            <hr/>
-            <div class="row">
-                <article class="col-3 col-12-mobile special">
-                    <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic07.jpg"/></a>
+            <div class="container">
+                <article class="special" id="main">
                     <header>
-                        <h3><a href="snack_get.html">Gravida aliquam penatibus</a></h3>
+                        <h2><a href="#">스낵 스토어</a></h2>
+                        <p>
+                            Morbi convallis lectus malesuada sed fermentum dolore amet
+                        </p>
                     </header>
-                    <p>
-                        10,000원
-                    </p>
                 </article>
-                <article class="col-3 col-12-mobile special">
-                    <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic08.jpg"/></a>
-                    <header>
-                        <h3><a href="snack_get.html">Sed quis rhoncus placerat</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
-                <article class="col-3 col-12-mobile special">
-                    <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>
-                    <header>
-                        <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
-                <article class="col-3 col-12-mobile special">
-                    <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>
-                    <header>
-                        <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
-                <article class="col-3 col-12-mobile special">
-                    <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>
-                    <header>
-                        <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
-                <article class="col-3 col-12-mobile special">
-                    <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>
-                    <header>
-                        <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
-                <article class="col-3 col-12-mobile special">
-                    <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>
-                    <header>
-                        <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
-                <article class="col-3 col-12-mobile special">
-                    <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>
-                    <header>
-                        <h3><a href="#">Magna laoreet et aliquam</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
+                <hr/>
+                <div class="row">
+                    <article class="col-3 col-12-mobile special" th:each="snack : ${snackList}"
+                             th:if="${snackList.totalElements > 0}">
+                        <a class="image featured" th:href="@{/snack/detail(id=${snack.id})}">
+                            <!-- locahost:8080/snack/detail?id=1 -->
+                            <img th:alt="${snack.snack_alt}"
+                                 th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
+                        </a>
+                        <header>
+                            <h3><a th:href="@{/snack/detail(id=${snack.id})}" th:text="${snack.snack_nm}"></a></h3>
+                        </header>
+                        <p th:text="${snack.snack_price} + '원'"></p>
+                    </article>
+                </div>
+                <div style="text-align: center" th:unless="${snackList.totalElements > 0}">
+                    <h3>상품을 준비중 입니다.</h3>
+                </div>
+
+                <!--                    <article class="col-3 col-12-mobile special">-->
+                <!--                        <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic08.jpg"/></a>-->
+                <!--                        <header>-->
+                <!--                            <h3><a href="snack_get.html">Sed quis rhoncus placerat</a></h3>-->
+                <!--                        </header>-->
+                <!--                        <p>-->
+                <!--                            10,000원-->
+                <!--                        </p>-->
+                <!--                    </article>-->
+                <!--                    <article class="col-3 col-12-mobile special">-->
+                <!--                        <a class="image featured" href="snack_get.html"><img alt="" src="/images/menu/menu8.png"/></a>-->
+                <!--                        <header>-->
+                <!--                            <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>-->
+                <!--                        </header>-->
+                <!--                        <p>-->
+                <!--                            10,000원-->
+                <!--                        </p>-->
+                <!--                    </article>-->
+                <!--                    <article class="col-3 col-12-mobile special">-->
+                <!--                        <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>-->
+                <!--                        <header>-->
+                <!--                            <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>-->
+                <!--                        </header>-->
+                <!--                        <p>-->
+                <!--                            10,000원-->
+                <!--                        </p>-->
+                <!--                    </article>-->
+                <!--                    <article class="col-3 col-12-mobile special">-->
+                <!--                        <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>-->
+                <!--                        <header>-->
+                <!--                            <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>-->
+                <!--                        </header>-->
+                <!--                        <p>-->
+                <!--                            10,000원-->
+                <!--                        </p>-->
+                <!--                    </article>-->
+                <!--                    <article class="col-3 col-12-mobile special">-->
+                <!--                        <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>-->
+                <!--                        <header>-->
+                <!--                            <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>-->
+                <!--                        </header>-->
+                <!--                        <p>-->
+                <!--                            10,000원-->
+                <!--                        </p>-->
+                <!--                    </article>-->
+                <!--                    <article class="col-3 col-12-mobile special">-->
+                <!--                        <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>-->
+                <!--                        <header>-->
+                <!--                            <h3><a href="snack_get.html">Magna laoreet et aliquam</a></h3>-->
+                <!--                        </header>-->
+                <!--                        <p>-->
+                <!--                            10,000원-->
+                <!--                        </p>-->
+                <!--                    </article>-->
+                <!--                    <article class="col-3 col-12-mobile special">-->
+                <!--                        <a class="image featured" href="snack_get.html"><img alt="" src="/images/pic09.jpg"/></a>-->
+                <!--                        <header>-->
+                <!--                            <h3><a href="#">Magna laoreet et aliquam</a></h3>-->
+                <!--                        </header>-->
+                <!--                        <p>-->
+                <!--                            10,000원-->
+                <!--                        </p>-->
+                <!--                    </article>-->
+
                 <div class="paging_btn">
                     <ul>
                         <li><a href="#">1</a></li>
@@ -123,41 +132,37 @@
         </div>
     </div>
 
-</div>
+    <footer data-include-path="footer.html"></footer>
 
-<footer data-include-path="footer.html"></footer>
+    <!-- Scripts -->
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/jquery.dropotron.min.js"></script>
+    <script src="/assets/js/jquery.scrolly.min.js"></script>
+    <script src="/assets/js/jquery.scrollex.min.js"></script>
+    <script src="/assets/js/browser.min.js"></script>
+    <script src="/assets/js/breakpoints.min.js"></script>
+    <script src="/assets/js/util.js"></script>
+    <script src="/assets/js/main.js"></script>
 
-</div>
-
-<!-- Scripts -->
-<script src="/assets/js/jquery.min.js"></script>
-<script src="/assets/js/jquery.dropotron.min.js"></script>
-<script src="/assets/js/jquery.scrolly.min.js"></script>
-<script src="/assets/js/jquery.scrollex.min.js"></script>
-<script src="/assets/js/browser.min.js"></script>
-<script src="/assets/js/breakpoints.min.js"></script>
-<script src="/assets/js/util.js"></script>
-<script src="/assets/js/main.js"></script>
-
-<script>
-    // include.js
-    window.addEventListener('load', function() {
-        var allElements = document.getElementsByTagName('*');
-        Array.prototype.forEach.call(allElements, function(el) {
-            var includePath = el.dataset.includePath;
-            if(includePath) {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if(this.readyState == 4 && this.status == 200) {
-                        el.outerHTML = this.responseText;
-                    }
-                };
-                xhttp.open('GET', includePath, true);
-                xhttp.send();
-            }
-        });
-    }); // 이 부분을 추가하여 괄호를 닫습니다.
-</script>
+    <script>
+        // include.js
+        window.addEventListener('load', function () {
+            var allElements = document.getElementsByTagName('*');
+            Array.prototype.forEach.call(allElements, function (el) {
+                var includePath = el.dataset.includePath;
+                if (includePath) {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            el.outerHTML = this.responseText;
+                        }
+                    };
+                    xhttp.open('GET', includePath, true);
+                    xhttp.send();
+                }
+            });
+        }); // 이 부분을 추가하여 괄호를 닫습니다.
+    </script>
 </th:block>
 </body>
 </html>
