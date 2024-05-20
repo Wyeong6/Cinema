@@ -79,7 +79,7 @@ public class MovieController {
     // 리뷰작성 모달
     @RequestMapping("/review/{movieId}")
     public String reviewPopup(@PathVariable("movieId") String movieId, Model model) {
-        System.out.println("movieId" + movieId);
+        System.out.println("무비컨트롤의 무비아이디ㅁㄴㅇㄹㄴㅁㄹㅇㅁㄴㄹ" + movieId);
         model.addAttribute("movieId", movieId);
         return "movie/review_modal";
     }

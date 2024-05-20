@@ -30,6 +30,7 @@ public class CommentController {
 
     @GetMapping(value = "/movies/{movieId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CommentDTO>> getCommentList(@PathVariable("movieId") String movieId){
+        System.out.println("comment 무비아이디 = "+ movieId);
         List<CommentDTO> commentList = commentService.getCommentList(movieId);
 
         return new ResponseEntity<>(commentList, HttpStatus.OK);

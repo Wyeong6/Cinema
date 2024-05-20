@@ -379,12 +379,14 @@
 //            댓글       --------------------------------------------------
     const loadComments = () => {
         const movieId = $('#movieId').val();
+        console.log("겟페이지 무비아이디 = " + movieId);
 
         $.ajax({
-            url: `/movies/${movieId}`,
+            url: `/movies/` + movieId ,
             method: 'GET',
             dataType: 'json',
             success: (data) => {
+                console.log(data)
 
                 const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
                 reviewsSection.empty(); // 기존 내용을 비웁니다.

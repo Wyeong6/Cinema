@@ -31,7 +31,7 @@
             </header>
             <footer>
                 <a href="#banner" class="button circled scrolly">예매</a>
-                <a  class="videoButton">비디오</a>
+                <a class="button circled scrolly" id="videoButton">비디오</a>
             </footer>
         </div>
 
@@ -251,12 +251,8 @@
                 </article>
             </div>
         </section>
-
     </div>
-
 </div>
-
-    <p>------------------------------이미지클릭 하면 비디오재생----------------------------------</p>
 
     <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -284,7 +280,6 @@
     <script src="/assets/js/main.js"></script>
     <!-- Scripts -->
 
-
     <script th:inline="javascript">
         $(document).ready(function() {
             if ($.fn.modal) {
@@ -292,79 +287,75 @@
             } else {
                 console.log('Bootstrap modal is NOT loaded');
             }
-        });
-        /*<![CDATA[*/
-        const movies = /*[[${videoMovies}]]*/ [];
-        const movieTitles = movies.map(movie => movie.title);
-        const moviePosters = movies.map(movie => "https://image.tmdb.org/t/p/w1280" + movie.backdropPath);
-        const movieVideos = movies.filter(movie => movie.video).map(movie => "https://www.youtube.com/embed/" + movie.video);
 
-        /*]]>*/
+            /*<![CDATA[*/
+            const movies = /*[[${videoMovies}]]*/ [];
+            const movieTitles = movies.map(movie => movie.title);
+            const moviePosters = movies.map(movie => "https://image.tmdb.org/t/p/w1280" + movie.backdropPath);
+            const movieVideos = movies.filter(movie => movie.video).map(movie => "https://www.youtube.com/embed/" + movie.video);
+            /*]]>*/
 
-        console.log(movieTitles);
-        console.log(moviePosters);
-        console.log(movieVideos);
+            console.log(movieTitles);
+            console.log(moviePosters);
+            console.log(movieVideos);
 
-            $(document).ready(function() {
-            var memberEmail = $('#info').data('username'); // 사용자 이름 가져오기
-            console.log(memberEmail)
+            // var memberEmail = $('#info').data('username'); // 사용자 이름 가져오기
+            // console.log(memberEmail)
             $('.movie-detail-link').on('click', function(event) {
-            event.preventDefault(); // 기본 동작 방지
+                event.preventDefault(); // 기본 동작 방지
 
-            var movieId = $(this).closest('article').data('movie-id'); // 영화 ID 가져오기
-            var url = '/movies/' + movieId + '?memberEmail=' + encodeURIComponent(memberEmail);
-
+                var movieId = $(this).closest('article').data('movie-id'); // 영화 ID 가져오기
+                // var url = '/movies/' + movieId + '?memberEmail=' + encodeURIComponent(memberEmail);
+                var url = '/movies/' + movieId;
                 window.location.href = url; // URL로 이동
             });
 
-                // 모달 닫기 버튼 클릭 시 모달 닫기
-                $('.close').on('click', function() {
-                    $('#videoModal').modal('hide');
-                });
+            //모달 close버튼시  영상 정지
+            $('.close').on('click', function() {
+
+                $('#videoModal').modal('hide');
+                $('#videoFrame').attr('src', '');
             });
-
-
-
-    function changeBackgroundAndTitle(index) {
-    const header = document.getElementById('header');
-    const movieTitle = document.getElementById('movie_title');
-    const buttons = document.querySelectorAll('.btn');
-
-    $('.videoButton').on('click', function () {
-    // const index = $(this).data('index');
-    const videoUrl = movieVideos[index];
-    console.log("videoUrl" + videoUrl)
-    $('#videoFrame').attr('src', videoUrl);
-    $('#videoModal').modal('show');
-    });
-
+            //모달이 닫히면 영상중지
             $('#videoModal').on('hidden.bs.modal', function () {
-
-
-
+                $('#videoFrame').attr('src', '');
+            });
+            // 버튼 클릭 이벤트 핸들러 추가
+            $('.btn').on('click', function() {
+                const index = $(this).index('.btn'); // 클릭된 버튼의 인덱스 계산
+                changeBackgroundAndTitle(index);
             });
 
+            function changeBackgroundAndTitle(index) {
+                const header = document.getElementById('header');
+                const movieTitle = document.getElementById('movie_title');
+                const buttons = document.querySelectorAll('.btn');
 
-        header.style.backgroundImage = `url(${moviePosters[index]})`;
+                $('#videoButton').off('click').on('click', function () {
+                    const videoUrl = movieVideos[index];
+                    console.log("videoUrl" + videoUrl)
+                    $('#videoFrame').attr('src', videoUrl);
+                    $('#videoModal').modal('show');
+                });
 
-        movieTitle.textContent = movieTitles [index];
+                header.style.backgroundImage = `url(${moviePosters[index]})`;
+                movieTitle.textContent = movieTitles[index];
 
-        // Update button styles
-        buttons.forEach((button, idx) => {
-            if (idx === index) {
-                button.classList.add('clicked');
-            } else {
-                button.classList.remove('clicked');
+                // 버튼 스타일 업데이트
+                buttons.forEach((button, idx) => {
+                    if (idx === index) {
+                        button.classList.add('clicked');
+                    } else {
+                        button.classList.remove('clicked');
+                    }
+                });
             }
+
+            changeBackgroundAndTitle(0); // 초기 설정
         });
-    }
+    </script>
 
-    document.addEventListener('DOMContentLoaded', () => {
-        changeBackgroundAndTitle(0);
-    });
-</script>
-
-    <p>---------------------------------------------------인기순 ------------------------------</p>
+<!--    <p>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;인기순 &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</p>-->
     <!--<div th:each="movie, iterStat : ${movies}">-->
     <!--    <div th:if="${iterStat.index < 2}">-->
     <!--        <h2>영화 번호: <span th:text="${movie.id}">영화 번호</span></h2>-->
