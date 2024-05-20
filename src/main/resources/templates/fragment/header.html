@@ -18,11 +18,19 @@
     <h1 class="logo" style="font-size: 2em;"><a href="index.html">CINEMACAST</a></h1>
 
     <!-- info -->
-    <div id="info">
+    <div id="info" th:data-username="${#authentication.name}">
         <ul>
-            <li><a href="/new">회원가입</a></li>
-            <li><a href="login.html">로그인</a></li>
-            <li><a href="cart_list.html">장바구니</a></li>
+            <li sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다.</li>
+            <li sec:authorize="isAnonymous()">
+                <a href="/member/new">회원가입</a>
+            </li>
+            <li sec:authorize="isAnonymous()">
+                <a href="/member/login">로그인</a>
+            </li>
+            <li sec:authorize="isAuthenticated()">
+                <a href="/member/logout">로그아웃</a>
+            </li>
+            <li><a href="#">장바구니</a></li>
         </ul>
     </div>
 
