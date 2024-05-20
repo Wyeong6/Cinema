@@ -16,7 +16,7 @@ public class Snack extends BaseTimeEntity {
     @Id
     @Column(name = "snack_item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long snack_item_id;
+    private Long id;
 
     private String snack_nm; // 스낵명
 
@@ -32,7 +32,7 @@ public class Snack extends BaseTimeEntity {
 
     private String snack_detail; // 스낵 상세 설명
 
-    public static Snack createSnack(SnackDTO snackDTO) {
+    public static Snack toEntity(SnackDTO snackDTO) {
         return Snack.builder()
                 .snack_nm(snackDTO.getSnack_nm())
                 .snack_image(snackDTO.getSnack_image())

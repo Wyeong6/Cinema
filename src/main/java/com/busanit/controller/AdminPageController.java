@@ -53,7 +53,7 @@ public class AdminPageController {
             return "admin/admin_snack_register";
         }
         try {
-        snackService.saveSnack(Snack.createSnack(snackDTO));
+        snackService.saveSnack(Snack.toEntity(snackDTO));
         } catch(IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }

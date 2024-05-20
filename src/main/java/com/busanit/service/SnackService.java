@@ -18,20 +18,18 @@ public class SnackService {
         Page<Snack> snackList = snackRepository.findAll(pageable);
 
         // Page<Entity> -> Page<Dto> 변환
-        return snackList.map(entity -> {
-            return SnackDTO.builder()
-                    .snack_item_id(entity.getSnack_item_id())
-                    .snack_nm(entity.getSnack_nm())
-                    .snack_image(entity.getSnack_image())
-                    .snack_alt(entity.getSnack_alt())
-                    .snack_price(entity.getSnack_price())
-                    .snack_stock(entity.getSnack_stock())
-                    .snack_set(entity.getSnack_set())
-                    .snack_detail(entity.getSnack_detail())
-                    .regDate(entity.getRegDate())
-                    .updateDate(entity.getUpdateDate())
-                    .build();
-        });
+        return snackList.map(entity -> SnackDTO.builder()
+                .id(entity.getId())
+                .snack_nm(entity.getSnack_nm())
+                .snack_image(entity.getSnack_image())
+                .snack_alt(entity.getSnack_alt())
+                .snack_price(entity.getSnack_price())
+                .snack_stock(entity.getSnack_stock())
+                .snack_set(entity.getSnack_set())
+                .snack_detail(entity.getSnack_detail())
+                .regDate(entity.getRegDate())
+                .updateDate(entity.getUpdateDate())
+                .build());
     }
 
     // 스낵 저장(관리자 페이지)

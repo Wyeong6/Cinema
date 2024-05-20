@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class SnackDTO {
 
-    private Long snack_item_id;
+    private Long id;
 
     private String snack_nm; // 스낵명
 

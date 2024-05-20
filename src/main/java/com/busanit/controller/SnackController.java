@@ -20,7 +20,7 @@ public class SnackController {
     private final SnackService snackService;
 
     @GetMapping("/snackList")
-    public String snackList(Model model, @PageableDefault(size = 5, sort = "snack_item_id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public String snackList(Model model, @PageableDefault(size = 8, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<SnackDTO> snackDTOList = null;
 
         snackDTOList = snackService.getSnackList(pageable);
