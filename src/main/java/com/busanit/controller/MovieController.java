@@ -68,6 +68,7 @@ public class MovieController {
     public String movieDetailinfo(@PathVariable("movieId") Long movieId, Model model) {
         List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(movieId);
         model.addAttribute("movieInfos", movieInfos);
+        model.addAttribute("movieId", movieId);
         return "movie/movie_get";
     }
 
