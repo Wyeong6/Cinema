@@ -106,13 +106,17 @@
             <p><a href="/nowMovie">더보기</a></p>
         </div>
         <div class="reel">
-            <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 10}" >
+            <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 9}" >
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="225" />
+                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="400" />
                 </a>
                 <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
                 <header>
-                    <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
+                    <h3>
+                        <a th:href="@{'/movies/' + ${movie.id}}">
+                            <span th:utext="${#strings.length(movie.title) &gt; 10 ? #strings.substring(movie.title, 0, 10) + '...' : movie.title}">...</span>
+                        </a>
+                    </h3>
                     <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
                 </header>
                 <div class="button_box">
@@ -131,14 +135,17 @@
             <p><a href="/comingMove">more</a></p>
         </div>
         <div class="reel">
-            <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 10}" >
+            <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 9}" >
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="173" height="250" />
+                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="400" />
                 </a>
-                <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
                  <header>
-                    <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.releaseDate}">개봉날짜</span></p>
+                     <h3>
+                         <a th:href="@{'/movies/' + ${movie.id}}">
+                             <span th:utext="${#strings.length(movie.title) &gt; 20 ? #strings.substring(movie.title, 0, 20) + '...' : movie.title}">...</span>
+                         </a>
+                     </h3>
+                    <p><img src="/images/calendar.png" alt="clock"/> <span th:text="${movie.releaseDate}">개봉날짜</span></p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>

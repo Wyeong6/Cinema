@@ -15,7 +15,10 @@
 <!--    댓글-->
     <style>
         /* 상세 페이지 css 조정 */
-
+        h2.movie_title {
+            font-size: 2em;
+            margin-bottom: 1em;
+        }
         .still-cut-article {
             width: 300px;
             display: flex;
@@ -86,22 +89,26 @@
 
         <div class="container" th:each="movie, iterStat : ${movieInfos}">
             <input type="hidden" id="movieId" th:value="${movie.id}">
-            <div class="row gtr-200">
-                <div class="col-8 col-12-mobile" id="content">
+            <div class="row">
+                <div class="col-12-mobile" id="content">
                     <article id="main">
-                        <header>
-                            <h2><a href="#">Movie Title</a></h2>
-                            <p th:text="${movie.title}"></p>
-                        </header>
-                        <div id="get_header">
-                            <a href="#" class="image featured" style="width: 40%;"><img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
+                        <header id="get_info">
+                            <a href="#" class="image featured"><img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
                             onclick="openModal()"
                             /></a>
                             <div class="movie_info">
-                                <p><b>개봉일자 : </b> <span th:text="${movie.releaseDate}">releasedate</span></p>
-                                <p><b>장르 : </b> <span th:text="${movie.genres}">genres</span></p>
-                                <p><b>상영시간 : </b> <span th:text="${movie.runtime} + '분'">runtime</span></p>
+                                <div class="info_header">
+                                    <h2 th:text="${movie.title}" class="movie_title"></h2>
+                                    <a href="#" class="button" style="height: 3em">지금 예매하기</a>
+                                </div>
+                                <span th:text="${movie.releaseDate} + ' | '">releasedate</span>
+                                <span th:text="${movie.genres} + ' | '">genres</span>
+                                <span th:text="${movie.runtime} + '분'">runtime</span>
                                 <p><b>감독 : </b>director <b>각본 : </b>writer</p>
+
+                                <p th:text="${movie.overview}">
+                                    ~ overview ~
+                                </p>
 
                                 <div class="movie_data_box">
                                     <div class="movie_data">
@@ -117,35 +124,26 @@
                                         <p th:text="${movie.voteAverage}">vote rating</p>
                                     </div>
                                 </div>
-                                <a href="#" class="button">지금 예매하기</a>
                             </div>
-                        </div>
-                        <div id="movie-info"></div>
-                        <p th:text="${movie.overview}">
-                           ~ overview ~
-                        </p>
-                    </article>
-                </div>
-                <div class="col-4 col-12-mobile" id="sidebar">
-                    <hr class="first" />
-                    <section id="reviews">
-                        <header>
-                            <h3>관람평</h3>
-                            <button onclick="openReviewModal()" class="modal_open">작성하기</button>
                         </header>
-                        <div class="row gtr-50">
-                            <table class="default" id="reviews-table">
-                                <!-- 댓글이 여기에 추가될 것입니다 -->
-                            </table>
+                        <h3>출연진</h3>
+                        <div id="movie-info">
+
                         </div>
-                    </section>
+
+                    </article>
                 </div>
             </div>
 
+            <section class="movie_etc">
+                <div class="etc_btn">
+                    <button type="button" class="button stillcut_btn clicked">스틸컷</button>
+                    <button type="button" class="button reviews_btn">리뷰</button>
+                </div>
+            </section>
+
             <!-- 스틸컷 for each (반복) -->
-            <div id="stillcut" th:each="movie, iterStat : ${movieInfos}">
-                <hr />
-                <h2>StillCut</h2>
+            <div id="stillcut" th:each="movie, iterStat : ${movieInfos}" >
                 <div class="row">
                     <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}" th:class="${iterStat.count > 4} ? 'hide stillCut' : 'stillCut'" >
                         <article class="col-4 col-12-mobile special still-cut-article">
@@ -157,8 +155,18 @@
                         </article>
                     </div>
                 </div>
-                <p id="showMore" style="cursor: pointer; color: blue; text-decoration: underline;">more</p>
-                <p id="showLess" style="cursor: pointer; color: blue; text-decoration: underline; display:none;">접기</p>
+                <p id="showMore" style="cursor: pointer;"><a>more</a></p>
+                <p id="showLess" style="cursor: pointer; display:none;"><a>접기</a></p>
+            </div>
+            <div id="reviews" style="display: none">
+                <button onclick="openReviewModal()" class="modal_open">관람평 작성하기</button>
+                <div class="row">
+                    <table class="default" id="reviews-table">
+                        <!-- 댓글이 여기에 추가될 것입니다 -->
+                    </table>
+                </div>
+                <p id="showMore_review" style="cursor: pointer;"><a>more</a></p>
+                <p id="showLess_review" style="cursor: pointer; display:none;"><a>접기</a></p>
             </div>
             <!-- 모달 -->
             <div id="myModal" class="modal">
@@ -221,18 +229,18 @@
             movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
             movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
 
-            // 출연진 정보 출력 (이미지 포함)
-            data.cast.slice(0, 5).forEach(cast => {
-                const castDiv = createPersonDiv(cast.name, cast.profile_path);
-                movieInfoDiv.appendChild(castDiv); // castDiv를 movieInfoDiv에 추가
-            });
-
             // 감독 정보 출력 (이미지 포함)
             const director = data.crew.find(person => person.job === 'Director');
             if (director) {
                 const directorDiv = createPersonDiv(director.name, director.profile_path, true);
                 movieInfoDiv.appendChild(directorDiv); // directorDiv를 movieInfoDiv에 추가
             }
+
+            // 출연진 정보 출력 (이미지 포함)
+            data.cast.slice(0, 5).forEach(cast => {
+                const castDiv = createPersonDiv(cast.name, cast.profile_path);
+                movieInfoDiv.appendChild(castDiv); // castDiv를 movieInfoDiv에 추가
+            });
         } catch (error) {
             console.error('Error:', error);
         }
@@ -241,20 +249,21 @@
     // 인물 정보와 이미지를 담은 div 생성 함수
     function createPersonDiv(name, profilePath, isDirector = false) {
         const personDiv = document.createElement('div'); // 새로운 div 생성
-        personDiv.style.margin = '5px'; // 간격 설정
+        personDiv.style.margin = '8px'; // 간격 설정
+        personDiv.style.width = '15%';
 
         const p = document.createElement('p');
         p.innerHTML = isDirector ? `<b>감독 : </b>${name}` : name;
-        p.style.fontSize = '15px'; // 글자 크기 작게 설정
+        p.style.fontSize = '1em'; // 글자 크기 작게 설정
 
         const img = document.createElement('img');
         img.src = `https://image.tmdb.org/t/p/w200${profilePath}`; // 이미지 경로 설정
         img.alt = `${name}'s profile image`;
-        img.style.width = '40px';
+        img.style.width = '100%';
         img.style.height = 'auto'; // 높이를 자동으로 설정
 
-        personDiv.appendChild(p);
         personDiv.appendChild(img);
+        personDiv.appendChild(p);
 
         return personDiv;
     }
@@ -325,22 +334,31 @@
 
     /*--------- 이미지 상세보기 모달 끝 --------*/
 
+    // 버튼 클릭 시 스틸컷 또는 리뷰 테이블
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('img').forEach(function(img) {
+            img.addEventListener('click', function() {
+                this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
+            });
+        });
 
-    window.addEventListener('load', function() {
-        // 모든 요소를 가져와서 includePath 데이터 속성이 있는 경우 해당 경로의 파일을 가져와서 대체하는 작업을 수행
-        var allElements = document.getElementsByTagName('*');
-        Array.prototype.forEach.call(allElements, function (el) {
-            var includePath = el.dataset.includePath;
-            if (includePath) {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        el.outerHTML = this.responseText;
-                    }
-                };
-                xhttp.open('GET', includePath, true);
-                xhttp.send();
-            }
+        var stillCutBtn = document.querySelector(".stillcut_btn");
+        var reviewsBtn = document.querySelector(".reviews_btn");
+        var stillCutDiv = document.getElementById("stillcut");
+        var reviewsDiv = document.getElementById("reviews");
+
+        stillCutBtn.addEventListener("click", function() {
+            stillCutDiv.style.display = "block";
+            reviewsDiv.style.display = "none";
+            stillCutBtn.classList.add("clicked");
+            reviewsBtn.classList.remove("clicked");
+        });
+
+        reviewsBtn.addEventListener("click", function() {
+            stillCutDiv.style.display = "none";
+            reviewsDiv.style.display = "block";
+            reviewsBtn.classList.add("clicked");
+            stillCutBtn.classList.remove("clicked");
         });
     });
 

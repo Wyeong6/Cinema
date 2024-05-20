@@ -1,10 +1,12 @@
 package com.busanit.controller;
 
 import com.busanit.domain.SnackDTO;
+import com.busanit.entity.Snack;
 import com.busanit.service.SnackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,10 +47,15 @@ public class AdminPageController {
     public String snackRegister() { return "admin/admin_snack_register"; }
 
     @PostMapping("/snackRegister")
-    public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult) {
+    public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult, Model model) {
 
         if(bindingResult.hasErrors()) {
             return "admin/admin_snack_register";
+        }
+        try {
+        snackService.saveSnack(Snack.toEntity(snackDTO));
+        } catch(IllegalStateException e) {
+            model.addAttribute("errorMessage", e.getMessage());
         }
 
         return "admin/admin_snack_register";
