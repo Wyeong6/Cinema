@@ -84,10 +84,6 @@ public class Movie {
         image.setMovie(this);
     }
 
-    //--------------- 생성자
-//    public Movie() {
-//        this.images = new ArrayList<>();
-//    }
 
 
 }
