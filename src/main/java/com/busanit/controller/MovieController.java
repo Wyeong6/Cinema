@@ -65,8 +65,8 @@ public class MovieController {
     }
     //디테일페이지
     @GetMapping("/movies/{movieId}")
-    public String movieDetailinfo(@PathVariable("movieId") Long moviedId, Model model) {
-        List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(moviedId);
+    public String movieDetailinfo(@PathVariable("movieId") Long movieId, Model model) {
+        List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(movieId);
         model.addAttribute("movieInfos", movieInfos);
         return "movie/movie_get";
     }
@@ -77,8 +77,10 @@ public class MovieController {
     }
 
     // 리뷰작성 모달
-    @RequestMapping("/review")
-    public String reviewPopup() {
+    @RequestMapping("/review/{movieId}")
+    public String reviewPopup(@PathVariable("movieId") String movieId, Model model) {
+        System.out.println("movieId" + movieId);
+        model.addAttribute("movieId", movieId);
         return "movie/review_modal";
     }
 }

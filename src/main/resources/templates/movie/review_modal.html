@@ -12,9 +12,12 @@
   <link rel="stylesheet" href="/assets/css/main.css" />
   <link rel="stylesheet" href="/assets/css/custom.css" />
   <script src="/jquery/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 </head>
 <body>
+<input type="hidden" id="movieId" th:value="${movieId}">
 <!-- review-modal.html -->
 <div id="review_modal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
   <div role="document">
@@ -48,5 +51,42 @@
     </div>
   </div>
 </div>
+<script>
+
+  window.onload = function() {
+    var memberEmail = JSON.parse(sessionStorage.getItem("userInfo"));
+    const movieId = document.getElementById('movieId').value;
+    console.log(movieId);
+    console.log(memberEmail);
+    $('#reviewForm').submit(function(e) {
+
+    e.preventDefault();
+
+    // 댓글 데이터를 수집하는 부분은 submit 이벤트 내부로 이동
+    const comment = $('#reviewContent').val();
+    const grade = $('#reviewRating').val();
+
+    const commentData = JSON.stringify({
+      memberEmail: memberEmail.email,
+      comment: comment,
+      grade: grade,
+      movieId: movieId
+    });
+
+    console.log(commentData);
+
+    $.ajax({
+      url: '/new',
+      method: 'POST',
+      contentType: 'application/json',
+      data: commentData,
+      success: () => {
+        $('#commentModal').modal('hide');
+
+      }
+    });
+  });
+  };
+</script>
 </body>
 </html>

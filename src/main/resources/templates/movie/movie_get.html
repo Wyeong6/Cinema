@@ -73,40 +73,14 @@
                             <button onclick="openReviewModal()" class="modal_open">작성하기</button>
                         </header>
                         <div class="row gtr-50">
-                            <table class="default">
-                                <tr>
-                                    <td>
-                                        <h4>gpfud***</h4>
-                                        <p>2024.05.17</p>
-                                        <p>줜잼</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <h4>gpfud***</h4>
-                                        <p>2024.05.17</p>
-                                        <p>줜잼</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <h4>gpfud***</h4>
-                                        <p>2024.05.17</p>
-                                        <p>줜잼</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <h4>gpfud***</h4>
-                                        <p>2024.05.17</p>
-                                        <p>줜잼</p>
-                                    </td>
-                                </tr>
+                            <table class="default" id="reviews-table">
+                                <!-- 댓글이 여기에 추가될 것입니다 -->
                             </table>
                         </div>
                     </section>
                 </div>
             </div>
+
             <div id="stillcut" th:each="movie, iterStat : ${movieInfos}">
                 <hr />
                 <h2>StillCut</h2>
@@ -124,71 +98,13 @@
                 <p id="showMore" style="cursor: pointer; color: blue; text-decoration: underline;">more</p>
                 <p id="showLess" style="cursor: pointer; color: blue; text-decoration: underline; display:none;">접기</p>
             </div>
-
             <!-- 모달 -->
             <div id="myModal" class="modal">
                 <span class="close" onclick="closeModal()">&times;</span>
                 <img class="modal-content" id="modalImage">
             </div>
-
         </div>
-
     </div>
-
-<!--    <div class="container">-->
-<!--        <h2>댓글</h2>-->
-<!--        <div id="comments"></div>-->
-<!--        <button id="addCommentBtn" class="btn btn-primary">댓글 추가하기</button>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; 댓글 추가 모달 &ndash;&gt;-->
-<!--    <div id="info" th:data-username="${#authentication.name}">-->
-<!--        <ul>-->
-<!--            <li sec:authorize="hasRole('USER')"><span sec:authentication="name"></span> 님 환영합니다.<li>-->
-<!--            <li sec:authorize="isAnonymous()">-->
-<!--                <a href="/member/new">회원가입</a>-->
-<!--            </li>-->
-<!--            <li sec:authorize="isAnonymous()">-->
-<!--                <a href="/member/login">로그인</a>-->
-<!--            </li>-->
-<!--            <li sec:authorize="isAuthenticated()">-->
-<!--                <a href="/member/logout">로그아웃</a>-->
-<!--            </li>-->
-<!--            <li><a href="#">장바구니</a></li>-->
-<!--        </ul>-->
-<!--    </div>-->
-<!--    <div class="modal" id="commentModal">-->
-<!--        <div class="modal-dialog">-->
-<!--            <div class="modal-content">-->
-<!--                <div class="modal-header">-->
-<!--                    <h5 class="modal-title">댓글 추가</h5>-->
-<!--                    <button type="button" class="close" data-dismiss="modal">&times;</button>-->
-<!--                </div>-->
-<!--                <div class="modal-body">-->
-<!--                    <form id="commentForm">-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="commentText">댓글:</label>-->
-<!--                            <textarea class="form-control" id="commentText"></textarea>-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="rating">평점:</label>-->
-<!--                            <select class="form-control" id="rating">-->
-<!--                                <option>1</option>-->
-<!--                                <option>2</option>-->
-<!--                                <option>3</option>-->
-<!--                                <option>4</option>-->
-<!--                                <option>5</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                        <button type="submit" class="btn btn-primary">댓글 작성</button>-->
-<!--                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>-->
-<!--                    </form>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-
-
     <footer data-include-path="footer.html"></footer>
 </div>
 
@@ -331,10 +247,6 @@
 
     /*--------- 이미지 상세보기 모달 끝 --------*/
 
-
-
-
-
     window.addEventListener('load', function() {
         // 모든 요소를 가져와서 includePath 데이터 속성이 있는 경우 해당 경로의 파일을 가져와서 대체하는 작업을 수행
         var allElements = document.getElementsByTagName('*');
@@ -353,158 +265,53 @@
         });
     });
 
-    const slides = document.querySelector('.slides');
-    const indicatorLine = document.querySelector('.indicator-line');
-    const totalSlides = document.querySelectorAll('.slides article').length;
-    let isDragging = false;
-    let startPos = 0;
-    let currentTranslate = 0;
-    let prevTranslate = 0;
-    let animationID;
-    let currentIndex = 0;
-    let sliderWidth = slides.clientWidth;
-
-    slides.addEventListener('mousedown', dragStart);
-    slides.addEventListener('mouseup', dragEnd);
-    slides.addEventListener('mouseleave', dragEnd);
-    slides.addEventListener('mousemove', drag);
-
-    slides.addEventListener('touchstart', dragStart);
-    slides.addEventListener('touchend', dragEnd);
-    slides.addEventListener('touchmove', drag);
-
-    window.addEventListener('resize', () => {
-        sliderWidth = slides.clientWidth;
-        setPositionByIndex();
-    });
-
-    function dragStart(event) {
-        isDragging = true;
-        startPos = getPositionX(event);
-        animationID = requestAnimationFrame(animation);
-        slides.classList.add('grabbing');
-    }
-
-    function drag(event) {
-        if (isDragging) {
-            const currentPosition = getPositionX(event);
-            currentTranslate = prevTranslate + currentPosition - startPos;
-            setSliderPosition();
-        }
-    }
-
-    function dragEnd() {
-        isDragging = false;
-        cancelAnimationFrame(animationID);
-        const movedBy = currentTranslate - prevTranslate;
-
-        if (movedBy < -sliderWidth / 4 && currentIndex < totalSlides - 1) currentIndex += 1;
-        if (movedBy > sliderWidth / 4 && currentIndex > 0) currentIndex -= 1;
-
-        setPositionByIndex();
-        slides.classList.remove('grabbing');
-    }
-
-    function getPositionX(event) {
-        return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-    }
-
-    function animation() {
-        if (isDragging) requestAnimationFrame(animation);
-    }
-
-    function setSliderPosition() {
-        slides.style.transform = `translateX(${currentTranslate}px)`;
-    }
-
-    function setPositionByIndex() {
-        currentTranslate = currentIndex * -sliderWidth / totalSlides;
-        prevTranslate = currentTranslate;
-        slides.style.transform = `translateX(${currentTranslate}px)`;
-        updateIndicator();
-    }
-
-    function updateIndicator() {
-        const indicatorWidth = sliderWidth / totalSlides;
-        indicatorLine.style.transform = `translateX(${currentIndex * indicatorWidth}px)`;
-    }
-
     // 리뷰 작성 모달을 팝업 창으로 열기
     function openReviewModal() {
-            window.open('/review', 'ReviewModal', 'width=600,height=600');
+        const movieId = $('#movieId').val();
+        console.log("movieId" + movieId);
+            window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=600');
     }
 
-//                                  댓글       --------------------------------------------------
-    $(document).ready(function() {
-        // 환경 설정: 필요한 변수 선언
+//            댓글       --------------------------------------------------
+    const loadComments = () => {
         const movieId = $('#movieId').val();
-        const memberEmail = $('#info').data('username');
-
-        // 댓글을 로드하는 함수 정의
-        const loadComments = () => {
-            $.ajax({
-                url: `/movies/${movieId}`,
-                method: 'GET',
-                dataType: 'json',
-                success: (data) => {
-                    const commentsContainer = $('#comments').empty();
-                    data.forEach(({memberId, movieId, comment, grade}) => {
-                        commentsContainer.append(
-                            `<div class="comment">
-                            <p>작성자 ID: ${memberId}</p>
-                            <p>영화번호 : ${movieId}</p>
-                            <p>댓글: ${comment}</p>
+        console.log(movieId);
+        $.ajax({
+            url: `/movies/${movieId}`,
+            method: 'GET',
+            dataType: 'json',
+            success: (data) => {
+                const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
+                reviewsSection.empty(); // 기존 내용을 비웁니다.
+                data.forEach(({memberId, comment, grade}) => {
+                    // 각 댓글마다의 HTML 구조를 생성합니다.
+                    const reviewRow = `
+                    <tr>
+                        <td>
+                            <h4>${memberId}</h4>
+                            <p>${new Date().toISOString().slice(0, 10)}</p>
+                            <p>${comment}</p>
                             <p>평점: ${grade}</p>
-                        </div>`
-                        );
-                    });
-                },
-                error: (xhr, status, error) => {
-                    console.error("댓글을 불러오지 못했습니다:", error);
-                    $('#comments').append(
-                        `<div class="error">
-                        <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
-                    </div>`
-                    );
-                }
+                        </td>
+                    </tr>
+                `;
+                    reviewsSection.append(reviewRow); // 생성된 HTML을 테이블에 추가합니다.
             });
-        };
-
-        // 모달을 보여주는 이벤트 핸들러
-        $('#addCommentBtn').click(() => $('#commentModal').modal('show'));
-
-        // 댓글 제출 이벤트 핸들러
-        $('#commentForm').submit(function(e) {
-            e.preventDefault();
-
-            // 댓글 데이터를 수집하는 부분은 submit 이벤트 내부로 이동
-            const comment = $('#commentText').val();
-            const grade = $('#rating').val();
-
-            const commentData = JSON.stringify({
-                memberEmail: memberEmail,
-                comment: comment,
-                grade: grade,
-                movieId: movieId
-            });
-
-            console.log(commentData);
-
-            $.ajax({
-                url: '/new',
-                method: 'POST',
-                contentType: 'application/json',
-                data: commentData,
-                success: () => {
-                    $('#commentModal').modal('hide');
-                    loadComments();
-                }
-            });
+        },
+        error: (xhr, status, error) => {
+            console.error("댓글을 불러오지 못했습니다:", error);
+            $('#comments').append(
+                `<div class="error">
+                    <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
+                   </div>`
+            );
+        }
         });
+    };
+    // 모달을 보여주는 이벤트 핸들러
+    $('#addCommentBtn').click(() => $('#commentModal').modal('show'));
+    loadComments();
 
-        // 초기 댓글 로드
-        loadComments();
-    });
 </script>
 </body>
 </html>

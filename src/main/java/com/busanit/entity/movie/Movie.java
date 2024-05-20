@@ -41,7 +41,7 @@ public class Movie {
 
     //이미지 관계
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private List<MovieImage> images;
+    private List<MovieImage> images = new ArrayList<>();
 
     //영화 스틸컷 관계
     @ManyToMany
