@@ -1,23 +1,22 @@
-<!DOCTYPE HTML>
-
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html xmlns:sec="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout/layout_total}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Cinemacast</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/custom.css" />
+    <link rel="stylesheet" href="/assets/css/custom_player.css" />
     <link rel="stylesheet" href="/assets/css/nav.css" />
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 
 <!--    댓글-->
 </head>
 <body class="right-sidebar is-preload">
+<th:block layout:fragment="content">
 <div id="page-wrapper">
 
     <header data-include-path="./header.html"></header>
@@ -112,7 +111,7 @@
                 <h2>StillCut</h2>
                 <div class="row">
                     <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}" th:class="${iterStat.count > 4} ? 'hidden stillCut' : 'stillCut'" >
-                        <article class="col-4 col-12-mobile special">
+                        <article class="col-4 col-12-mobile special still-cut-article">
                             <a href="#" class="image featured">
                                 <img th:src="@{'https://image.tmdb.org/t/p/original/' + ${stillCutPath}}" alt="스틸컷"
                                      onclick="openModal(this.getAttribute('src'))"
@@ -506,5 +505,6 @@
         loadComments();
     });
 </script>
+</th:block>
 </body>
 </html>
