@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.repository.EntityGraph;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -28,11 +28,12 @@ public class Movie {
     private String overview;
 
     //장르 관계
-    @ManyToMany
+    @OrderBy("genreName") // 장르고정시키기용
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
-    private List<Genre> genres = new ArrayList<>();
+    private Set<Genre> genres = new LinkedHashSet<>();
 
     //영화 상세보기 관계
     @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
@@ -41,15 +42,16 @@ public class Movie {
 
 
     //이미지 관계
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<MovieImage> images;
 
     //영화 스틸컷 관계
-    @ManyToMany
+    @OrderBy("movieStillCutId")
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "stillCuts",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_still_cut_id"))
-    private List<MovieStillCut> stillCuts = new ArrayList<>();
+    private Set<MovieStillCut> stillCuts = new HashSet<>();
 
 
     public void addStillCut(MovieStillCut stillCut) {
@@ -80,9 +82,14 @@ public class Movie {
     public Movie() {
         this.images = new ArrayList<>();
     }
-    // genreIds 설정 메소드
-    public void setGenreIds(List<Genre> genreIds) {
-        this.genres = genreIds;
+
+    public boolean hasImage(String posterPath, String backdropPath) {
+        for (MovieImage image : this.images) { // this.images는 Movie 객체에 속한 MovieImage 객체들의 리스트를 가정합니다.
+            if (image.getPosterPath().equals(posterPath) && image.getBackdropPath().equals(backdropPath)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

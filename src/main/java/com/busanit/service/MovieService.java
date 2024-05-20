@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -167,7 +168,7 @@ public class MovieService {
     //영화 장르 데이터 처리
     private void processGenreData(Movie movie, MovieDTO movieDTO) {
 
-        List<Genre> existingGenres = movie.getGenres();
+        Set<Genre> existingGenres = movie.getGenres();
 
         for (Integer genreId : movieDTO.getGenreIds()) {
             String genreName = GenreUtils.getGenreName(genreId); // ID를 한글 이름으로 변환
@@ -205,6 +206,7 @@ public class MovieService {
 
     public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
         MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
+        System.out.println("responseBody = " + responseBody);
         Movie movie = movieRepository.findById(movieDetailDTO.getId()).orElse(new Movie());
         MovieDetail movieDetail = getOrCreateMovieDetail(movie);
         movieDetail.setReleaseDate(movieDetailDTO.getRelease_date());
@@ -255,7 +257,7 @@ public class MovieService {
     }
 
     // MovieImage 객체 생성 및 posterPath 설정
-    private void processImageData(JsonNode node, Movie movie) {
+    private void processImageData(JsonNode node) {
 
         MovieImage movieImage = new MovieImage();
         // API 응답에서 poster_path 값 추출 및 설정
