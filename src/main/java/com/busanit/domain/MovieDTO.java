@@ -40,55 +40,41 @@ public class MovieDTO {
     public static MovieDTO convertToDTO(Movie movie){
         MovieDTO movieDTO = new MovieDTO();
 
-        // 고유번호, 제목, 상세보기
         movieDTO.setId(movie.getMovieId());
         movieDTO.setTitle(movie.getTitle());
         movieDTO.setOverview(movie.getOverview());
 
-        // 이미지의 배경 및 포스터 경로
-        movieDTO.setBackdropPath(movie.getImages().get(0).getBackdropPath());
-        movieDTO.setPosterPath(movie.getImages().get(0).getPosterPath());
+        movie.getImages().stream().findFirst().ifPresent(image -> {
+            movieDTO.setBackdropPath(image.getBackdropPath());
+            movieDTO.setPosterPath(image.getPosterPath());
+        });
 
-        // Optional을 사용하여 MovieDetail이 null인 경우를 처리
-        //비디오, 인기 , 평점
-        Optional.ofNullable(movie.getMovieDetail()).ifPresent(detail -> {
+        Optional.ofNullable(movie.getMovieDetail()).ifPresentOrElse(detail -> {
             movieDTO.setPopularity(detail.getPopularity());
             movieDTO.setVoteAverage(detail.getVoteAverage());
             movieDTO.setVideo(detail.getVideo());
             movieDTO.setReleaseDate(detail.getReleaseDate());
             movieDTO.setRuntime(detail.getRuntime());
             movieDTO.setCertifications(detail.getCertification());
-        });
-
-        // MovieDetail이 null인 경우의 대체값 설정
-        if (movie.getMovieDetail() == null) {
+        }, () -> {
             movieDTO.setVoteAverage(0);
             movieDTO.setVideo(null);
-        }
+        });
 
         Optional.ofNullable(movie.getStillCuts()).ifPresent(stillCuts -> {
             List<String> stillCutPaths = stillCuts.stream()
-                    .map(MovieStillCut::getStillCuts) // getImagePath 대신 실제 필드명을 사용해야 함
+                    .map(MovieStillCut::getStillCuts)
                     .collect(Collectors.toList());
             movieDTO.setStillCutPaths(stillCutPaths);
         });
 
-        // 장르 이름 추출 및 설정
-        Optional.ofNullable(movie.getGenres()).ifPresent(Genres ->{
-            List<String> genreNames = Genres.stream()
-                    .map(Genre::getGenreName) // Genre 객체에서 이름 추출
+        Optional.ofNullable(movie.getGenres()).ifPresent(genres -> {
+            List<String> genreNames = genres.stream()
+                    .map(Genre::getGenreName)
                     .collect(Collectors.toList());
             movieDTO.setGenres(genreNames);
-
         });
-
-//        // 장르 이름 추출 및 설정
-//        List<String> genreNames = movie.getGenres().stream()
-//                .map(Genre::getGenreName) // Genre 객체에서 이름 추출
-//                .collect(Collectors.toList());
-//        movieDTO.setGenres(genreNames);
 
         return movieDTO;
     }
-
 }

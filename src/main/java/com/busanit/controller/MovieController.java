@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
@@ -23,10 +22,10 @@ public class MovieController {
     @Transactional
     @GetMapping("/movies/Main")
     public String getDetailMovies(Model model) throws IOException {
-        movieService2.fetchAndStoreMoviesNowPlaying();
-        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
-        movieService2.fetchAndStoreMovieStillCuts();
-        movieService2.fetchAndStoreCertificationData();
+//        movieService2.fetchAndStoreMoviesNowPlaying();
+//        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
+//        movieService2.fetchAndStoreMovieStillCuts();
+//        movieService2.fetchAndStoreCertificationData();
 
         //비디오가 있는 인기순영화
         List<MovieDTO> videoMovies = movieService2.getVideoMovies();
@@ -40,6 +39,7 @@ public class MovieController {
         List<MovieDTO> hotMovies = movieService2.getHotMovies();
         model.addAttribute("hotMovies", hotMovies);
 
+        //개봉예정
         List<MovieDTO> upcomingMovies = movieService2.fetchAndStoreUpcoming();
         model.addAttribute("upcomingMovies", upcomingMovies);
 
@@ -63,10 +63,10 @@ public class MovieController {
         model.addAttribute("upcomingMovies", upcomingMovies);
         return "movie/movie_list_comming";
     }
-
+    //디테일페이지
     @GetMapping("/movies/{movieId}")
-    public String movieDetailinfo(@PathVariable("movieId") Long movidId, Model model) {
-        List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(movidId);
+    public String movieDetailinfo(@PathVariable("movieId") Long moviedId, Model model) {
+        List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(moviedId);
         model.addAttribute("movieInfos", movieInfos);
         return "movie/movie_get";
     }
@@ -81,16 +81,7 @@ public class MovieController {
     public String reviewPopup() {
         return "movie/review_modal";
     }
-
 }
 
-
-
-//    @GetMapping("/test")
-//    public String test(Model model) {
-//        List<Movie> movies = movieRepository.findAll();
-//        model.addAttribute("movies", movies);
-//        return "test";
-//    }
 
 

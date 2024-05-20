@@ -364,7 +364,11 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
             movieDetailRepository.save(movieDetail);
         }
     }
-
+//    public List<MovieDTO> getAll() {
+//        List<Movie> movieList = movieRepository.findAll();
+//        // MapStruct를 사용한 변환
+//        return MovieMapper.INSTANCE.moviesToMovieDTOs(movieList);
+//    }
     public List<MovieDTO> getAll(){
         List<Movie> movieList = movieRepository.findAll();
         return movieList.stream().map(MovieDTO::convertToDTO)
@@ -384,7 +388,6 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
-
     // 영화 상세보기
     public List<MovieDTO> getMovieDetailInfo(Long movieID) {
         Optional<Movie> movieList = movieRepository.findById(movieID);

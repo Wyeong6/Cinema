@@ -36,7 +36,7 @@
         </div>
 
         <!-- info -->
-        <div id="info">
+        <div id="info" th:data-username="${#authentication.name}">
             <ul>
                 <li><a href="signup.html">회원가입</a></li>
                 <li><a href="login.html">로그인</a></li>
@@ -93,25 +93,39 @@
     <section class="carousel">
         <div class="section_title">
             <h2>Weekly Hot Movies</h2>
-            <p><a href="/nowMovie">more</a></p>
+            <p><a href="/nowMovie">더보기</a></p>
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 10}" >
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="173" height="250" />
+                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="225" />
                 </a>
-                <img src="/images/2.png" alt="one" class="overlay-img" />
+                <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
                 <header>
                     <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
                     <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
-                    <button class="get_btn"><a th:href="@{'/movie_get/' + ${movie.id}}">상세보기</a></button>
+                    <button class="get_btn"><a href="#" class="movie-detail-link">상세보기</a></button>
                 </div>
             </article>
         </div>
     </section>
+    <script>
+        $(document).ready(function() {
+            var memberEmail = $('#info').data('username'); // 사용자 이름 가져오기
+            console.log(memberEmail)
+            $('.movie-detail-link').on('click', function(event) {
+                event.preventDefault(); // 기본 동작 방지
+
+                var movieId = $(this).closest('article').data('movie-id'); // 영화 ID 가져오기
+                var url = '/movies/' + movieId + '?memberEmail=' + encodeURIComponent(memberEmail);
+
+                window.location.href = url; // URL로 이동
+            });
+        });
+    </script>
 
     <!-- Comming Soon -->
     <section class="carousel">
@@ -121,11 +135,13 @@
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 10}" >
-                <a href="#" class="image featured"><img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="144" height="216" /></a>
-                <img src="/images/2.png" alt="one" class="overlay-img" />
-                <header>
-                    <h3><a th:href="@{'/movie/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
+                <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
+                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="173" height="250" />
+                </a>
+                <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
+                 <header>
+                    <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
+                    <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.releaseDate}">개봉날짜</span></p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
