@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Cinemacast</title>
@@ -13,22 +13,14 @@
 <body>
 <!-- Header -->
 <div id="header">
-    <h1 class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
+    <h1 class="logo" style="font-size: 2em;"><a href="index.html">CINEMACAST</a></h1>
 
     <!-- info -->
     <div id="info">
         <ul>
-            <li sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다.</li>
-            <li sec:authorize="isAnonymous()">
-                <a href="/member/new">회원가입</a>
-            </li>
-            <li sec:authorize="isAnonymous()">
-                <a href="/member/login">로그인</a>
-            </li>
-            <li sec:authorize="isAuthenticated()">
-                <a href="/member/logout">로그아웃</a>
-            </li>
-            <li><a href="#">장바구니</a></li>
+            <li><a href="/new">회원가입</a></li>
+            <li><a href="login.html">로그인</a></li>
+            <li><a href="cart_list.html">장바구니</a></li>
         </ul>
     </div>
 
@@ -50,9 +42,9 @@
                     <li><a href="#">상영 시간표</a></li>
                 </ul>
             </li>
-            <li><a href="left-sidebar.html">이벤트</a></li>
-            <!--								<li><a href="right-sidebar.html">Right Sidebar</a></li>-->
-            <li><a href="movie_list_now.html">공지사항</a></li>
+            <li><a href="snack_list.html">스낵 스토어</a></li>
+            <li><a href="event_list.html">이벤트</a></li>
+            <li><a href="notice_list.html">공지사항</a></li>
         </ul>
     </nav>
 

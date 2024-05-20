@@ -2,6 +2,7 @@ package com.busanit.domain;
 
 import com.busanit.entity.movie.Genre;
 import com.busanit.entity.movie.Movie;
+import com.busanit.entity.movie.MovieStillCut;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -24,8 +25,8 @@ public class MovieDTO {
     @JsonProperty("release_date")
     private String releaseDate;
     private String certifications;
-    private String stillCut;
     private String video;
+    @JsonProperty("poster_path")
     private String posterPath;
     private String backdropPath;
     private String popularity;
@@ -34,53 +35,46 @@ public class MovieDTO {
     @JsonProperty("genre_ids")
     private List<Integer> genreIds;
     private List<String> Genres;
-
+    private List<String> stillCutPaths;
 
     public static MovieDTO convertToDTO(Movie movie){
         MovieDTO movieDTO = new MovieDTO();
 
-        // 고유번호, 제목, 상세보기
         movieDTO.setId(movie.getMovieId());
         movieDTO.setTitle(movie.getTitle());
         movieDTO.setOverview(movie.getOverview());
 
-        // 이미지의 배경 및 포스터 경로
-        movieDTO.setBackdropPath(movie.getImages().get(0).getBackdropPath());
-        movieDTO.setPosterPath(movie.getImages().get(0).getPosterPath());
+        movie.getImages().stream().findFirst().ifPresent(image -> {
+            movieDTO.setBackdropPath(image.getBackdropPath());
+            movieDTO.setPosterPath(image.getPosterPath());
+        });
 
-        // Optional을 사용하여 MovieDetail이 null인 경우를 처리
-        //비디오, 인기 , 평점
-        Optional.ofNullable(movie.getMovieDetail()).ifPresent(detail -> {
+        Optional.ofNullable(movie.getMovieDetail()).ifPresentOrElse(detail -> {
             movieDTO.setPopularity(detail.getPopularity());
             movieDTO.setVoteAverage(detail.getVoteAverage());
             movieDTO.setVideo(detail.getVideo());
-        });
-
-        // MovieDetail이 null인 경우의 대체값 설정
-        if (movie.getMovieDetail() == null) {
+            movieDTO.setReleaseDate(detail.getReleaseDate());
+            movieDTO.setRuntime(detail.getRuntime());
+            movieDTO.setCertifications(detail.getCertification());
+        }, () -> {
             movieDTO.setVoteAverage(0);
             movieDTO.setVideo(null);
-        }
+        });
 
-        // 장르 이름 추출 및 설정
-        List<String> genreNames = movie.getGenres().stream()
-                .map(Genre::getGenreName) // Genre 객체에서 이름 추출
-                .collect(Collectors.toList());
-        movieDTO.setGenres(genreNames);
+        Optional.ofNullable(movie.getStillCuts()).ifPresent(stillCuts -> {
+            List<String> stillCutPaths = stillCuts.stream()
+                    .map(MovieStillCut::getStillCuts)
+                    .collect(Collectors.toList());
+            movieDTO.setStillCutPaths(stillCutPaths);
+        });
+
+        Optional.ofNullable(movie.getGenres()).ifPresent(genres -> {
+            List<String> genreNames = genres.stream()
+                    .map(Genre::getGenreName)
+                    .collect(Collectors.toList());
+            movieDTO.setGenres(genreNames);
+        });
 
         return movieDTO;
     }
-
-    public MovieDTO(Long id, String title) {
-        this.id = id;
-        this.title = title;
-    }
-//    public static MovieDTO convertToDTO(Movie movie){
-//        return MovieDTO.builder()
-//                .id(movie.getMovieId())
-//                .title(movie.getTitle())
-//                .overview(movie.getOverview())
-//                .build();
-//    }
-
 }
