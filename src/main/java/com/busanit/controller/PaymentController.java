@@ -2,7 +2,9 @@ package com.busanit.controller;
 
 import com.busanit.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -12,8 +14,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    @Value("${html5_inicis_key}")
+    private String html5InicisKey;
+
     @PostMapping("/test") /*이름 수정예정*/
-    public String payTest() {
+    public String payTest(Model model) {
+        model.addAttribute("html5InicisKey", html5InicisKey);
         return "payment/test_pay";
     }
 

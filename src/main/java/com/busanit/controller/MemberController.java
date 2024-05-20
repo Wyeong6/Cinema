@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/member")
 @RequiredArgsConstructor
@@ -98,13 +100,13 @@ public class MemberController {
 
     @PostMapping("/findId")
     public String findId(String name, String age, Model model) {
-        String beforeMasking = memberService.findUserEmail(name, age);
-        model.addAttribute("findInfo", memberService.maskingEmail(beforeMasking));
+        List<String> beforeMasking = memberService.findUserEmails(name, age);
+        model.addAttribute("findInfo", memberService.maskingEmails(beforeMasking));
 
         return "member/findResult";
     }
 
-    // 아이디(이메일) 찾기
+    // 패스워드 찾기
     @GetMapping("/findPassword")
     public String findPassword() {
         return "member/findPassword";

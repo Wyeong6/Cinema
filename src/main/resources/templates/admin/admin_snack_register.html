@@ -1,0 +1,41 @@
+<h4 class="fw-bold py-3 mb-4">스낵 스토어 상품 등록</h4>
+<!-- Basic Layout -->
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="/admin/snackRegister" method="post">
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_name">상품명</label>
+                        <input class="form-control" id="snack_name" placeholder="상품명을 입력해주세요." name="snack_nm" type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_price">가격</label>
+                        <input class="form-control" id="snack_price" placeholder="상품 가격을 입력해주세요." name="snack_price" type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_stock">수량</label>
+                        <input class="form-control" id="snack_stock" placeholder="상품 수량을 입력해주세요." name="snack_stock" type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="basic-default-message">상품 상세 설명</label>
+                        <textarea
+                                class="form-control"
+                                id="basic-default-message"
+                                placeholder="상품 상세 설명을 입력해주세요."
+                        ></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_image">이미지 이름</label>
+                        <input class="form-control" id="snack_image" placeholder="상품 이미지명을 입력해주세요." name="snack_image" type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_alt">이미지 alt 설명</label>
+                        <input class="form-control" id="snack_alt" placeholder="상품 이미지 alt 설명을 입력해주세요." name="snack_alt" type="text"/>
+                    </div>
+                    <button class="btn btn-primary" type="submit">등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

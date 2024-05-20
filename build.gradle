@@ -56,10 +56,9 @@ dependencies {
     // 난수 생성
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
-    // Map Struct (엔티티, DTO 편하게 쓰기)
-    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    //DTO와 엔티티 간의 변환을 처리하는 라이브러리
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 
 }
 

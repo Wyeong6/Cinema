@@ -5,18 +5,18 @@
     <title>Title</title>
 </head>
 <body>
+<!--<h2 th:text=></h2>-->
 <div th:each="movie : ${movies}">
     <h2 th:text="'Movie Title = ' + ${movie.title}"></h2>
     <p th:text="'Movie Overview = ' + ${movie.overview}"></p>
     <p th:text="'Movie ID = ' + ${movie.movieId}"></p>
-
     <p th:text="'Movie VoteAverage = ' + ${movie.movieDetail.voteAverage}"></p>
-    <div th:each="'Movie Genres = ' + ${movie.genres}">
-<!--        <span th:text="${}"></span>-->
-    </div>
-    <div th:each="image : ${movie.movieImage}">
-        <img th:src="${image.imageUrl}" />
-    </div>
+    <p th:each="genre : ${movie.genres}" th:text="${genre.genreName}">
+            <div th:each="image : ${movie.images}">
+            <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${image.posterPath}}"  alt="포스터"/>
+            <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${image.backdropPath}}"  alt="백드랍"/>
+        </div>
 </div>
+
 </body>
 </html>

@@ -1,18 +1,21 @@
 <!DOCTYPE HTML>
+
 <!--
 	Helios by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
+<html xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <title>Cinemacast</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="/static/css/main.css" />
-    <link rel="stylesheet" href="/static/css/custom.css" />
-    <link rel="stylesheet" href="/static/css/nav.css" />
-    <noscript><link rel="stylesheet" href="/static/css/noscript.css" /></noscript>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/custom.css" />
+    <link rel="stylesheet" href="/assets/css/nav.css" />
+    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+
+<!--    댓글-->
 </head>
 <body class="right-sidebar is-preload">
 <div id="page-wrapper">
@@ -22,22 +25,21 @@
     <!-- Main -->
     <div class="wrapper style1">
 
-        <div class="container">
+        <div class="container" th:each="movie, iterStat : ${movieInfos}">
+            <input type="hidden" id="movieId" th:value="${movie.id}">
             <div class="row gtr-200">
                 <div class="col-8 col-12-mobile" id="content">
                     <article id="main">
                         <header>
                             <h2><a href="#">Movie Title</a></h2>
-                            <p>
-                                THE ROUNDUP : PUNISHMENT
-                            </p>
+                            <p th:text="${movie.title}"></p>
                         </header>
                         <div id="get_header">
-                            <a href="#" class="image featured" style="width: 40%;"><img src="/static/css/images/movieposter.webp" alt="영화포스터" /></a>
+                            <a href="#" class="image featured" style="width: 40%;"><img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터" /></a>
                             <div class="movie_info">
-                                <p><b>개봉일자 : </b>releasedate</p>
-                                <p><b>장르 : </b>genres</p>
-                                <p><b>상영시간 : </b>runtime</p>
+                                <p><b>개봉일자 : </b> <span th:text="${movie.releaseDate}">releasedate</span></p>
+                                <p><b>장르 : </b> <span th:text="${movie.genres}">genres</span></p>
+                                <p><b>상영시간 : </b> <span th:text="${movie.runtime} + '분'">runtime</span></p>
                                 <p><b>감독 : </b>director <b>각본 : </b>writer</p>
 
                                 <div class="movie_data_box">
@@ -46,119 +48,163 @@
                                         <p>cnv</p>
                                     </div>
                                     <div class="movie_data">
-                                        <h4>예매율</h4>
-                                        <p>popularity (%)</p>
+                                        <h4>인기도</h4>
+                                        <p th:text="${movie.popularity}">popularity (%)</p>
                                     </div>
                                     <div class="movie_data">
-                                        <h4>실관람 평점</h4>
-                                        <p>star rating</p>
+                                        <h4>평점</h4>
+                                        <p th:text="${movie.voteAverage}">vote rating</p>
                                     </div>
                                 </div>
+                                <a href="#" class="button">지금 예매하기</a>
                             </div>
-
                         </div>
                         <div id="movie-info"></div>
-                        <p>
-                            Commodo id natoque malesuada sollicitudin elit suscipit. Curae suspendisse mauris posuere accumsan massa
-                            posuere lacus convallis tellus interdum. Amet nullam fringilla nibh nulla convallis ut venenatis purus
-                            lobortis. Auctor etiam porttitor phasellus tempus cubilia ultrices tempor sagittis. Nisl fermentum
-                            consequat integer interdum integer purus sapien. Nibh eleifend nulla nascetur pharetra commodo mi augue
-                            interdum tellus. Ornare cursus augue feugiat sodales velit lorem. Semper elementum ullamcorper lacinia
-                            natoque aenean scelerisque vel lacinia mollis quam sodales congue.
+                        <p th:text="${movie.overview}">
+                           ~ overview ~
                         </p>
                     </article>
                 </div>
                 <div class="col-4 col-12-mobile" id="sidebar">
                     <hr class="first" />
-                    <section>
+                    <section id="reviews">
                         <header>
-                            <h3><a href="#">Sed lorem etiam consequat</a></h3>
+                            <h3>관람평</h3>
+                            <button onclick="openReviewModal()" class="modal_open">작성하기</button>
                         </header>
                         <div class="row gtr-50">
-                            <div class="col-4">
-                                <a href="#" class="image fit"><img src="/static/css/images/pic10.jpg" alt="" /></a>
-                            </div>
-                            <div class="col-8">
-                                <h4>Nibh sed cubilia</h4>
-                                <p>
-                                    Amet nullam fringilla nibh nulla convallis tique ante proin.
-                                </p>
-                            </div>
-                            <div class="col-4">
-                                <a href="#" class="image fit"><img src="/static/css/images/pic11.jpg" alt="" /></a>
-                            </div>
-                            <div class="col-8">
-                                <h4>Proin sed adipiscing</h4>
-                                <p>
-                                    Amet nullam fringilla nibh nulla convallis tique ante proin.
-                                </p>
-                            </div>
-                            <div class="col-4">
-                                <a href="#" class="image fit"><img src="/static/css/images/pic12.jpg" alt="" /></a>
-                            </div>
-                            <div class="col-8">
-                                <h4>Lorem feugiat magna</h4>
-                                <p>
-                                    Amet nullam fringilla nibh nulla convallis tique ante proin.
-                                </p>
-                            </div>
-                            <div class="col-4">
-                                <a href="#" class="image fit"><img src="/static/css/images/pic13.jpg" alt="" /></a>
-                            </div>
-                            <div class="col-8">
-                                <h4>Sed tempus fringilla</h4>
-                                <p>
-                                    Amet nullam fringilla nibh nulla convallis tique ante proin.
-                                </p>
-                            </div>
-                            <div class="col-4">
-                                <a href="#" class="image fit"><img src="/static/css/images/pic14.jpg" alt="" /></a>
-                            </div>
-                            <div class="col-8">
-                                <h4>Malesuada fermentum</h4>
-                                <p>
-                                    Amet nullam fringilla nibh nulla convallis tique ante proin.
-                                </p>
-                            </div>
+                            <table class="default">
+                                <tr>
+                                    <td>
+                                        <h4>gpfud***</h4>
+                                        <p>2024.05.17</p>
+                                        <p>줜잼</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h4>gpfud***</h4>
+                                        <p>2024.05.17</p>
+                                        <p>줜잼</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h4>gpfud***</h4>
+                                        <p>2024.05.17</p>
+                                        <p>줜잼</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h4>gpfud***</h4>
+                                        <p>2024.05.17</p>
+                                        <p>줜잼</p>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
-                        <footer>
-                            <a href="#" class="button">Magna Adipiscing</a>
-                        </footer>
                     </section>
                 </div>
             </div>
-            <div id="stillcut">
+            <div id="stillcut" th:each="movie, iterStat : ${movieInfos}">
                 <hr />
                 <h2>StillCut</h2>
                 <div class="row">
-                    <article class="col-4 col-12-mobile special">
-                        <a href="#" class="image featured"><img src="/static/css/images/pic07.jpg" alt="" /></a>
-                    </article>
-                    <article class="col-4 col-12-mobile special">
-                        <a href="#" class="image featured"><img src="/static/css/images/pic08.jpg" alt="" /></a>
-                    </article>
-                    <article class="col-4 col-12-mobile special">
-                        <a href="#" class="image featured"><img src="/static/css/images/pic09.jpg" alt="" /></a>
-                    </article>
+                    <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}" th:class="${iterStat.count > 4} ? 'hidden stillCut' : 'stillCut'" >
+                        <article class="col-4 col-12-mobile special">
+                            <a href="#" class="image featured">
+                                <img th:src="@{'https://image.tmdb.org/t/p/original/' + ${stillCutPath}}" alt="스틸컷"
+                                     onclick="openModal(this.getAttribute('src'))"
+                                />
+                            </a>
+                        </article>
+                    </div>
                 </div>
+                <p id="showMore" style="cursor: pointer; color: blue; text-decoration: underline;">more</p>
+                <p id="showLess" style="cursor: pointer; color: blue; text-decoration: underline; display:none;">접기</p>
             </div>
+
+            <!-- 모달 -->
+            <div id="myModal" class="modal">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <img class="modal-content" id="modalImage">
+            </div>
+
         </div>
 
     </div>
+
+<!--    <div class="container">-->
+<!--        <h2>댓글</h2>-->
+<!--        <div id="comments"></div>-->
+<!--        <button id="addCommentBtn" class="btn btn-primary">댓글 추가하기</button>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; 댓글 추가 모달 &ndash;&gt;-->
+<!--    <div id="info" th:data-username="${#authentication.name}">-->
+<!--        <ul>-->
+<!--            <li sec:authorize="hasRole('USER')"><span sec:authentication="name"></span> 님 환영합니다.<li>-->
+<!--            <li sec:authorize="isAnonymous()">-->
+<!--                <a href="/member/new">회원가입</a>-->
+<!--            </li>-->
+<!--            <li sec:authorize="isAnonymous()">-->
+<!--                <a href="/member/login">로그인</a>-->
+<!--            </li>-->
+<!--            <li sec:authorize="isAuthenticated()">-->
+<!--                <a href="/member/logout">로그아웃</a>-->
+<!--            </li>-->
+<!--            <li><a href="#">장바구니</a></li>-->
+<!--        </ul>-->
+<!--    </div>-->
+<!--    <div class="modal" id="commentModal">-->
+<!--        <div class="modal-dialog">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h5 class="modal-title">댓글 추가</h5>-->
+<!--                    <button type="button" class="close" data-dismiss="modal">&times;</button>-->
+<!--                </div>-->
+<!--                <div class="modal-body">-->
+<!--                    <form id="commentForm">-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="commentText">댓글:</label>-->
+<!--                            <textarea class="form-control" id="commentText"></textarea>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="rating">평점:</label>-->
+<!--                            <select class="form-control" id="rating">-->
+<!--                                <option>1</option>-->
+<!--                                <option>2</option>-->
+<!--                                <option>3</option>-->
+<!--                                <option>4</option>-->
+<!--                                <option>5</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                        <button type="submit" class="btn btn-primary">댓글 작성</button>-->
+<!--                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>-->
+<!--                    </form>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
 
     <footer data-include-path="footer.html"></footer>
 </div>
 
 <!-- Scripts -->
-<script src="/static/js/jquery.min.js"></script>
-<script src="/static/js/jquery.dropotron.min.js"></script>
-<script src="/static/js/jquery.scrolly.min.js"></script>
-<script src="/static/js/jquery.scrollex.min.js"></script>
-<script src="/static/js/browser.min.js"></script>
-<script src="/static/js/breakpoints.min.js"></script>
-<script src="/static/js/util.js"></script>
-<script src="/static/js/main.js"></script>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/jquery.dropotron.min.js"></script>
+<script src="/assets/js/jquery.scrolly.min.js"></script>
+<script src="/assets/js/jquery.scrollex.min.js"></script>
+<script src="/assets/js/browser.min.js"></script>
+<script src="/assets/js/breakpoints.min.js"></script>
+<script src="/assets/js/util.js"></script>
+<script src="/assets/js/main.js"></script>
 
+
+
+<!--              댓글         ------------------             -->
 <script>
     // include.js
     window.addEventListener('load', function() {
@@ -243,31 +289,222 @@
             Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
         }
     };
+    // 스틸컷 더보기(more), 접기 클릭 함수
+    document.getElementById("showMore").addEventListener("click", function() {
+        var hiddenElements = document.querySelectorAll(".hidden");
+        for (var i = 0; i < hiddenElements.length; i++) {
+            hiddenElements[i].classList.remove("hidden");
+        }
+        this.style.display = 'none'; // "더보기"를 숨깁니다.
+        document.getElementById("showLess").style.display = 'block'; // "접기"를 보여줍니다.
+    });
+
+    document.getElementById("showLess").addEventListener("click", function() {
+        var stillCuts = document.querySelectorAll(".stillCut");
+        for (var i = 0; i < stillCuts.length; i++) {
+            if (i > 3) { // 처음 4개를 제외한 나머지를 숨깁니다.
+                stillCuts[i].classList.add("hidden");
+            }
+        }
+        this.style.display = 'none'; // "접기"를 숨깁니다.
+        document.getElementById("showMore").style.display = 'block'; // "더보기"를 다시 보여줍니다.
+    });
+
+    // 이미지 클릭시 원본크기로 볼수있게 띄우는 모달 관련 변수 및 함수들
+    var currentScrollPosition = 0;
+
+    function openModal(imageSrc) {
+        currentScrollPosition = window.scrollY;
+        document.body.style.overflow = 'hidden';
+        var modal = document.getElementById("myModal");
+        var modalImg = document.getElementById("modalImage");
+        modal.style.display = "block";
+        modalImg.src = imageSrc;
+    }
+
+    function closeModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+        document.body.style.overflow = '';
+        window.scrollTo(0, currentScrollPosition);
+    }
+
+    /*--------- 이미지 상세보기 모달 끝 --------*/
 
 
 
 
+
+    window.addEventListener('load', function() {
+        // 모든 요소를 가져와서 includePath 데이터 속성이 있는 경우 해당 경로의 파일을 가져와서 대체하는 작업을 수행
+        var allElements = document.getElementsByTagName('*');
+        Array.prototype.forEach.call(allElements, function (el) {
+            var includePath = el.dataset.includePath;
+            if (includePath) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        el.outerHTML = this.responseText;
+                    }
+                };
+                xhttp.open('GET', includePath, true);
+                xhttp.send();
+            }
+        });
+    });
+
+    const slides = document.querySelector('.slides');
+    const indicatorLine = document.querySelector('.indicator-line');
+    const totalSlides = document.querySelectorAll('.slides article').length;
+    let isDragging = false;
+    let startPos = 0;
+    let currentTranslate = 0;
+    let prevTranslate = 0;
+    let animationID;
+    let currentIndex = 0;
+    let sliderWidth = slides.clientWidth;
+
+    slides.addEventListener('mousedown', dragStart);
+    slides.addEventListener('mouseup', dragEnd);
+    slides.addEventListener('mouseleave', dragEnd);
+    slides.addEventListener('mousemove', drag);
+
+    slides.addEventListener('touchstart', dragStart);
+    slides.addEventListener('touchend', dragEnd);
+    slides.addEventListener('touchmove', drag);
+
+    window.addEventListener('resize', () => {
+        sliderWidth = slides.clientWidth;
+        setPositionByIndex();
+    });
+
+    function dragStart(event) {
+        isDragging = true;
+        startPos = getPositionX(event);
+        animationID = requestAnimationFrame(animation);
+        slides.classList.add('grabbing');
+    }
+
+    function drag(event) {
+        if (isDragging) {
+            const currentPosition = getPositionX(event);
+            currentTranslate = prevTranslate + currentPosition - startPos;
+            setSliderPosition();
+        }
+    }
+
+    function dragEnd() {
+        isDragging = false;
+        cancelAnimationFrame(animationID);
+        const movedBy = currentTranslate - prevTranslate;
+
+        if (movedBy < -sliderWidth / 4 && currentIndex < totalSlides - 1) currentIndex += 1;
+        if (movedBy > sliderWidth / 4 && currentIndex > 0) currentIndex -= 1;
+
+        setPositionByIndex();
+        slides.classList.remove('grabbing');
+    }
+
+    function getPositionX(event) {
+        return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+    }
+
+    function animation() {
+        if (isDragging) requestAnimationFrame(animation);
+    }
+
+    function setSliderPosition() {
+        slides.style.transform = `translateX(${currentTranslate}px)`;
+    }
+
+    function setPositionByIndex() {
+        currentTranslate = currentIndex * -sliderWidth / totalSlides;
+        prevTranslate = currentTranslate;
+        slides.style.transform = `translateX(${currentTranslate}px)`;
+        updateIndicator();
+    }
+
+    function updateIndicator() {
+        const indicatorWidth = sliderWidth / totalSlides;
+        indicatorLine.style.transform = `translateX(${currentIndex * indicatorWidth}px)`;
+    }
+
+    // 리뷰 작성 모달을 팝업 창으로 열기
+    function openReviewModal() {
+            window.open('/review', 'ReviewModal', 'width=600,height=600');
+    }
+
+//                                  댓글       --------------------------------------------------
+    $(document).ready(function() {
+        // 환경 설정: 필요한 변수 선언
+        const movieId = $('#movieId').val();
+        const memberEmail = $('#info').data('username');
+
+        // 댓글을 로드하는 함수 정의
+        const loadComments = () => {
+            $.ajax({
+                url: `/movies/${movieId}`,
+                method: 'GET',
+                dataType: 'json',
+                success: (data) => {
+                    const commentsContainer = $('#comments').empty();
+                    data.forEach(({memberId, movieId, comment, grade}) => {
+                        commentsContainer.append(
+                            `<div class="comment">
+                            <p>작성자 ID: ${memberId}</p>
+                            <p>영화번호 : ${movieId}</p>
+                            <p>댓글: ${comment}</p>
+                            <p>평점: ${grade}</p>
+                        </div>`
+                        );
+                    });
+                },
+                error: (xhr, status, error) => {
+                    console.error("댓글을 불러오지 못했습니다:", error);
+                    $('#comments').append(
+                        `<div class="error">
+                        <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
+                    </div>`
+                    );
+                }
+            });
+        };
+
+        // 모달을 보여주는 이벤트 핸들러
+        $('#addCommentBtn').click(() => $('#commentModal').modal('show'));
+
+        // 댓글 제출 이벤트 핸들러
+        $('#commentForm').submit(function(e) {
+            e.preventDefault();
+
+            // 댓글 데이터를 수집하는 부분은 submit 이벤트 내부로 이동
+            const comment = $('#commentText').val();
+            const grade = $('#rating').val();
+
+            const commentData = JSON.stringify({
+                memberEmail: memberEmail,
+                comment: comment,
+                grade: grade,
+                movieId: movieId
+            });
+
+            console.log(commentData);
+
+            $.ajax({
+                url: '/new',
+                method: 'POST',
+                contentType: 'application/json',
+                data: commentData,
+                success: () => {
+                    $('#commentModal').modal('hide');
+                    loadComments();
+                }
+            });
+        });
+
+        // 초기 댓글 로드
+        loadComments();
+    });
 </script>
-
-
-<div th:each="movie, iterStat : ${movies}">
-    <div>
-        <h2>영화 번호: <span th:text="${movie.id}">영화 번호</span></h2>
-        <h3>영화 이름: <span th:text="${movie.title}">영화 이름</span></h3>
-        <p>영화 설명: <span th:text="${movie.overview}">영화 설명</span></p>
-        <p>영화 장르: <span th:text="${#strings.listJoin(movie.genres, ', ')}">영화 장르</span></p>
-        <p>영화 평점: <span th:text="${movie.voteAverage}">영화 평점</span></p>
-        <p>인기도: <span th:text="${movie.popularity}">인기도</span></p>
-        <div th:if="${movie.video}">
-            <p>영화 비디오:</p>
-            <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <p>영화 배경사진:</p>
-        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경사진" />
-        <p>영화 포스터:</p>
-        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.posterPath}}" alt="포스터" />
-    </div>
-</div>
-
 </body>
 </html>

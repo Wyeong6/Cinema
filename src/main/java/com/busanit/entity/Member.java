@@ -2,10 +2,14 @@ package com.busanit.entity;
 
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
+import com.busanit.entity.movie.Comment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "member")
@@ -44,6 +48,14 @@ public class Member extends BaseTimeEntity {
     private Boolean checkedTermsE;
 
     private Boolean checkedTermsS;
+    //멤버와 댓글 연관관계
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Comment> comment = new ArrayList<>();
+
+    public void addComment(Comment comment){
+        this.comment.add(comment);
+        comment.setMember(this);
+    }
 
     // 일반 폼 회원 생성
     public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {
