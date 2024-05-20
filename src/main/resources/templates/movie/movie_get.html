@@ -1,23 +1,82 @@
-<!DOCTYPE HTML>
-
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html xmlns:sec="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout/layout_total}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Cinemacast</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/custom.css" />
+    <link rel="stylesheet" href="/assets/css/custom_player.css" />
     <link rel="stylesheet" href="/assets/css/nav.css" />
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
-
 <!--    댓글-->
+    <style>
+        /* 상세 페이지 css 조정 */
+
+        .still-cut-article {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 10px;
+        }
+
+
+        .hide {
+            display: none;
+        }
+
+        .still-cut-article img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* 이미지클릭시 띄우는 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 60px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="right-sidebar is-preload">
+<th:block layout:fragment="content">
 <div id="page-wrapper">
 
     <header data-include-path="./header.html"></header>
@@ -35,7 +94,9 @@
                             <p th:text="${movie.title}"></p>
                         </header>
                         <div id="get_header">
-                            <a href="#" class="image featured" style="width: 40%;"><img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터" /></a>
+                            <a href="#" class="image featured" style="width: 40%;"><img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
+                            onclick="openModal()"
+                            /></a>
                             <div class="movie_info">
                                 <p><b>개봉일자 : </b> <span th:text="${movie.releaseDate}">releasedate</span></p>
                                 <p><b>장르 : </b> <span th:text="${movie.genres}">genres</span></p>
@@ -73,46 +134,21 @@
                             <button onclick="openReviewModal()" class="modal_open">작성하기</button>
                         </header>
                         <div class="row gtr-50">
-                            <table class="default">
-                                <tr>
-                                    <td>
-                                        <h4>gpfud***</h4>
-                                        <p>2024.05.17</p>
-                                        <p>줜잼</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <h4>gpfud***</h4>
-                                        <p>2024.05.17</p>
-                                        <p>줜잼</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <h4>gpfud***</h4>
-                                        <p>2024.05.17</p>
-                                        <p>줜잼</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <h4>gpfud***</h4>
-                                        <p>2024.05.17</p>
-                                        <p>줜잼</p>
-                                    </td>
-                                </tr>
+                            <table class="default" id="reviews-table">
+                                <!-- 댓글이 여기에 추가될 것입니다 -->
                             </table>
                         </div>
                     </section>
                 </div>
             </div>
+
+            <!-- 스틸컷 for each (반복) -->
             <div id="stillcut" th:each="movie, iterStat : ${movieInfos}">
                 <hr />
                 <h2>StillCut</h2>
                 <div class="row">
-                    <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}" th:class="${iterStat.count > 4} ? 'hidden stillCut' : 'stillCut'" >
-                        <article class="col-4 col-12-mobile special">
+                    <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}" th:class="${iterStat.count > 4} ? 'hide stillCut' : 'stillCut'" >
+                        <article class="col-4 col-12-mobile special still-cut-article">
                             <a href="#" class="image featured">
                                 <img th:src="@{'https://image.tmdb.org/t/p/original/' + ${stillCutPath}}" alt="스틸컷"
                                      onclick="openModal(this.getAttribute('src'))"
@@ -124,71 +160,13 @@
                 <p id="showMore" style="cursor: pointer; color: blue; text-decoration: underline;">more</p>
                 <p id="showLess" style="cursor: pointer; color: blue; text-decoration: underline; display:none;">접기</p>
             </div>
-
             <!-- 모달 -->
             <div id="myModal" class="modal">
                 <span class="close" onclick="closeModal()">&times;</span>
                 <img class="modal-content" id="modalImage">
             </div>
-
         </div>
-
     </div>
-
-<!--    <div class="container">-->
-<!--        <h2>댓글</h2>-->
-<!--        <div id="comments"></div>-->
-<!--        <button id="addCommentBtn" class="btn btn-primary">댓글 추가하기</button>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; 댓글 추가 모달 &ndash;&gt;-->
-<!--    <div id="info" th:data-username="${#authentication.name}">-->
-<!--        <ul>-->
-<!--            <li sec:authorize="hasRole('USER')"><span sec:authentication="name"></span> 님 환영합니다.<li>-->
-<!--            <li sec:authorize="isAnonymous()">-->
-<!--                <a href="/member/new">회원가입</a>-->
-<!--            </li>-->
-<!--            <li sec:authorize="isAnonymous()">-->
-<!--                <a href="/member/login">로그인</a>-->
-<!--            </li>-->
-<!--            <li sec:authorize="isAuthenticated()">-->
-<!--                <a href="/member/logout">로그아웃</a>-->
-<!--            </li>-->
-<!--            <li><a href="#">장바구니</a></li>-->
-<!--        </ul>-->
-<!--    </div>-->
-<!--    <div class="modal" id="commentModal">-->
-<!--        <div class="modal-dialog">-->
-<!--            <div class="modal-content">-->
-<!--                <div class="modal-header">-->
-<!--                    <h5 class="modal-title">댓글 추가</h5>-->
-<!--                    <button type="button" class="close" data-dismiss="modal">&times;</button>-->
-<!--                </div>-->
-<!--                <div class="modal-body">-->
-<!--                    <form id="commentForm">-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="commentText">댓글:</label>-->
-<!--                            <textarea class="form-control" id="commentText"></textarea>-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="rating">평점:</label>-->
-<!--                            <select class="form-control" id="rating">-->
-<!--                                <option>1</option>-->
-<!--                                <option>2</option>-->
-<!--                                <option>3</option>-->
-<!--                                <option>4</option>-->
-<!--                                <option>5</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                        <button type="submit" class="btn btn-primary">댓글 작성</button>-->
-<!--                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>-->
-<!--                    </form>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-
-
     <footer data-include-path="footer.html"></footer>
 </div>
 
@@ -234,6 +212,7 @@
 
     async function fetchMovieCredits() {
         try {
+            // var apiKey = 547e2cd4d0e26e68fb907dafef4f90ac;
             const response = await fetch('https://api.themoviedb.org/3/movie/1011985/credits?language=ko-KR', options);
             const data = await response.json();
 
@@ -289,14 +268,28 @@
             Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
         }
     };
+
+
     // 스틸컷 더보기(more), 접기 클릭 함수
+    // 현재 표시된 항목의 수를 추적하는 변수
+    var visibleCount = 4; // 처음에 보이는 항목 수
+    var increment = 8; // 한 번에 표시할 추가 항목 수
+
     document.getElementById("showMore").addEventListener("click", function() {
-        var hiddenElements = document.querySelectorAll(".hidden");
-        for (var i = 0; i < hiddenElements.length; i++) {
-            hiddenElements[i].classList.remove("hidden");
+        var stillCuts = document.querySelectorAll(".stillCut");
+        var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
+
+        for (var i = visibleCount; i < newVisibleCount; i++) {
+            stillCuts[i].classList.remove("hide");
         }
-        this.style.display = 'none'; // "더보기"를 숨깁니다.
-        document.getElementById("showLess").style.display = 'block'; // "접기"를 보여줍니다.
+
+        visibleCount = newVisibleCount; // 업데이트된 표시된 항목의 수
+
+        // 모든 항목이 표시되었는지 확인
+        if (visibleCount >= stillCuts.length) {
+            this.style.display = 'none'; // "더보기"를 숨깁니다.
+            document.getElementById("showLess").style.display = 'block'; // "접기"를 보여줍니다.
+        }
     });
 
     document.getElementById("showLess").addEventListener("click", function() {
@@ -306,6 +299,7 @@
                 stillCuts[i].classList.add("hidden");
             }
         }
+        visibleCount = 4; // "접기" 후 처음 표시된 항목의 수로 리셋
         this.style.display = 'none'; // "접기"를 숨깁니다.
         document.getElementById("showMore").style.display = 'block'; // "더보기"를 다시 보여줍니다.
     });
@@ -315,7 +309,7 @@
 
     function openModal(imageSrc) {
         currentScrollPosition = window.scrollY;
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hide';
         var modal = document.getElementById("myModal");
         var modalImg = document.getElementById("modalImage");
         modal.style.display = "block";
@@ -330,9 +324,6 @@
     }
 
     /*--------- 이미지 상세보기 모달 끝 --------*/
-
-
-
 
 
     window.addEventListener('load', function() {
@@ -353,158 +344,54 @@
         });
     });
 
-    const slides = document.querySelector('.slides');
-    const indicatorLine = document.querySelector('.indicator-line');
-    const totalSlides = document.querySelectorAll('.slides article').length;
-    let isDragging = false;
-    let startPos = 0;
-    let currentTranslate = 0;
-    let prevTranslate = 0;
-    let animationID;
-    let currentIndex = 0;
-    let sliderWidth = slides.clientWidth;
-
-    slides.addEventListener('mousedown', dragStart);
-    slides.addEventListener('mouseup', dragEnd);
-    slides.addEventListener('mouseleave', dragEnd);
-    slides.addEventListener('mousemove', drag);
-
-    slides.addEventListener('touchstart', dragStart);
-    slides.addEventListener('touchend', dragEnd);
-    slides.addEventListener('touchmove', drag);
-
-    window.addEventListener('resize', () => {
-        sliderWidth = slides.clientWidth;
-        setPositionByIndex();
-    });
-
-    function dragStart(event) {
-        isDragging = true;
-        startPos = getPositionX(event);
-        animationID = requestAnimationFrame(animation);
-        slides.classList.add('grabbing');
-    }
-
-    function drag(event) {
-        if (isDragging) {
-            const currentPosition = getPositionX(event);
-            currentTranslate = prevTranslate + currentPosition - startPos;
-            setSliderPosition();
-        }
-    }
-
-    function dragEnd() {
-        isDragging = false;
-        cancelAnimationFrame(animationID);
-        const movedBy = currentTranslate - prevTranslate;
-
-        if (movedBy < -sliderWidth / 4 && currentIndex < totalSlides - 1) currentIndex += 1;
-        if (movedBy > sliderWidth / 4 && currentIndex > 0) currentIndex -= 1;
-
-        setPositionByIndex();
-        slides.classList.remove('grabbing');
-    }
-
-    function getPositionX(event) {
-        return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-    }
-
-    function animation() {
-        if (isDragging) requestAnimationFrame(animation);
-    }
-
-    function setSliderPosition() {
-        slides.style.transform = `translateX(${currentTranslate}px)`;
-    }
-
-    function setPositionByIndex() {
-        currentTranslate = currentIndex * -sliderWidth / totalSlides;
-        prevTranslate = currentTranslate;
-        slides.style.transform = `translateX(${currentTranslate}px)`;
-        updateIndicator();
-    }
-
-    function updateIndicator() {
-        const indicatorWidth = sliderWidth / totalSlides;
-        indicatorLine.style.transform = `translateX(${currentIndex * indicatorWidth}px)`;
-    }
-
     // 리뷰 작성 모달을 팝업 창으로 열기
     function openReviewModal() {
-            window.open('/review', 'ReviewModal', 'width=600,height=600');
+        const movieId = $('#movieId').val();
+        console.log("movieId" + movieId);
+            window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=600');
     }
 
-//                                  댓글       --------------------------------------------------
-    $(document).ready(function() {
-        // 환경 설정: 필요한 변수 선언
+//            댓글       --------------------------------------------------
+    const loadComments = () => {
         const movieId = $('#movieId').val();
-        const memberEmail = $('#info').data('username');
-
-        // 댓글을 로드하는 함수 정의
-        const loadComments = () => {
-            $.ajax({
-                url: `/movies/${movieId}`,
-                method: 'GET',
-                dataType: 'json',
-                success: (data) => {
-                    const commentsContainer = $('#comments').empty();
-                    data.forEach(({memberId, movieId, comment, grade}) => {
-                        commentsContainer.append(
-                            `<div class="comment">
-                            <p>작성자 ID: ${memberId}</p>
-                            <p>영화번호 : ${movieId}</p>
-                            <p>댓글: ${comment}</p>
+        console.log(movieId);
+        $.ajax({
+            url: `/movies/${movieId}`,
+            method: 'GET',
+            dataType: 'json',
+            success: (data) => {
+                const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
+                reviewsSection.empty(); // 기존 내용을 비웁니다.
+                data.forEach(({memberId, comment, grade}) => {
+                    // 각 댓글마다의 HTML 구조를 생성합니다.
+                    const reviewRow = `
+                    <tr>
+                        <td>
+                            <h4>${memberId}</h4>
+                            <p>${new Date().toISOString().slice(0, 10)}</p>
+                            <p>${comment}</p>
                             <p>평점: ${grade}</p>
-                        </div>`
-                        );
-                    });
-                },
-                error: (xhr, status, error) => {
-                    console.error("댓글을 불러오지 못했습니다:", error);
-                    $('#comments').append(
-                        `<div class="error">
-                        <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
-                    </div>`
-                    );
-                }
+                        </td>
+                    </tr>
+                `;
+                    reviewsSection.append(reviewRow); // 생성된 HTML을 테이블에 추가합니다.
             });
-        };
-
-        // 모달을 보여주는 이벤트 핸들러
-        $('#addCommentBtn').click(() => $('#commentModal').modal('show'));
-
-        // 댓글 제출 이벤트 핸들러
-        $('#commentForm').submit(function(e) {
-            e.preventDefault();
-
-            // 댓글 데이터를 수집하는 부분은 submit 이벤트 내부로 이동
-            const comment = $('#commentText').val();
-            const grade = $('#rating').val();
-
-            const commentData = JSON.stringify({
-                memberEmail: memberEmail,
-                comment: comment,
-                grade: grade,
-                movieId: movieId
-            });
-
-            console.log(commentData);
-
-            $.ajax({
-                url: '/new',
-                method: 'POST',
-                contentType: 'application/json',
-                data: commentData,
-                success: () => {
-                    $('#commentModal').modal('hide');
-                    loadComments();
-                }
-            });
+        },
+        error: (xhr, status, error) => {
+            console.error("댓글을 불러오지 못했습니다:", error);
+            $('#comments').append(
+                `<div class="error">
+                    <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
+                   </div>`
+            );
+        }
         });
+    };
+    // 모달을 보여주는 이벤트 핸들러
+    $('#addCommentBtn').click(() => $('#commentModal').modal('show'));
+    loadComments();
 
-        // 초기 댓글 로드
-        loadComments();
-    });
 </script>
+</th:block>
 </body>
 </html>

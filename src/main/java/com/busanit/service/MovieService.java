@@ -284,7 +284,7 @@ public class MovieService {
         movieStillCut.setStillCuts(filePath); // 여기서는 각각의 filePath를 별도로 저장합니다.
         movie.addStillCut(movieStillCut);
         movieStillCutRepository.save(movieStillCut);
-        movieRepository.save(movie);
+//        movieRepository.save(movie);
     }
 
 
