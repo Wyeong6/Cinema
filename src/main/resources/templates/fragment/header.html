@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="header">
 <head>
     <meta charset="UTF-8">
     <title>Cinemacast</title>
@@ -42,7 +44,7 @@
                     <li><a href="#">상영 시간표</a></li>
                 </ul>
             </li>
-            <li><a href="snack_list.html">스낵 스토어</a></li>
+            <li><a href="/snack/snackList">스낵 스토어</a></li>
             <li><a href="event_list.html">이벤트</a></li>
             <li><a href="notice_list.html">공지사항</a></li>
         </ul>
@@ -50,4 +52,5 @@
 
 </div>
 </body>
+</th:block>
 </html>

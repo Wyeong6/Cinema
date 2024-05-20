@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+
+
+<!--<th:block layout:fragment="css"></th:block>-->
+<!--<th:block layout:fragment="javascript"></th:block>-->
+
+<body class="homepage is-preload">
+<div id="page-wrapper">
+
+    <!-- Page Content -->
+        <th:block layout:fragment="content"></th:block>
+    <!-- /#page-content-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+<th:block th:replace="fragment/footer::footer"></th:block>
+
+</body>
+</html>
