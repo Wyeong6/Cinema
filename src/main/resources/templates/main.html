@@ -100,23 +100,21 @@
     <section class="carousel">
         <div class="section_title">
             <h2>Weekly Hot Movies</h2>
-            <p><a href="/nowMovie">more</a></p>
+            <p><a href="/nowMovie">더보기</a></p>
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 10}" >
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="173" height="250" />
+                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="225" />
                 </a>
-                <img src="/images/2.png" alt="one" class="overlay-img" />
+                <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
                 <header>
                     <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
                     <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
-<!--                    <button class="get_btn"><a th:href="@{'/movies/' + ${movie.id}}">상세보기</a></button>-->
                     <button class="get_btn"><a href="#" class="movie-detail-link">상세보기</a></button>
-
                 </div>
             </article>
         </div>
@@ -144,9 +142,11 @@
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 10}" >
-                <a href="#" class="image featured"><img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="144" height="216" /></a>
-                <img src="/images/2.png" alt="one" class="overlay-img" />
-                <header>
+                <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
+                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="173" height="250" />
+                </a>
+                <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
+                 <header>
                     <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
                     <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.releaseDate}">개봉날짜</span></p>
                 </header>

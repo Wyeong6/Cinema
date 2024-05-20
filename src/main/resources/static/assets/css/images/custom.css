@@ -1,0 +1,592 @@
+@font-face {
+    font-family: 'MyCustomFont';
+    src: url('/assets/css/font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
+}
+
+#header {
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.5s ease-in-out;
+}
+
+.logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 2% 0 0 42%;
+    font-family: 'MyCustomFont', sans-serif;
+    z-index: 9999999;
+}
+
+#info {
+    position: absolute;
+    top: 2%;
+    right:1em;
+    width: auto;
+    height: 37px;
+    z-index: 9999;
+}
+
+#info ul {
+    display: flex;
+    justify-content: space-between;
+    list-style-type: none;
+}
+
+#info ul li {
+    font-size: 13px;
+    margin-right: 10px;
+}
+
+/* paging_btn */
+.paging_btn {
+    display: block;
+    width: 100%;
+    margin-top: 3%;
+}
+.paging_btn ul {
+    margin: 0 auto;
+    width: 20%;
+    display: flex;
+    justify-content: space-between;
+}
+.paging_btn ul li {
+    /*margin-right: 1%;*/
+    list-style-type: none;
+}
+/* footer */
+.contact {
+    margin: 0 auto;
+}
+.contact button {
+    border-radius: 50px;
+    font-size: 30px;
+    background: rgba(229, 229, 229, 0.3);
+}
+.contact button:hover {
+    background: rgb(229, 229, 229);
+    color: #3B353C;
+}
+
+/* 메인 페이지 */
+#header .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+#img_btn {
+    position: absolute;
+    top: 40%;
+    right: 1%;
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+}
+#img_btn .btn {
+    color: #fff;
+    background: none;
+    font-size: 0.8em;
+    padding: 0.65em 1em 0.65em 1em;
+    cursor: pointer;
+    border: none;
+    transition: color 0.3s;
+}
+#img_btn .clicked {
+    color: #df7366;
+    font-size: 2em;
+}
+
+#img_btn .btn:hover {
+    color: #df7366;
+    font-size: 1em;
+}
+.carousel .section_title {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8em 2em 8em;
+}
+.carousel article {
+    position: relative; /* <article> 요소에 상대 위치 지정 */
+    display: inline-block; /* 요소들이 인라인으로 나타나도록 설정 */
+}
+.carousel .overlay-img {
+    width: 7em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* 겹쳐진 이미지가 위에 표시되도록 설정 */
+    margin-top: 8em;
+}
+.carousel .ten {
+    width: 5em;
+    margin-top: 9em;
+    margin-left: 1em;
+}
+.carousel header > p {
+    font-size: 1em;
+    margin-bottom: 0;
+}
+.carousel header > p > img {
+    width: 1em;
+}
+.carousel .button_box {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5em 1.5em 0;
+    z-index: 99999;
+}
+.carousel .button_box .reservation_btn {
+    background: #df7366;
+    font-size: 1em;
+    color: #fff;
+    padding: 0.5em 1.4em 0.5em 1.4em;
+}
+.carousel .button_box .get_btn {
+    font-size: 1em;
+    background: #555555;
+    z-index: 99999;
+    padding: 0.5em 1.4em 0.5em 1.4em;
+}
+.comming_list .button_box {
+    justify-content: center;
+}
+#features article {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#features header > p {
+    font-size: 1.2em;
+    margin-bottom: 1em;
+}
+#features .more_btn {
+    text-align: right;
+}
+
+/* 상세 페이지 */
+.wrapper .container #main img {
+    width: 100%
+}
+#get_header {
+    display: flex;
+    justify-content: flex-start;
+}
+#get_header .movie_info {
+    width: 55%;
+    margin-left: 5%;
+}
+#get_header .movie_data_box {
+    margin: 30% 0 2% 0;
+    display: flex;
+    justify-content: space-between;
+}
+#get_header .movie_data {
+    margin-right: 5%;
+}
+.slider {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.slides {
+    display: flex;
+    transition: transform 0.1s ease-out;
+    cursor: grab;
+}
+
+.slides:active {
+    cursor: grabbing;
+}
+
+.slides article {
+    min-width: 30%;
+    box-sizing: border-box;
+    margin-right: 1%;
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+.slides article:last-child {
+    margin-right: 0;
+}
+.slides article header > p {
+    margin: 0.5em 0 0.5em 0;
+}
+.slides article header p > a {
+    font-size: 18px;
+}
+
+.image.featured img {
+    width: 100%;
+    display: block;
+}
+
+.slider-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: left;
+}
+.indicator-line {
+    height: 4px;
+    background-color: #333;
+    width: 30%;
+    transition: transform 0.1s ease-out;
+}
+
+#stillcut {
+    padding-top: 2%;
+}
+#stillcut h3 {
+    padding-bottom: 2%;
+    font-size: 40px;
+}
+#reviews header {
+    margin-bottom: 8%;
+    display: flex;
+    justify-content: space-between;
+}
+#reviews .modal_open {
+    background: none;
+    color: #3B353C;
+    padding: 0;
+}
+#reviews p {
+    text-align: left;
+}
+/* 리뷰 모달 */
+#review_modal {
+    margin: 0 auto;
+    width: 80%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+}
+#review_modal h1 {
+    font-size: 1.5em;
+    font-weight: 700;
+}
+#review_modal .form-group {
+    margin: 3% 0;
+}
+#review_modal .button_box {
+    display: flex;
+    justify-content: space-between;
+}
+#review_modal button {
+    width: 48%;
+}
+#review_modal button:nth-child(1) {
+    background: #dddddd;
+    color: #3B353C;
+}
+#review_modal button:first-child:hover {
+    background: #e5e5e5;
+}
+/* 현재 상영작 페이지*/
+.list {
+    padding: 4em 0 6em 0;
+    height: auto;
+    width: 100%;
+}
+.list hr {
+    top:0;
+    margin-bottom: 4em;
+}
+.list p {
+    text-align: center;
+}
+/* 스낵 상세 페이지 */
+#snack_get_section {
+    display: flex;
+    flex-direction: row;
+}
+#snack_get_section img {
+    width: 50%;
+}
+#snack_get_section table {
+    width: 100%;
+    height: 100%;
+}
+#td_count {
+    padding: 1em 0;
+}
+.count_box {
+    position: relative; /* 부모 요소를 상대 위치로 설정 */
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background: #c4c3ca;
+    border-radius: 15px;
+}
+.count_box button {
+    background: none;
+    font-size: 30px;
+}
+.count_box button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.count_box p {
+    position: absolute; /* 자식 요소를 절대 위치로 설정 */
+    top: 50%; /* 부모 요소의 세로 중앙에 위치시키기 위해 50% 설정 */
+    left: 50%; /* 부모 요소의 가로 중앙에 위치시키기 위해 50% 설정 */
+    transform: translate(-50%, -50%); /* 요소를 세로와 가로로 모두 중앙에 위치 */
+    margin: 0; /* 기본 마진 제거 */
+}
+#total_price {
+    font-size: 30px;
+    font-weight: 900;
+}
+#tr_purchase {
+    width: 100%;
+}
+#tr_purchase td {
+    padding: 3em 0 1em 0;
+}
+#tr_purchase td:first-child {
+    padding: 1em 1em 1em 0;
+}
+#tr_purchase button {
+    font-size: 20px;
+    width: 100%;
+    border: 5px solid #df7366;
+    color: #3B353C;
+}
+#tr_purchase button.cart{
+    font-size: 20px;
+    width: 100%;
+    background: #fafafa;
+    border: 5px solid rgba(223, 115, 102, 0.3);
+    color: #3B353C;
+}
+/* notice_list*/
+.notice_list table.default tr th{
+    text-align: center;
+}
+.notice_list table th:nth-child(1) {
+    width: 10%;
+}
+.notice_list table th:nth-child(2) {
+    width: 70%;
+}
+.notice_list table th:nth-child(3) {
+    width: 10%;
+}
+.notice_list table th:nth-child(4) {
+    width: 10%;
+}
+.notice_list table td{
+    text-align: center;
+}
+.notice_list table td:nth-child(1) {
+    width: 10%;
+}
+.notice_list table td:nth-child(2) {
+    width: 70%;
+}
+.notice_list table td:nth-child(3) {
+    width: 10%;
+}
+.notice_list table td:nth-child(4) {
+    width: 10%;
+}
+/* notice_get */
+.container {
+    position: relative;
+}
+.notice_get table {
+    margin: 4em 0 2em;
+}
+.notice_get table tr td:first-child{
+    text-align: center;
+    width: 30%;
+}
+.notice_get button {
+    margin: 0 auto;
+    display: block; /* 버튼을 블록 요소로 설정 */
+    width: 18%;
+    font-size: 20px;
+}
+/* cart_list */
+.cart_list {
+    display: flex;
+    justify-content: space-between;
+}
+.cart_list header {
+    display: flex;
+    justify-content: space-between;
+}
+.cart_list header > p {
+    font-size: 20px;
+}
+.cart_list #main {
+    width: 70%;
+}
+#cart_list_section table tr th,
+#cart_list_section table tr td {
+    text-align: center;
+    vertical-align: middle;
+}
+td p {
+    display: block; /* 블록 요소로 유지 */
+    margin: 0 auto; /* 가로 중앙 정렬 */
+    text-align: center; /* 텍스트 내용을 중앙 정렬 */
+}
+#cart_list_section table tr th:nth-child(1) {
+    width: 20%;
+}
+#cart_list_section table tr th:nth-child(2) {
+    width: 40%;
+}
+#cart_list_section table tr th:nth-child(3) {
+    width: 5%;
+}
+#cart_list_section table tr th:nth-child(4) {
+    width: 20%;
+}
+#cart_list_section table tr th:nth-child(5) {
+    width: 10%;
+}
+#cart_list_section table tr td:nth-child(1) {
+    width: 20%;
+}
+#cart_list_section table tr td:nth-child(2) {
+    width: 40%;
+}
+#cart_list_section table tr td:nth-child(3) {
+    width: 10%;
+}
+#cart_list_section table tr td:nth-child(3) input {
+    width: 100%;
+    padding: 2%;
+}
+#cart_list_section table tr td:nth-child(4) {
+    width: 20%;
+}
+#cart_list_section table tr td:nth-child(4) .calc_price {
+    color: #777777;
+    font-size: 0.8em;
+}
+#cart_list_section table tr td:nth-child(4) .total_price {
+    color: #3B353C;
+    font-weight: 700;
+    font-size: 1.2em;
+}
+#cart_list_section table tr td:nth-child(5) {
+    width: 10%;
+}
+.wrapper .container #cart_list_section .delete_td img {
+    width: 30%;
+}
+#main .button_box {
+    margin-top: 3.5em;
+    margin-left: 0;
+    display: flex;
+    justify-content: space-between;
+}
+#main .button_box .continue_btn {
+    height: 70%;
+    background: none;
+    color: #3B353C;
+    font-size: 20px;
+    border-radius: 15px;
+    border: 5px solid rgba(223, 115, 102, 0.3);
+}
+#main .button_box .continue_btn:hover {
+    background: rgba(223, 115, 102, 0.3);
+    border: none;
+}
+#main .price_box {
+    text-align: center;
+    vertical-align: center;
+}
+#main .price_box p {
+    font-size: 25px;
+    font-weight: 700;
+}
+article#pay {
+    width: 28%;
+    background: #fafafa;
+    position: relative;
+}
+article#pay h2 {
+    font-weight: 700;
+    margin: 1.5em 0 0 0.5em;
+}
+article#pay .row {
+    margin: 3em 1em;
+}
+article#pay .row > * {
+    padding: 0;
+}
+article#pay .row > #payment > button {
+    width: 75%;
+    padding: 0.65em 2em 0.65em 2em;
+    font-size: 1em;
+    background: none;
+    border: 3px solid rgba(223, 115, 102, 0.3);
+    border-radius: 50px;
+    color: #3B353C;
+}
+article#pay .row > #payment > button:hover {
+    background: rgba(223, 115, 102, 0.3);
+    border: none;
+}
+article#pay > button {
+    display: block;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    border-radius: 0;
+    font-size: 30px;
+}
+/* 개인정보수정 - edit_personal_info */
+.edit_info tr td:nth-child(1) {
+    width: 20%;
+}
+.edit_info tr td:nth-child(2) {
+    width: 80%;
+}
+.edit_info tr td:nth-child(2) input {
+    width: 80%;
+    border: 1px solid #aaaaaa;
+}
+.edit_info tr td:nth-child(2) button {
+    font-size: 18px;
+    margin-left: 10px;
+    padding: 0.4em 1em 0.4em 1em;
+    background: #e5e5e5;
+    color: #3B353C;
+}
+.edit_info tr td:nth-child(2) ul li {
+    font-size: 15px;
+}
+.edit_info tr:nth-child(3) td:nth-child(2) div p {
+    text-align: left;
+    font-size: 15px;
+    display: none;
+}
+.info_submit_box {
+    margin-top: 1.5em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.info_submit_box button {
+    font-size: 20px;
+}
+.info_submit_box button:first-child {
+    margin-right: 20px;
+    background: #dddddd;
+    color: #3B353C;
+}
+.info_submit_box button:first-child:hover {
+    background: #e5e5e5;
+}
