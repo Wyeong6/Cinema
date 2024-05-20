@@ -1,54 +1,90 @@
 package com.busanit.controller;
 import com.busanit.domain.MovieDTO;
 import com.busanit.entity.movie.Movie;
-import com.busanit.repository.MovieRepository;
 import com.busanit.service.MovieService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.io.IOException;
 import java.util.List;
-
 
 @Controller
 @RequiredArgsConstructor
 public class MovieController {
 
-    private final MovieRepository movieRepository;
-    private final MovieService movieService;
+    private final MovieService movieService2;
 
+    @Transactional
     @GetMapping("/movies/Main")
     public String getDetailMovies(Model model) throws IOException {
-        movieService.fetchAndStoreMoviesNowPlaying();
-        movieService.fetchAndStoreMovieRuntimeAndReleaseData();
-//        movieService.fetchAndStoreMovieStillCuts();
+        movieService2.fetchAndStoreMoviesNowPlaying();
+        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
+        movieService2.fetchAndStoreMovieStillCuts();
+        movieService2.fetchAndStoreCertificationData();
 
-        List<MovieDTO> movies = movieService.getHotMovies();
-        model.addAttribute("movies", movies);
+        //비디오가 있는 인기순영화
+        List<MovieDTO> videoMovies = movieService2.getVideoMovies();
+        model.addAttribute("videoMovies", videoMovies);
 
+        //모든 영화
+        List<MovieDTO> allMovies = movieService2.getAll();
+        model.addAttribute("allMovies", allMovies);
+
+        //인기순
+        List<MovieDTO> hotMovies = movieService2.getHotMovies();
+        model.addAttribute("hotMovies", hotMovies);
+
+        List<MovieDTO> upcomingMovies = movieService2.fetchAndStoreUpcoming();
+        model.addAttribute("upcomingMovies", upcomingMovies);
 
         return "main";
     }
 
+    //현재 상영작페이지
+    @GetMapping("/nowMovie")
+    public String nowMovie(Model model){
+        List<MovieDTO> allMovies = movieService2.getAll();
+        model.addAttribute("allMovies", allMovies);
 
-    // 호출 기준 순서 nowPlay - RunTimeAndReleaseData - StillCuts - Certification
-    // 절대 바꾸지마세요 !!
-    @GetMapping("movies/test")
-    public void getMovies() throws IOException {
-        movieService.fetchAndStoreMoviesNowPlaying();
-        movieService.fetchAndStoreMovieRuntimeAndReleaseData();
-        movieService.fetchAndStoreMovieStillCuts();
-        movieService.fetchAndStoreCertificationData();
+        return "movie/movie_list_now";
     }
 
+    //개봉예정 페이지
+    @GetMapping("/comingMove")
+    public String hotMove(Model model) throws IOException {
 
-    @GetMapping("/test")
+        List<MovieDTO> upcomingMovies = movieService2.fetchAndStoreUpcoming();
+        model.addAttribute("upcomingMovies", upcomingMovies);
+        return "movie/movie_list_comming";
+    }
+
+    @GetMapping("/movies/{movieId}")
+    public String movieDetailinfo(@PathVariable("movieId") Long movidId, Model model) {
+        List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(movidId);
+        model.addAttribute("movieInfos", movieInfos);
+        return "movie/movie_get";
+    }
+
+    @GetMapping("/movies/get")
     public String test(Model model) {
-        List<Movie> movies = movieRepository.findAll();
-        model.addAttribute("movies", movies);
-        return "test";
+        return "movie/movie_get";
     }
+
+
+
 }
+
+
+
+//    @GetMapping("/test")
+//    public String test(Model model) {
+//        List<Movie> movies = movieRepository.findAll();
+//        model.addAttribute("movies", movies);
+//        return "test";
+//    }
+
 

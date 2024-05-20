@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>CINEMACAST</title>
-    <link href="/static/assets/css/login.css" rel="stylesheet"/>
+    <link href="/assets/css/login.css" rel="stylesheet"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -51,6 +51,7 @@
     <style>
         .fieldError, .errorMessage {
             color: white;
+            text-align: center;
         }
     </style>
 
@@ -121,12 +122,12 @@
     </div>
     <!-- google button -->
     <button class="google_btn" onclick="location.href='/oauth2/authorization/google'">
-        <i class="fa fa-google"><img alt="구글 아이콘" src="/static/images/google-logo.png"/></i>
+        <i class="fa fa-google"><img alt="구글 아이콘" src="/images/google-logo.png"/></i>
         Sign in with Google
     </button>
     <!-- naver button -->
     <button class="naver_btn">
-        <i class="fa fa-github"><img alt="네이버 아이콘" src="/static/images/naver-logo.png"/></i>
+        <i class="fa fa-github"><img alt="네이버 아이콘" src="/images/naver-logo.png"/></i>
         Sign in with Naver (미구현)
     </button>
 </div>
@@ -237,5 +238,16 @@
         </label>
     </div>
 </div>
+
+<!--필수 약관 미동의시 가입제한-->
+<script>
+    document.getElementById("signup_form").addEventListener("submit", function(event) {
+        var essentialChk = document.getElementById("essential_chk");
+        if(!essentialChk.checked) {
+            event.preventDefault(); // 폼 제출 방지
+            alert('개인정보 수집 및 이용 동의는 필수입니다.');
+        }
+    });
+</script>
 </body>
 </html>
