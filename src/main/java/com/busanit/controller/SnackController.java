@@ -35,11 +35,15 @@ public class SnackController {
     }
 
     @GetMapping("/detail")
-    public String detail(Long id, Model model) {
+    public String detail(Long id, Model model, @PageableDefault(size = 3) Pageable pageable) {
 
         SnackDTO snackDTO = snackService.get(id);
-
         model.addAttribute("snack", snackDTO);
+
+        // 스낵 추천 리스트(랜덤)
+        Page<SnackDTO> snackDTOList = null;
+        snackDTOList = snackService.getSnackListRandom(pageable);
+        model.addAttribute("snackList", snackDTOList);
 
         return "snack/snack_get";
     }
