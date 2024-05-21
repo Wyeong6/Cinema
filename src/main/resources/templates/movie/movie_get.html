@@ -15,7 +15,7 @@
 <!--    댓글-->
 
     <style>
-        
+
         .hide {
             display: none;
         }
@@ -63,6 +63,31 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        /* 비디오 모달 관련 CSS */
+        .video-modal-content {
+            width: 80%; /* 모달 너비, 필요에 따라 조정 */
+            max-width: 640px; /* 최대 너비, 필요에 따라 조정 */
+        }
+
+        #videoFrame {
+            width: 100%; /* iframe의 너비를 부모 요소에 맞춤 */
+            height: 720px; /* 높이, 필요에 따라 조정 */
+        }
+
+
+        .video-modal-content {
+            width: 100%; /* 영상 크기 조정 */
+            max-width: 1280px; /* 최대 크기 설정 */
+            margin: auto; /* 수평 중앙 정렬 */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* 화면 중앙 정렬 */
+            z-index: 1000; /* 필요에 따라 조정 */
+        }
+
+
     </style>
 </head>
 <body class="right-sidebar is-preload">
@@ -84,15 +109,19 @@
                             <a href="#" class="image featured">
                                 <img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
                                      th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
-                            /></a>
+                                     style="width: 400px; height: 600px;" /></a>
                             <div class="movie_info">
                                 <div class="info_header">
                                     <h2 th:text="${movie.title}" class="movie_title"></h2>
-                                    <a href="#" class="button" style="height: 3em">지금 예매하기</a>
+                                    <a href="#" class="button" style="height: 3em;">지금 예매하기</a>
                                 </div>
                                 <span th:text="${movie.releaseDate} + ' | '">releasedate</span>
                                 <span th:text="${movie.genres} + ' | '">genres</span>
                                 <span th:text="${movie.runtime} + '분'">runtime</span>
+                                <div style="text-align: right;">
+<!--                                    <a th:href="@{'https://www.youtube.com/watch?v=' + ${movie.video}}" class="button" style="height: 3em;">트레일러 보기</a>-->
+                                    <button id="videoModalBtn" class="button" style="height: 3em;" th:data-video-id="${movie.video}">트레일러 보기</button>
+                                </div>
                                 <p><b>감독 : </b>director <b>각본 : </b>writer</p>
 
                                 <p th:text="${movie.overview}">
@@ -122,6 +151,16 @@
                     </article>
                 </div>
             </div>
+
+            <!-- 비디오 트레일러 모달 -->
+            <div id="videoModal" class="modal">
+                <div class="video-modal-content">
+                    <span class="close">&times;</span>
+                    <iframe id="videoFrame" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+
+
 
             <section class="movie_etc">
                 <div class="etc_btn">
@@ -182,7 +221,7 @@
 <!--              댓글         ------------------             -->
 <script>
     // include.js
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
         var allElements = document.getElementsByTagName('*');
         Array.prototype.forEach.call(allElements, function (el) {
             var includePath = el.dataset.includePath;
@@ -241,10 +280,11 @@
     function createPersonDiv(name, profilePath, isDirector = false) {
         const personDiv = document.createElement('div'); // 새로운 div 생성
         personDiv.style.margin = '8px'; // 간격 설정
-        personDiv.style.width = '15%';
+        personDiv.style.width = '200px';
+        personDiv.style.height = '300px';
 
         const p = document.createElement('p');
-        p.innerHTML = isDirector ? `<b>감독 : </b>${name}` : name;
+        p.innerHTML = isDirector ? `<p>감독 : ${name}</p>` : `<p>${name}</p>`;
         p.style.fontSize = '1em'; // 글자 크기 작게 설정
 
         const img = document.createElement('img');
@@ -277,7 +317,7 @@
     var visibleCount = 4; // 처음에 보이는 항목 수
     var increment = 8; // 한 번에 표시할 추가 항목 수
 
-    document.getElementById("showMore").addEventListener("click", function() {
+    document.getElementById("showMore").addEventListener("click", function () {
         var stillCuts = document.querySelectorAll(".stillCut");
         var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
 
@@ -300,7 +340,7 @@
         }
     });
 
-    document.getElementById("showLess").addEventListener("click", function() {
+    document.getElementById("showLess").addEventListener("click", function () {
         var stillCuts = document.querySelectorAll(".stillCut");
         for (var i = 0; i < stillCuts.length; i++) {
             if (i > 3) { // 처음 4개를 제외한 나머지를 숨깁니다.
@@ -334,24 +374,70 @@
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
         document.body.style.overflow = '';
+        // 자꾸 모달 닫을때 포스터 이미지 크기가 바껴서
+        // 걍 모달 함수에서 닫을때 포스터이미지 크기를 강제로 설정해서 크기변동이 없는것처럼 보이게함.
+        document.querySelector('.image.featured img').style.width = '400px';
+        document.querySelector('.image.featured img').style.height = '600px';
 
         window.scrollTo(0, currentScrollPosition);
     }
 
     /*--------- 이미지 상세보기 모달 끝 --------*/
 
+    /* 유튜브 트레일러 관련 모달 시작 */
+
+    //     document.getElementById('videoModalBtn').addEventListener('click', function() {
+    //     var modal = document.getElementById('videoModal');
+    //     var videoUrl = 'https://www.youtube.com/watch?v=' + '@{${movie.video}}';
+    //     document.getElementById('videoFrame').src = videoUrl;
+    //     modal.style.display = "block";
+    // });
+    //
+    //     document.getElementsByClassName('close')[0].addEventListener('click', function() {
+    //     document.getElementById('videoModal').style.display = "none";
+    //     document.getElementById('videoFrame').src = ""; // 비디오 정지
+    // });
+
+        // 자바스크립트에서 타임리프를 이용한 변수 가져오기위한 코드 포함
+    document.addEventListener('DOMContentLoaded', function() {
+        var openModalButton = document.getElementById('videoModalBtn');
+        if (openModalButton) {
+            openModalButton.addEventListener('click', function() {
+                var modal = document.getElementById('videoModal');
+                var videoId = openModalButton.getAttribute('data-video-id');
+                if(videoId == null) {
+                    videoId = 'dQw4w9WgXcQ'; // 기본 비디오 ID 설정
+                }
+                var videoUrl = 'https://www.youtube.com/embed/' + videoId;
+                document.getElementById('videoFrame').src = videoUrl;
+                modal.style.display = "flex"; // flex로 변경
+                document.body.style.overflow = 'hide'; // 스크롤 막기
+            });
+
+            document.getElementsByClassName('close')[0].addEventListener('click', function() {
+                var modal = document.getElementById('videoModal');
+                modal.style.display = "none";
+                document.getElementById('videoFrame').src = ""; // 비디오 중지
+                document.body.style.overflow = ''; // 스크롤 복원
+            });
+        }
+    });
+
+
+    /* 유튜브 트레일러 관련 모달 끝 */
+
     // 버튼 클릭 시 스틸컷 또는 리뷰 테이블
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('img').forEach(function(img) {
-            img.addEventListener('click', function() {
-                this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
-            });
-        });
+    document.querySelectorAll('img').forEach(function(img) {
+    img.addEventListener('click', function() {
+    this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
+    });
+    });
 
-        var stillCutBtn = document.querySelector(".stillcut_btn");
-        var reviewsBtn = document.querySelector(".reviews_btn");
-        var stillCutDiv = document.getElementById("stillcut");
-        var reviewsDiv = document.getElementById("reviews");
+    var stillCutBtn = document.querySelector(".stillcut_btn");
+    var reviewsBtn = document.querySelector(".reviews_btn");
+    var stillCutDiv = document.getElementById("stillcut");
+    var reviewsDiv = document.getElementById("reviews");
 
         stillCutBtn.addEventListener("click", function() {
             stillCutDiv.style.display = "block";
