@@ -26,6 +26,11 @@ public class SnackController {
         snackDTOList = snackService.getSnackList(pageable);
         model.addAttribute("snackList", snackDTOList);
 
+        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() -5);
+        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() +5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "snack/snack_list";
     }
 
