@@ -39,11 +39,11 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-//    public List<CommentDTO> getCommentList(String movieId) {
-//        List<Comment> commentList = commentRepository.findByMovieIdOrderByCnoDesc(Long.valueOf(movieId));
-//
-//        return CommentDTO.toDTOList(commentList);
-//    }
+    public List<CommentDTO> getCommentList(String movieId) {
+        List<Comment> commentList = commentRepository.findByMovieIdOrderByCnoDesc(Long.valueOf(movieId));
+
+        return CommentDTO.toDTOList(commentList);
+    }
 
 //    public CommentSummary getCommentsAndAverageGrade(String movieId) {
 //        CommentSummary gpa = commentRepository.findCommentsAndAvgGrade(Long.valueOf(movieId));
@@ -51,29 +51,29 @@ public class CommentService {
 //        List<CommentDTO> dtoList = CommentDTO.toDTOList(commentList);
 //
 //    }
-public CommentSummaryDTO getCommentsAndAverageGrade(String movieId) {
-    List<Object[]> results = commentRepository.findCommentsAndAvgGradeByMovieId(Long.valueOf(movieId));
-
-    List<CommentDTO> commentDtos = new ArrayList<>();
-    Double avgGrade = null;
-
-    for (Object[] result : results) {
-        Long id = ((Number) result[0]).longValue();
-        String content = (String) result[1];
-        String author = (String) result[2];
-        if (avgGrade == null) {
-            avgGrade = ((Number) result[3]).doubleValue(); // 첫 번째 레코드에서 평균 점수를 가져옵니다.
-        }
-
-        commentDtos.add(CommentDTO.builder()
-                .cno(id)
-                .comment(content)
-                .memberEmail(author)
-                .build());
-    }
-
-    return new CommentSummaryDTO(Long.valueOf(movieId), avgGrade, commentDtos);
-}
+//public CommentSummaryDTO getCommentsAndAverageGrade(String movieId) {
+//    List<Object[]> results = commentRepository.findCommentsAndAvgGradeByMovieId(Long.valueOf(movieId));
+//
+//    List<CommentDTO> commentDtos = new ArrayList<>();
+//    Double avgGrade = null;
+//
+//    for (Object[] result : results) {
+//        Long id = ((Number) result[0]).longValue();
+//        String content = (String) result[1];
+//        String author = (String) result[2];
+//        if (avgGrade == null) {
+//            avgGrade = ((Number) result[3]).doubleValue(); // 첫 번째 레코드에서 평균 점수를 가져옵니다.
+//        }
+//
+//        commentDtos.add(CommentDTO.builder()
+//                .cno(id)
+//                .comment(content)
+//                .memberEmail(author)
+//                .build());
+//    }
+//
+//    return new CommentSummaryDTO(Long.valueOf(movieId), avgGrade, commentDtos);
+//}
 
 
 

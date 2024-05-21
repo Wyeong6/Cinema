@@ -393,7 +393,7 @@
 
                 const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
                 reviewsSection.empty(); // 기존 내용을 비웁니다.
-                data.forEach(({memberEmail, comment, }) => {
+                data.forEach(({memberEmail, comment,grade }) => {
                     // 각 댓글마다의 HTML 구조를 생성합니다.
                     const reviewRow = `
                     <tr>
