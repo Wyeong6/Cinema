@@ -42,7 +42,7 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 9999999;
             padding-top: 60px;
             left: 0;
             top: 0;
@@ -367,13 +367,14 @@
     function openReviewModal() {
         const movieId = $('#movieId').val();
         console.log("movieId: " + movieId);
-        var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=600');
+        var reviewWindow = window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=400');
         var checkWindowClosed = setInterval(function() {
             if (reviewWindow.closed) {
                 clearInterval(checkWindowClosed);
                 loadComments();
             }
         }, 500); // 0.5초마다 상태 확인
+
     }
 
 
@@ -400,8 +401,11 @@
                         <td>
                             <h4>${memberEmail}</h4>
                             <p>${new Date().toISOString().slice(0, 10)}</p>
+                            <div>
+                                <input type="radio" id="5-stars" name="rating" value="5" v-model="ratings"/>
+                                <label for="5-stars" class="star pr-4">★</label>
+                            </div>
                             <p>${comment}</p>
-                            <p>평점: ${grade}</p>
                         </td>
                     </tr>
                 `;

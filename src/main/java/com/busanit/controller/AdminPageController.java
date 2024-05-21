@@ -27,7 +27,7 @@ public class AdminPageController {
     /*기존 adminPage 삭제예정*/
     @GetMapping("/adminMain2")
     public String adminMain2(){
-        return "admin/adminMain";
+        return "testAdminMain";
     }
 
     @PostMapping("/movie")
@@ -49,6 +49,7 @@ public class AdminPageController {
     @PostMapping("/snackRegister")
     public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult, Model model) {
 
+        model.addAttribute("urlLoad", "/admin/snackRegister"); // javascript load function 에 필요함
         if(bindingResult.hasErrors()) {
             return "admin/admin_snack_register";
         }
@@ -58,7 +59,7 @@ public class AdminPageController {
             model.addAttribute("errorMessage", e.getMessage());
         }
 
-        return "admin/admin_snack_register";
+        return "admin/admin_layout";
     }
 
     @PostMapping("/help")

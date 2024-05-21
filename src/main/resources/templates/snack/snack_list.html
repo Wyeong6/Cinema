@@ -121,11 +121,29 @@
                 <!--                    </article>-->
 
                 <div class="paging_btn">
-                    <ul>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
+                    <ul style="text-align: center" th:if="${snackList.totalElements > 0}">
+                        <li th:classappend="${snackList.first} ? 'disabled'">
+                            <a th:href="@{/snack/snackList(page=0)}">First</a>
+                        </li>
+                        <li th:classappend="${1 == snackList.pageable.pageNumber + 1} ? 'disabled'">
+                            <a th:href="@{/snack/snackList(page=${snackList.pageable.pageNumber - 1})}">Previous</a>
+                        </li>
+                        <!-- th:classappend="${page == list.pageable.getPageNumber() + 1} ? 'disabled'" 현재 페이지는 클릭 불가-->
+                        <li th:classappend="${page == snackList.pageable.getPageNumber() + 1} ? 'disabled'"
+                            th:each="page : ${#numbers.sequence(startPage, endPage)}">
+                            <a th:href="@{/snack/snackList(page=${page} - 1)}" th:text="${page}">1</a>
+                        </li>
+                        <li th:classappend="${snackList.totalPages == snackList.pageable.pageNumber + 1} ? 'disabled'">
+                            <a th:href="@{/snack/snackList(page=${snackList.pageable.pageNumber + 1})}">Next</a>
+                        </li>
+                        <li th:classappend="${snackList.last} ? 'disabled'">
+                            <a th:href="@{/snack/snackList(page=${snackList.totalPages - 1})}">Last</a>
+                        </li>
+                    </ul>
+                    <ul th:unless="${snackList.totalElements > 0}">
+                        <li>
+                            <a>1</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -146,14 +164,14 @@
 
     <script>
         // include.js
-        window.addEventListener('load', function () {
+        window.addEventListener('load', function() {
             var allElements = document.getElementsByTagName('*');
-            Array.prototype.forEach.call(allElements, function (el) {
+            Array.prototype.forEach.call(allElements, function(el) {
                 var includePath = el.dataset.includePath;
-                if (includePath) {
+                if(includePath) {
                     var xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
+                    xhttp.onreadystatechange = function() {
+                        if(this.readyState == 4 && this.status == 200) {
                             el.outerHTML = this.responseText;
                         }
                     };
