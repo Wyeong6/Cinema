@@ -27,7 +27,7 @@ public class AdminPageController {
     /*기존 adminPage 삭제예정*/
     @GetMapping("/adminMain2")
     public String adminMain2(){
-        return "admin/adminMain";
+        return "testAdminMain";
     }
 
     @PostMapping("/movie")
