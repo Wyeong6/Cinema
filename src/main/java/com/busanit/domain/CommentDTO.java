@@ -20,8 +20,10 @@ public class CommentDTO {
     private String memberEmail;
     private String grade;
     private Long movieId;
+    private Long gpa;
     private LocalDateTime createDate;
     private LocalDateTime modifiedDate;
+
 
     public static List<CommentDTO> toDTOList(List<Comment> commentList) {
         return commentList.stream()
@@ -31,6 +33,7 @@ public class CommentDTO {
                         .memberEmail(comment.getMemberEmail())
                         .grade(comment.getGrade())
                         .movieId(comment.getMovieId())
+                        .gpa(comment.getGpa())
                         .createDate(comment.getCreatedDate())
                         .build())
                 .collect(Collectors.toList());
