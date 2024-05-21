@@ -121,7 +121,7 @@
                                     </div>
                                     <div class="movie_data">
                                         <h4>평점</h4>
-                                        <p th:text="${movie.voteAverage}">vote rating</p>
+<!--                                        <p th:text="${movie.voteAverage}">vote rating</p>-->
                                     </div>
                                 </div>
                             </div>
@@ -209,7 +209,7 @@
             }
         });
     });
-
+    // credits api 제작진 사진
     const options = {
         method: 'GET',
         headers: {
@@ -376,11 +376,14 @@
         }, 500); // 0.5초마다 상태 확인
     }
 
-//            댓글       --------------------------------------------------
+
     const loadComments = () => {
         const movieId = $('#movieId').val();
         console.log("겟페이지 무비아이디 = " + movieId);
 
+
+
+//            댓글리스트    --------------------------------------------------
         $.ajax({
             url: `/movies/` + movieId ,
             method: 'GET',
@@ -390,7 +393,7 @@
 
                 const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
                 reviewsSection.empty(); // 기존 내용을 비웁니다.
-                data.forEach(({memberEmail, comment, grade}) => {
+                data.forEach(({memberEmail, comment, }) => {
                     // 각 댓글마다의 HTML 구조를 생성합니다.
                     const reviewRow = `
                     <tr>

@@ -30,8 +30,8 @@ public class MovieDTO {
     private String posterPath;
     private String backdropPath;
     private String popularity;
-    @JsonProperty("vote_average")
-    private double voteAverage;
+//    @JsonProperty("vote_average")
+//    private double voteAverage;
     @JsonProperty("genre_ids")
     private List<Integer> genreIds;
     private List<String> Genres;
@@ -51,13 +51,13 @@ public class MovieDTO {
 
         Optional.ofNullable(movie.getMovieDetail()).ifPresentOrElse(detail -> {
             movieDTO.setPopularity(detail.getPopularity());
-            movieDTO.setVoteAverage(detail.getVoteAverage());
+//            movieDTO.setVoteAverage(detail.getVoteAverage());
             movieDTO.setVideo(detail.getVideo());
             movieDTO.setReleaseDate(detail.getReleaseDate());
             movieDTO.setRuntime(detail.getRuntime());
             movieDTO.setCertifications(detail.getCertification());
         }, () -> {
-            movieDTO.setVoteAverage(0);
+//            movieDTO.setVoteAverage(0);
             movieDTO.setVideo(null);
         });
 

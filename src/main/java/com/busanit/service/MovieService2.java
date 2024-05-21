@@ -158,7 +158,7 @@ public class MovieService2 {
     // MovieDetail 객체를 MovieDTO와 비디오 키를 이용해 업데이트
     private void updateMovieDetail(MovieDetail movieDetail, MovieDTO movieDTO, String videoKey) {
         movieDetail.setVideo(videoKey);
-        movieDetail.setVoteAverage(movieDTO.getVoteAverage());
+//        movieDetail.setVoteAverage(movieDTO.getVoteAverage());
         movieDetail.setPopularity(movieDTO.getPopularity());
         movieDetail.setReleaseDate(movieDTO.getReleaseDate());
     }
