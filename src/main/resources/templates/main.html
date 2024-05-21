@@ -108,7 +108,7 @@
     <section class="carousel">
         <div class="section_title">
             <h2>Weekly Hot Movies</h2>
-            <p><a href="/nowMovie">더보기</a></p>
+            <p><a href="/nowMovies">더보기</a></p>
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 9}" >
@@ -137,7 +137,7 @@
     <section class="carousel">
         <div class="section_title">
             <h2>Comming Soon</h2>
-            <p><a href="/comingMove">more</a></p>
+            <p><a href="/comingMoves">more</a></p>
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 9}" >

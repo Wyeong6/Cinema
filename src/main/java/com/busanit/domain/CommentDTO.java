@@ -18,9 +18,8 @@ public class CommentDTO {
     private Long cno;
     private String comment;
     private String memberEmail;
-    private String grade;
+    private Double grade;
     private Long movieId;
-    private Long gpa;
     private LocalDateTime createDate;
     private LocalDateTime modifiedDate;
 
@@ -33,7 +32,6 @@ public class CommentDTO {
                         .memberEmail(comment.getMemberEmail())
                         .grade(comment.getGrade())
                         .movieId(comment.getMovieId())
-                        .gpa(comment.getGpa())
                         .createDate(comment.getCreatedDate())
                         .build())
                 .collect(Collectors.toList());

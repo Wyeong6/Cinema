@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/assets/css/custom_player.css" />
     <link rel="stylesheet" href="/assets/css/nav.css" />
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+
 <!--    댓글-->
     <style>
         /* 상세 페이지 css 조정 */
@@ -119,9 +120,8 @@
                                         <h4>인기도</h4>
                                         <p th:text="${movie.popularity}">popularity (%)</p>
                                     </div>
-                                    <div class="movie_data">
+                                    <div class="movie_data_averageRating">
                                         <h4>평점</h4>
-<!--                                        <p th:text="${movie.voteAverage}">vote rating</p>-->
                                     </div>
                                 </div>
                             </div>
@@ -193,7 +193,7 @@
 <!--              댓글         ------------------             -->
 <script>
     // include.js
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
         var allElements = document.getElementsByTagName('*');
         Array.prototype.forEach.call(allElements, function (el) {
             var includePath = el.dataset.includePath;
@@ -284,7 +284,7 @@
     var visibleCount = 4; // 처음에 보이는 항목 수
     var increment = 8; // 한 번에 표시할 추가 항목 수
 
-    document.getElementById("showMore").addEventListener("click", function() {
+    document.getElementById("showMore").addEventListener("click", function () {
         var stillCuts = document.querySelectorAll(".stillCut");
         var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
 
@@ -301,7 +301,7 @@
         }
     });
 
-    document.getElementById("showLess").addEventListener("click", function() {
+    document.getElementById("showLess").addEventListener("click", function () {
         var stillCuts = document.querySelectorAll(".stillCut");
         for (var i = 0; i < stillCuts.length; i++) {
             if (i > 3) { // 처음 4개를 제외한 나머지를 숨깁니다.
@@ -335,9 +335,9 @@
     /*--------- 이미지 상세보기 모달 끝 --------*/
 
     // 버튼 클릭 시 스틸컷 또는 리뷰 테이블
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('img').forEach(function(img) {
-            img.addEventListener('click', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('img').forEach(function (img) {
+            img.addEventListener('click', function () {
                 this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
             });
         });
@@ -347,14 +347,14 @@
         var stillCutDiv = document.getElementById("stillcut");
         var reviewsDiv = document.getElementById("reviews");
 
-        stillCutBtn.addEventListener("click", function() {
+        stillCutBtn.addEventListener("click", function () {
             stillCutDiv.style.display = "block";
             reviewsDiv.style.display = "none";
             stillCutBtn.classList.add("clicked");
             reviewsBtn.classList.remove("clicked");
         });
 
-        reviewsBtn.addEventListener("click", function() {
+        reviewsBtn.addEventListener("click", function () {
             stillCutDiv.style.display = "none";
             reviewsDiv.style.display = "block";
             reviewsBtn.classList.add("clicked");
@@ -362,69 +362,91 @@
         });
     });
 
-
+    const movieId = $('#movieId').val();
     // 리뷰 작성 모달을 팝업 창으로 열기
     function openReviewModal() {
-        const movieId = $('#movieId').val();
-        console.log("movieId: " + movieId);
-        var reviewWindow = window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=400');
-        var checkWindowClosed = setInterval(function() {
+        var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=400');
+        var checkWindowClosed = setInterval(function () {
             if (reviewWindow.closed) {
                 clearInterval(checkWindowClosed);
                 loadComments();
             }
         }, 500); // 0.5초마다 상태 확인
-
     }
 
-
-    const loadComments = () => {
-        const movieId = $('#movieId').val();
-        console.log("겟페이지 무비아이디 = " + movieId);
-
-
-
 //            댓글리스트    --------------------------------------------------
+    const loadComments = () => {
+        const emojiMap = {
+            1: '😡',
+            2: '😠',
+            3: '😐',
+            4: '😊',
+            5: '😍'
+        };
+
         $.ajax({
-            url: `/movies/` + movieId ,
+            url: `/movies/` + movieId,
             method: 'GET',
             dataType: 'json',
             success: (data) => {
-                console.log(data)
-
-                const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
-                reviewsSection.empty(); // 기존 내용을 비웁니다.
-                data.forEach(({memberEmail, comment,grade }) => {
-                    // 각 댓글마다의 HTML 구조를 생성합니다.
-                    const reviewRow = `
-                    <tr>
-                        <td>
-                            <h4>${memberEmail}</h4>
-                            <p>${new Date().toISOString().slice(0, 10)}</p>
-                            <div>
-                                <input type="radio" id="5-stars" name="rating" value="5" v-model="ratings"/>
-                                <label for="5-stars" class="star pr-4">★</label>
-                            </div>
-                            <p>${comment}</p>
-                        </td>
-                    </tr>
-                `;
-                    reviewsSection.append(reviewRow); // 생성된 HTML을 테이블에 추가합니다.
-            });
-        },
-        error: (xhr, status, error) => {
-            console.error("댓글을 불러오지 못했습니다:", error);
-            $('#comments').append(
-                `<div class="error">
-                    <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
-                   </div>`
-            );
-        }
+                //평점
+                const movieDataSection = $('.movie_data_averageRating');
+                movieDataSection.html(`<h4>평점</h4><p>${data.averageRating}</p>`);
+                //댓글정보
+                const reviewsSection = $('#reviews-table');
+                reviewsSection.empty();
+                data.comments.forEach((comment) => {
+                    appendReviewRow(reviewsSection, comment, emojiMap);
+                });
+            },
+            error: (xhr, status, error) => {
+                console.error("댓글을 불러오지 못했습니다:", error);
+                $('#comments').append(`<div class="error"><p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p></div>`);
+            }
         });
     };
+    //이메일 처리
+    function maskEmail(email) {
+        const atIndex = email.indexOf('@');
+        let emailName = email.slice(0, atIndex);
+        const emailDomain = email.slice(atIndex + 1);
+
+        if (emailName.length > 3) {
+            emailName = `${emailName.slice(0, -3)}***`;
+        } else {
+            emailName = '***';
+        }
+
+        return `${emailName}@${emailDomain}`;
+    }
+
+    function generateStars(grade) {
+        return '★'.repeat(grade);
+    }
+    //댓글 수만큼 반복생성
+    function appendReviewRow(reviewsSection, comment, emojiMap) {
+        const maskedEmail = maskEmail(comment.memberEmail);
+        const stars = generateStars(comment.grade);
+        const emoji = emojiMap[comment.grade] || '';
+        const reviewRow = `
+        <tr>
+            <td>
+                <div>
+                    <span>${emoji}</span>${stars}
+                    <input type="radio" id="${comment.grade}-stars" value="${comment.grade}" checked="checked" />
+                    <span>${new Date().toISOString().slice(0, 10)}</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <h4>${maskedEmail}</h4><span style="margin-left: 40px">${comment.comment}</span>
+                </div>
+            </td>
+        </tr>
+    `;
+        reviewsSection.append(reviewRow);
+    }
     loadComments();
 
-</script>
+    </script>
 </th:block>
 </body>
 </html>

@@ -17,9 +17,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 //            "GROUP BY c.movieId")
 //    CommentSummary findCommentsAndAvgGrade(@Param("movieId") Long movieId);
 
-
-    @Query(value = "SELECT c.memberId, c.comment, c.grade, (SELECT AVG(c2.grade) FROM Comment c2 WHERE c2.movie_id = c.movie_id) as avgGrade " +
-            "FROM Comment c " +
-            "WHERE c.movie_id = :movieId", nativeQuery = true)
-    List<Object[]> findCommentsAndAvgGradeByMovieId(@Param("movieId") Long movieId);
+    @Query("SELECT AVG(c.grade) FROM Comment c WHERE c.movie.movieId = :movieId")
+    Double findAvgRatingByMovieId(Long movieId);
 }

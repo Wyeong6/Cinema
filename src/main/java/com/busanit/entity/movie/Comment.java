@@ -25,13 +25,11 @@ public class Comment{
     private String comment;
 
     @Column(nullable = false)
-    private String grade;
+    private Double grade;
 
     private String memberEmail;
 
     private Long movieId;
-
-    private Long gpa;
 
     @Column(updatable = false)
     @CreationTimestamp
@@ -55,7 +53,6 @@ public class Comment{
                 .comment(dto.getComment())
                 .grade(dto.getGrade())
                 .movieId(dto.getMovieId())
-                .gpa(dto.getGpa())
                 .memberEmail(dto.getMemberEmail())
                 .build();
     }

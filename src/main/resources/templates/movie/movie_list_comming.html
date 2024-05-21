@@ -36,32 +36,24 @@
 			</article>
 			<hr />
 			<div class="row">
-
-
-				<!--		<table>-->
-				<!--			<tr th:each="movie : ${videoMovies}">-->
-				<!--				<td th:text="${movie.title}"> </td>-->
-				<!--				<td><img th:src="@{|https://image.tmdb.org/t/p/w200${movie.posterPath}|}" alt="포스터" /></td>-->
-				<!--				<td th:if="${movie.video}">-->
-				<!--					<p>영화 비디오:</p>-->
-				<!--					<iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}"-->
-				<!--							frameBorder="0"-->
-				<!--							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"-->
-				<!--							allowFullScreen></iframe>-->
-				<!--				</td>-->
-				<!--			</tr>-->
-				<!--		</table>-->
-
-				<article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${upcomingMovies}">
-					<a href="#" class="img-resize"><img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진" width="207.36" height="311.04"/></a>
+				<article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${moviePage}">
+					<a th:href="@{'/movies/' + ${movie.id}}" class="image featured"><img
+							th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/></a>
 					<header>
-						<h4><a th:href="@{'/movie/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h4>
+						<h4><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a>
+						</h4>
 					</header>
-					<p>
-
-					</p>
 				</article>
+			</div>
 
+			<!-- 페이지네이션 -->
+			<div class="pagination">
+				<a href="#" th:if="${moviePage.hasPrevious()}" th:href="@{/commingMoviesPaging(page=${moviePage.number - 1})}">이전</a>
+				<span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
+        <a th:href="@{/nowMoviesPaging(page=${pageNum})}" th:text="${pageNum + 1}"
+		   th:classappend="${pageNum == moviePage.number} ? 'active' : ''"></a>
+    </span>
+				<a href="#" th:if="${moviePage.hasNext()}" th:href="@{/commingMoviesPaging(page=${moviePage.number + 1})}">다음</a>
 			</div>
 		</div>
 
