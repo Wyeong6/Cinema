@@ -69,10 +69,10 @@
                             </tr>
                             <tr id="tr_purchase">
                                 <td>
-                                    <button class="cart">장바구니에 담기</button>
+                                    <button onclick="saveLocalStorage()" class="cart">장바구니에 담기</button>
                                 </td>
                                 <td>
-                                    <button>바로 구매하기</button>
+                                    <button onclick="requestPay()">바로 구매하기</button>
                                 </td>
                             </tr>
                         </table>
@@ -93,18 +93,6 @@
                                 </h3>
                             </header>
                         </article>
-<!--                        <article class="col-4 col-12-mobile special">-->
-<!--                            <a class="image featured" href="#"><img alt="" src="/images/pic08.jpg"/></a>-->
-<!--                            <header>-->
-<!--                                <h3><a href="#">Sed quis rhoncus placerat</a></h3>-->
-<!--                            </header>-->
-<!--                        </article>-->
-<!--                        <article class="col-4 col-12-mobile special">-->
-<!--                            <a class="image featured" href="#"><img alt="" src="/images/pic09.jpg"/></a>-->
-<!--                            <header>-->
-<!--                                <h3><a href="#">Magna laoreet et aliquam</a></h3>-->
-<!--                            </header>-->
-<!--                        </article>-->
                     </div>
                 </div>
             </div>
@@ -124,8 +112,16 @@
     <script src="/assets/js/util.js"></script>
     <script src="/assets/js/main.js"></script>
 
-    <script>
-        // 수량 count + 합계
+    <!--결제 프로그램 쓰려면 jquery 필요-->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
+    <script th:inline="javascript">
+        let currentPrice = 0; // 결제시 사용할 변수
+        let currentCount = 1; // 장바구니 저장값
+
+        // 주문 수량 count + 합계
         document.addEventListener("DOMContentLoaded", function() {
             const countElement = document.getElementById("countValue");
             const discountButton = document.getElementById("discount");
@@ -139,10 +135,12 @@
             function updateTotalPrice() {
                 let totalPrice = snackPrice * count;
                 totalPriceElement.textContent = totalPrice.toLocaleString() + '원';
+                currentPrice = totalPrice; // 현재 수량을 전역 변수에 저장
+                currentCount = count; // 현재 count를 전역 변수에 저장
             }
 
             discountButton.addEventListener("click", function() {
-                if (count > 1) {
+                if(count > 1) {
                     count--;
                     countElement.textContent = count;
                     updateTotalPrice();
@@ -158,6 +156,111 @@
             // 초기 총 합계 설정
             updateTotalPrice();
         });
+
+        <!-- 결제 프로그램 관련 시작 -->
+        const html5InicisKey = [[${html5InicisKey}]];
+        const snackName = [[${snack.snack_nm}]];
+
+        function requestPay() { // 값 수정예정
+            const totalPriceElement = document.getElementById("total_price");
+            // const self = this;
+            // if(self.price == null || self.price == '') {
+            //     alert("금액을 입력하세요.")
+            // } else if(self.contractformcheck == false) {
+            //     alert("이용약관에 동의 해주세요.")
+            // } else {
+            IMP.init(html5InicisKey); // 고객사 식별코드
+            IMP.request_pay({
+                pg: "html5_inicis", //"{PG사 코드}.{상점 ID}",
+                pay_method: "card",
+                merchant_uid: `payment-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
+                name: snackName, // 주문명
+                amount: currentPrice, // 결제 금액
+                buyer_email: "test@test.com",
+                buyer_name: "구매자",
+                buyer_tel: "010-0000-0000",
+                m_redirect_url: '/payment/complete'
+            }, function(rsp) {
+                // let result = "";
+                if(rsp.success) {
+                    var msg = "결제가 완료되었습니다.";
+                    msg += "고유ID : " + rsp.imp_uid;
+                    msg += "상점 거래ID : " + rsp.merchant_uid;
+                    msg += "결제 금액 : " + rsp.paid_amount;
+                    msg += "카드 승인번호 : " + rsp.apply_num;
+                    $.ajax({
+                        type: "GET",
+                        url: "payment/complete",
+                        data: {
+                            "amount": money
+                        },
+                    });
+
+                    // result = "0";
+                    //
+                    // const form = new FormData();
+                    // form.append("impuid", rsp.imp_uid)
+                    // form.append("merchantuid", rsp.merchant_uid)
+                    // form.append("paidamount", rsp.amount)
+                    // form.append("applynum", rsp.apply_num)
+                    // form.append("email", rsp.buyer_email)
+                    //
+                    // console.log(form)
+
+                    // self.$axios.post("http://localhost:8080/payment/complete" + rsp.email, form)
+                    //     .then(function(res) {
+                    //         if(res.status === 200) {
+                    //             console.log(res)
+                    //             self.close();
+                    //             window.location.reload(true);
+                    //         }
+                    //     });
+                } else {
+                    var msg = "결제에 실패하였습니다.";
+                    msg += "에러내용 : " + rsp.error_msg;
+                    // result = "1";
+                    // self.contractformcheck = false;
+                    // self.formattedPrice = "";
+                    // self.price = 0;
+                    // self.isPlaceholderVisible = true;
+                }
+                // if(result === "0") {
+                //     alert("성공")
+                // }
+                // self.contractformcheck = false
+                alert(msg);
+                // document.location.href = "/" // alert창 확인 후 이동할 url
+            });
+        }
+        <!--결제 프로그램 관련 끝-->
+
+        // 장바구니 - localStorage에 데이터 저장
+        function saveLocalStorage() {
+            // 로컬 스토리지에서 장바구니 데이터 불러오기
+            let cart = JSON.parse(localStorage.getItem('snackCart')) || [];
+            // localStorage key값
+            let cartKEYID = [[${snack.id}]];
+            // 새로운 상품 정보 생성
+            let newItem = { id: cartKEYID, name: [[${snack.snack_nm}]], image: [[${snack.snack_image}]], alt: [[${snack.snack_alt}]], count: currentCount, price: [[${snack.snack_price}]]}
+            // 이미 장바구니에 있는 상품인지 확인
+            let existingItemIndex = cart.findIndex(item => item.name === newItem.name);
+
+            if (existingItemIndex !== -1) {
+                // 이미 있는 상품이라면 수량 변경
+                cart[existingItemIndex].count = currentCount;
+            } else {
+                // 새로운 상품 추가
+                cart.push(newItem);
+            }
+
+            // 갱신된 장바구니 데이터 로컬 스토리지에 저장
+            localStorage.setItem("snackCart"+cartKEYID, JSON.stringify(cart));
+
+            // 장바구니로 이동하시겠습니까? 알림 띄우기
+            if (confirm("장바구니로 이동하시겠습니까?")) {
+                window.location.href = "/payment/cartList"; // 장바구니 URL로 이동
+            }
+        }
 
         // include.js
         window.addEventListener('load', function() {
