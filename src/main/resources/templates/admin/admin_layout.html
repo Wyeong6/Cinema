@@ -283,7 +283,7 @@
 
 <!-- Page JS -->
 
-<script>
+<script th:inline="javascript">
     $(document).ready(function() {
         // 멤버 관리
         $('.member_btn').on('click', function() {
@@ -310,6 +310,16 @@
             $('.container-xxl').load('admin_notice_list.html');
         });
     });
+
+    /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
+    $(document).ready(function() {
+        var urlLoad = [[${urlLoad}]];
+        if(urlLoad != null) {
+            // 페이지가 로드될 때 실행되는 코드
+            $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
+        }
+    });
+
 </script>
 
 <!-- Place this tag in your head or just before your close body tag. -->
