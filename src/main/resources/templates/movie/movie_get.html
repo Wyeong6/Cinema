@@ -13,70 +13,8 @@
     <link rel="stylesheet" href="/assets/css/nav.css" />
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 <!--    댓글-->
-    <style>
-        /* 상세 페이지 css 조정 */
-        h2.movie_title {
-            font-size: 2em;
-            margin-bottom: 1em;
-        }
-        .still-cut-article {
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin: 10px;
-        }
 
 
-        .hide {
-            display: none;
-        }
-
-        .still-cut-article img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        /* 이미지클릭시 띄우는 모달 */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            padding-top: 60px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.9);
-        }
-
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #fff;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body class="right-sidebar is-preload">
 <th:block layout:fragment="content">
@@ -90,11 +28,13 @@
         <div class="container" th:each="movie, iterStat : ${movieInfos}">
             <input type="hidden" id="movieId" th:value="${movie.id}">
             <div class="row">
-                <div class="col-12-mobile" id="content">
+                    <div class="col-12-mobile" id="content">
                     <article id="main">
+                        <div class="movie_info_background" >
                         <header id="get_info">
-                            <a href="#" class="image featured"><img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
-                            onclick="openModal()"
+                            <a href="#" class="image featured">
+                                <img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
+                                     th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
                             /></a>
                             <div class="movie_info">
                                 <div class="info_header">
@@ -126,11 +66,10 @@
                                 </div>
                             </div>
                         </header>
+                        </div>
                         <h3>출연진</h3>
                         <div id="movie-info">
-
                         </div>
-
                     </article>
                 </div>
             </div>
@@ -164,11 +103,12 @@
                     <table class="default" id="reviews-table">
                         <!-- 댓글이 여기에 추가될 것입니다 -->
                     </table>
+                    <!--스틸컷 더보기 접기-->
                 </div>
                 <p id="showMore_review" style="cursor: pointer;"><a>more</a></p>
                 <p id="showLess_review" style="cursor: pointer; display:none;"><a>접기</a></p>
             </div>
-            <!-- 모달 -->
+            <!-- 이미지 상세보기 모달 -->
             <div id="myModal" class="modal">
                 <span class="close" onclick="closeModal()">&times;</span>
                 <img class="modal-content" id="modalImage">
@@ -298,10 +238,16 @@
 
         visibleCount = newVisibleCount; // 업데이트된 표시된 항목의 수
 
+        // "접기" 버튼을 항상 보여줌
+        document.getElementById("showLess").style.display = 'block';
+
         // 모든 항목이 표시되었는지 확인
         if (visibleCount >= stillCuts.length) {
-            this.style.display = 'none'; // "더보기"를 숨깁니다.
-            document.getElementById("showLess").style.display = 'block'; // "접기"를 보여줍니다.
+            // "더보기"를 숨김
+            this.style.display = 'none';
+        } else {
+            // 아직 표시되지 않은 항목이 있다면 "더보기"를 계속 보여줌
+            this.style.display = 'block';
         }
     });
 
@@ -314,13 +260,17 @@
         }
         visibleCount = 4; // "접기" 후 처음 표시된 항목의 수로 리셋
         this.style.display = 'none'; // "접기"를 숨깁니다.
-        document.getElementById("showMore").style.display = 'block'; // "더보기"를 다시 보여줍니다.
+        document.getElementById("showMore").style.display = 'block'; // "더보기"가 다시 보여질 상황을 위해
     });
+
 
     // 이미지 클릭시 원본크기로 볼수있게 띄우는 모달 관련 변수 및 함수들
     var currentScrollPosition = 0;
 
     function openModal(imageSrc) {
+
+        var header = document.getElementById("header")
+        header.style.display = "hide"
         currentScrollPosition = window.scrollY;
         document.body.style.overflow = 'hide';
         var modal = document.getElementById("myModal");
@@ -330,9 +280,12 @@
     }
 
     function closeModal() {
+        var header = document.getElementById("header");
+        header.style.display = '';
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
         document.body.style.overflow = '';
+
         window.scrollTo(0, currentScrollPosition);
     }
 
@@ -412,6 +365,9 @@
     // 모달을 보여주는 이벤트 핸들러
     $('#addCommentBtn').click(() => $('#commentModal').modal('show'));
     loadComments();
+
+
+
 
 </script>
 </th:block>

@@ -3045,6 +3045,7 @@ input, select, textarea {
 		/* Header */
 
 			#header {
+
 				background-attachment: scroll;
 				padding: 2.5em 0 0 0;
 			}
