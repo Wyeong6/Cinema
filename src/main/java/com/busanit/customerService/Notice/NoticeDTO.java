@@ -20,4 +20,5 @@ public class NoticeDTO {
     private LocalDate updateDate;
     private int viewCount;
     private boolean pinned;
+
 }
