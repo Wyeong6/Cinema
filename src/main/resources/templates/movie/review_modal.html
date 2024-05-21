@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Cinemacast</title>
+  <script src="movie_get.html"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <link rel="stylesheet" href="/assets/css/main.css" />
@@ -72,18 +73,21 @@
         movieId: movieId
       });
 
-      console.log(commentData);
+    console.log(commentData);
 
-      $.ajax({
-        url: '/new',
-        method: 'POST',
-        contentType: 'application/json',
-        data: commentData,
-        success: () => {
-          $('#review_modal').modal('hide');
-        }
-      });
+    $.ajax({
+      url: '/new',
+      method: 'POST',
+      contentType: 'application/json',
+      data: commentData,
+      success: () => {
+        $('#reviewForm')[0].reset();
+        $('#review_modal').modal('hide');
+        alert('리뷰가 성공적으로 등록되었습니다.');
+        window.close(); // 창을 닫습니다.
+      }
     });
+  });
   };
 </script>
 

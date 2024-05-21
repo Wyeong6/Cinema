@@ -31,6 +31,8 @@ public class Comment{
 
     private Long movieId;
 
+    private Long gpa;
+
     @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createdDate;
@@ -53,6 +55,7 @@ public class Comment{
                 .comment(dto.getComment())
                 .grade(dto.getGrade())
                 .movieId(dto.getMovieId())
+                .gpa(dto.getGpa())
                 .memberEmail(dto.getMemberEmail())
                 .build();
     }

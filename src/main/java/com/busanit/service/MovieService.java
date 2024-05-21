@@ -159,7 +159,7 @@ public class MovieService {
         // 영화 상세 정보를 업데이트하거나 생성
         MovieDetail movieDetail = getOrCreateMovieDetail(movie);
         movieDetail.setVideo(videoKey);
-        movieDetail.setVoteAverage(movieDTO.getVoteAverage());
+//        movieDetail.setVoteAverage(movieDTO.getVoteAverage());
         movieDetail.setPopularity(movieDTO.getPopularity());
         movieDetail.setReleaseDate(movieDTO.getReleaseDate());
         movie.setMovieDetail(movieDetail);

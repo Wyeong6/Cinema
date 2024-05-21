@@ -3,6 +3,7 @@ package com.busanit.controller;
 import com.busanit.domain.SnackDTO;
 import com.busanit.service.SnackService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SnackController {
 
     private final SnackService snackService;
+
+    @Value("${html5_inicis_key}")
+    private String html5InicisKey;
 
     @GetMapping("/snackList")
     public String snackList(Model model, @PageableDefault(size = 8, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
@@ -44,6 +48,9 @@ public class SnackController {
         Page<SnackDTO> snackDTOList = null;
         snackDTOList = snackService.getSnackListRandom(pageable);
         model.addAttribute("snackList", snackDTOList);
+
+        // 결제
+        model.addAttribute("html5InicisKey", html5InicisKey);
 
         return "snack/snack_get";
     }

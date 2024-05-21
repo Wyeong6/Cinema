@@ -31,5 +31,12 @@ public class PaymentController {
         // DB에 저장하는 로직 넣기
     }
 
+    // 스낵 cart
+    @GetMapping("/cartList")
+    public String cartList(Model model) {
+        model.addAttribute("html5InicisKey", html5InicisKey);
+        return "payment/cart_list";
+    }
+
 
 }

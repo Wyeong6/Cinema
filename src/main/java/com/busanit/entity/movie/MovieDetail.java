@@ -21,7 +21,7 @@ public class MovieDetail {
     //심의등급
     private String certification;
     //평점
-    private double voteAverage;
+//    private double voteAverage;
     //비디오
     private String video;
     //인기
