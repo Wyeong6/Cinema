@@ -121,7 +121,7 @@
         let currentPrice = 0; // 결제시 사용할 변수
         let currentCount = 1; // 장바구니 저장값
 
-        // 수량 count + 합계
+        // 주문 수량 count + 합계
         document.addEventListener("DOMContentLoaded", function() {
             const countElement = document.getElementById("countValue");
             const discountButton = document.getElementById("discount");
@@ -238,12 +238,12 @@
         function saveLocalStorage() {
             // 로컬 스토리지에서 장바구니 데이터 불러오기
             let cart = JSON.parse(localStorage.getItem('snackCart')) || [];
-            // 새로운 상품 정보 생성
-            let newItem = { name: [[${snack.snack_nm}]], image: [[${snack.snack_image}]], alt: [[${snack.snack_alt}]], count: currentCount, price: [[${snack.snack_price}]]}
-            // 이미 장바구니에 있는 상품인지 확인
-            let existingItemIndex = cart.findIndex(item => item.name === newItem.name);
             // localStorage key값
             let cartKEYID = [[${snack.id}]];
+            // 새로운 상품 정보 생성
+            let newItem = { id: cartKEYID, name: [[${snack.snack_nm}]], image: [[${snack.snack_image}]], alt: [[${snack.snack_alt}]], count: currentCount, price: [[${snack.snack_price}]]}
+            // 이미 장바구니에 있는 상품인지 확인
+            let existingItemIndex = cart.findIndex(item => item.name === newItem.name);
 
             if (existingItemIndex !== -1) {
                 // 이미 있는 상품이라면 수량 변경
