@@ -21,27 +21,6 @@ public class CommentController {
 
     private final CommentService commentService;
 
-//    @PostMapping("/new")
-//    //@ResponseStatus(HttpStatus.CREATED) - 상태 코드만 반환할 경우
-//    public String register(@ModelAttribute CommentDTO commentDTO){
-//        commentService.register(commentDTO);
-//        //메세지를 날리고 싶은 경우
-//        return "redirect:/list"; // 댓글 등록 성공 후 리스트 페이지로 리다이렉트
-//    }
-//
-//    @GetMapping("/list")
-//    public String getCommentList(Model model){
-//        List<CommentDTO> commentList = commentService.getCommentList();
-//        model.addAttribute("comments", commentList);
-//        return "movie/commentsList"; // 댓글 목록을 보여주는 HTML 뷰의 이름
-//    }
-//    @GetMapping("/new")
-//    public String getCommentForm() {
-//        return "movie/comment"; // commentForm.html을 반환
-//    }
-
-
-    //    ----------------------------restController 쓸때
     @PostMapping("/new")
     public ResponseEntity<String> register(@RequestBody CommentDTO commentDTO) {
         commentService.register(commentDTO);

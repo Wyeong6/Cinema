@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="header">
 <head>
     <meta charset="UTF-8">
     <title>Cinemacast</title>
@@ -13,14 +15,27 @@
 <body>
 <!-- Header -->
 <div id="header">
-    <h1 class="logo" style="font-size: 2em;"><a href="index.html">CINEMACAST</a></h1>
+    <h1 class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
 
     <!-- info -->
-    <div id="info">
+    <div id="info" th:data-username="${#authentication.name}">
         <ul>
-            <li><a href="/new">회원가입</a></li>
-            <li><a href="login.html">로그인</a></li>
-            <li><a href="cart_list.html">장바구니</a></li>
+            <li sec:authorize="hasRole('USER')">
+                <span sec:authentication="name"/> 님 환영합니다.
+            </li>
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/adminMain}" th:text="'관리자 페이지'"></a>
+            </li>
+            <li sec:authorize="isAnonymous()">
+                <a href="/member/new">회원가입</a>
+            </li>
+            <li sec:authorize="isAnonymous()">
+                <a href="/member/login">로그인</a>
+            </li>
+            <li sec:authorize="isAuthenticated()">
+                <a href="/member/logout">로그아웃</a>
+            </li>
+            <li><a href="#">장바구니</a></li>
         </ul>
     </div>
 
@@ -42,7 +57,7 @@
                     <li><a href="#">상영 시간표</a></li>
                 </ul>
             </li>
-            <li><a href="snack_list.html">스낵 스토어</a></li>
+            <li><a href="/snack/snackList">스낵 스토어</a></li>
             <li><a href="event_list.html">이벤트</a></li>
             <li><a href="notice_list.html">공지사항</a></li>
         </ul>
@@ -50,4 +65,5 @@
 
 </div>
 </body>
+</th:block>
 </html>

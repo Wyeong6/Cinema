@@ -4,7 +4,10 @@
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
+<html lang="en"
+      layout:decorate="~{layout/layout_total}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Cinemacast</title>
     <meta charset="utf-8"/>
@@ -17,122 +20,163 @@
     </noscript>
 </head>
 <body class="no-sidebar is-preload">
-<div id="page-wrapper">
+<th:block layout:fragment="content">
+    <div id="page-wrapper">
 
-    <header data-include-path="header.html"></header>
+        <header data-include-path="header.html"></header>
 
-    <!-- Main -->
-    <div class="wrapper style1 snack_get list">
+        <!-- Main -->
+        <div class="wrapper style1 snack_get list">
 
-        <div class="container">
-            <article class="special" id="main">
-                <header>
-                    <h2><a href="#">Snack Name</a></h2>
-                    <p>
-                        Morbi convallis lectus malesuada sed fermentum dolore amet
-                    </p>
-                </header>
-                <section id="snack_get_section">
-                    <a class="image featured" href="#"><img alt="" src="/images/snack_img.jpeg"/></a>
-                    <table class="default">
-                        <tr>
-                            <td>구성품</td>
-                            <td>팝콘 big 1개<br/>
-                                콜라 2개
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>남은 수량</td>
-                            <td>100개</td>
-                        </tr>
-                        <tr>
-                            <td>가격</td>
-                            <td>10,000원</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" id="td_count">
-                                <div class="count_box">
-                                    <button id="discount">-</button>
-                                    <p>1</p>
-                                    <button id="upcount">+</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>총 합계</td>
-                            <td id="total_price">10,000원</td>
-                        </tr>
-                        <tr id="tr_purchase">
-                            <td>
-                                <button class="cart">장바구니에 담기</button>
-                            </td>
-                            <td>
-                                <button>바로 구매하기</button>
-                            </td>
-                        </tr>
-                    </table>
-                </section>
-            </article>
-            <hr/>
-            <div>
-                <h3 style="font-size: 40px; margin-bottom: 1em">추천 상품</h3>
-                <div class="row">
-                    <article class="col-4 col-12-mobile special">
-                        <a class="image featured" href="#"><img alt="" src="/images/pic07.jpg"/></a>
-                        <header>
-                            <h3><a href="#">Gravida aliquam penatibus</a></h3>
-                        </header>
-                    </article>
-                    <article class="col-4 col-12-mobile special">
-                        <a class="image featured" href="#"><img alt="" src="/images/pic08.jpg"/></a>
-                        <header>
-                            <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                        </header>
-                    </article>
-                    <article class="col-4 col-12-mobile special">
-                        <a class="image featured" href="#"><img alt="" src="/images/pic09.jpg"/></a>
-                        <header>
-                            <h3><a href="#">Magna laoreet et aliquam</a></h3>
-                        </header>
-                    </article>
+            <div class="container">
+                <article class="special" id="main">
+                    <header>
+                        <h2>
+                            <a href="#" th:text="${snack.snack_nm}"></a>
+                        </h2>
+                        <p th:text="${snack.snack_detail}"></p>
+                    </header>
+                    <section id="snack_get_section">
+                        <a class="image featured" href="#">
+                            <img th:alt="${snack.snack_alt}"
+                                 th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
+                        </a>
+                        <table class="default">
+                            <tr>
+                                <td>구성품</td>
+                                <td th:text="${snack.snack_set}"></td>
+                            </tr>
+                            <tr>
+                                <td>남은 수량</td>
+                                <td th:text="${snack.snack_stock}"></td>
+                            </tr>
+                            <tr>
+                                <td>가격</td>
+                                <td id="snackPrice" th:text="${snack.snack_price}"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" id="td_count">
+                                    <div class="count_box">
+                                        <button id="discount">-</button>
+                                        <p id="countValue">1</p>
+                                        <button id="upcount">+</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>총 합계</td>
+                                <td id="total_price">10,000원</td>
+                            </tr>
+                            <tr id="tr_purchase">
+                                <td>
+                                    <button class="cart">장바구니에 담기</button>
+                                </td>
+                                <td>
+                                    <button>바로 구매하기</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </section>
+                </article>
+                <hr/>
+                <div>
+                    <h3 style="font-size: 40px; margin-bottom: 1em">추천 상품</h3>
+                    <div class="row">
+                        <article class="col-4 col-12-mobile special" th:each="snack : ${snackList}">
+                            <a class="image featured" th:href="@{/snack/detail(id=${snack.id})}">
+                                <img th:alt="${snack.snack_alt}"
+                                     th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
+                            </a>
+                            <header>
+                                <h3>
+                                    <a th:href="@{/snack/detail(id=${snack.id})}" th:text="${snack.snack_nm}"></a>
+                                </h3>
+                            </header>
+                        </article>
+<!--                        <article class="col-4 col-12-mobile special">-->
+<!--                            <a class="image featured" href="#"><img alt="" src="/images/pic08.jpg"/></a>-->
+<!--                            <header>-->
+<!--                                <h3><a href="#">Sed quis rhoncus placerat</a></h3>-->
+<!--                            </header>-->
+<!--                        </article>-->
+<!--                        <article class="col-4 col-12-mobile special">-->
+<!--                            <a class="image featured" href="#"><img alt="" src="/images/pic09.jpg"/></a>-->
+<!--                            <header>-->
+<!--                                <h3><a href="#">Magna laoreet et aliquam</a></h3>-->
+<!--                            </header>-->
+<!--                        </article>-->
+                    </div>
                 </div>
             </div>
         </div>
+
+        <footer data-include-path="footer.html"></footer>
+
     </div>
 
-    <footer data-include-path="footer.html"></footer>
+    <!-- Scripts -->
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/jquery.dropotron.min.js"></script>
+    <script src="/assets/js/jquery.scrolly.min.js"></script>
+    <script src="/assets/js/jquery.scrollex.min.js"></script>
+    <script src="/assets/js/browser.min.js"></script>
+    <script src="/assets/js/breakpoints.min.js"></script>
+    <script src="/assets/js/util.js"></script>
+    <script src="/assets/js/main.js"></script>
 
-</div>
+    <script>
+        // 수량 count + 합계
+        document.addEventListener("DOMContentLoaded", function() {
+            const countElement = document.getElementById("countValue");
+            const discountButton = document.getElementById("discount");
+            const upcountButton = document.getElementById("upcount");
+            const totalPriceElement = document.getElementById("total_price");
+            const snackPriceElement = document.getElementById("snackPrice");
 
-<!-- Scripts -->
-<script src="/assets/js/jquery.min.js"></script>
-<script src="/assets/js/jquery.dropotron.min.js"></script>
-<script src="/assets/js/jquery.scrolly.min.js"></script>
-<script src="/assets/js/jquery.scrollex.min.js"></script>
-<script src="/assets/js/browser.min.js"></script>
-<script src="/assets/js/breakpoints.min.js"></script>
-<script src="/assets/js/util.js"></script>
-<script src="/assets/js/main.js"></script>
+            let count = parseInt(countElement.textContent);
+            let snackPrice = parseInt(snackPriceElement.textContent.replace(/[^0-9]/g, ''));
 
-<script>
-    // include.js
-    window.addEventListener('load', function() {
-        var allElements = document.getElementsByTagName('*');
-        Array.prototype.forEach.call(allElements, function(el) {
-            var includePath = el.dataset.includePath;
-            if(includePath) {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if(this.readyState == 4 && this.status == 200) {
-                        el.outerHTML = this.responseText;
-                    }
-                };
-                xhttp.open('GET', includePath, true);
-                xhttp.send();
+            function updateTotalPrice() {
+                let totalPrice = snackPrice * count;
+                totalPriceElement.textContent = totalPrice.toLocaleString() + '원';
             }
-        });
-    });
-</script>
 
+            discountButton.addEventListener("click", function() {
+                if (count > 1) {
+                    count--;
+                    countElement.textContent = count;
+                    updateTotalPrice();
+                }
+            });
+
+            upcountButton.addEventListener("click", function() {
+                count++;
+                countElement.textContent = count;
+                updateTotalPrice();
+            });
+
+            // 초기 총 합계 설정
+            updateTotalPrice();
+        });
+
+        // include.js
+        window.addEventListener('load', function() {
+            var allElements = document.getElementsByTagName('*');
+            Array.prototype.forEach.call(allElements, function(el) {
+                var includePath = el.dataset.includePath;
+                if(includePath) {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if(this.readyState == 4 && this.status == 200) {
+                            el.outerHTML = this.responseText;
+                        }
+                    };
+                    xhttp.open('GET', includePath, true);
+                    xhttp.send();
+                }
+            });
+        });
+    </script>
+</th:block>
 </body>
 </html>

@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'MyCustomFont';
-    src: url('/assets/css/font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
+    src: url('/static/assets/css/font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
 
 #header {
@@ -114,12 +114,13 @@
     display: inline-block; /* 요소들이 인라인으로 나타나도록 설정 */
 }
 .carousel .overlay-img {
-    width: 7em;
+    width: 5em;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 1; /* 겹쳐진 이미지가 위에 표시되도록 설정 */
-    margin-top: 8em;
+    margin-left: -5%;
+    margin-top: -5%;
 }
 .carousel .ten {
     width: 5em;
@@ -171,68 +172,24 @@
 .wrapper .container #main img {
     width: 100%
 }
-#get_header {
+#get_info {
     display: flex;
     justify-content: flex-start;
 }
-#get_header .movie_info {
-    width: 55%;
-    margin-left: 5%;
-}
-#get_header .movie_data_box {
-    margin: 30% 0 2% 0;
+#get_info .info_header {
     display: flex;
     justify-content: space-between;
 }
-#get_header .movie_data {
+#get_info .movie_info {
+    margin-left: 5%;
+}
+#get_info .movie_data_box {
+    margin: 5% 0 2% 0;
+    display: flex;
+    justify-content: space-between;
+}
+#get_info .movie_data {
     margin-right: 5%;
-}
-.slider {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-}
-
-.slides {
-    display: flex;
-    transition: transform 0.1s ease-out;
-    cursor: grab;
-}
-
-.slides:active {
-    cursor: grabbing;
-}
-
-.slides article {
-    min-width: 30%;
-    box-sizing: border-box;
-    margin-right: 1%;
-    text-align: center;
-    margin-bottom: 1em;
-}
-
-.slides article:last-child {
-    margin-right: 0;
-}
-.slides article header > p {
-    margin: 0.5em 0 0.5em 0;
-}
-.slides article header p > a {
-    font-size: 18px;
-}
-
-.image.featured img {
-    width: 100%;
-    display: block;
-}
-
-.slider-indicator {
-    position: absolute;
-    bottom: 10px;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: left;
 }
 .indicator-line {
     height: 4px;
@@ -240,26 +197,52 @@
     width: 30%;
     transition: transform 0.1s ease-out;
 }
-
-#stillcut {
-    padding-top: 2%;
+.movie_etc {
+    margin-top: 5%;
+    margin-bottom: 0;
+    width: 100%;
 }
-#stillcut h3 {
-    padding-bottom: 2%;
-    font-size: 40px;
-}
-#reviews header {
-    margin-bottom: 8%;
+.movie_etc div.etc_btn {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+}
+.movie_etc button {
+    width: 50%;
+    height: 5%;
+    font-size: 1em;
+    border-radius: 0;
+    background: #fafafa;
+    color: #3B353C;
+}
+.movie_etc button:hover {
+    width: 50%;
+    height: 5%;
+    font-size: 1em;
+    border-radius: 0;
+    background: #e5e5e5;
+    color: #3B353C;
+}
+.movie_etc button.clicked {
+    background: #e5e5e5;
+    color: #3B353C;
+}
+#reviews .row {
+    margin: 0;
+}
+#reviews table {
+    margin-top: 2%;
+    width: 100%;
+}
+#reviews table td p {
+    text-align: left;
 }
 #reviews .modal_open {
-    background: none;
-    color: #3B353C;
-    padding: 0;
-}
-#reviews p {
-    text-align: left;
+    margin-top: 2%;
+    width: 100%;
+    font-size: 1em;
+    border-radius: 0;
+    background: #483949;
+    color: #fff;
 }
 /* 리뷰 모달 */
 #review_modal {
@@ -269,11 +252,46 @@
     margin-bottom: 5%;
 }
 #review_modal h1 {
+    text-align: center;
     font-size: 1.5em;
     font-weight: 700;
 }
+#review_modal h3 {
+    text-align: center;
+}
 #review_modal .form-group {
     margin: 3% 0;
+}
+.star-rating {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row-reverse;
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    justify-content: space-around;
+    padding: 0 0.2em;
+    text-align: center;
+    width: 50%;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    font-size: 1.2em;
+    -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 0.05em;
+    -webkit-text-stroke-color: #2b2a29;
+    cursor: pointer;
+}
+.star-rating :checked ~ label {
+    -webkit-text-fill-color: gold;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    -webkit-text-fill-color: #fff58c;
+}
+#review_modal textarea {
+    margin-top: -1em;
 }
 #review_modal .button_box {
     display: flex;
@@ -281,6 +299,7 @@
 }
 #review_modal button {
     width: 48%;
+    font-size: 1em;
 }
 #review_modal button:nth-child(1) {
     background: #dddddd;
@@ -289,6 +308,17 @@
 #review_modal button:first-child:hover {
     background: #e5e5e5;
 }
+#stillcut {
+    padding-top: 2%;
+}
+#stillcut h3 {
+    padding-bottom: 2%;
+    font-size: 40px;
+}
+#stillcut p, #reviews > #showMore_review, #reviews > #showLess_review {
+    text-align: center;
+ }
+
 /* 현재 상영작 페이지*/
 .list {
     padding: 4em 0 6em 0;
@@ -589,63 +619,4 @@ article#pay > button {
 }
 .info_submit_box button:first-child:hover {
     background: #e5e5e5;
-}
-
-/* 상세 페이지 css 조정*/
-/* 스틸컷 article 크기 조정 */
-.special {
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 10px;
-}
-
-.special img {
-    max-width: 100%;
-    max-height: 100%;
-}
-/* 스틸컷의 more 눌렀을때 더나오게하는거 관련 css */
-.hidden {
-    display: none;
-}
-
-/* 이미지클릭시 띄우는 모달 */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    padding-top: 60px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.9);
-}
-
-.modal-content {
-    margin: auto;
-    display: block;
-    width: 100%;
-    max-width: 1200px;
-}
-
-.close {
-    position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #fff;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.close:hover,
-.close:focus {
-    color: #bbb;
-    text-decoration: none;
-    cursor: pointer;
 }

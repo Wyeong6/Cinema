@@ -1,5 +1,6 @@
 package com.busanit.entity;
 
+import com.busanit.domain.SnackDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +16,7 @@ public class Snack extends BaseTimeEntity {
     @Id
     @Column(name = "snack_item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long snack_item_id;
+    private Long id;
 
     private String snack_nm; // 스낵명
 
@@ -31,4 +32,15 @@ public class Snack extends BaseTimeEntity {
 
     private String snack_detail; // 스낵 상세 설명
 
+    public static Snack toEntity(SnackDTO snackDTO) {
+        return Snack.builder()
+                .snack_nm(snackDTO.getSnack_nm())
+                .snack_image(snackDTO.getSnack_image())
+                .snack_alt(snackDTO.getSnack_alt())
+                .snack_price(snackDTO.getSnack_price())
+                .snack_stock(snackDTO.getSnack_stock())
+                .snack_set(snackDTO.getSnack_set())
+                .snack_detail(snackDTO.getSnack_detail())
+                .build();
+    }
 }

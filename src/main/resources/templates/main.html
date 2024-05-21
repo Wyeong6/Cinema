@@ -1,11 +1,8 @@
-<!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout/layout_main}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>CinemaCast</title>
     <meta charset="utf-8" />
@@ -17,6 +14,7 @@
 
 </head>
 <body class="homepage is-preload">
+<th:block layout:fragment="content">
 <div id="page-wrapper">
 
     <!-- Header -->
@@ -38,7 +36,12 @@
         <!-- info -->
         <div id="info" th:data-username="${#authentication.name}">
             <ul>
-                <li sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다.</li>
+                <li sec:authorize="hasRole('USER')">
+                    <span sec:authentication="name"/> 님 환영합니다.
+                </li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/adminMain}" th:text="'관리자 페이지'"></a>
+                </li>
                 <li sec:authorize="isAnonymous()">
                     <a href="/member/new">회원가입</a>
                 </li>
@@ -70,7 +73,7 @@
                         <li><a href="#">상영 시간표</a></li>
                     </ul>
                 </li>
-                <li><a href="snack_list.html">스낵 스토어</a></li>
+                <li><a href="/snack/snackList">스낵 스토어</a></li>
                 <li><a href="event_list.html">이벤트</a></li>
                 <li><a href="/cs/notice">공지사항</a></li>
             </ul>
@@ -104,13 +107,17 @@
             <p><a href="/nowMovie">더보기</a></p>
         </div>
         <div class="reel">
-            <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 10}" >
+            <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 9}" >
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="225" />
+                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="400" />
                 </a>
                 <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
                 <header>
-                    <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
+                    <h3>
+                        <a th:href="@{'/movies/' + ${movie.id}}">
+                            <span th:utext="${#strings.length(movie.title) &gt; 10 ? #strings.substring(movie.title, 0, 10) + '...' : movie.title}">...</span>
+                        </a>
+                    </h3>
                     <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
                 </header>
                 <div class="button_box">
@@ -142,14 +149,17 @@
             <p><a href="/comingMove">more</a></p>
         </div>
         <div class="reel">
-            <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 10}" >
+            <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 9}" >
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="173" height="250" />
+                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="400" />
                 </a>
-                <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
                  <header>
-                    <h3><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a></h3>
-                    <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.releaseDate}">개봉날짜</span></p>
+                     <h3>
+                         <a th:href="@{'/movies/' + ${movie.id}}">
+                             <span th:utext="${#strings.length(movie.title) &gt; 20 ? #strings.substring(movie.title, 0, 20) + '...' : movie.title}">...</span>
+                         </a>
+                     </h3>
+                    <p><img src="/images/calendar.png" alt="clock"/> <span th:text="${movie.releaseDate}">개봉날짜</span></p>
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn">예매하기</button>
@@ -258,146 +268,6 @@
 
     </div>
 
-    <!-- Footer -->
-    <div id="footer">
-        <div class="container">
-            <div class="row">
-
-                <!-- Tweets -->
-                <section class="col-4 col-12-mobile">
-                    <header>
-                        <h2 class="icon brands fa-twitter circled"><span class="label">Tweets</span></h2>
-                    </header>
-                    <ul class="divided">
-                        <li>
-                            <article class="tweet">
-                                Amet nullam fringilla nibh nulla convallis tique ante sociis accumsan.
-                                <span class="timestamp">5 minutes ago</span>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="tweet">
-                                Hendrerit rutrum quisque.
-                                <span class="timestamp">30 minutes ago</span>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="tweet">
-                                Curabitur donec nulla massa laoreet nibh. Lorem praesent montes.
-                                <span class="timestamp">3 hours ago</span>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="tweet">
-                                Lacus natoque cras rhoncus curae dignissim ultricies. Convallis orci aliquet.
-                                <span class="timestamp">5 hours ago</span>
-                            </article>
-                        </li>
-                    </ul>
-                </section>
-
-                <!-- Posts -->
-                <section class="col-4 col-12-mobile">
-                    <header>
-                        <h2 class="icon solid fa-file circled"><span class="label">Posts</span></h2>
-                    </header>
-                    <ul class="divided">
-                        <li>
-                            <article class="post stub">
-                                <header>
-                                    <h3><a href="#">Nisl fermentum integer</a></h3>
-                                </header>
-                                <span class="timestamp">3 hours ago</span>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="post stub">
-                                <header>
-                                    <h3><a href="#">Phasellus portitor lorem</a></h3>
-                                </header>
-                                <span class="timestamp">6 hours ago</span>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="post stub">
-                                <header>
-                                    <h3><a href="#">Magna tempus consequat</a></h3>
-                                </header>
-                                <span class="timestamp">Yesterday</span>
-                            </article>
-                        </li>
-                        <li>
-                            <article class="post stub">
-                                <header>
-                                    <h3><a href="#">Feugiat lorem ipsum</a></h3>
-                                </header>
-                                <span class="timestamp">2 days ago</span>
-                            </article>
-                        </li>
-                    </ul>
-                </section>
-
-                <!-- Photos -->
-                <section class="col-4 col-12-mobile">
-                    <header>
-                        <h2 class="icon solid fa-camera circled"><span class="label">Photos</span></h2>
-                    </header>
-                    <div class="row gtr-25">
-                        <div class="col-6">
-                            <a href="#" class="image fit"><img src="/images/pic10.jpg" alt="" /></a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="image fit"><img src="/images/pic11.jpg" alt="" /></a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="image fit"><img src="/images/pic12.jpg" alt="" /></a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="image fit"><img src="/images/pic13.jpg" alt="" /></a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="image fit"><img src="/images/pic14.jpg" alt="" /></a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="image fit"><img src="/images/pic15.jpg" alt="" /></a>
-                        </div>
-                    </div>
-                </section>
-
-            </div>
-            <hr />
-            <div class="row">
-                <div class="col-12">
-
-                    <!-- Contact -->
-                    <section class="contact">
-                        <header>
-                            <h3>Nisl turpis nascetur interdum?</h3>
-                        </header>
-                        <p>Urna nisl non quis interdum mus ornare ridiculus egestas ridiculus lobortis vivamus tempor aliquet.</p>
-                        <ul class="icons">
-                            <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-                            <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-                            <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-                            <li><a href="#" class="icon brands fa-pinterest"><span class="label">Pinterest</span></a></li>
-                            <li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
-                            <li><a href="#" class="icon brands fa-linkedin-in"><span class="label">Linkedin</span></a></li>
-                        </ul>
-                    </section>
-
-                    <!-- Copyright -->
-                    <div class="copyright">
-                        <ul class="menu">
-                            <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-                        </ul>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
-    <footer data-include-path="footer.html"></footer>
 </div>
 
 <!-- Scripts -->
@@ -497,25 +367,6 @@
 
 </script>
 <script>
-    // include.js
-    window.addEventListener('load', function() {
-        var allElements = document.getElementsByTagName('*');
-        Array.prototype.forEach.call(allElements, function (el) {
-            var includePath = el.dataset.includePath;
-            if (includePath) {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        el.outerHTML = this.responseText;
-                    }
-                };
-                xhttp.open('GET', includePath, true);
-                xhttp.send();
-            }
-        });
-    });
-</script>
-<script>
     const images = [
         'url("/assets/css/images/main_img1.webp")',
         'url("/assets/css/images/main_img2.jpeg")',
@@ -559,5 +410,6 @@
 </script>
 
 
+</th:block>
 </body>
 </html>
