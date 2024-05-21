@@ -78,6 +78,6 @@ public class AdminPageController {
                                  @RequestParam(defaultValue = "1") int page,
                                  @RequestParam(defaultValue = "10") int size) {
         noticeService.prepareNoticeList(model, page, size);
-        return "cs/noticeAdmin";
+        return "/cs/noticeAdmin";
     }
 }

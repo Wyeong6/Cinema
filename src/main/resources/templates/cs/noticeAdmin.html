@@ -47,24 +47,44 @@
         </table>
 
         <div class="paging_btn">
-            <ul>
-                <a th:href="@{/cs/noticeAdmin(page=${1})}"
-                   th:onclick="${currentPage == 1} ? 'return false;'"><<</a><a>&nbsp;</a>
-                <a th:href="@{/cs/noticeAdmin(page=${currentPage - 1})}"
-                   th:onclick="${currentPage == 1} ? 'return false;'">&lt;</a><a>&nbsp;</a>
-                <li th:each="pageNum : ${pageNumbers}">
-                    <a th:href="@{/cs/noticeAdmin(page=${pageNum}, size=${size})}"
-                       th:text="${pageNum}"
-                       th:onclick="${pageNum == currentPage} ? 'return false;'"></a>
-                </li><span>&nbsp;</span>
-                <a>&nbsp;</a>
-                <a th:href="@{/cs/noticeAdmin(page=${currentPage + 1})}"
-                   th:onclick="${currentPage == totalPages} ? 'return false;'">&gt;</a><a>&nbsp;</a>
-                <span></span>
-                <a th:href="@{/cs/noticeAdmin(page=${totalPages})}"
-                   th:onclick="${currentPage == totalPages} ? 'return false;'">>></a>
-            </ul>
+            <div id="pagination"></div>
         </div>
 
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        function generatePaginationButtons(totalPages) {
+            let paginationHTML = '';
+            for(let i = 1; i <= totalPages; i++) {
+                paginationHTML += `<a class="page-item" href="/admin/notice?page=${i}">${i}</a>`;
+            }
+            $("#pagination").html(paginationHTML);
+
+            $(".page-item").on('click', function(e) {
+                e.preventDefault();
+                let pageNum = $(this).text();
+                loadPageData(pageNum);
+            });
+        }
+
+        function loadPageData(pageNumber) {
+            $.ajax({
+                url: "/admin/notice/page",
+                method: "GET",
+                data: { page: pageNumber },
+                success: function(data) {
+                    console.log("Data for page " + pageNumber + " loaded.");
+                },
+                error: function(err) {
+                    console.error("Failed to load page data.", err);
+                }
+            });
+        }
+
+        let initialPage = 1;
+        loadPageData(initialPage);
+        generatePaginationButtons([[${totalPages}]]);  // Replace with actual totalPages
+    });
+</script>
