@@ -69,7 +69,7 @@
                             </tr>
                             <tr id="tr_purchase">
                                 <td>
-                                    <button class="cart">장바구니에 담기</button>
+                                    <button onclick="saveLocalStorage()" class="cart">장바구니에 담기</button>
                                 </td>
                                 <td>
                                     <button onclick="requestPay()">바로 구매하기</button>
@@ -118,7 +118,8 @@
     <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 
     <script th:inline="javascript">
-        let currentCount = 0; // 결제시 사용할 변수
+        let currentPrice = 0; // 결제시 사용할 변수
+        let currentCount = 1; // 장바구니 저장값
 
         // 수량 count + 합계
         document.addEventListener("DOMContentLoaded", function() {
@@ -134,7 +135,8 @@
             function updateTotalPrice() {
                 let totalPrice = snackPrice * count;
                 totalPriceElement.textContent = totalPrice.toLocaleString() + '원';
-                currentCount = totalPrice; // 현재 수량을 전역 변수에 저장
+                currentPrice = totalPrice; // 현재 수량을 전역 변수에 저장
+                currentCount = count; // 현재 count를 전역 변수에 저장
             }
 
             discountButton.addEventListener("click", function() {
@@ -173,7 +175,7 @@
                 pay_method: "card",
                 merchant_uid: `payment-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
                 name: snackName, // 주문명
-                amount: currentCount, // 결제 금액
+                amount: currentPrice, // 결제 금액
                 buyer_email: "test@test.com",
                 buyer_name: "구매자",
                 buyer_tel: "010-0000-0000",
@@ -230,8 +232,35 @@
                 // document.location.href = "/" // alert창 확인 후 이동할 url
             });
         }
-
         <!--결제 프로그램 관련 끝-->
+
+        // 장바구니 - localStorage에 데이터 저장
+        function saveLocalStorage() {
+            // 로컬 스토리지에서 장바구니 데이터 불러오기
+            let cart = JSON.parse(localStorage.getItem('snackCart')) || [];
+            // 새로운 상품 정보 생성
+            let newItem = { name: [[${snack.snack_nm}]], image: [[${snack.snack_image}]], alt: [[${snack.snack_alt}]], count: currentCount, price: [[${snack.snack_price}]]}
+            // 이미 장바구니에 있는 상품인지 확인
+            let existingItemIndex = cart.findIndex(item => item.name === newItem.name);
+            // localStorage key값
+            let cartKEYID = [[${snack.id}]];
+
+            if (existingItemIndex !== -1) {
+                // 이미 있는 상품이라면 수량 변경
+                cart[existingItemIndex].count = currentCount;
+            } else {
+                // 새로운 상품 추가
+                cart.push(newItem);
+            }
+
+            // 갱신된 장바구니 데이터 로컬 스토리지에 저장
+            localStorage.setItem("snackCart"+cartKEYID, JSON.stringify(cart));
+
+            // 장바구니로 이동하시겠습니까? 알림 띄우기
+            if (confirm("장바구니로 이동하시겠습니까?")) {
+                window.location.href = "/payment/cartList"; // 장바구니 URL로 이동
+            }
+        }
 
         // include.js
         window.addEventListener('load', function() {
