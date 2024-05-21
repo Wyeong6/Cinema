@@ -310,6 +310,10 @@
             $('.container-xxl').load('/admin/notice');
         });
     });
+
+    function goPage(page, size) {
+        $('.container-xxl').load('/admin/notice?page=' + page + '&size=' + size);
+    }
 </script>
 
 <!-- Place this tag in your head or just before your close body tag. -->
