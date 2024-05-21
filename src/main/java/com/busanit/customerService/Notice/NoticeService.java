@@ -1,10 +1,13 @@
 package com.busanit.customerService.Notice;
 
+import com.busanit.customerService.util.PaginationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +35,28 @@ public class NoticeService {
         return noticeRepository.findById(id).map(noticeMapper::toNoticeDTO).orElse(null);
     }
 
+    public void prepareNoticeList(Model model, int page, int size) {
+        Page<NoticeDTO> noticePage = getNoticePaginated(page, size);
+        model.addAttribute("noticeList", noticePage.getContent()); // Get content from Page
+        int totalPages = noticePage.getTotalPages(); // Get total pages from Page
+        PaginationUtil.addPaginationAttributes(model, page, size, totalPages);
+
+        // Calculate page numbers to display
+        List<Integer> pageNumbers = PaginationUtil.calculatePageNumbers(page, totalPages);
+        model.addAttribute("pageNumbers", pageNumbers);
+    }
+
+
     public void incrementViewCount(com.busanit.customerService.Notice.Notice notice) {
         notice.setViewCount(notice.getViewCount() + 1);
+        noticeRepository.save(notice);
     }
 
     public Page<NoticeDTO> getNoticePaginated(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size); // Convert to zero-based page numbering
-        Page<Notice> noticePage = noticeRepository.findAll(pageable);
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Notice> noticePage = noticeRepository.findAllOrderedByPinnedAndId(pageable);
+
+
         return noticePage.map(noticeMapper::toNoticeDTO);
     }
 

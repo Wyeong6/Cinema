@@ -25,16 +25,7 @@ public class NoticeController {
     public String showNoticeList(Model model,
                                  @RequestParam(defaultValue = "1") int page,
                                  @RequestParam(defaultValue = "10") int size) {
-
-        Page<NoticeDTO> noticePage = noticeService.getNoticePaginated(page, size);
-        model.addAttribute("noticeList", noticePage.getContent()); // Get content from Page
-        int totalPages = noticePage.getTotalPages(); // Get total pages from Page
-        PaginationUtil.addPaginationAttributes(model, page, size, totalPages);
-
-        // Calculate page numbers to display
-        List<Integer> pageNumbers = PaginationUtil.calculatePageNumbers(page, totalPages);
-        model.addAttribute("pageNumbers", pageNumbers);
-
+        noticeService.prepareNoticeList(model, page, size);
         return "cs/notice";
     }
 
