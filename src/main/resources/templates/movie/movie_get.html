@@ -366,7 +366,7 @@
     function openReviewModal() {
         const movieId = $('#movieId').val();
         console.log("movieId" + movieId);
-            window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=600');
+            window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=400');
     }
 
 //            댓글       --------------------------------------------------
@@ -387,8 +387,11 @@
                         <td>
                             <h4>${memberId}</h4>
                             <p>${new Date().toISOString().slice(0, 10)}</p>
+                            <div>
+                                <input type="radio" id="5-stars" name="rating" value="5" v-model="ratings"/>
+                                <label for="5-stars" class="star pr-4">★</label>
+                            </div>
                             <p>${comment}</p>
-                            <p>평점: ${grade}</p>
                         </td>
                     </tr>
                 `;

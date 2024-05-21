@@ -252,11 +252,46 @@
     margin-bottom: 5%;
 }
 #review_modal h1 {
+    text-align: center;
     font-size: 1.5em;
     font-weight: 700;
 }
+#review_modal h3 {
+    text-align: center;
+}
 #review_modal .form-group {
     margin: 3% 0;
+}
+.star-rating {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row-reverse;
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    justify-content: space-around;
+    padding: 0 0.2em;
+    text-align: center;
+    width: 50%;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    font-size: 1.2em;
+    -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 0.05em;
+    -webkit-text-stroke-color: #2b2a29;
+    cursor: pointer;
+}
+.star-rating :checked ~ label {
+    -webkit-text-fill-color: gold;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    -webkit-text-fill-color: #fff58c;
+}
+#review_modal textarea {
+    margin-top: -1em;
 }
 #review_modal .button_box {
     display: flex;
@@ -264,6 +299,7 @@
 }
 #review_modal button {
     width: 48%;
+    font-size: 1em;
 }
 #review_modal button:nth-child(1) {
     background: #dddddd;
