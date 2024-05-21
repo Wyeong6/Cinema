@@ -34,4 +34,13 @@ public class SnackController {
         return "snack/snack_list";
     }
 
+    @GetMapping("/detail")
+    public String detail(Long id, Model model) {
+
+        SnackDTO snackDTO = snackService.get(id);
+
+        model.addAttribute("snack", snackDTO);
+
+        return "snack/snack_get";
+    }
 }
