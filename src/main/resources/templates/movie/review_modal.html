@@ -1,9 +1,4 @@
 <!DOCTYPE HTML>
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
 <head>
   <title>Cinemacast</title>
@@ -19,74 +14,105 @@
 <body>
 <input type="hidden" id="movieId" th:value="${movieId}">
 <!-- review-modal.html -->
-<div id="review_modal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
-  <div role="document">
-    <div >
-      <div >
-        <h1 id="reviewModalLabel">관람평 작성하기</h1>
-      </div>
+<div id="app">
+  <div id="review_modal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div role="document">
       <div>
-        <form id="reviewForm">
-          <h3 style="margin-top: 5px">movie title</h3>
-          <div class="form-group">
-            <label for="reviewContent">내용</label>
-            <textarea class="form-control" id="reviewContent" rows="3" required></textarea>
-          </div>
-          <div class="form-group">
-            <label for="reviewRating">평점</label>
-            <select class="form-control" id="reviewRating" required>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
-          </div>
-          <div class="button_box">
-            <button type="reset" class="btn btn-primary">취소</button>
-            <button type="submit" class="btn btn-primary">제출</button>
-          </div>
-        </form>
+        <div>
+          <h1 id="reviewModalLabel">관람평 작성하기</h1>
+        </div>
+        <div>
+          <form id="reviewForm">
+            <h3 style="margin-top: 5px">movie title</h3>
+            <div class="form-group">
+              <div class="star-rating space-x-4 mx-auto">
+                <input type="radio" id="5-stars" name="rating" value="5" v-model="ratings"/>
+                <label for="5-stars" class="star pr-4">★</label>
+                <input type="radio" id="4-stars" name="rating" value="4" v-model="ratings"/>
+                <label for="4-stars" class="star">★</label>
+                <input type="radio" id="3-stars" name="rating" value="3" v-model="ratings"/>
+                <label for="3-stars" class="star">★</label>
+                <input type="radio" id="2-stars" name="rating" value="2" v-model="ratings"/>
+                <label for="2-stars" class="star">★</label>
+                <input type="radio" id="1-star" name="rating" value="1" v-model="ratings"/>
+                <label for="1-star" class="star">★</label>
+                <div style="margin-right: 0.5em">
+                  <span>{{ emoji }}</span>
+                </div>
+              </div>
+              <textarea class="form-control" id="reviewContent" rows="3" required></textarea>
+            </div>
+            <div class="button_box">
+              <button type="reset" class="btn btn-primary">취소</button>
+              <button type="submit" class="btn btn-primary">제출</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </div>
-<script>
 
+<script>
   window.onload = function() {
     var memberEmail = JSON.parse(sessionStorage.getItem("userInfo"));
     const movieId = document.getElementById('movieId').value;
     console.log(movieId);
     console.log(memberEmail);
     $('#reviewForm').submit(function(e) {
+      e.preventDefault();
 
-    e.preventDefault();
+      const comment = $('#reviewContent').val();
+      const grade = $("input[name='rating']:checked").val(); // 선택된 별점 값을 가져옵니다.
 
-    // 댓글 데이터를 수집하는 부분은 submit 이벤트 내부로 이동
-    const comment = $('#reviewContent').val();
-    const grade = $('#reviewRating').val();
+      const commentData = JSON.stringify({
+        memberEmail: memberEmail.email,
+        comment: comment,
+        grade: grade,
+        movieId: movieId
+      });
 
-    const commentData = JSON.stringify({
-      memberEmail: memberEmail.email,
-      comment: comment,
-      grade: grade,
-      movieId: movieId
+      console.log(commentData);
+
+      $.ajax({
+        url: '/new',
+        method: 'POST',
+        contentType: 'application/json',
+        data: commentData,
+        success: () => {
+          $('#review_modal').modal('hide');
+        }
+      });
     });
-
-    console.log(commentData);
-
-    $.ajax({
-      url: '/new',
-      method: 'POST',
-      contentType: 'application/json',
-      data: commentData,
-      success: () => {
-        $('#commentModal').modal('hide');
-
-      }
-    });
-  });
   };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      ratings: null,
+    },
+    computed: {
+      emoji() {
+        switch(this.ratings) {
+          case '5':
+            return '😁';
+          case '4':
+            return '😊';
+          case '3':
+            return '😐';
+          case '2':
+            return '😞';
+          case '1':
+            return '😡';
+          default:
+            return '';
+        }
+      }
+    }
+  });
 </script>
 </body>
 </html>
