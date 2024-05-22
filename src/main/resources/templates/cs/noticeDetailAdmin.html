@@ -1,0 +1,73 @@
+<div class="row notice_list">
+    <table>
+        <thead>
+            <th>번호</th>
+            <th>제목</th>
+            <th>조회수</th>
+            <th>등록일자</th>
+        </thead>
+        <tbody>
+        <tr>
+            <td th:text="${notice.id}"></td>
+            <td th:text="${notice.title}"></td>
+            <td th:text="${notice.viewCount}"></td>
+            <td th:text="${notice.regDate}"></td>
+        </tr>
+        </tbody>
+        <tr>
+            <td>내용</td>
+            <td th:text="${notice.content}"></td>
+        </tr>
+
+    </table>
+
+<!--    <div>-->
+<!--        <span th:if="${nextNotice != null}">-->
+<!--        <a>다음글&nbsp;</a>-->
+<!--        <a th:href="@{/cs/notice/{id}(id=${nextNotice.id})}" th:text="${nextNotice.title}"></a>-->
+
+<!--        </span>-->
+<!--        <br>-->
+<!--        <span th:if="${previousNotice != null}">-->
+<!--        <a>이전글&nbsp;</a>-->
+<!--        <a th:href="@{/cs/notice/{id}(id=${previousNotice.id})}" th:text="${previousNotice.title}"></a>-->
+<!--        </span>-->
+<!--        </br>-->
+<!--        <a th:href="@{/cs/notice(page=${currentPage}, size=${size})}">Back to Notice List</a>-->
+<!--    </div>-->
+
+    <div>
+        <a>돌아가기</a>
+        <a>수정</a>
+        <a href="javascript:void(0);" class="delete-notice" th:attr="data-id=${notice.id}">삭제</a>
+    </div>
+
+
+</div>
+
+<script th:inline="javascript">
+    $(document).ready(function() {
+        $('.delete-notice').on('click', function() {
+            const noticeId = this.getAttribute('data-id');
+            const previousPage = this.getAttribute('data-page');
+            deleteNotice(noticeId, previousPage);
+        });
+
+        function deleteNotice(noticeId, previousPage) {
+            $.ajax({
+                url: '/admin/notice/' + noticeId,
+                type: 'DELETE',
+                success: function(response) {
+                    alert('공지사항이 삭제되었습니다.');
+                    // 성공적으로 삭제된 경우에는 필요한 작업 수행
+                    window.location.href = `/admin/notice?page=${previousPage}`;
+                },
+                error: function(xhr, status, error) {
+                    alert('공지사항 삭제 중 오류가 발생했습니다.');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+    });
+</script>
+

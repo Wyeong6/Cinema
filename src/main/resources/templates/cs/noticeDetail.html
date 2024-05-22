@@ -83,25 +83,30 @@
                     <tr>
                         <td th:text="${notice.id}"></td>
                         <td th:text="${notice.title}"></td>
-                        <td th:text="${notice.regDate}"></td>
                         <td th:text="${notice.viewCount}"></td>
+                        <td th:text="${notice.regDate}"></td>
                     </tr>
                     </tbody>
+                    <tr>
+                        <td>내용</td>
+                        <td th:text="${notice.content}"></td>
+                    </tr>
 
                 </table>
 
                 <div>
-            <span th:if="${previousNotice != null}">
-                <a th:href="@{/cs/notice/{id}(id=${previousNotice.id})}">다음글</a>
-            </span>
-                    <br>
                     <span th:if="${nextNotice != null}">
-            <a th:href="@{/cs/notice/{id}(id=${nextNotice.id})}">이전글</a>
-            </span>
-                </div>
+                    <a>다음글&nbsp;</a>
+                    <a th:href="@{/cs/notice/{id}(id=${nextNotice.id})}" th:text="${nextNotice.title}"></a>
 
-                <div>
-                    <a href="/cs/notice">Back to Notice List</a>
+                    </span>
+                    <br>
+                    <span th:if="${previousNotice != null}">
+                    <a>이전글&nbsp;</a>
+                    <a th:href="@{/cs/notice/{id}(id=${previousNotice.id})}" th:text="${previousNotice.title}"></a>
+                    </span>
+                    </br>
+                    <a th:href="@{/cs/notice(page=${currentPage}, size=${size})}">Back to Notice List</a>
                 </div>
             </div>
         </div>
@@ -122,43 +127,6 @@
 <script src="/assets/js/util.js"></script>
 <script src="/assets/js/main.js"></script>
 
-<script>
-    // include.js
-    window.addEventListener('load', function () {
-        const allElements = document.getElementsByTagName('*');
-        Array.prototype.forEach.call(allElements, function (el) {
-            const includePath = el.dataset.includePath;
-            if (includePath) {
-                const xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function () {
-                    if (this.readyState === 4 && this.status === 200) {
-                        el.outerHTML = this.responseText;
-                    }
-                };
-                xhttp.open('GET', includePath, true);
-                xhttp.send();
-            }
-        });
-    }); // 이 부분을 추가하여 괄호를 닫습니다.
-
-    // Save scroll position before navigating away
-    document.addEventListener('DOMContentLoaded', function() {
-        const paginationLinks = document.querySelectorAll('.paging_btn a');
-        paginationLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                localStorage.setItem('scrollPosition', window.scrollY);
-            });
-        });
-    });
-
-    // Restore scroll position after page load
-    window.addEventListener('load', function() {
-        const scrollPosition = localStorage.getItem('scrollPosition');
-        if (scrollPosition) {
-            window.scrollTo(0, parseInt(scrollPosition, 10));
-            localStorage.removeItem('scrollPosition'); // Clean up
-        }
-    });
 </script>
 </body>
 </html>
