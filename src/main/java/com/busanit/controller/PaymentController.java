@@ -34,7 +34,10 @@ public class PaymentController {
     // 스낵 cart
     @GetMapping("/cartList")
     public String cartList(Model model) {
+
+        // 결제
         model.addAttribute("html5InicisKey", html5InicisKey);
+
         return "payment/cart_list";
     }
 

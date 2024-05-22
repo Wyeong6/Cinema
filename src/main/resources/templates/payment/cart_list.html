@@ -48,7 +48,7 @@
                                 </button>
                                 <div class="price_box">
                                     <h4 style="font-weight: bold">Total Price</h4>
-                                    <p id="total_price2">250,000원</p>
+                                    <p id="total_price2">0원</p>
                                 </div>
                             </div>
                         </section>
@@ -65,7 +65,7 @@
                                 </div>
                             </div>
                         </section>
-                        <button class="button">결제하기</button>
+                        <button class="button" onclick="requestPay()">결제하기</button>
                     </article>
                 </div>
                 <hr/>
@@ -124,7 +124,14 @@
     <script src="/assets/js/util.js"></script>
     <script src="/assets/js/main.js"></script>
 
-    <script>
+    <!--결제 프로그램 쓰려면 jquery 필요-->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
+    <script th:inline="javascript">
+        let currentPrice = 0; // 결제시 사용할 변수
+
         document.addEventListener("DOMContentLoaded", function() {
             //localstorage에 저장된 snackCart 장바구니 개수
             function getCartItemCount() {
@@ -143,12 +150,14 @@
 
             // cart table값 가져오기
             let cartTable = document.getElementById("cartTable");
-            // let totalPrice2 = 0;
+            let totalPrice2 = 0;
+
             for(let i = 0; i < localStorage.length; i++) {
                 let key = localStorage.key(i);
                 if(key.startsWith("snackCart")) {
                     let item = JSON.parse(localStorage.getItem(key));
                     console.log("Loading item:", item);
+
                     // data가 배열이라면 각 요소를 확인
                     item.forEach(item => {
                         let row = cartTable.insertRow();
@@ -160,12 +169,12 @@
                         let deleteCell = row.insertCell(4);
 
                         imgCell.innerHTML = `<img alt="${item.alt}" src="/images/menu/${item.image}">`;
-                        nameCell.innerHTML = `<a href="/snack/detail?id=${item.id}">${item.name}</a>`;
+                        nameCell.innerHTML = `<a href="/snack/detail?id=${item.id}"><span class="itemInfo" data-item-id="${item.id}">${item.name}</span></a>`;
                         countCell.innerHTML = `
                                     <div class="count_box">
-                                        <button id="discount">-</button>
-                                        <p id="countValue">${item.count}</p>
-                                        <button id="upcount">+</button>
+                                        <button class="discount">-</button>
+                                        <p class="countValue">${item.count}</p>
+                                        <button class="upcount">+</button>
                                     </div>`;
                         priceCell.innerHTML = `
                             <p class="calc_price">${item.count} * ${item.price}</p>
@@ -173,61 +182,182 @@
                         `;
                         deleteCell.innerHTML = `<img alt="상품 삭제 버튼" src="/images/delete.png" onclick="removeItem('${key}')"/>`;
 
-                        // totalPrice2 += item.count * item.price; // 진짜 최종 totalPrice2
+                        totalPrice2 += item.count * item.price; // 진짜 최종 totalPrice2
+                        currentPrice = totalPrice2; // 현재 Price를을 전역 변수에 저장
                     });
                 }
             }
 
             // 주문 수량 count + 합계
-            const countElement = document.getElementById("countValue");
-            const discountButton = document.getElementById("discount");
-            const upcountButton = document.getElementById("upcount");
-            const totalPriceElement = document.getElementById("total_price");
+            const countElements = document.querySelectorAll('.countValue');
+            const itemElements = document.querySelectorAll('.itemInfo');
             const totalPrice2Element = document.getElementById("total_price2");
 
-            let count = parseInt(countElement.textContent);
-
             function updateTotalPrice() {
-                // 모든 total_price 클래스를 가진 요소를 선택
-                const totalPrices = document.querySelectorAll('.total_price');
-                // 총합을 저장할 변수를 초기화
-                let totalPrice2 = 0;
-                // 각 요소에서 값을 추출하고 총합에 더합니다.
-                totalPrices.forEach(element => {
-                    // 요소의 텍스트 내용을 가져와 숫자로 변환합니다.
-                    const price = parseInt(element.textContent.replace('원', '').replace(/[^0-9]/g, ''));
-                    // 총합에 더합니다.
-                    totalPrice2 += price;
+                totalPrice2 = 0;
+                countElements.forEach(countElement => {
+                    let count = parseInt(countElement.textContent);
+                    let price = parseInt(countElement.parentElement.parentElement.nextElementSibling.firstElementChild.textContent.split('*')[1].trim());
+                    totalPrice2 += count * price;
                 });
                 totalPrice2Element.textContent = totalPrice2.toLocaleString() + '원';
+                currentPrice = totalPrice2; // 현재 Price를을 전역 변수에 저장
             }
 
-            discountButton.addEventListener("click", function() {
-                if(count > 1) {
-                    count--;
-                    countElement.textContent = count;
-                    updateTotalPrice();
-                }
-            });
+            countElements.forEach((countElement, index) => {
+                const discountButton = countElement.parentElement.querySelector('.discount');
+                const upcountButton = countElement.parentElement.querySelector('.upcount');
 
-            upcountButton.addEventListener("click", function() {
-                count++;
-                countElement.textContent = count;
-                updateTotalPrice();
+                const itemElement = itemElements[index]; // 해당 인덱스에 해당하는 아이템 요소 가져오기
+                const itemId = itemElement.getAttribute('data-item-id'); // 해당 아이템의 ID 값 가져오기
+
+                discountButton.addEventListener("click", function() {
+                    let count = parseInt(countElement.textContent);
+                    if(count > 1) {
+                        count--;
+                        countElement.textContent = count;
+
+                        // 가격 업데이트
+                        const price = parseInt(countElement.parentElement.parentElement.nextElementSibling.firstElementChild.textContent.split('*')[1].trim());
+                        const calcPriceElement = countElement.parentElement.parentElement.nextElementSibling.firstElementChild;
+                        const totalPriceElement = countElement.parentElement.parentElement.nextElementSibling.lastElementChild;
+
+                        calcPriceElement.textContent = `${count} * ${price}`;
+                        totalPriceElement.textContent = `${(count * price).toLocaleString()}원`;
+
+                        updateTotalPrice();
+                        updateLocalStorage(itemId, count);
+                    }
+                });
+
+                upcountButton.addEventListener("click", function() {
+                    let count = parseInt(countElement.textContent);
+                    count++;
+                    countElement.textContent = count;
+
+                    // 가격 업데이트
+                    const price = parseInt(countElement.parentElement.parentElement.nextElementSibling.firstElementChild.textContent.split('*')[1].trim());
+                    const calcPriceElement = countElement.parentElement.parentElement.nextElementSibling.firstElementChild;
+                    const totalPriceElement = countElement.parentElement.parentElement.nextElementSibling.lastElementChild;
+
+                    calcPriceElement.textContent = `${count} * ${price}`;
+                    totalPriceElement.textContent = `${(count * price).toLocaleString()}원`;
+
+                    updateTotalPrice();
+                    updateLocalStorage(itemId, count);
+                });
             });
 
             // 초기 총 합계 설정
             updateTotalPrice();
+
+            // 장바구니 아이템 수량 업데이트 함수
+            function updateLocalStorage(itemId, count) {
+                const cartKEYID = parseInt(itemId, 10); // Convert itemId to integer
+                const saveCount = parseInt(count, 10); // Convert count to integer
+                const key = `snackCart${cartKEYID}`; // Dynamically create the key
+
+                // Retrieve the item array with the given key
+                let itemArray = JSON.parse(localStorage.getItem(key)) || [];
+
+                // Find the item in the array
+                const itemIndex = itemArray.findIndex(item => item.id === cartKEYID);
+
+                if(itemIndex !== -1) {
+                    // If the item exists, update its count
+                    console.log("Current item in cart:", itemArray[itemIndex]);
+                    itemArray[itemIndex].count = saveCount;
+                    console.log("Updated item count:", itemArray[itemIndex].count);
+                } else {
+                    // If the item doesn't exist
+                    console.log("Adding new item to cart with ID:", cartKEYID);
+                }
+
+                // Save the updated item array back to localStorage
+                localStorage.setItem(key, JSON.stringify(itemArray));
+            }
         });
 
         function removeItem(key) {
             localStorage.removeItem(key);
             location.reload(); // 페이지를 새로고침하여 테이블을 업데이트
         }
-    </script>
 
-    <script th:inline="javascript">
+        <!-- 결제 프로그램 관련 시작 -->
+        const html5InicisKey = [[${html5InicisKey}]];
 
+        function requestPay() { // 값 수정예정
+            const totalPriceElement = document.getElementById("total_price");
+            // const self = this;
+            // if(self.price == null || self.price == '') {
+            //     alert("금액을 입력하세요.")
+            // } else if(self.contractformcheck == false) {
+            //     alert("이용약관에 동의 해주세요.")
+            // } else {
+            IMP.init(html5InicisKey); // 고객사 식별코드
+            IMP.request_pay({
+                pg: "html5_inicis", //"{PG사 코드}.{상점 ID}",
+                pay_method: "card",
+                merchant_uid: `payment-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
+                name: "장바구니 결제", // 주문명
+                amount: currentPrice, // 결제 금액
+                buyer_email: "test@test.com",
+                buyer_name: "구매자",
+                buyer_tel: "010-0000-0000",
+                m_redirect_url: '/payment/complete'
+            }, function(rsp) {
+                // let result = "";
+                if(rsp.success) {
+                    var msg = "결제가 완료되었습니다.";
+                    msg += "고유ID : " + rsp.imp_uid;
+                    msg += "상점 거래ID : " + rsp.merchant_uid;
+                    msg += "결제 금액 : " + rsp.paid_amount;
+                    msg += "카드 승인번호 : " + rsp.apply_num;
+                    $.ajax({
+                        type: "GET",
+                        url: "payment/complete",
+                        data: {
+                            "amount": money
+                        },
+                    });
+
+                    // result = "0";
+                    //
+                    // const form = new FormData();
+                    // form.append("impuid", rsp.imp_uid)
+                    // form.append("merchantuid", rsp.merchant_uid)
+                    // form.append("paidamount", rsp.amount)
+                    // form.append("applynum", rsp.apply_num)
+                    // form.append("email", rsp.buyer_email)
+                    //
+                    // console.log(form)
+
+                    // self.$axios.post("http://localhost:8080/payment/complete" + rsp.email, form)
+                    //     .then(function(res) {
+                    //         if(res.status === 200) {
+                    //             console.log(res)
+                    //             self.close();
+                    //             window.location.reload(true);
+                    //         }
+                    //     });
+                } else {
+                    var msg = "결제에 실패하였습니다.";
+                    msg += "에러내용 : " + rsp.error_msg;
+                    // result = "1";
+                    // self.contractformcheck = false;
+                    // self.formattedPrice = "";
+                    // self.price = 0;
+                    // self.isPlaceholderVisible = true;
+                }
+                // if(result === "0") {
+                //     alert("성공")
+                // }
+                // self.contractformcheck = false
+                alert(msg);
+                // document.location.href = "/" // alert창 확인 후 이동할 url
+            });
+        }
+        <!--결제 프로그램 관련 끝-->
     </script>
 </th:block>
 </body>
