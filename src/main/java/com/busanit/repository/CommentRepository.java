@@ -9,14 +9,9 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findByMovieIdOrderByCnoDesc(Long movieId);
+//    List<Comment> findByMovieIdOrderByCnoDesc(Long movieId);
 
-//    @Query("SELECT new com.busanit.domain.CommentSummary(c.movieId, AVG(c.grade)) " +
-//            "FROM Comment c " +
-//            "WHERE c.movieId = :movieId " +
-//            "GROUP BY c.movieId")
-//    CommentSummary findCommentsAndAvgGrade(@Param("movieId") Long movieId);
-
+    List<Comment> findByMovieMovieIdOrderByCnoDesc(Long movieId);
     @Query("SELECT AVG(c.grade) FROM Comment c WHERE c.movie.movieId = :movieId")
     Double findAvgRatingByMovieId(Long movieId);
 }

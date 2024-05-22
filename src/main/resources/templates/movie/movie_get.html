@@ -365,6 +365,12 @@
     const movieId = $('#movieId').val();
     // 리뷰 작성 모달을 팝업 창으로 열기
     function openReviewModal() {
+
+        var memberEmail = JSON.parse(sessionStorage.getItem("userInfo"));
+        if(memberEmail == null){
+            alert("로그인 후 이용해주세요.");
+            return;
+        }
         var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=400');
         var checkWindowClosed = setInterval(function () {
             if (reviewWindow.closed) {
@@ -391,7 +397,7 @@
             success: (data) => {
                 //평점
                 const movieDataSection = $('.movie_data_averageRating');
-                movieDataSection.html(`<h4>평점</h4><p>${data.averageRating}</p>`);
+                movieDataSection.html(`<h4>평점</h4><p>${data.averageRating !== null ? data.averageRating : 0}</p>`);
                 //댓글정보
                 const reviewsSection = $('#reviews-table');
                 reviewsSection.empty();

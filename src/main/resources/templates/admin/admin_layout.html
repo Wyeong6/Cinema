@@ -301,7 +301,20 @@
         $('.snack_btn').on('click', function() {
             $('.container-xxl').load('/admin/snackList');
         });
-        // 이벤트 관리
+
+        $('.event_reg_btn').on('click', function() {
+            $('.container-xxl').load('/admin/eventRegister', function() {
+                // 페이지가 로드된 후 실행되는 콜백 함수
+                var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+                if (userInfo && userInfo.email) {
+                    console.log("userInfo.email:", userInfo.email);
+                    document.getElementById('memberEmail').value = userInfo.email;
+                } else {
+                    console.log("userInfo or userInfo.email is not available");
+                }
+            });
+        });
+
         $('.event_btn').on('click', function() {
             $('.container-xxl').load('admin_event_list.html');
         });
@@ -317,6 +330,8 @@
         if(urlLoad != null) {
             // 페이지가 로드될 때 실행되는 코드
             $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
+
+
         }
     });
 

@@ -24,7 +24,6 @@ public class CommentController {
 
     @GetMapping(value = "/movies/{movieId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommentSummaryDTO> getCommentList(@PathVariable("movieId") String movieId){
-        System.out.println("comment 무비아이디 = "+ movieId);
         List<CommentDTO> comments = commentService.getCommentList(movieId);
         Double averageRating = commentService.getAverageRating(movieId);
         CommentSummaryDTO commentList = new CommentSummaryDTO(averageRating, comments);

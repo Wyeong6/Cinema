@@ -27,10 +27,6 @@ public class Comment{
     @Column(nullable = false)
     private Double grade;
 
-    private String memberEmail;
-
-    private Long movieId;
-
     @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createdDate;
@@ -39,21 +35,21 @@ public class Comment{
     private LocalDateTime updateDate;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_movie_id")
+    @JoinColumn(name = "movie_id")
     private Movie movie;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_member_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     //빌더를 사용하면 코
-    public static Comment dtoToEntity(CommentDTO dto) {
+    public static Comment dtoToEntity(CommentDTO dto, Movie movie,Member member) {
         return Comment.builder()
                 .cno(dto.getCno())
                 .comment(dto.getComment())
                 .grade(dto.getGrade())
-                .movieId(dto.getMovieId())
-                .memberEmail(dto.getMemberEmail())
+                .member(member)
+                .movie(movie)
                 .build();
     }
 }

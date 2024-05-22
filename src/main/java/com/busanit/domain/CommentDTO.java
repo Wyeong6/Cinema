@@ -29,9 +29,9 @@ public class CommentDTO {
                 .map(comment -> CommentDTO.builder()
                         .cno(comment.getCno())
                         .comment(comment.getComment())
-                        .memberEmail(comment.getMemberEmail())
+                        .memberEmail(comment.getMember().getEmail())
                         .grade(comment.getGrade())
-                        .movieId(comment.getMovieId())
+                        .movieId(comment.getMovie().getMovieId())
                         .createDate(comment.getCreatedDate())
                         .build())
                 .collect(Collectors.toList());

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이벤트 등록</title>
+    <!-- 필요한 CSS 파일 및 기타 헤더 내용 -->
+</head>
+<body>
+<h4 class="fw-bold py-3 mb-4">이벤트 등록</h4>
+<!-- Basic Layout -->
+
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="/admin/eventRegister" method="post">
+                    <input type="hidden" name="memberEmail" id="memberEmail">
+                    <div class="mb-3">
+                        <label class="form-label" for="event_name">이벤트 제목</label>
+                        <input class="form-control" id="event_name" name="event_name" placeholder="이벤트 제목을 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="event_detail">이벤트 상세 설명</label>
+                        <input class="form-control" id="event_detail" name="event_detail"
+                               placeholder="이벤트 상세 설명을 입력해주세요." required type="text" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="event_image">이미지 이름</label>
+                        <input class="form-control" id="event_image" name="event_image"
+                               placeholder="이미지 파일명을 입력해주세요. ex) event01.png" required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="event_alt">이미지 alt 설명</label>
+                        <input class="form-control" id="event_alt" name="event_alt" placeholder="이미지 alt 설명을 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <button class="btn btn-primary" type="submit">등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -58,8 +58,7 @@
   window.onload = function() {
     var memberEmail = JSON.parse(sessionStorage.getItem("userInfo"));
     const movieId = document.getElementById('movieId').value;
-    console.log(movieId);
-    console.log(memberEmail);
+    console.log(memberEmail)
     $('#reviewForm').submit(function(e) {
       e.preventDefault();
 
@@ -72,8 +71,6 @@
         grade: grade,
         movieId: movieId
       });
-
-    console.log(commentData);
 
     $.ajax({
       url: '/new',

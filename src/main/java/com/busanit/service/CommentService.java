@@ -28,12 +28,18 @@ public class CommentService {
 
     //댓글쓰기
     public void register(CommentDTO commentDTO) {
+
+
         Movie movie = movieRepository.findById(commentDTO.getMovieId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 movieId: " + commentDTO.getMovieId()));
         Member member = memberRepository.findByEmail(commentDTO.getMemberEmail())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 memberId: " + commentDTO.getMemberEmail()));
 
-        Comment comment = Comment.dtoToEntity(commentDTO);
+        Comment comment = Comment.dtoToEntity(commentDTO,movie,member);
+
+        comment.setMovie(movie);
+        comment.setMember(member);
+
         member.addComment(comment);
         movie.addComment(comment);
 
@@ -42,7 +48,7 @@ public class CommentService {
 
     //댓글리스트
     public List<CommentDTO> getCommentList(String movieId) {
-        List<Comment> commentList = commentRepository.findByMovieIdOrderByCnoDesc(Long.valueOf(movieId));
+        List<Comment> commentList = commentRepository.findByMovieMovieIdOrderByCnoDesc(Long.valueOf(movieId));
 
         return CommentDTO.toDTOList(commentList);
     }

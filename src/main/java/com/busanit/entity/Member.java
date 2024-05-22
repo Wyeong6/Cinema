@@ -56,6 +56,20 @@ public class Member extends BaseTimeEntity {
         this.comment.add(comment);
         comment.setMember(this);
     }
+    //멤버와 이벤트게시글 연관관계
+    @ManyToMany
+    @JoinTable(
+            name = "member_event",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private List<Event> events = new ArrayList<>();
+
+    public void addEvent(Event event) {
+        if (events == null) {
+            events = new ArrayList<>();
+        }
+        events.add(event);
+    }
 
     // 일반 폼 회원 생성
     public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {

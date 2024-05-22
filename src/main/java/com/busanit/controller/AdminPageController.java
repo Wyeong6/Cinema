@@ -1,7 +1,10 @@
 package com.busanit.controller;
 
+import com.busanit.domain.EventDTO;
 import com.busanit.domain.SnackDTO;
+import com.busanit.entity.Event;
 import com.busanit.entity.Snack;
+import com.busanit.service.EventService;
 import com.busanit.service.SnackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminPageController {
 
     private final SnackService snackService;
+    private final EventService eventService;
 
     @GetMapping("/adminMain")
     public String adminMain(){
@@ -61,6 +65,27 @@ public class AdminPageController {
 
         return "admin/admin_layout";
     }
+    @GetMapping("/eventRegister")
+    public String eventRegister() { return "admin/admin_event_register"; }
+
+    @PostMapping("/eventRegister")
+    public String eventRegister(@Valid EventDTO eventDTO, BindingResult bindingResult, Model model) {
+
+
+        model.addAttribute("urlLoad", "/admin/eventRegister"); // javascript load function 에 필요함
+        if(bindingResult.hasErrors()) {
+            return "admin/admin_event_register";
+        }
+        try {
+            System.out.println("eventDTO: " + eventDTO.toString());
+            eventService.saveEvent(eventDTO);
+        } catch(IllegalStateException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+        return "admin/admin_layout";
+    }
+
+
 
     @PostMapping("/help")
     public String help(){
