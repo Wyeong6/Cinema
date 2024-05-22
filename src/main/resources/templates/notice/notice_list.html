@@ -1,152 +1,192 @@
 <!DOCTYPE HTML>
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html lang="en"
-      layout:decorate="~{layout/layout_total}"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <title>Cinemacast</title>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
-    <link href="/assets/css/main.css" rel="stylesheet"/>
-    <link href="/assets/css/custom.css" rel="stylesheet"/>
-    <link href="/assets/css/nav.css" rel="stylesheet"/>
-    <noscript>
-        <link href="/assets/css/noscript.css" rel="stylesheet"/>
-    </noscript>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="/assets/css/custom.css" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="no-sidebar is-preload">
-<th:block layout:fragment="content">
-    <div id="page-wrapper">
+<div id="page-wrapper">
 
-        <!-- Header -->
-        <header data-include-path="header.html"></header>
-
-        <!-- Main movie_list 한 페이지에 16개 정도되게 해주세요 -->
-        <div class="wrapper style1 snack_list list">
-
-            <div class="container">
-                <article class="special" id="main">
-                    <header>
-                        <h2><a href="#">공지사항</a></h2>
-                        <p>
-                            Morbi convallis lectus malesuada sed fermentum dolore amet
-                        </p>
-                    </header>
-                </article>
-                <hr/>
-                <!--						공지사항 목록 table -->
-                <div class="row notice_list">
-                    <table class="default">
-                        <thead>
-                        <tr>
-                            <th>번호</th>
-                            <th>제목</th>
-                            <th>조회수</th>
-                            <th>등록일자</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
-                            <td>238</td>
-                            <td>2024-05-16</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
-                            <td>238</td>
-                            <td>2024-05-16</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
-                            <td>238</td>
-                            <td>2024-05-16</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
-                            <td>238</td>
-                            <td>2024-05-16</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
-                            <td>238</td>
-                            <td>2024-05-16</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
-                            <td>238</td>
-                            <td>2024-05-16</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
-                            <td>238</td>
-                            <td>2024-05-16</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
-                            <td>238</td>
-                            <td>2024-05-16</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <div class="paging_btn">
-                        <ul>
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
+    <!-- Header -->
+    <div id="header">
+        <div class="overlay"></div>
+        <h1 class="logo" style="font-size: 2em;">CINEMACAST</h1>
+        <!-- Inner -->
+        <div class="inner">
+            <header>
+                <h1><a href="index.html" id="movie_title">Movie Title</a></h1>
+                <hr />
+                <p>Another fine freebie by HTML5 UP</p>
+            </header>
+            <footer>
+                <a href="#banner" class="button circled scrolly">예매</a>
+            </footer>
         </div>
 
-        <footer data-include-path="footer.html"></footer>
+        <!-- info -->
+        <div id="info" th:data-username="${#authentication.name}">
+            <ul>
+                <li sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다.</li>
+                <li sec:authorize="isAnonymous()">
+                    <a href="/member/new">회원가입</a>
+                </li>
+                <li sec:authorize="isAnonymous()">
+                    <a href="/member/login">로그인</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a href="/member/logout">로그아웃</a>
+                </li>
+                <li><a href="#">장바구니</a></li>
+            </ul>
+        </div>
+
+        <!-- Nav -->
+        <nav id="nav">
+            <ul>
+                <li>
+                    <a href="#">영화</a>
+                    <ul>
+                        <li><a href="movie_list_full.html">영화 전체보기</a></li>
+                        <li><a href="movie_list_now.html">현재 상영작</a></li>
+                        <li><a href="movie_list_comming.html">상영 예정작</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">예매</a>
+                    <ul>
+                        <li><a href="#">예매</a></li>
+                        <li><a href="#">상영 시간표</a></li>
+                    </ul>
+                </li>
+                <li><a href="snack_list.html">스낵 스토어</a></li>
+                <li><a href="event_list.html">이벤트</a></li>
+                <li><a href="/cs/notice">공지사항</a></li>
+            </ul>
+        </nav>
+
+    <div class="wrapper style1 snack_list list">
+
+        <div class="container">
+            <article id="main" class="special">
+                <header>
+                    <h2><a href="#">공지사항</a></h2>
+                    <p>
+                        Morbi convallis lectus malesuada sed fermentum dolore amet
+                    </p>
+                </header>
+            </article>
+            <hr/>
+            <!--						공지사항 목록 table -->
+            <div class="row notice_list">
+                <table class="default">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>제목</th>
+                        <th>조회수</th>
+                        <th>등록일자</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
+                        <td>238</td>
+                        <td>2024-05-16</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
+                        <td>238</td>
+                        <td>2024-05-16</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
+                        <td>238</td>
+                        <td>2024-05-16</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
+                        <td>238</td>
+                        <td>2024-05-16</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
+                        <td>238</td>
+                        <td>2024-05-16</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
+                        <td>238</td>
+                        <td>2024-05-16</td>
+                    </tr><tr>
+                        <td>1</td>
+                        <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
+                        <td>238</td>
+                        <td>2024-05-16</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="notice_get.html">Cinemacast 개인정보처리방침 개정 안내</a></td>
+                        <td>238</td>
+                        <td>2024-05-16</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="paging_btn">
+                    <ul>
+                        <li><a href="#">1</a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
     </div>
 
-    <!-- Scripts -->
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/jquery.dropotron.min.js"></script>
-    <script src="/assets/js/jquery.scrolly.min.js"></script>
-    <script src="/assets/js/jquery.scrollex.min.js"></script>
-    <script src="/assets/js/browser.min.js"></script>
-    <script src="/assets/js/breakpoints.min.js"></script>
-    <script src="/assets/js/util.js"></script>
-    <script src="/assets/js/main.js"></script>
+    <footer data-include-path="footer.html"></footer>
 
-    <script>
-        // include.js
-        window.addEventListener('load', function () {
-            var allElements = document.getElementsByTagName('*');
-            Array.prototype.forEach.call(allElements, function (el) {
-                var includePath = el.dataset.includePath;
-                if (includePath) {
-                    var xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            el.outerHTML = this.responseText;
-                        }
-                    };
-                    xhttp.open('GET', includePath, true);
-                    xhttp.send();
-                }
-            });
-        }); // 이 부분을 추가하여 괄호를 닫습니다.
-    </script>
-</th:block>
+</div>
+
+<!-- Scripts -->
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/jquery.dropotron.min.js"></script>
+<script src="/assets/js/jquery.scrolly.min.js"></script>
+<script src="/assets/js/jquery.scrollex.min.js"></script>
+<script src="/assets/js/browser.min.js"></script>
+<script src="/assets/js/breakpoints.min.js"></script>
+<script src="/assets/js/util.js"></script>
+<script src="/assets/js/main.js"></script>
+
+<script>
+    // include.js
+    window.addEventListener('load', function () {
+        var allElements = document.getElementsByTagName('*');
+        Array.prototype.forEach.call(allElements, function (el) {
+            var includePath = el.dataset.includePath;
+            if (includePath) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        el.outerHTML = this.responseText;
+                    }
+                };
+                xhttp.open('GET', includePath, true);
+                xhttp.send();
+            }
+        });
+    }); // 이 부분을 추가하여 괄호를 닫습니다.
+</script>
 </body>
 </html>
