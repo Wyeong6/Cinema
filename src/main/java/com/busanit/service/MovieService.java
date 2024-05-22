@@ -21,10 +21,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -104,6 +101,7 @@ public class MovieService {
         List<MovieDTO> moviesOnPage = allMovies.subList(start, end);
         return new PageImpl<>(moviesOnPage, pageable, allMovies.size());
     }
+
 
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
@@ -388,15 +386,8 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    //현재 상영작 페이지
-    public Page<MovieDTO> getAll2(Pageable pageable) {
-        Page<Movie> movieList = movieRepository.findAll(pageable);
-        return movieList.map(MovieDTO::convertToDTO);
-    }
-
-    //현재 상영작 페이지 페이지네이션
-    public Page<MovieDTO> getMoviespaging(int page) {
-        Pageable pageable = PageRequest.of(page, 12); // 페이지 번호와 페이지 당 항목 수 설정
+    public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size); // 페이지 번호, 페이지당 항목 수 및 정렬 필드 설정
         Page<Movie> movieList = movieRepository.findAll(pageable);
         return movieList.map(MovieDTO::convertToDTO); // DTO로 변환
     }

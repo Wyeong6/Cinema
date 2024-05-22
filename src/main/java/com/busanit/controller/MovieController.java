@@ -56,18 +56,7 @@ public class MovieController {
     public String nowMovies(Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "12") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<MovieDTO> moviePage = movieService2.getAll2(pageable);
-        model.addAttribute("moviePage", moviePage);
-
-        return "movie/movie_list_now";
-    }
-
-    //현재 상영작 페이지 페이지네이션
-    @GetMapping("/nowMoviesPaging")
-    public String nowMoviesPage(@RequestParam("page") int page, Model model) {
-        // 페이지 번호에 따른 영화 목록을 가져오는 로직
-        Page<MovieDTO> moviePage = movieService2.getMoviespaging(page);
+        Page<MovieDTO> moviePage = movieService2.getMoviesPagingAndSorting(page, size);
         model.addAttribute("moviePage", moviePage);
         return "movie/movie_list_now";
     }
@@ -78,15 +67,6 @@ public class MovieController {
         Pageable pageable = PageRequest.of(page - 1, 12); // 1페이지부터 시작하도록 조정
         Page<MovieDTO> upcomingMoviesPage = movieService2.getUpcomingMovies(pageable);
         model.addAttribute("moviePage", upcomingMoviesPage);
-        return "movie/movie_list_comming";
-    }
-
-    //    개봉예정 페이지 페이지네이션
-    @GetMapping("/commingMoviesPaging")
-    public String listMovies(@RequestParam("page") int page, Model model) {
-        // 페이지 번호에 따른 영화 목록을 가져오는 로직
-        Page<MovieDTO> moviePage = movieService2.getMoviespaging(page);
-        model.addAttribute("moviePage", moviePage);
         return "movie/movie_list_comming";
     }
 
@@ -107,7 +87,6 @@ public class MovieController {
     // 리뷰작성 모달
     @RequestMapping("/review/{movieId}")
     public String reviewPopup(@PathVariable("movieId") String movieId, Model model) {
-        System.out.println("무비컨트롤의 무비아이디ㅁㄴㅇㄹㄴㅁㄹㅇㅁㄴㄹ" + movieId);
         model.addAttribute("movieId", movieId);
         return "movie/review_modal";
     }

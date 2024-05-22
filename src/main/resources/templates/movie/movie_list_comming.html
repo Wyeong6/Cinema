@@ -1,97 +1,104 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{layout/layout_total}"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  xmlns:sec="http://www.w3.org/1999/xhtml"
-	  xmlns:th="http://www.thymeleaf.org">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-	<title>Cinemacast</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-	<link rel="stylesheet" href="/assets/css/main.css" />
-	<link rel="stylesheet" href="/assets/css/custom.css" />
-	<link rel="stylesheet" href="/assets/css/nav.css" />
-	<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+    <title>Cinemacast</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="/assets/css/main.css"/>
+    <link rel="stylesheet" href="/assets/css/custom.css"/>
+    <link rel="stylesheet" href="/assets/css/nav.css"/>
+    <noscript>
+        <link rel="stylesheet" href="/assets/css/noscript.css"/>
+    </noscript>
 </head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
-<div id="page-wrapper">
+    <div id="page-wrapper">
 
-	<!-- Header -->
-	<header data-include-path="header.html"></header>
+        <!-- Header -->
+        <header data-include-path="header.html"></header>
 
-	<!-- Main movie_list 한 페이지에 16개 정도되게 해주세요 -->
-	<div class="wrapper style1 movie_list">
+        <!-- Main movie_list 한 페이지에 16개 정도되게 해주세요 -->
+        <div class="wrapper style1 movie_list">
 
 
-		<div id="movies"></div>
+            <div id="movies"></div>
 
-		<div class="container">
-			<article id="main" class="special">
-				<header>
-					<h2><a href="#">상영 예정작</a></h2>
-					<p>
-						Morbi convallis lectus malesuada sed fermentum dolore amet
-					</p>
-				</header>
-			</article>
-			<hr />
-			<div class="row">
-				<article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${moviePage}">
-					<a th:href="@{'/movies/' + ${movie.id}}" class="image featured"><img
-							th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/></a>
-					<header>
-						<h4><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a>
-						</h4>
-					</header>
-				</article>
-			</div>
+            <div class="container">
+                <article id="main" class="special">
+                    <header>
+                        <h2><a href="#">상영 예정작</a></h2>
+                        <p>
+                            Morbi convallis lectus malesuada sed fermentum dolore amet
+                        </p>
+                    </header>
+                </article>
+                <hr/>
+                <div class="row">
+                    <article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${moviePage.content}">
+                        <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
+                            <img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/>
+                        </a>
+                        <header>
+                            <h4>
+                                <a th:href="@{'/movies/' + ${movie.id}}">
+                                    <span th:text="${movie.title}">영화 이름</span>
+                                </a>
+                            </h4>
+                        </header>
+                    </article>
+                </div>
 
-			<!-- 페이지네이션 -->
-			<div class="pagination">
-				<a href="#" th:if="${moviePage.hasPrevious()}" th:href="@{/commingMoviesPaging(page=${moviePage.number - 1})}">이전</a>
-				<span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
-        <a th:href="@{/nowMoviesPaging(page=${pageNum})}" th:text="${pageNum + 1}"
-		   th:classappend="${pageNum == moviePage.number} ? 'active' : ''"></a>
-    </span>
-				<a href="#" th:if="${moviePage.hasNext()}" th:href="@{/commingMoviesPaging(page=${moviePage.number + 1})}">다음</a>
-			</div>
-		</div>
+                <!-- 페이지네이션 -->
+                <div class="pagination">
+                    <a href="#" th:if="${moviePage.hasPrevious()}"
+                       th:href="@{/comingMoves(page=${moviePage.number - 1 + 1})}">이전</a>
+                    <span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
+            <a th:href="@{/comingMoves(page=${pageNum + 1})}" th:text="${pageNum + 1}"
+               th:classappend="${pageNum == moviePage.number} ? 'active' : ''"></a>
+        </span>
+                    <a href="#" th:if="${moviePage.hasNext()}"
+                       th:href="@{/comingMoves(page=${moviePage.number + 1 + 1})}">다음</a>
+                </div>
+            </div>
+        </div>
 
-	</div>
+        <footer data-include-path="footer.html"></footer>
 
-	<footer data-include-path="footer.html"></footer>
+    </div>
 
-</div>
+    <!-- Scripts -->
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/jquery.dropotron.min.js"></script>
+    <script src="/assets/js/jquery.scrolly.min.js"></script>
+    <script src="/assets/js/jquery.scrollex.min.js"></script>
+    <script src="/assets/js/browser.min.js"></script>
+    <script src="/assets/js/breakpoints.min.js"></script>
+    <script src="/assets/js/util.js"></script>
+    <script src="/assets/js/main.js"></script>
 
-<!-- Scripts -->
-<script src="/assets/js/jquery.min.js"></script>
-<script src="/assets/js/jquery.dropotron.min.js"></script>
-<script src="/assets/js/jquery.scrolly.min.js"></script>
-<script src="/assets/js/jquery.scrollex.min.js"></script>
-<script src="/assets/js/browser.min.js"></script>
-<script src="/assets/js/breakpoints.min.js"></script>
-<script src="/assets/js/util.js"></script>
-<script src="/assets/js/main.js"></script>
-
-<script>
-	// include.js
-	window.addEventListener('load', function() {
-		var allElements = document.getElementsByTagName('*');
-		Array.prototype.forEach.call(allElements, function(el) {
-			var includePath = el.dataset.includePath;
-			if (includePath) {
-				var xhttp = new XMLHttpRequest();
-				xhttp.onreadystatechange = function () {
-					if (this.readyState == 4 && this.status == 200) {
-						el.outerHTML = this.responseText;
-					}
-				};
-				xhttp.open('GET', includePath, true);
-				xhttp.send();
-			}
-		});
-	}); // 이 부분을 추가하여 괄호를 닫습니다.
-</script>
+    <script>
+        // include.js
+        window.addEventListener('load', function () {
+            var allElements = document.getElementsByTagName('*');
+            Array.prototype.forEach.call(allElements, function (el) {
+                var includePath = el.dataset.includePath;
+                if (includePath) {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            el.outerHTML = this.responseText;
+                        }
+                    };
+                    xhttp.open('GET', includePath, true);
+                    xhttp.send();
+                }
+            });
+        }); // 이 부분을 추가하여 괄호를 닫습니다.
+    </script>
 </th:block>
 </body>
 </html>

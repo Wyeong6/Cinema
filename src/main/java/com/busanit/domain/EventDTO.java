@@ -1,15 +1,16 @@
 package com.busanit.domain;
 
 import com.busanit.entity.Event;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventDTO {
 
     private Long id;
@@ -21,28 +22,17 @@ public class EventDTO {
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
 
-    public static EventDTO toDTO(Event event){
+    public static EventDTO toDTO(Event event) {
         return EventDTO.builder()
                 .id(event.getId())
                 .event_name(event.getEvent_name())
+                .memberEmail(event.getMemberEmail())
                 .event_image(event.getEvent_image())
                 .event_alt(event.getEvent_alt())
-                .event_detail(event.getEvent_Detail())
+                .event_detail(event.getEvent_detail()) // 소문자로 수정
                 .regDate(event.getRegDate())
                 .updateDate(event.getUpdateDate())
                 .build();
     }
 
-    public String toString() {
-        return "EventDTO{" +
-                "id=" + id +
-                ", event_name='" + event_name + '\'' +
-                ", memberEmail='" + memberEmail + '\'' +
-                ", event_image='" + event_image + '\'' +
-                ", event_alt='" + event_alt + '\'' +
-                ", event_Detail='" + event_detail + '\'' +
-                ", regDate=" + regDate +
-                ", updateDate=" + updateDate +
-                '}';
-    }
 }

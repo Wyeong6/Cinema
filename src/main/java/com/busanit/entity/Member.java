@@ -3,6 +3,7 @@ package com.busanit.entity;
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.entity.movie.Comment;
+import com.busanit.entity.movie.Genre;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -57,19 +58,20 @@ public class Member extends BaseTimeEntity {
         comment.setMember(this);
     }
     //멤버와 이벤트게시글 연관관계
-    @ManyToMany
-    @JoinTable(
-            name = "member_event",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> events = new ArrayList<>();
+//    @ManyToMany
+//    @JoinTable(
+//            name = "member_event",
+//            joinColumns = @JoinColumn(name = "member_id"),
+//            inverseJoinColumns = @JoinColumn(name = "event_id"))
+//    private List<Event> events = new ArrayList<>();
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    private List<Event> events;
 
-    public void addEvent(Event event) {
-        if (events == null) {
-            events = new ArrayList<>();
-        }
-        events.add(event);
-    }
+//    public void addEvent(Event event) {
+//        this.events.add(event);
+//        event.getMembers().add(this);
+//        }
+
 
     // 일반 폼 회원 생성
     public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {

@@ -301,23 +301,22 @@
         $('.snack_btn').on('click', function() {
             $('.container-xxl').load('/admin/snackList');
         });
-
+        // 이벤트 관리
         $('.event_reg_btn').on('click', function() {
             $('.container-xxl').load('/admin/eventRegister', function() {
                 // 페이지가 로드된 후 실행되는 콜백 함수
                 var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
                 if (userInfo && userInfo.email) {
-                    console.log("userInfo.email:", userInfo.email);
                     document.getElementById('memberEmail').value = userInfo.email;
-                } else {
-                    console.log("userInfo or userInfo.email is not available");
                 }
             });
         });
 
         $('.event_btn').on('click', function() {
-            $('.container-xxl').load('admin_event_list.html');
+            $('.container-xxl').load('/admin/eventList');
         });
+
+
         // 공지사항 관리
         $('.notice_btn').on('click', function() {
             $('.container-xxl').load('/admin/notice');
