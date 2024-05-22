@@ -307,9 +307,13 @@
         });
         // 공지사항 관리
         $('.notice_btn').on('click', function() {
-            $('.container-xxl').load('admin_notice_list.html');
+            $('.container-xxl').load('/admin/notice');
         });
     });
+
+    function goPage(page, size) {
+        $('.container-xxl').load('/admin/notice?page=' + page + '&size=' + size);
+    }
 
     /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
     $(document).ready(function() {

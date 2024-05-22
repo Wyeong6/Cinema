@@ -1,16 +1,23 @@
 package com.busanit.controller;
 
+import com.busanit.customerService.Notice.NoticeDTO;
+import com.busanit.customerService.Notice.NoticeService;
+import com.busanit.customerService.util.PaginationUtil;
 import com.busanit.domain.SnackDTO;
 import com.busanit.entity.Snack;
 import com.busanit.service.SnackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -18,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminPageController {
 
     private final SnackService snackService;
+    private final NoticeService noticeService;
 
     @GetMapping("/adminMain")
     public String adminMain(){
@@ -63,7 +71,13 @@ public class AdminPageController {
     }
 
     @PostMapping("/help")
-    public String help(){
-        return "admin/adminHelpPage";
+    public String help(){ return "admin/adminHelpPage"; }
+
+    @GetMapping("/notice")
+    public String showNoticeList(Model model,
+                                 @RequestParam(defaultValue = "1") int page,
+                                 @RequestParam(defaultValue = "10") int size) {
+        noticeService.prepareNoticeList(model, page, size);
+        return "/cs/noticeAdmin";
     }
 }
