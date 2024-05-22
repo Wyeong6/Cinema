@@ -23,7 +23,7 @@
 <th:block layout:fragment="content">
     <div id="page-wrapper">
 
-        <header data-include-path="header.html"></header>
+<!--        <header data-include-path="header.html"></header>-->
 
         <!-- Main -->
         <div class="wrapper style1 snack_get list">
@@ -98,7 +98,7 @@
             </div>
         </div>
 
-        <footer data-include-path="footer.html"></footer>
+<!--        <footer data-include-path="footer.html"></footer>-->
 
     </div>
 
@@ -135,7 +135,7 @@
             function updateTotalPrice() {
                 let totalPrice = snackPrice * count;
                 totalPriceElement.textContent = totalPrice.toLocaleString() + '원';
-                currentPrice = totalPrice; // 현재 수량을 전역 변수에 저장
+                currentPrice = totalPrice; // 현재 Price를 전역 변수에 저장
                 currentCount = count; // 현재 count를 전역 변수에 저장
             }
 
