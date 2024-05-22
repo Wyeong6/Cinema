@@ -34,6 +34,7 @@ public class SnackDTO {
 
     public static SnackDTO toDTO(Snack snack) {
         return SnackDTO.builder()
+                .id(snack.getId())
                 .snack_nm(snack.getSnack_nm())
                 .snack_image(snack.getSnack_image())
                 .snack_alt(snack.getSnack_alt())

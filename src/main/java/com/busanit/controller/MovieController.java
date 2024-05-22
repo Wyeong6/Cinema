@@ -27,10 +27,10 @@ public class MovieController {
     @Transactional
     @GetMapping("/movies/Main")
     public String getDetailMovies(Model model) throws IOException {
-//        movieService2.fetchAndStoreMoviesNowPlaying();
-//        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
-//        movieService2.fetchAndStoreMovieStillCuts();
-//        movieService2.fetchAndStoreCertificationData();
+        movieService2.fetchAndStoreMoviesNowPlaying();
+        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
+        movieService2.fetchAndStoreMovieStillCuts();
+        movieService2.fetchAndStoreCertificationData();
 
         //비디오가 있는 인기순영화
         List<MovieDTO> videoMovies = movieService2.getVideoMovies();
@@ -95,6 +95,7 @@ public class MovieController {
     public String movieDetailinfo(@PathVariable("movieId") Long movieId, Model model) {
         List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(movieId);
         model.addAttribute("movieInfos", movieInfos);
+        model.addAttribute("movieId", movieId);
         return "movie/movie_get";
     }
 
