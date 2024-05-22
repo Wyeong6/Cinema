@@ -311,6 +311,10 @@
         });
     });
 
+    function goPage(page, size) {
+        $('.container-xxl').load('/admin/notice?page=' + page + '&size=' + size);
+    }
+
     /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
     $(document).ready(function() {
         var urlLoad = [[${urlLoad}]];
