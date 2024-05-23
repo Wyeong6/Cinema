@@ -552,7 +552,7 @@
 
     function updateReactionCount(movieId) {
         $.ajax({
-            url: '/movies/' + movieId, // 반응 카운트를 가져올 수 있는 서버의 URL
+            url: '/movie/' + movieId, // 반응 카운트를 가져올 수 있는 서버의 URL
             type: 'GET',
             success: function(response) {
                 // 여기서 response는 서버에서 반환한 JSON 데이터
