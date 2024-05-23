@@ -395,4 +395,52 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
                 .collect(Collectors.toList());
     }
 
+    /* upcoming 상세보기를 위한 전용함수들  시작 */
+//
+//    public void fetchAndStoreMoviesUpcoming() throws IOException {
+//        int totalPages = fetchTotalPages();
+//        for (int page = 1; page <= totalPages; page++) {
+//            // https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=1&api_key=547e2cd4d0e26e68fb907dafef4f90ac&region=KR
+//            String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
+//            Request request = new Request.Builder().url(url).build();
+//            try (Response response = client.newCall(request).execute()) {
+//                String responseBody = response.body().string();
+//                processResponse(responseBody);
+//            }
+//        }
+//    }
+//
+//    public void fetchAndStoreMovieRuntimeAndReleaseDataUpcoming(Long movieId) throws IOException {
+//            String url = "https://api.themoviedb.org/3/movie/" + movieId + "?language=ko-KR&api_key=" + apiKey;
+//            Request request = new Request.Builder().url(url).build();
+//            try (Response response = client.newCall(request).execute()) {
+//                String responseBody = response.body().string();
+//                processRuntimeAndReleaseDataResponse(responseBody);
+//        }
+//    }
+//
+//    public void fetchAndStoreMovieStillCutsUpcoming(Long movieId) throws IOException {
+//
+//            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/images?include_image_language=kr%2Cnull&language=KR&api_key=" + apiKey;
+//            Request request = new Request.Builder().url(url).build();
+//            try (Response response = client.newCall(request).execute()) {
+//                String responseBody = response.body().string();
+//                processStillCutsResponse(responseBody);
+//            }
+//        }
+//
+//    public void fetchAndStoreCertificationDataUpcoming(Long movieId) throws IOException {
+//            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/release_dates?api_key=" + apiKey;
+//            Request request = new Request.Builder().url(url).build();
+//            try (Response response = client.newCall(request).execute()) {
+//                String responseBody = response.body().string();
+//                processCertificationResponse(responseBody, movieId);
+//            }
+//
+//    }
+
+
+
+
+
 }

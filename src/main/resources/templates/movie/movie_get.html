@@ -160,11 +160,16 @@
                 </div>
             </div>
 
-            <button type="button" onclick="addReaction(1, `${movieId}`, 'LIKE')">좋아요</button>
-            <span id="likeCount_${movie.id}">0</span>
+            <button type="button" onclick="addReaction(1, `${movieId}`, 'LIKE')">재밌어요</button>
+            <span class="like-count">0</span>
+            <button type="button" onclick="addReaction(1, `${movieId}`, 'DISLIKE')">재미없어요</button>
+            <span class="dislike-count">0</span>
             <button type="button" onclick="addReaction(1, `${movieId}`, 'SAD')">슬퍼요</button>
-            <span id="sadCount_${movie.id}">0</span> <!-- 초기값을 0으로 설정 -->
-
+            <span class="sad-count">0</span>
+            <button type="button" onclick="addReaction(1, `${movieId}`, 'FUNNY')">웃겨요</button>
+            <span class="funny-count">0</span>
+            <button type="button" onclick="addReaction(1, `${movieId}`, 'SCARY')">무서워요</button>
+            <span class="scary-count">0</span>
 
             <section class="movie_etc">
                 <div class="etc_btn">
@@ -477,9 +482,6 @@
     const loadComments = () => {
         const movieId = $('#movieId').val();
         console.log("겟페이지 무비아이디 = " + movieId);
-
-
-
 //            댓글리스트    --------------------------------------------------
         $.ajax({
             url: `/movies/` + movieId ,
@@ -522,6 +524,9 @@
 
     /* 좋아요 싫어요 슬퍼요 등등 리액션 관련 함수 시작 */
 
+    var currentReactions = {}; // 사용자의 현재 리액션 선택을 추적하는 객체
+
+
     function addReaction(memberId, movieId, reactionType) {
 
         var data = {
@@ -531,6 +536,35 @@
         };
         console.log('Sending data:', data);
 
+        // currentReactions 객체에 movieId 키가 존재하는지 확인
+        if (!(movieId in currentReactions)) {
+            // 존재하지 않으면 초기값으로 빈 객체 설정
+            currentReactions[movieId] = {}; // 수정됨: null 대신 빈 객체로 초기화
+        }
+
+        var currentMemberReaction = currentReactions[movieId][memberId]; // 수정됨: 현재 멤버의 리액션을 추적
+
+        console.log('currentMemberReaction =', currentMemberReaction);
+
+        if (currentMemberReaction === reactionType) {
+            // 이미 선택된 리액션을 다시 클릭하면 취소
+            removeReaction(memberId, movieId, reactionType);
+        } else {
+            // 다른 리액션을 클릭하면 이전 리액션 취소 후 새로운 리액션 추가
+            if (currentMemberReaction) {
+                removeReaction(memberId, movieId, currentMemberReaction, function() {
+                    sendReaction(memberId, movieId, reactionType);
+                    currentReactions[movieId][memberId] = reactionType;
+                });
+            } else {
+                sendReaction(memberId, movieId, reactionType);
+                currentReactions[movieId][memberId] = reactionType;
+            }
+        }
+    }
+
+
+    function sendReaction(memberId, movieId, reactionType) {
         $.ajax({
             url: '/add',
             type: 'POST',
@@ -550,9 +584,11 @@
         });
     }
 
+
+
     function updateReactionCount(movieId) {
         $.ajax({
-            url: '/movies/' + movieId, // 반응 카운트를 가져올 수 있는 서버의 URL
+            url: '/movie/' + movieId, // 반응 카운트를 가져올 수 있는 서버의 URL
             type: 'GET',
             success: function(response) {
                 // 여기서 response는 서버에서 반환한 JSON 데이터
@@ -562,7 +598,10 @@
 
                 // JSON 데이터를 사용하여 각 반응 카운트를 업데이트
                 $('#likeCount_' + movieId).text(response.likeCount); // 좋아요 카운트 업데이트
+                $('#dislikeCount_' + movieId).text(response.dislikeCount); // 싫어요 카운트 업데이트
                 $('#sadCount_' + movieId).text(response.sadCount);   // 슬퍼요 카운트 업데이트
+                $('#funnyCount_' + movieId).text(response.funnyCount);   // 웃겨요 카운트 업데이트
+                $('#scaryCount_' + movieId).text(response.scaryCount);   // 무서워요 카운트 업데이트
                 // 필요한 경우 다른 반응 카운트도 업데이트
             },
             error: function(xhr, status, error) {
@@ -570,6 +609,66 @@
             }
         });
     }
+
+    function removeReaction(memberId, movieId,reactionType, callback) {
+        var data = {
+            memberId: memberId,
+            movieId: movieId,
+            reactionType: reactionType
+        };
+        console.log('Removing data:', data);
+
+        $.ajax({
+            url: '/remove',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                console.log('Response:', response);
+                updateReactionCount(movieId);
+                delete currentReactions[movieId][memberId];
+                if (Object.keys(currentReactions[movieId]).length === 0) { // 만약 해당 movieId에 대한 리액션이 더 이상 없다면
+                    delete currentReactions[movieId]; // 해당 movieId를 currentReactions에서 제거
+                }
+                if (callback) callback();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error removing reaction:', status, error);
+                console.log('XHR Object:', xhr);
+                console.log('Response Text:', xhr.responseText);
+            }
+        });
+    }
+
+
+    // 페이지 로딩끝나면 함수호출에서 페이지 접속하자마자 리액션현황 보여줌
+    // 및 span에 id추가해서 카운트보이게하는 기능도 있음
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("movieId = " + movieId)
+
+        var likeCountSpans = document.querySelectorAll('.like-count');
+        var dislikeCountSpans = document.querySelectorAll('.dislike-count');
+        var sadCountSpans = document.querySelectorAll('.sad-count');
+        var funnyCountSpans = document.querySelectorAll('.funny-count');
+        var scaryCountSpans = document.querySelectorAll('.scary-count');
+
+        likeCountSpans.forEach(span => {
+            span.id = 'likeCount_' + movieId;
+        });
+        dislikeCountSpans.forEach(span => {
+            span.id = 'dislikeCount_' + movieId;
+        });
+        sadCountSpans.forEach(span => {
+            span.id = 'sadCount_' + movieId;
+        });
+        funnyCountSpans.forEach(span => {
+            span.id = 'funnyCount_' + movieId;
+        });
+        scaryCountSpans.forEach(span => {
+            span.id = 'scaryCount_' + movieId;
+        });
+        updateReactionCount(movieId);
+    });
 
 
     /* 좋아요 싫어요 슬퍼요 등등 리액션 관련 함수 끝   */

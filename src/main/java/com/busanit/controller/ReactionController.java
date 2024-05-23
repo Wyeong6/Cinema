@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("")
 @RequiredArgsConstructor
 public class ReactionController {
 
@@ -33,7 +32,11 @@ public class ReactionController {
         Map<String, Long> reactions = new HashMap<>();
         // 반응 카운트 조회 로직
         reactions.put("likeCount", reactionService.getReactionCount(movieId, ReactionType.LIKE));
+        reactions.put("dislikeCount", reactionService.getReactionCount(movieId, ReactionType.DISLIKE));
         reactions.put("sadCount", reactionService.getReactionCount(movieId, ReactionType.SAD));
+        reactions.put("funnyCount", reactionService.getReactionCount(movieId, ReactionType.FUNNY));
+        reactions.put("scaryCount", reactionService.getReactionCount(movieId, ReactionType.SCARY));
+
         // 다른 반응들도 동일하게 추가
         return reactions;
     }
@@ -53,7 +56,12 @@ public class ReactionController {
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<String> removeReaction(@RequestParam Long memberId, @RequestParam Long movieId) {
+    public ResponseEntity<String> removeReaction(@RequestBody ReactionRequest reactionRequest) {
+
+        Long memberId = reactionRequest.getMemberId();
+        Long movieId = reactionRequest.getMovieId();
+        String reactionType = reactionRequest.getReactionType();
+
         try {
             reactionService.removeReaction(memberId, movieId);
             return ResponseEntity.ok("Reaction removed successfully");
