@@ -27,6 +27,10 @@ public class CustomFormLoginSuccessHandler implements AuthenticationSuccessHandl
 //            response.sendRedirect("/");
 //        }
 
+        // 사용자 인증 후 세션에 userId 저장
+        String userEmail = authentication.getName();
+        request.getSession().setAttribute("userEmail", userEmail);
+
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
         if (roles.contains("ROLE_ADMIN")) {
