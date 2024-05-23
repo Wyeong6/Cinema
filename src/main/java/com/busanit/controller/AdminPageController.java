@@ -8,6 +8,8 @@ import com.busanit.entity.Snack;
 import com.busanit.service.SnackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,6 +27,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@Slf4j
 public class AdminPageController {
 
     private final SnackService snackService;
@@ -81,9 +84,7 @@ public class AdminPageController {
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
 
-        model.addAttribute("urlLoad", "/admin/snackList?page=" + page); // javascript load function 에 필요함
-
-        return "admin/admin_layout";
+        return "/admin/admin_snack_list";
     }
 
 
