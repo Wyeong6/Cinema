@@ -1,0 +1,32 @@
+<h4 class="fw-bold py-3 mb-4" xmlns="http://www.w3.org/1999/html">공지 작성</h4>
+<!-- Basic Layout -->
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="/admin/notice/add" method="post">
+                    <div class="mb-3">
+                        <label class="form-label" for="pinned">중요</label>
+                        <select class="form-select" id="pinned" name="pinned" required style="width: 50%;">
+                            <option value="0">안중요</option>
+                            <option value="1">중요</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="title">제목</label>
+                        <input class="form-control" id="title" name="title" placeholder="공지사항 제목"
+                               required type="text" style="width: 50%;"/>
+                    </div>
+                    </br>
+                    <div class="mb-3">
+                        <label class="form-label" for="content">내용</label>
+                        <textarea class="form-control" id="content" name="content" placeholder="공지사항 내용"
+                                  required style="width: 50%;" rows="20" cols="20" wrap="hard"></textarea>
+                    </div>
+                    <button class="btn btn-primary" type="submit">작성하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</script>

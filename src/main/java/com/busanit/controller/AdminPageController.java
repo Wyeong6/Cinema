@@ -1,8 +1,6 @@
 package com.busanit.controller;
 
-import com.busanit.customerService.Notice.Notice;
-import com.busanit.customerService.Notice.NoticeDTO;
-import com.busanit.customerService.Notice.NoticeService;
+import com.busanit.customerService.Notice.*;
 import com.busanit.customerService.util.PaginationUtil;
 import com.busanit.domain.SnackDTO;
 import com.busanit.entity.Snack;
@@ -87,35 +85,43 @@ public class AdminPageController {
         return "/cs/noticeAdmin";
     }
 
-    @GetMapping("/notice/{id}")
-    public String showNoticeDetails(@PathVariable Long id, Model model,
+    @GetMapping("/notice/{id}/{currentPage}")
+    public String showNoticeDetails(Model model,
+                                    @PathVariable Long id,
+                                    @PathVariable int currentPage,
                                     @RequestParam(defaultValue = "1") int page,
                                     @RequestParam(defaultValue = "10") int size) {
         Notice notice = noticeService.getNoticeById(id);
-        noticeService.prepareNoticeList(model, page, size);
         if (notice == null) {
             return "redirect:/admin/notice";
         }
-
         noticeService.incrementViewCount(notice);
 
-        Notice previousNotice = noticeService.getPreviousNotice(id);
-        Notice nextNotice = noticeService.getNextNotice(id);
+        String content = notice.getContent();
+        content = content.replace("\n", "<br/>");
 
+        model.addAttribute("currentPage", currentPage);
         model.addAttribute("notice", notice);
-        model.addAttribute("previousNotice", previousNotice);
-        model.addAttribute("nextNotice", nextNotice);
-
+        model.addAttribute("content", content);
         return "cs/noticeDetailAdmin";
     }
 
     @DeleteMapping("/notice/{id}")
     public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
-        boolean deleted = noticeService.deleteNoticeById(id);
-        if (deleted) {
-            return ResponseEntity.ok("삭제 완료");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제 실패");
-        }
+        return noticeService.deleteNoticeById(id)
+                ? ResponseEntity.ok("삭제 완료")
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제 실패");
+    }
+
+    @GetMapping("/notice/add")
+    public String addNotice() {
+        return "/cs/noticeAddAdmin";
+    }
+
+    @PostMapping("/notice/add")
+    public String addNotice(@ModelAttribute NoticeDTO noticeDTO, BindingResult result, Model model) {
+        model.addAttribute("urlLoad", "/admin/notice/add");
+        noticeService.NoticeSave(noticeDTO);
+        return "admin/admin_layout";
     }
 }

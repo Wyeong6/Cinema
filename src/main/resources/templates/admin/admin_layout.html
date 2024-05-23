@@ -306,6 +306,10 @@
             $('.container-xxl').load('admin_event_list.html');
         });
         // 공지사항 관리
+        $('.notice_reg_btn').on('click', function(e) {
+            e.preventDefault()
+            $('.container-xxl').load('/admin/notice/add');
+        });
         $('.notice_btn').on('click', function() {
             $('.container-xxl').load('/admin/notice');
         });

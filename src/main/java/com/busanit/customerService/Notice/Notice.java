@@ -3,6 +3,10 @@ package com.busanit.customerService.Notice;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(value = {AuditingEntityListener.class})
 public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +25,10 @@ public class Notice {
     private String title;
     @Size(max = 5000)
     private String content;
+    @CreatedDate
+    @Column(updatable = false)
     private LocalDate regDate;
+    @LastModifiedDate
     private LocalDate updatedDate;
     @Column(nullable = false, columnDefinition = "Int DEFAULT 0")
     private int viewCount = 0;

@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -50,7 +52,6 @@ public class NoticeService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Notice> noticePage = noticeRepository.findAllOrderedByPinnedAndId(pageable);
 
-
         return noticePage.map(noticeMapper::toNoticeDTO);
     }
 
@@ -82,10 +83,11 @@ public class NoticeService {
 
     public boolean deleteNoticeById(Long id) {
         Optional<Notice> noticeOptional = noticeRepository.findById(id);
-        if(noticeOptional.isPresent()) {
+        if (noticeOptional.isPresent()) {
             noticeRepository.deleteById(id);
-            return true;
+            return true; // Deletion successful
         }
-        return false;
+        return false; // Notice not found
     }
+
 }
