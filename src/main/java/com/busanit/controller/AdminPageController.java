@@ -109,8 +109,10 @@ public String eventList(Model model, @RequestParam(defaultValue = "0") int page,
     System.out.println("삭제컨트롤");
 
         eventService.delete(eventId);
-        return "redirect:/admin/eventList";
+//        return "redirect:/admin/eventList";
+    return "admin/admin_layout";
     }
+
 
     @PostMapping("/help")
     public String help(){ return "admin/adminHelpPage"; }

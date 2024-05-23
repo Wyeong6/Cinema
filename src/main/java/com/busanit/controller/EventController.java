@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class EventController {
 
     private final EventService eventService;
-    @GetMapping("/eventList")
+    @GetMapping("/event/eventList")
     public String eventList(Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "8") int size) {
         Page<EventDTO> eventDTO = eventService.getEventList(page, size);
 

@@ -48,8 +48,10 @@ public class Event{
 
 
     public void addMember(Member member) {
+        if (this.members == null) {
+            this.members = new ArrayList<>();
+        }
         this.members.add(member);
-        member.getEvents().add(this);
     }
     public List<Member> getMembers() {
         if (this.members == null) {

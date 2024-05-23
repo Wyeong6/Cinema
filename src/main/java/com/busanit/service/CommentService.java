@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -56,5 +57,12 @@ public class CommentService {
     //평균평점
     public Double getAverageRating(String movieId){
         return commentRepository.findAvgRatingByMovieId(Long.valueOf(movieId));
+    }
+
+    public Boolean hasCommented(String memberEmail , Long movieId){
+
+        Optional<Comment> comment = commentRepository.findCommentByMemberEmailAndMovieMovieId(memberEmail, movieId);
+        return comment.isPresent();
+
     }
 }

@@ -23,15 +23,10 @@ public class EventService {
 
 
 
-        System.out.println("eventDTO.getMemberEmail()  " + eventDTO.getMemberEmail());
-
-        Event event = eventRepository.findById(eventDTO.getId())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 eventId: " + eventDTO.getId()));
-
         Member member = memberRepository.findByEmail(eventDTO.getMemberEmail())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 member 이메일: " + eventDTO.getMemberEmail()));
 
-        event.addMember(member); // 이벤트에 회원 추가
+
 
 //        Member member = memberRepository.findByEmail(eventDTO.getMemberEmail())
 //                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 memberId: " + eventDTO.getMemberEmail()));
@@ -39,7 +34,8 @@ public class EventService {
 //        Event event = Event.toEntity(eventDTO);
 //
 //        member.addEvent(event);
-
+        Event event = Event.toEntity(eventDTO);
+        event.addMember(member); // 이벤트에 회원 추가
         eventRepository.save(event);
     }
 

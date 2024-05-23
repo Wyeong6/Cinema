@@ -461,26 +461,45 @@
 
         const movieId = $('#movieId').val();
 
-        //
-        // const movieId = [[${movieId}]]
-        //
         fetchMovieCredits(movieId);
 
         // 리뷰 작성 모달을 팝업 창으로 열기
         function openReviewModal() {
+            var member = JSON.parse(sessionStorage.getItem("userInfo"));
 
-            var memberEmail = JSON.parse(sessionStorage.getItem("userInfo"));
-            if(memberEmail == null){
+            if(member == null){
                 alert("로그인 후 이용해주세요.");
                 return;
+            }else {
+                var MemberEmail = member.email;
             }
-            var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=400');
-            var checkWindowClosed = setInterval(function () {
-                if (reviewWindow.closed) {
-                    clearInterval(checkWindowClosed);
-                    loadComments();
+            console.log(member)
+            console.log(MemberEmail);
+
+            // 댓글 작성 여부 확인
+            $.ajax({
+                url: `/movies/hasCommented/${MemberEmail}/${movieId}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(hasCommented) {
+                    console.log("hasCommented 값:", hasCommented);
+
+                    if (hasCommented) {
+                        alert("이미 댓글을 작성하셨습니다.");
+                    } else {
+                        var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=400');
+                        var checkWindowClosed = setInterval(function () {
+                            if (reviewWindow.closed) {
+                                clearInterval(checkWindowClosed);
+                                loadComments();
+                            }
+                        }, 500); // 0.5초마다 상태 확인
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("댓글 작성 여부를 확인하는 중 오류가 발생했습니다:", error);
                 }
-            }, 500); // 0.5초마다 상태 확인
+            });
         }
 
         //            댓글리스트    --------------------------------------------------
@@ -498,6 +517,7 @@
                 method: 'GET',
                 dataType: 'json',
                 success: (data) => {
+                    console.log(data)
                     //평점
                     const movieDataSection = $('.movie_data_averageRating');
                     movieDataSection.html(`<h4>평점</h4><p>${data.averageRating !== null ? data.averageRating : 0}</p>`);
@@ -514,6 +534,7 @@
                 }
             });
         };
+
         //이메일 처리
         function maskEmail(email) {
             const atIndex = email.indexOf('@');
