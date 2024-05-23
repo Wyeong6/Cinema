@@ -8,7 +8,12 @@ import com.busanit.entity.Snack;
 import com.busanit.service.SnackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +27,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@Slf4j
 public class AdminPageController {
 
     private final SnackService snackService;
@@ -35,7 +41,7 @@ public class AdminPageController {
     /*기존 adminPage 삭제예정*/
     @GetMapping("/adminMain2")
     public String adminMain2(){
-        return "testAdminMain";
+        return "admin/testAdminMain";
     }
 
     @PostMapping("/movie")
@@ -49,7 +55,38 @@ public class AdminPageController {
     }
 
     @GetMapping("/snackList")
-    public String snackList() { return "admin/admin_snack_list"; }
+    public String snackList(Model model,
+                            @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<SnackDTO> snackDTOList = null;
+
+        snackDTOList = snackService.getSnackList(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() -5);
+        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() +5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_snack_list";
+    }
+
+    @PostMapping("/snackList")
+    public String snackList(@RequestParam(name = "page", defaultValue = "0") int page,
+                            Model model,
+                            @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<SnackDTO> snackDTOList = null;
+
+        snackDTOList = snackService.getSnackList(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "/admin/admin_snack_list";
+    }
+
 
     @GetMapping("/snackRegister")
     public String snackRegister() { return "admin/admin_snack_register"; }
