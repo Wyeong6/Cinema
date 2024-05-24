@@ -1,8 +1,13 @@
 package com.busanit.controller;
 
+import com.busanit.domain.SnackDTO;
 import com.busanit.service.PaymentService;
+import com.busanit.service.SnackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final SnackService snackService;
 
     @Value("${html5_inicis_key}")
     private String html5InicisKey;
@@ -33,8 +39,16 @@ public class PaymentController {
 
     // 스낵 cart
     @GetMapping("/cartList")
-    public String cartList(Model model) {
+    public String cartList(Model model, @PageableDefault(size = 6) Pageable pageable) {
+
+        // 스낵 추천 리스트(랜덤)
+        Page<SnackDTO> snackDTOList = null;
+        snackDTOList = snackService.getSnackListRandom(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        // 결제
         model.addAttribute("html5InicisKey", html5InicisKey);
+
         return "payment/cart_list";
     }
 
