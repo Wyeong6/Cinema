@@ -39,7 +39,7 @@ public class SnackController {
     }
 
     @GetMapping("/detail")
-    public String detail(Long id, Model model, @PageableDefault(size = 3) Pageable pageable) {
+    public String detail(Long id, Model model, @PageableDefault(size = 4) Pageable pageable) {
 
         SnackDTO snackDTO = snackService.get(id);
         model.addAttribute("snack", snackDTO);

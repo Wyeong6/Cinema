@@ -43,12 +43,6 @@
         <!-- info -->
         <div id="info" th:data-username="${#authentication.name}">
             <ul>
-                <li sec:authorize="hasRole('USER')">
-                    <span sec:authentication="name"/> 님 환영합니다.
-                </li>
-                <li sec:authorize="hasRole('ADMIN')">
-                    <a th:href="@{/admin/adminMain}" th:text="'관리자 페이지'"></a>
-                </li>
                 <li sec:authorize="isAnonymous()">
                     <a href="/member/new">회원가입</a>
                 </li>
@@ -57,6 +51,12 @@
                 </li>
                 <li sec:authorize="isAuthenticated()">
                     <a href="/member/logout">로그아웃</a>
+                </li>
+                <li sec:authorize="hasRole('USER')">
+                    <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
+                </li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/adminMain}" th:text="'관리자페이지'"></a>
                 </li>
                 <li><a href="/payment/cartList">장바구니</a></li>
             </ul>

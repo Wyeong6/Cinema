@@ -90,6 +90,9 @@
                                             <li>
                                                 <a class="info_edit_btn">개인정보수정</a>
                                             </li>
+                                            <li th:if="${formUser == 'formUser'}">
+                                                <a class="password_edit_btn">비밀번호수정</a>
+                                            </li>
                                             <li>
                                                 <a class="cancel_btn">회원탈퇴</a>
                                             </li>
@@ -141,6 +144,10 @@
         // 개인정보수정 버튼 클릭 이벤트 설정
         $('#sidebar').on('click', '.info_edit_btn', function() {
             $('#content').load('/mypage/infoEdit');
+        });
+        // 비밀번호수정 버튼 클릭 이벤트
+        $('#sidebar').on('click', '.password_edit_btn', function() {
+            $('#content').load('/mypage/passwordEdit');
         });
         // 회원탈퇴 버튼 클릭 이벤트 설정
         $('#sidebar').on('click', '.cancel_btn', function() {

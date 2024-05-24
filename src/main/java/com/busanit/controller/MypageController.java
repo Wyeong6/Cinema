@@ -1,7 +1,11 @@
 package com.busanit.controller;
 
+import com.busanit.domain.FormMemberDTO;
+import com.busanit.domain.OAuth2MemberDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -11,8 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MypageController {
 
     @GetMapping("/")
-    public String mypage() {
-
+    public String mypage(@AuthenticationPrincipal Object principal, Model model) {
+        // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
+        if(principal instanceof OAuth2MemberDTO) {
+            OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
+            model.addAttribute("socialUser", "socialUser");
+        } else if(principal instanceof FormMemberDTO) {
+            FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
+            model.addAttribute("formUser", "formUser");
+        }
         return "/layout/layout_mypage";
     }
 
@@ -52,6 +63,12 @@ public class MypageController {
     public String mypageEdit() {
 
         return "/mypage/mypage_private_info";
+    }
+
+    @GetMapping("/passwordEdit")
+    public String mypagePasswordEdit() {
+
+        return "/mypage/mypage_private_password";
     }
 
 }
