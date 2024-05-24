@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'MyCustomFont';
-    src: url('/static/assets/css/font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
+    src: url('font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
 
 #header {
@@ -317,7 +317,7 @@
 }
 #stillcut p, #reviews > #showMore_review, #reviews > #showLess_review {
     text-align: center;
-}
+ }
 
 /* 현재 상영작 페이지*/
 .list {
@@ -619,4 +619,152 @@ article#pay > button {
 }
 .info_submit_box button:first-child:hover {
     background: #e5e5e5;
+}
+
+/* 마이페이지 */
+.mypage_nav {
+    padding-left: 0;
+    width: 80%;
+    background: #e5e5e5;
+    cursor: pointer;
+}
+.mypage_nav ul, li {
+    padding-left: 0;
+    list-style-type: none;
+}
+.mypage_nav nav > ul > li > a {
+    font-weight: 700;
+    text-decoration-color: #e5e5e5;
+}
+.mypage_nav ul, li > ul > li {
+    padding: 0.5em 1em;
+}
+.mypage_nav ul > li li {
+    padding: 0;
+}
+.mypage_nav li li:hover {
+    font-weight: 700;
+}
+#mypage_main .user_info {
+    margin: 2em 0;
+    padding: 2em 2em;
+    display: flex;
+    justify-content: space-between;
+    background: #fafafa;
+    border-radius: 1em;
+}
+#mypage_main .user_info img {
+    width: 5em;
+    height: auto;
+    margin-right: 2em;
+}
+#mypage_main .user_info button {
+    background: #e5e5e5;
+    color: #3B353C;
+}
+#mypage_main .user_info > div {
+    display: flex;
+    flex-direction: row;
+}
+#mypage_main .user_info .point p {
+    margin-right: 1em;
+}
+.history header {
+    display: flex;
+    justify-content: space-between;
+}
+.history header div{
+    display: flex;
+    flex-direction: row;
+}
+.history header p {
+    margin-left: 10px;
+    font-size: 16px;
+}
+.history header > a {
+    margin-left: 10px;
+    font-size: 16px;
+}
+.history_data {
+    display: flex;
+    flex-direction: row;
+    border: 3px solid #e5e5e5;
+    padding: 1em 2em;
+    border-radius: 1em;
+}
+.history_data img {
+    width: 5em;
+    margin-right: 1em;
+}
+.history_data p {
+    margin-bottom: 0;
+}
+#mypage_main > section {
+    margin-top: 5em;
+}
+
+#mypage_membership .user_info {
+    margin: 2em 0;
+    padding: 2em 2em;
+    text-align: center;
+    background: #fafafa;
+    border-radius: 1em;
+}
+#mypage_membership .user_info img {
+    width: 5em;
+    height: auto;
+    margin-right: 2em;
+}
+#mypage_membership .user_info p {
+    text-align: center;
+}
+#mypage_membership .user_info > div {
+    display: flex;
+    flex-direction: row;
+}
+#mypage_membership .user_info .point p {
+    margin-right: 1em;
+}
+#mypage_membership h3 {
+    margin-top: 2em;
+    margin-bottom: 1em;
+}
+#mypage_membership table td {
+    text-align: center;
+}
+#mypage_point hr {
+    top:0;
+    margin-bottom: 1em;
+}
+#mypage_point section header p {
+    margin-bottom: 1em;
+    text-align: right;
+    font-size: 1.5em;
+}
+#mypage_point table td {
+    display: flex;
+    justify-content: space-between;
+}
+#mypage_point table td {
+    display: flex;
+    justify-content: space-between;
+}
+#mypage_point td div:first-child p {
+    text-align: left;
+}
+#mypage_point td div:last-child p {
+    text-align: right;
+}
+#mypage_review th, td {
+    text-align: center;
+}
+#mypage_review td img{
+    /* 이미지 세로 중앙 정렬*/
+    vertical-align: middle;
+}
+#mypage_private_info td {
+    text-align: left;
+}
+#mypage_private_info ul li {
+    list-style-type: disc;
 }
