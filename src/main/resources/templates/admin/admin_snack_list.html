@@ -47,7 +47,9 @@
                 <td th:text="${snack.snack_price} + '원'"></td>
                 <td th:text="${snack.snack_stock}"></td>
                 <td style="text-align: right; width: 50px;">
-                    <img alt="상품 수정 버튼" src="/images/edit.png" style="width: 24px; height: auto; margin-right: 20px;"/>
+                    <img alt="상품 수정 버튼" src="/images/edit.png"
+                         style="width: 24px; height: auto; margin-right: 20px;"
+                         th:onclick="'editItem(' + ${snack.id} + ', ' + ${snackList.pageable.pageNumber} + ')'"/>
                     <img alt="상품 삭제 버튼" src="/images/delete.png"
                          style="width: 24px; height: auto; margin-right: 15px;"
                          th:onclick="'removeItem(' + ${snack.id} + ', ' + ${snackList.pageable.pageNumber} + ')'"/>
@@ -91,12 +93,13 @@
             <li th:classappend="${snackList.pageable.pageNumber == 0} ? 'disabled'">
                 <a href="javascript:void(0);" th:onclick="'saveUrl(' + (${snackList.pageable.pageNumber} - 1) + ')'">Previous</a>
             </li>
-            <li th:each="page : ${#numbers.sequence(startPage, endPage)}"
-                th:classappend="${page == snackList.pageable.pageNumber + 1} ? 'disabled'">
+            <li th:classappend="${page == snackList.pageable.pageNumber + 1} ? 'disabled'"
+                th:each="page : ${#numbers.sequence(startPage, endPage)}">
                 <a href="javascript:void(0);" th:onclick="'saveUrl(' + (${page} - 1) + ')'"
                    th:text="${page}">1</a>
             </li>
-            <li id="pagingLi" th:classappend="${snackList.totalPages == snackList.pageable.pageNumber + 1} ? 'disabled'">
+            <li id="pagingLi"
+                th:classappend="${snackList.totalPages == snackList.pageable.pageNumber + 1} ? 'disabled'">
                 <a href="javascript:void(0);" th:onclick="'saveUrl(' + (${snackList.pageable.pageNumber} + 1) + ')'">Next</a>
             </li>
             <li th:classappend="${snackList.last} ? 'disabled'">
@@ -115,7 +118,7 @@
 <script>
     function saveUrl(page) {
         // 클릭된 요소가 'disabled' 클래스를 가지고 있는지 확인
-        if ($("li.disabled a").is(event.target)) {
+        if($("li.disabled a").is(event.target)) {
             return; // 'disabled' 클래스가 있으면 함수를 종료
         }
 
@@ -133,10 +136,28 @@
         });
     }
 
+    function editItem(snackItemId, page) {
+        $.ajax({
+            type: 'GET',
+            url: '/admin/snackEdit',
+            data: {
+                snackItemId: snackItemId,
+                page: page
+            },
+            success: function(response) {
+                $('.container-xxl').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error admin-snackList snackEdit button :', error);
+            }
+        })
+
+    }
+
     function removeItem(snackItemId, page) {
         var isConfirmed = confirm("정말 삭제하시겠습니까?"); // '정말 삭제하시겠습니까?' 알림창 표시
 
-        if (isConfirmed) { // 확인
+        if(isConfirmed) { // 확인
             $.ajax({
                 type: 'POST',
                 url: '/admin/snackDelete',

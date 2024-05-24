@@ -107,6 +107,30 @@ public class AdminPageController {
         return "admin/admin_layout";
     }
 
+    @GetMapping("/snackEdit")
+    public String snackEdit(@RequestParam(name = "page", defaultValue = "0") int page,
+                              @RequestParam(name = "snackItemId") long snackItemId,
+                              Model model,
+                              @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                              SnackDTO snackDTO){
+
+        SnackDTO snackDTO2 = snackService.get(snackItemId);
+
+        Page<SnackDTO> snackDTOList = null;
+
+        snackDTOList = snackService.getSnackList(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        model.addAttribute("snack", snackDTO2);
+
+        return "/admin/admin_snack_edit";
+    }
+
     @PostMapping("/snackDelete")
     public String snackDelete(@RequestParam(name = "page", defaultValue = "0") int page,
                               @RequestParam(name = "snackItemId") long snackItemId,
