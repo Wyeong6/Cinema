@@ -12,6 +12,11 @@
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+<style>
+    a#movie_title:hover ~ hr {
+        visibility: hidden; /* <hr> 태그 숨기기 */
+    }
+</style>
 </head>
 
 <body class="homepage is-preload">
@@ -26,26 +31,18 @@
         <div class="inner">
             <header>
                 <h1><a href="index.html" id="movie_title">Movie Title</a></h1>
-                <hr />
+                <hr id="main_hr" />
                 <p>Another fine freebie by HTML5 UP</p>
             </header>
             <footer>
                 <a href="#banner" class="button circled scrolly">예매</a>
-                <a class="button circled scrolly" id="videoButton">비디오</a>
+<!--                <a class="button circled scrolly" id="videoButton">비디오</a>-->
             </footer>
         </div>
-
-
 
         <!-- info -->
         <div id="info" th:data-username="${#authentication.name}">
             <ul>
-                <li sec:authorize="hasRole('USER')">
-                    <span sec:authentication="name"/> 님 환영합니다.
-                </li>
-                <li sec:authorize="hasRole('ADMIN')">
-                    <a th:href="@{/admin/adminMain}" th:text="'관리자 페이지'"></a>
-                </li>
                 <li sec:authorize="isAnonymous()">
                     <a href="/member/new">회원가입</a>
                 </li>
@@ -54,6 +51,12 @@
                 </li>
                 <li sec:authorize="isAuthenticated()">
                     <a href="/member/logout">로그아웃</a>
+                </li>
+                <li sec:authorize="hasRole('USER')">
+                    <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
+                </li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/adminMain}" th:text="'관리자페이지'"></a>
                 </li>
                 <li><a href="/payment/cartList">장바구니</a></li>
             </ul>
@@ -84,11 +87,11 @@
         </nav>
 
         <div id="img_btn">
-            <button class="btn clicked" onclick="changeBackgroundAndTitle(0)">1</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(1)">2</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(2)">3</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(3)">4</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(4)">5</button>
+            <button class="btn clicked" onclick="changeBackgroundAndTitle(0)">01</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(1)">02</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(2)">03</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(3)">04</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(4)">05</button>
         </div>
 
     </div>

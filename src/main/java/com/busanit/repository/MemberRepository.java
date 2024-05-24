@@ -15,6 +15,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 중복 회원 검사
     Optional<Member> findByEmail(String email);
 
+    // (비밀번호 변경시) 기존 비밀번호 확인용
+    @Query("SELECT m.password FROM Member m WHERE m.email = :email")
+    String findByPassword(String email);
+
     // 사용자 email 로 member_id 찾기
     @Query("SELECT m.id FROM Member m WHERE m.email = :email")
     Long findUserIdx(String email);
