@@ -23,9 +23,12 @@ public class ReactionController {
     private final MovieRepository movieRepository;
 
 
-    ////// 멤버아이디 동적으로 가져와야함
-    ////// 숫자 실시간으로 변하는거 해야함
-    ////// 연결되는 링크 해결해야함
+    ////// 멤버아이디 동적으로 가져와야함 - 해결
+    ////// 숫자 실시간으로 변하는거 해야함 - 해결
+    ////// 연결되는 링크 해결해야함 -
+    ////// 새로고침했을때 다시 눌러지는거 해결해야함 -
+    ////// 로그인안하고 눌렀을때 로그인하라고 모달띄워야함 -
+
     @GetMapping("/movie/{movieId}")
     @ResponseBody
     public Map<String, Long> getMovieReaction(@PathVariable Long movieId) {
@@ -46,7 +49,7 @@ public class ReactionController {
     public ResponseEntity<String> addReaction(@RequestBody ReactionRequest reactionRequest) {
         try {
             ReactionType enumReactionType = ReactionType.valueOf(reactionRequest.getReactionType().toUpperCase());
-            reactionService.addReaction(reactionRequest.getMemberId(), reactionRequest.getMovieId(), enumReactionType);
+            reactionService.addReaction(reactionRequest.getUserEmail(), reactionRequest.getMovieId(), enumReactionType);
             return ResponseEntity.ok("Reaction added successfully");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Invalid reaction type");
@@ -58,17 +61,34 @@ public class ReactionController {
     @PostMapping("/remove")
     public ResponseEntity<String> removeReaction(@RequestBody ReactionRequest reactionRequest) {
 
-        Long memberId = reactionRequest.getMemberId();
+        String userEmail = reactionRequest.getUserEmail();
         Long movieId = reactionRequest.getMovieId();
-        String reactionType = reactionRequest.getReactionType();
 
         try {
-            reactionService.removeReaction(memberId, movieId);
+            reactionService.removeReaction(userEmail, movieId);
             return ResponseEntity.ok("Reaction removed successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while removing the reaction");
         }
     }
+
+    @GetMapping("/getCurrentReaction")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> getCurrentReaction(@RequestParam String userEmail, @RequestParam Long movieId) {
+        try {
+            String reactionType = reactionService.getCurrentReaction(userEmail, movieId);
+            Map<String, String> response = new HashMap<>();
+            response.put("reactionType", reactionType);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+
+
+
 
 
     // ReactionRequest DTO 클래스
@@ -76,7 +96,7 @@ public class ReactionController {
     @Getter
     public static class ReactionRequest {
         // Getters and setters
-        private Long memberId;
+        private String userEmail;
         private Long movieId;
         private String reactionType;
     }

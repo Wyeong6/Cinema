@@ -71,9 +71,16 @@ public class MovieController {
     @GetMapping("/movies/{movieId}")
     public String movieDetailinfo(@PathVariable("movieId") Long movieId, Model model) {
         List<MovieDTO> movieInfos = movieService2.getMovieDetailInfo(movieId);
+        String userEmail = movieService2.getUserEmail();
 //        List<MovieDTO> upcomingInfos = movieService2.getMovieDetailInfo(movieId);
         model.addAttribute("movieInfos", movieInfos);
         model.addAttribute("movieId", movieId);
+        model.addAttribute("userEmail", userEmail);
+
+        System.out.println("movie_get으로 넘어갈때 들고가는것들------------------------------------");
+        System.out.println("movieInfos = " + movieInfos);
+        System.out.println("movieId = " + movieId);
+        System.out.println("userEmail = " + userEmail);
 //        model.addAttribute("upcoming",)
         return "movie/movie_get";
     }
