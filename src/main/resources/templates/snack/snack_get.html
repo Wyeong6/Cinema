@@ -1,9 +1,4 @@
 <!DOCTYPE HTML>
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html lang="en"
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -29,7 +24,7 @@
         <div class="wrapper style1 snack_get list">
 
             <div class="container">
-                <article class="special" id="main">
+                <article class="special" id="main snack_get_main">
                     <header>
                         <h2>
                             <a href="#" th:text="${snack.snack_nm}"></a>
@@ -37,10 +32,14 @@
                         <p th:text="${snack.snack_detail}"></p>
                     </header>
                     <section id="snack_get_section">
-                        <a class="image featured" href="#">
-                            <img th:alt="${snack.snack_alt}"
-                                 th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
-                        </a>
+                        <div class="snack_image">
+                            <a class="image featured" href="#">
+                                <img th:alt="${snack.snack_alt}"
+                                     th:src="@{/images/menu/{image}(image=${snack.snack_image})}" class="snack_get_img"/>
+                            </a>
+                            <canvas class="canvas" style="display: none"></canvas>
+                        </div>
+
                         <table class="default">
                             <tr>
                                 <td>구성품</td>
@@ -82,7 +81,7 @@
                 <div>
                     <h3 style="font-size: 40px; margin-bottom: 1em">추천 상품</h3>
                     <div class="row">
-                        <article class="col-4 col-12-mobile special" th:each="snack : ${snackList}">
+                        <article class="col-3 col-12-mobile special" th:each="snack : ${snackList}">
                             <a class="image featured" th:href="@{/snack/detail(id=${snack.id})}">
                                 <img th:alt="${snack.snack_alt}"
                                      th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
@@ -124,8 +123,8 @@
         // 주문 수량 count + 합계
         document.addEventListener("DOMContentLoaded", function() {
             const countElement = document.getElementById("countValue");
-            const discountButton = document.getElementById("discount");
             const upcountButton = document.getElementById("upcount");
+            const discountButton = document.getElementById("discount");
             const totalPriceElement = document.getElementById("total_price");
             const snackPriceElement = document.getElementById("snackPrice");
 
@@ -139,11 +138,24 @@
                 currentCount = count; // 현재 count를 전역 변수에 저장
             }
 
+            function updateDiscountButtonState() {
+                if (count > 1) {
+                    discountButton.removeAttribute("disabled"); // disabled 속성 제거
+                    discountButton.classList.remove("disabled"); // disabled 클래스 제거
+                    discountButton.classList.add("hover"); // hover 클래스 추가
+                } else {
+                    discountButton.setAttribute("disabled", true); // disabled 속성 추가
+                    discountButton.classList.add("disabled"); // disabled 클래스 추가
+                    discountButton.classList.remove("hover"); // hover 클래스 제거
+                }
+            }
+
             discountButton.addEventListener("click", function() {
-                if(count > 1) {
+                if (count > 1) {
                     count--;
                     countElement.textContent = count;
                     updateTotalPrice();
+                    updateDiscountButtonState(); // 버튼 상태 업데이트
                 }
             });
 
@@ -151,10 +163,12 @@
                 count++;
                 countElement.textContent = count;
                 updateTotalPrice();
+                updateDiscountButtonState(); // 버튼 상태 업데이트
             });
 
             // 초기 총 합계 설정
             updateTotalPrice();
+            updateDiscountButtonState(); // 버튼 상태 업데이트
         });
 
         <!-- 결제 프로그램 관련 시작 -->
@@ -276,6 +290,51 @@
                     };
                     xhttp.open('GET', includePath, true);
                     xhttp.send();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const imgs = document.getElementsByClassName('snack_get_img');
+            const divs = document.getElementsByClassName('image');
+
+            Array.from(imgs).forEach((img, index) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    // Draw the image onto the canvas
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                    const pixelData = ctx.getImageData(0, 0, img.width, img.height).data;
+
+                    const colorCounts = {};
+                    let maxCount = 0;
+                    let dominantColor = '';
+
+                    // Analyze the image data
+                    for (let i = 0; i < pixelData.length; i += 4) {
+                        const color = `rgb(${pixelData[i]}, ${pixelData[i+1]}, ${pixelData[i+2]})`;
+                        if (!colorCounts[color]) {
+                            colorCounts[color] = 0;
+                        }
+                        colorCounts[color]++;
+                        if (colorCounts[color] > maxCount) {
+                            maxCount = colorCounts[color];
+                            dominantColor = color;
+                        }
+                    }
+
+                    // Set the background color
+                    divs[index].style.backgroundColor = dominantColor;
+                };
+
+                // Ensure the onload event fires for cached images too
+                if (img.complete) {
+                    img.onload();
                 }
             });
         });
