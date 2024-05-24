@@ -14,7 +14,8 @@
             <tr th:each="notice : ${noticeList}">
                 <td th:text="${notice.pinned ? '!' : notice.id}"></td>
                 <td><i class="fab fa-angular fa-lg text-danger me-3"></i>
-                    <a href="javascript:void(0);" class="menu-link notice_btn" th:text="${notice.title}" th:data-id="${notice.id}" th:data-page="${currentPage}"></a>
+                    <a href="javascript:void(0);" class="menu-link notice_btn"
+                       th:text="${notice.title}" th:data-id="${notice.id}" th:data-page="${currentPage}"></a>
                 </td>
                 <td th:text="${notice.viewCount}"></td>
                 <td th:text="${notice.regDate}"></td>
@@ -54,21 +55,29 @@
 
 <script th:inline="javascript">
     $(document).ready(function() {
-        // 작성
-        $('.add-notice').on('click', function() {
-            $('.container-xxl').load(`/admin/notice/add`);
-        });
-
+        // // 작성
+        // $('.add-notice').on('click', function() {
+        //     $('.container-xxl').load(`/admin/notice/add`);
+        // });
 
         // 공지사항 상세페이지
         $('.notice_btn').on('click', function() {
-            var noticeId = $(this).data('id');
-            var currentPage = $(this).data('page');
-            // 쿼리 매개변수를 포함한 URL 생성
-            var url = `/admin/notice/` + noticeId + `/` + currentPage;
+            const noticeId = this.getAttribute('data-id');
+            const currentPage = this.getAttribute('data-page'); // 현재 페이지 값 가져오기
 
-            // 해당 URL로 페이지를 불러옴
-            $('.container-xxl').load(url);
+            console.log("현재 게시물의 이전 페이지 값 ", currentPage);
+
+            // AJAX 요청을 통해 페이지를 불러옴
+            $.ajax({
+                type: "GET",
+                url: `/admin/notice/${noticeId}`, // URL에는 id만 포함
+                data: { currentPage: currentPage }, // 추가 매개변수로 currentPage 값 전달
+                success: function(response) {
+                    $('.container-xxl').html(response); // 성공 시 페이지 콘텐츠를 업데이트
+                },
+                error: function(xhr, status, error) {
+                }
+            });
         });
 
         // 파람으로 코드 압축. 계속 참고.
@@ -104,14 +113,5 @@
 
         goPage(page, 10);
     }
-
-    /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
-    $(document).ready(function() {
-        var urlLoad = [[${urlLoad}]];
-        if(urlLoad != null) {
-            // 페이지가 로드될 때 실행되는 코드
-            $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
-        }
-    });
 
 </script>

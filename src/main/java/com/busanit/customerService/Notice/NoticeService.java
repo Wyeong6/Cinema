@@ -1,6 +1,8 @@
 package com.busanit.customerService.Notice;
 
 import com.busanit.customerService.util.PaginationUtil;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +33,18 @@ public class NoticeService {
     public void NoticeSave(NoticeDTO noticeDTO) {
         Notice notice = noticeMapper.toNotice(noticeDTO);
         noticeRepository.save(notice);
+    }
+
+    @Transactional
+    public void NoticeMod(Long id, NoticeDTO noticeDTO) {
+        Notice notice = noticeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Notice not found"));
+        if (notice != null) {
+            // 수정된 내용을 엔티티에 반영합니다.
+            notice.setTitle(noticeDTO.getTitle());
+            notice.setContent(noticeDTO.getContent());
+            notice.setPinned(noticeDTO.isPinned());
+            noticeRepository.save(notice);
+        }
     }
 
     public NoticeDTO findById(Long id) {

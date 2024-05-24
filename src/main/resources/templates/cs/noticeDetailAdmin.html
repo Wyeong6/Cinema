@@ -14,10 +14,15 @@
             <td th:text="${notice.regDate}"></td>
         </tr>
         </tbody>
-        <tr>
-            <td>내용</td>
-            <td colspan="2" th:text="${notice.content}"></td>
-        </tr>
+        <thead>
+            <th>내용</th>
+        </thead>
+        <tbody>
+            <th colspan="2">
+                <pre th:text="${notice.content}"></pre>
+            </th>
+        </tbody>
+
 
     </table>
 
@@ -38,7 +43,7 @@
 
     <div>
         <a href="javascript:void(0);" class="back-notice" th:data-id="${notice.id}" th:data-page="${currentPage}">돌아가기</a>
-        <a>수정</a>
+        <a href="javascript:void(0);" class="mod-notice" th:data-id="${notice.id}" th:data-page="${currentPage}">수정</a>
         <a href="javascript:void(0);" class="delete-notice" th:data-id="${notice.id}" th:data-page="${currentPage}">삭제</a>
     </div>
 
@@ -47,27 +52,51 @@
 
 <script th:inline="javascript">
     $(document).ready(function() {
-        $('.back-notice').on('click', function() {
-            const previousPage = this.getAttribute('data-page');
-            $('.container-xxl').load(`/admin/notice?page=${previousPage}`);
+
+        $(document).on('click', '.back-notice', function() {
+            const currentPage = this.getAttribute('data-page');
+            console.log("돌아가기 버튼의 이전 페이지 값 ", currentPage)
+            $('.container-xxl').load(`/admin/notice?page=${currentPage}`);
         });
+
+        $(document).on('click', '.mod-notice', function() {
+            const noticeId = this.getAttribute('data-id');
+            const currentPage = this.getAttribute('data-page')
+            console.log("수정 버튼의 이전 페이지 값 ", currentPage)
+            modNotice(noticeId, currentPage);
+        });
+
+        function modNotice(noticeId, currentPage) {
+            $.ajax({
+                type: "GET",
+                url: `/admin/notice/mod/${noticeId}?page=${currentPage}`, // URL에는 noticeId만 포함
+                data: { currentPage: currentPage }, // 추가 매개변수로 currentPage 값 전달
+                success: function(response) {
+                    $('.container-xxl').load(`/admin/notice/mod/${noticeId}?page=${currentPage}`);
+                },
+                error: function(xhr, status, error) {
+                    alert('공지사항 수정 중 오류가 발생했습니다.');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+
 
 
         $('.delete-notice').on('click', function() {
             const noticeId = this.getAttribute('data-id');
-            const previousPage = this.getAttribute('data-page');
-            deleteNotice(noticeId, previousPage);
+            const currentPage = this.getAttribute('data-page');
+            deleteNotice(noticeId, currentPage);
         });
 
-        function deleteNotice(noticeId, previousPage) {
+        function deleteNotice(noticeId, currentPage) {
             $.ajax({
                 url: '/admin/notice/' + noticeId,
                 type: 'DELETE',
                 success: function(response) {
                     alert('공지사항이 삭제되었습니다.');
                     // 성공적으로 삭제된 경우에는 필요한 작업 수행
-                    // window.location.href = `/admin/notice?page=${previousPage}`;
-                    $('.container-xxl').load(`/admin/notice?page=${previousPage}`);
+                    $('.container-xxl').load(`/admin/notice?page=${currentPage}`);
 
                 },
                 error: function(xhr, status, error) {

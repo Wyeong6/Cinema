@@ -7,6 +7,9 @@ import com.busanit.entity.Snack;
 import com.busanit.service.SnackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminPageController {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminPageController.class);
     private final SnackService snackService;
     private final NoticeService noticeService;
 
@@ -85,24 +89,19 @@ public class AdminPageController {
         return "/cs/noticeAdmin";
     }
 
-    @GetMapping("/notice/{id}/{currentPage}")
+    @GetMapping("/notice/{id}")
     public String showNoticeDetails(Model model,
                                     @PathVariable Long id,
-                                    @PathVariable int currentPage,
-                                    @RequestParam(defaultValue = "1") int page,
-                                    @RequestParam(defaultValue = "10") int size) {
+                                    @RequestParam(value = "currentPage", required = false) Integer currentPage) {
         Notice notice = noticeService.getNoticeById(id);
         if (notice == null) {
             return "redirect:/admin/notice";
         }
         noticeService.incrementViewCount(notice);
 
-        String content = notice.getContent();
-        content = content.replace("\n", "<br/>");
-
         model.addAttribute("currentPage", currentPage);
+
         model.addAttribute("notice", notice);
-        model.addAttribute("content", content);
         return "cs/noticeDetailAdmin";
     }
 
@@ -119,9 +118,35 @@ public class AdminPageController {
     }
 
     @PostMapping("/notice/add")
-    public String addNotice(@ModelAttribute NoticeDTO noticeDTO, BindingResult result, Model model) {
-        model.addAttribute("urlLoad", "/admin/notice/add");
-        noticeService.NoticeSave(noticeDTO);
+    public String addNotice(Model model,
+                            @RequestParam(value = "currentPage", required = false) Integer currentPage,
+                            NoticeDTO noticeDTO, BindingResult result) {
+        Long id = noticeDTO.getId();
+        if (id == null) {
+            noticeService.NoticeSave(noticeDTO);
+            model.addAttribute("urlLoad", "/admin/notice");
+        } else {
+            noticeService.NoticeMod(id, noticeDTO);
+            model.addAttribute("urlLoad", "/admin/notice/" + id + "?page=" + currentPage);
+            model.addAttribute("currentPage", currentPage);
+            System.out.println("수정 완료해서 보낼 때: " + currentPage);
+        }
+
         return "admin/admin_layout";
+    }
+
+    @GetMapping("/notice/mod/{id}")
+    public String modNotice(@PathVariable Long id, Model model,
+                            @RequestParam(value = "currentPage", required = false) Integer currentPage ) {
+        NoticeDTO noticeDTO = noticeService.findById(id);
+
+        model.addAttribute("id", id);
+        model.addAttribute("title", noticeDTO.getTitle());
+        model.addAttribute("content", noticeDTO.getContent());
+        model.addAttribute("pinned", noticeDTO.isPinned());
+        model.addAttribute("currentPage", currentPage);
+        System.out.println("수정 페이지로 들어갔을 때 " + currentPage);
+
+        return "cs/noticeAddAdmin";
     }
 }
