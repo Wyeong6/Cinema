@@ -54,11 +54,22 @@ public class SnackService {
     public SnackDTO get(Long id) {
 
         Snack snack = snackRepository.findById(id).orElseThrow(() -> new NullPointerException("snack null"));
+
         return SnackDTO.toDTO(snack);
     }
 
     // 스낵 저장(관리자 페이지)
     public void saveSnack(Snack snack) {
         snackRepository.save(snack);
+    }
+
+    // 스낵 수정(관리자 페이지)
+    public void editSnack(SnackDTO snackDTO){
+        snackRepository.save(Snack.toEntity(snackDTO));
+    }
+
+    // 스낵 삭제(관리자 페이지)
+    public void deleteSnack(long snackItemId){
+        snackRepository.deleteById(snackItemId);
     }
 }

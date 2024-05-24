@@ -34,6 +34,7 @@ public class Snack extends BaseTimeEntity {
 
     public static Snack toEntity(SnackDTO snackDTO) {
         return Snack.builder()
+                .id(snackDTO.getId())
                 .snack_nm(snackDTO.getSnack_nm())
                 .snack_image(snackDTO.getSnack_image())
                 .snack_alt(snackDTO.getSnack_alt())
