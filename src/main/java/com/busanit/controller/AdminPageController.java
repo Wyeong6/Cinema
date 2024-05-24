@@ -107,6 +107,28 @@ public class AdminPageController {
         return "admin/admin_layout";
     }
 
+    @PostMapping("/snackDelete")
+    public String snackDelete(@RequestParam(name = "page", defaultValue = "0") int page,
+                              @RequestParam(name = "snackItemId") long snackItemId,
+                              Model model,
+                              @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                              SnackDTO snackDTO){
+
+        snackService.deleteSnack(snackItemId);
+
+        Page<SnackDTO> snackDTOList = null;
+
+        snackDTOList = snackService.getSnackList(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "/admin/admin_snack_list";
+    }
+
     @PostMapping("/help")
     public String help(){ return "admin/adminHelpPage"; }
 

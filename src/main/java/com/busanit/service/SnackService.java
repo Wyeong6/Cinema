@@ -61,4 +61,9 @@ public class SnackService {
     public void saveSnack(Snack snack) {
         snackRepository.save(snack);
     }
+
+    // 스낵 삭제(관리자 페이지)
+    public void deleteSnack(long snackItemId){
+        snackRepository.deleteById(snackItemId);
+    }
 }
