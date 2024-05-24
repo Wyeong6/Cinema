@@ -37,6 +37,7 @@
                 <th>이름</th>
                 <th>가격</th>
                 <th>잔여 수량</th>
+                <th>수정 날짜</th>
             </tr>
             </thead>
             <tbody class="table-border-bottom-0">
@@ -46,6 +47,7 @@
                 </td>
                 <td th:text="${snack.snack_price} + '원'"></td>
                 <td th:text="${snack.snack_stock}"></td>
+                <td th:text="${#temporals.format(snack.getUpdateDate(), 'yyyy-MM-dd HH:mm:ss')}"></td> <!--java.time.LocalDateTime 객체를 Thymeleaf에서 원하는 형식으로 표시하려면 #temporals 유틸리티를 사용-->
                 <td style="text-align: right; width: 50px;">
                     <img alt="상품 수정 버튼" src="/images/edit.png"
                          style="width: 24px; height: auto; margin-right: 20px;"
@@ -142,7 +144,6 @@
             url: '/admin/snackEdit',
             data: {
                 snackItemId: snackItemId,
-                page: page
             },
             success: function(response) {
                 $('.container-xxl').html(response);

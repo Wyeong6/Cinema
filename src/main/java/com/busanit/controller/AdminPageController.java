@@ -56,14 +56,14 @@ public class AdminPageController {
 
     @GetMapping("/snackList")
     public String snackList(Model model,
-                            @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+                            @PageableDefault(size = 15, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<SnackDTO> snackDTOList = null;
 
         snackDTOList = snackService.getSnackList(pageable);
         model.addAttribute("snackList", snackDTOList);
 
-        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() -5);
-        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() +5);
+        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() + 5);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
 
@@ -73,7 +73,7 @@ public class AdminPageController {
     @PostMapping("/snackList")
     public String snackList(@RequestParam(name = "page", defaultValue = "0") int page,
                             Model model,
-                            @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+                            @PageableDefault(size = 15, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<SnackDTO> snackDTOList = null;
 
         snackDTOList = snackService.getSnackList(pageable);
@@ -89,7 +89,9 @@ public class AdminPageController {
 
 
     @GetMapping("/snackRegister")
-    public String snackRegister() { return "admin/admin_snack_register"; }
+    public String snackRegister() {
+        return "admin/admin_snack_register";
+    }
 
     @PostMapping("/snackRegister")
     public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult, Model model) {
@@ -99,7 +101,7 @@ public class AdminPageController {
             return "admin/admin_snack_register";
         }
         try {
-        snackService.saveSnack(Snack.toEntity(snackDTO));
+            snackService.saveSnack(Snack.toEntity(snackDTO));
         } catch(IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }
@@ -108,27 +110,23 @@ public class AdminPageController {
     }
 
     @GetMapping("/snackEdit")
-    public String snackEdit(@RequestParam(name = "page", defaultValue = "0") int page,
-                              @RequestParam(name = "snackItemId") long snackItemId,
-                              Model model,
-                              @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-                              SnackDTO snackDTO){
+    public String snackEdit(@RequestParam(name = "snackItemId") long snackItemId,
+                            Model model) {
 
         SnackDTO snackDTO2 = snackService.get(snackItemId);
-
-        Page<SnackDTO> snackDTOList = null;
-
-        snackDTOList = snackService.getSnackList(pageable);
-        model.addAttribute("snackList", snackDTOList);
-
-        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() - 5);
-        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() + 5);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
-
         model.addAttribute("snack", snackDTO2);
 
         return "/admin/admin_snack_edit";
+    }
+
+    @PostMapping("/snackEdit")
+    public String snackEdit(SnackDTO snackDTO, Model model) {
+
+        snackService.editSnack(snackDTO);
+
+        model.addAttribute("urlLoad", "/admin/snackList"); // javascript load function 에 필요함
+
+        return "/admin/admin_layout";
     }
 
     @PostMapping("/snackDelete")
@@ -136,7 +134,7 @@ public class AdminPageController {
                               @RequestParam(name = "snackItemId") long snackItemId,
                               Model model,
                               @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-                              SnackDTO snackDTO){
+                              SnackDTO snackDTO) {
 
         snackService.deleteSnack(snackItemId);
 

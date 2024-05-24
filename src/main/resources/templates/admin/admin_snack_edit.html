@@ -31,7 +31,7 @@
         <div class="card mb-4">
             <div class="card-body">
                 <form action="/admin/snackEdit" method="post">
-                    <input name="snackItemId" th:value="${snack.id}" type="hidden">
+                    <input name="id" th:value="${snack.id}" type="hidden">
                     <div class="mb-3">
                         <label class="form-label" for="snack_name">상품명</label>
                         <input class="form-control" id="snack_name" name="snack_nm" placeholder="상품명을 입력해주세요."
