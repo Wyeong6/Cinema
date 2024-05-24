@@ -25,6 +25,8 @@ import org.springframework.data.domain.PageRequest;
 
 
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,6 +90,7 @@ public class MovieService {
         }
         return upcomingMovies;
     }
+
 
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
@@ -394,6 +397,21 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // 상세보기 들어갈때 로그인되어있는 유저 email받아오기
+    public String getUserEmail() {
+
+        String userEmail = null;
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+        return userEmail;
+    }
+
+
 
     /* upcoming 상세보기를 위한 전용함수들  시작 */
 //
