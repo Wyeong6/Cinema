@@ -2,6 +2,7 @@ package com.busanit.domain;
 
 import com.busanit.entity.Event;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,10 +15,14 @@ import java.util.List;
 public class EventDTO {
 
     private Long id;
+    @NotNull
     private String event_name;
     private String memberEmail;
+    @NotNull
     private String event_image;
+    @NotNull
     private String event_alt;
+    @NotNull
     private String event_detail;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;

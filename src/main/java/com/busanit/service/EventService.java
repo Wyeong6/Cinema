@@ -5,15 +5,19 @@ import com.busanit.entity.Event;
 import com.busanit.entity.Member;
 import com.busanit.repository.EventRepository;
 import com.busanit.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
@@ -21,19 +25,9 @@ public class EventService {
     //추가
     public void saveEvent(EventDTO eventDTO){
 
-
-
         Member member = memberRepository.findByEmail(eventDTO.getMemberEmail())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 member 이메일: " + eventDTO.getMemberEmail()));
 
-
-
-//        Member member = memberRepository.findByEmail(eventDTO.getMemberEmail())
-//                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 memberId: " + eventDTO.getMemberEmail()));
-//        System.out.println("memberEmail  " + member);
-//        Event event = Event.toEntity(eventDTO);
-//
-//        member.addEvent(event);
         Event event = Event.toEntity(eventDTO);
         event.addMember(member); // 이벤트에 회원 추가
         eventRepository.save(event);
@@ -49,7 +43,19 @@ public class EventService {
         return new PageImpl<>(eventDTOList, pageable, eventPage.getTotalElements());
     }
 
-    //업데이트
+    //업데이트 할 데이터를 페이지에 표시
+    public EventDTO getEvent(Long eventId){
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NullPointerException("event null"));
+        return EventDTO.toDTO(event);
+    }
+
+    public void updateEvent(EventDTO eventDTO) {
+        Event event = eventRepository.findById(eventDTO.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + eventDTO.getId()));
+
+        event.update(eventDTO); // Event 엔티티의 update 메소드를 호출하여 업데이트
+        eventRepository.save(event); // 변경 감지를 통한 업데이트
+    }
 
     //삭제
     public void delete(Long eventId){

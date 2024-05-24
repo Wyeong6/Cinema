@@ -268,6 +268,7 @@
 
 <!-- Core JS -->
 <!-- build:js assets/vendor/js/core.js -->
+
 <script src="/assets/vendor/libs/jquery/jquery.js"></script>
 <script src="/assets/vendor/libs/popper/popper.js"></script>
 <script src="/assets/vendor/js/bootstrap.js"></script>
@@ -301,7 +302,7 @@
         $('.snack_btn').on('click', function() {
             $('.container-xxl').load('/admin/snackList');
         });
-        // 이벤트 관리
+        // 이벤트 등록페이지 로드
         $('.event_reg_btn').on('click', function() {
             $('.container-xxl').load('/admin/eventRegister', function() {
                 // 페이지가 로드된 후 실행되는 콜백 함수
@@ -311,7 +312,42 @@
                 }
             });
         });
+        //커스텀 이벤트 수정페이지 로드
+        $(document).on('updateEvent', function (e, eventId) {
+            console.log('updateEvent handler called with eventId: ' + eventId);
+            if (eventId) {
+                $('.container-xxl').load('/admin/update/' + eventId);
 
+            }
+        });
+        //페이징기능
+        $(document).on('loadPageContent', function (e, pageNumber) {
+            console.log('loadPageContent event handler called with pageNumber: ' + pageNumber);
+            if (pageNumber) {
+                // 페이지 내용을 동적으로 로드하는 코드 수정
+                $('.container-xxl').load('/admin/eventList?page=' + pageNumber); // 변경된 부분
+                sessionStorage.removeItem('pageNumber');
+            }
+        });
+        //삭제 후 페이지로드
+        $(document).on('deleteEvent', function (e, pageNumber) {
+            console.log('deleteEvent event handler called with pageNumber: ' + pageNumber);
+            if (pageNumber) {
+                // 페이지 내용을 동적으로 로드하는 코드 수정
+                $('.container-xxl').load('/admin/eventList?page=' + pageNumber); // 변경된 부분
+                sessionStorage.removeItem('pageNumber');
+            }
+        });
+        //업데이트 후 페이지 로드
+        $(document).on('updateAfter', function (e, pageNumber) {
+            console.log('deleteEvent event handler called with pageNumber: ' + pageNumber);
+            if (pageNumber) {
+                // 페이지 내용을 동적으로 로드하는 코드 수정
+                $('.container-xxl').load('/admin/eventList?page=' + pageNumber); // 변경된 부분
+                sessionStorage.removeItem('pageNumber');
+            }
+        });
+        //이벤트 목록페이지 이동
         $('.event_btn').on('click', function() {
             $('.container-xxl').load('/admin/eventList');
         });

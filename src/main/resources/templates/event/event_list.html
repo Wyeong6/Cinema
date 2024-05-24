@@ -40,7 +40,8 @@ xmlns:th="http://www.thymeleaf.org">
 							<article class="col-3 col-12-mobile special" th:each="event : ${eventList}">
 								<input type="hidden" th:value="${event.id}" />
 								<a href="#" class="image featured">
-									<img th:src="@{/images/${event.event_image}}" alt="Event Image" />
+									<img th:src="@{'/images/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/>
+
 								</a>
 								<header>
 									<h3>
@@ -51,25 +52,9 @@ xmlns:th="http://www.thymeleaf.org">
 									<!-- 여기에 추가적인 설명이나 내용을 넣을 수 있습니다. 필요하지 않다면 비워둡니다. -->
 								</p>
 							</article>
-<!--							<table>-->
-<!--								<tbody>-->
-<!--								<tr th:each="event : ${eventList}">-->
-<!--									<td th:text="${event.id}"></td>-->
-<!--									<td th:text="${event.memberEmail}"></td>-->
-<!--									<td th:text="${event.event_name}"></td>-->
-<!--									<td th:text="${event.event_detail}"></td>-->
-<!--									<td><img th:src="@{${event.event_image}}" alt="Event Image"/></td>-->
-<!--									<td th:text="${event.event_alt}"></td>-->
-<!--									<td th:text="${#temporals.format(event.regDate, 'yyyy-MM-dd')}"></td>-->
-<!--									<td th:text="${#temporals.format(event.updateDate, 'yyyy-MM-dd')}"></td>-->
-<!--	&lt;!&ndash;								<td>&ndash;&gt;-->
-<!--	&lt;!&ndash;									<a th:href="@{'/admin/edit/' + ${event.id}}">수정</a>&ndash;&gt;-->
-<!--	&lt;!&ndash;									<a th:href="@{'/admin/delete/' + ${event.id}}">삭제</a>&ndash;&gt;-->
-<!--	&lt;!&ndash;								</td>&ndash;&gt;-->
-<!--								</tr>-->
-
-<!--								</tbody>-->
-<!--								</table>-->
+						</div>
+						<div style="text-align: center" th:unless="${eventList.totalElements > 0}">
+							<h3>상품을 준비중 입니다.</h3>
 						</div>
 					</div>
 				</div>

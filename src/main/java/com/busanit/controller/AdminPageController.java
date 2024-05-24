@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -74,9 +75,10 @@ public class AdminPageController {
 
         return "admin/admin_layout";
     }
+    //이벤트 등록페이지 이동
     @GetMapping("/eventRegister")
     public String eventRegister() { return "admin/admin_event_register"; }
-
+    //이벤트 등록 기능
     @PostMapping("/eventRegister")
     public String eventRegister(@Valid EventDTO eventDTO, BindingResult bindingResult, Model model) {
 
@@ -95,22 +97,50 @@ public class AdminPageController {
     }
 
 @GetMapping("/eventList")
-public String eventList(Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "8") int size) {
-    Page<EventDTO> eventDTO = eventService.getEventList(page, size);
+public String eventList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+    Page<EventDTO> eventDTO = eventService.getEventList(page -1 , size);
 
-    model.addAttribute("eventList", eventDTO);
-    model.addAttribute("startPage", Math.max(1, Math.max(1, page - 5))); // null 대신에 1을 사용
-    model.addAttribute("endPage", Math.min(eventDTO.getTotalPages(), Math.min(eventDTO.getTotalPages(), page + 5))); // null 대신에 getTotalPages()를 사용
+    int totalPages = eventDTO.getTotalPages();
+    int startPage = Math.max(1, page - 5);
+    int endPage = Math.min(totalPages, page + 4); // 페이지를 5개 보여주되, 첫 페이지에서 시작할 경우 보정
+
+    // 모델에 데이터 추가
+    model.addAttribute("eventList", eventDTO); //이벤트 게시글
+    model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
+    model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
+    model.addAttribute("startPage", startPage);
+    model.addAttribute("endPage", endPage);
 
     return "admin/admin_event_list";
+
 }
+
+//이벤트 수정 페이지
+@GetMapping("/update/{id}")
+public String editEvent(@PathVariable("id") Long eventId, Model model) {
+    System.out.println("업데이트 기능 ");
+    EventDTO event = eventService.getEvent(eventId);
+    model.addAttribute("event", event);
+    System.out.println("업데이트 후");
+    return "admin/admin_event_update"; // 수정 페이지로 이동
+}
+//이벤트 수정 기능
+@PostMapping("/update")
+public String updateEvent(@ModelAttribute EventDTO eventDTO) {
+    System.out.println(" 수정시작 기능 ");
+    eventService.updateEvent(eventDTO);
+    System.out.println("업데이트 기능 ");
+
+    return "redirect:/admin/eventList";
+}
+
+//이벤트 삭제기능
 @GetMapping("/delete/{id}")
     public String deleteEvent(@PathVariable("id") Long eventId) {
-    System.out.println("삭제컨트롤");
 
         eventService.delete(eventId);
-//        return "redirect:/admin/eventList";
-    return "admin/admin_layout";
+
+    return "redirect:/admin/eventList";
     }
 
 

@@ -58,19 +58,9 @@ public class Member extends BaseTimeEntity {
         comment.setMember(this);
     }
     //멤버와 이벤트게시글 연관관계
-//    @ManyToMany
-//    @JoinTable(
-//            name = "member_event",
-//            joinColumns = @JoinColumn(name = "member_id"),
-//            inverseJoinColumns = @JoinColumn(name = "event_id"))
-//    private List<Event> events = new ArrayList<>();
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Event> events;
 
-//    public void addEvent(Event event) {
-//        this.events.add(event);
-//        event.getMembers().add(this);
-//        }
 
 
     // 일반 폼 회원 생성

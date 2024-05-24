@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Event{
+public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,8 +37,6 @@ public class Event{
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
-//    @ManyToMany(mappedBy = "events", fetch = FetchType.LAZY)
-//    private List<Member> members = new ArrayList<>();
     @ManyToMany
     @JoinTable(
             name = "member_event",
@@ -53,20 +51,22 @@ public class Event{
         }
         this.members.add(member);
     }
-    public List<Member> getMembers() {
-        if (this.members == null) {
-            this.members = new ArrayList<>();
-        }
-        return this.members;
-    }
 
     public static Event toEntity(EventDTO eventDTO) {
         return Event.builder()
-               .event_name(eventDTO.getEvent_name())
+                .event_name(eventDTO.getEvent_name())
                 .memberEmail(eventDTO.getMemberEmail())
-               .event_image(eventDTO.getEvent_image())
-               .event_alt(eventDTO.getEvent_alt())
-               .event_detail(eventDTO.getEvent_detail())
-               .build();
+                .event_image(eventDTO.getEvent_image())
+                .event_alt(eventDTO.getEvent_alt())
+                .event_detail(eventDTO.getEvent_detail())
+                .build();
+    }
+
+    public void update(EventDTO eventDTO) {
+        this.event_name = eventDTO.getEvent_name();
+        this.memberEmail = eventDTO.getMemberEmail();
+        this.event_image = eventDTO.getEvent_image();
+        this.event_alt = eventDTO.getEvent_alt();
+        this.event_detail = eventDTO.getEvent_detail();
     }
 }

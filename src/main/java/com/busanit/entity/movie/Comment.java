@@ -31,9 +31,6 @@ public class Comment{
     @CreationTimestamp
     private LocalDateTime createdDate;
 
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
-
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
     private Movie movie;
