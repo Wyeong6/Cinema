@@ -40,7 +40,7 @@ xmlns:th="http://www.thymeleaf.org">
 							<article class="col-3 col-12-mobile special" th:each="event : ${eventList}">
 								<input type="hidden" th:value="${event.id}" />
 								<a href="#" class="image featured">
-									<img th:src="@{'/images/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/>
+									<img th:src="@{'/images/event/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/>
 
 								</a>
 								<header>

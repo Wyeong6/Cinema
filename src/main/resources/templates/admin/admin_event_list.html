@@ -65,7 +65,7 @@
         <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.memberEmail}"></strong></td>
         <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.event_name}"></strong></td>
         <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.event_detail}"></strong></td>
-        <td><img th:src="@{'/images/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/></td>
+        <td><img th:src="@{'/images/event/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/></td>
         <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.event_alt}"></strong></td>
         <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${#temporals.format(event.regDate, 'yyyy-MM-dd')}"></strong></td>
         <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${#temporals.format(event.updateDate, 'yyyy-MM-dd')}"></strong></td>
@@ -86,53 +86,63 @@
     <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}" th:text="${i}" class="paging-btn"></a>
 </div>
 </div>
-
 <script>
     $(document).ready(function() {
-        // 업데이트 버튼에 대한 클릭 이벤트 바인딩
-        $('.update-btn').click(function(e){
-            e.preventDefault(); // 기본 동작 방지
-            var pageNumber = $(this).data('page');
-            var eventId = $(this).data('id'); // data-id 속성에서 ID 추출
-            sessionStorage.setItem('eventId', eventId); // eventId를 세션에 저장
-            sessionStorage.setItem('pageNumber', pageNumber)
-            $(document).trigger('updateEvent', [eventId]); // 커스텀 이벤트 발생
-            console.log('updateEvent triggered with eventId: ' + eventId);
-        });
-
-        $('.paging-btn').click(function(e){
-            e.preventDefault(); // 기본 동작 방지
-            var pageNumber = $(this).data('page'); // data-page 속성에서 페이지 번호 추출
-            sessionStorage.setItem('pageNumber', pageNumber); // 페이지 번호를 세션에 저장
-            $(document).trigger('loadPageContent', [pageNumber]); // 커스텀 이벤트 발생
-            console.log('loadPageContent event triggered with pageNumber: ' + pageNumber);
-        });
-
-
-        $('.delete-btn').click(function(e){
-            e.preventDefault(); // 기본 동작 방지
-            var eventId = $(this).data('id'); // data-id 속성에서 이벤트 ID 추출
-            var pageNumber = $(this).data('page'); // data-page 속성에서 페이지 번호 추출
+        // AJAX 요청을 보내는 공통 함수
+        function sendRequest(url, data, onSuccess, onError) {
             $.ajax({
-                url: '/admin/delete/' + eventId,
                 type: 'GET',
-                success: function(response) {
-                    // 성공 시 페이지 새로고침 또는 동적 로드
-                    console.log('Event deleted successfully');
-                    sessionStorage.setItem('pageNumber', pageNumber); // 페이지 번호를 세션에 저장
-                    $(document).trigger('deleteEvent', [pageNumber]); // 커스텀 이벤트 발생
-
-
-                },
+                url: url,
+                data: data,
+                success: onSuccess,
                 error: function(xhr, status, error) {
-                    // 오류 처리
-                    console.error('Delete operation failed');
+                    console.error('Error occurred: ', error);
+                    if (onError) onError(xhr, status, error);
                 }
+            });
+        }
+
+        // 페이지 번호를 세션 스토리지에 저장하거나 제거하는 함수
+        function setPageNumber(pageNumber, shouldRemove = false) {
+            if (shouldRemove) {
+                sessionStorage.removeItem('pageNumber');
+            } else {
+                sessionStorage.setItem('pageNumber', pageNumber);
+            }
+        }
+
+        // 업데이트 버튼 클릭 이벤트 핸들러
+        $('.update-btn').click(function() {
+            var eventId = $(this).data('id');
+            var pageNumber = $(this).data('page');
+            setPageNumber(pageNumber);
+            sendRequest('/admin/update', { eventId: eventId }, function(response) {
+                $('.container-xxl').html(response);
             });
         });
 
-    });
+        // 페이징 버튼 클릭 이벤트 핸들러
+        $('.paging-btn').click(function(e) {
+            e.preventDefault();
+            var pageNumber = $(this).data('page');
+            sendRequest('/admin/eventList?page=' + pageNumber, {}, function(response) {
+                $('.container-xxl').html(response);
+                setPageNumber(pageNumber);
+            });
+        });
 
+        // 삭제 버튼 클릭 이벤트 핸들러
+        $('.delete-btn').click(function(e) {
+            e.preventDefault();
+            var eventId = $(this).data('id');
+            var pageNumber = $(this).data('page');
+            sendRequest('/admin/delete/' + eventId + '?pageNumber=' + pageNumber, {}, function(response) {
+                console.log('Event deleted successfully');
+                $('.container-xxl').html(response);
+                setPageNumber(pageNumber, true);
+            });
+        });
+    });
 </script>
 </body>
 </html>

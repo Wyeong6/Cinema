@@ -16,6 +16,7 @@
         <div class="card mb-4">
             <div class="card-body">
                 <form action="/admin/update" method="post">
+                    <input type="hidden" name="pageNumber" id="pageNumber">
                     <input type="hidden" name="id" id="id" th:value="${event.id}">
                     <div class="mb-3">
                         <label class="form-label" for="event_name">이벤트 제목</label>
@@ -46,8 +47,10 @@
 <script>
     $(document).ready(function() {
         $('form').on('submit', function(e) {
-            e.preventDefault(); // 폼 제출의 기본 동작 방지
+            e.preventDefault();
 
+            var pageNumber = sessionStorage.getItem('pageNumber');
+            $('#pageNumber').val(pageNumber);
             var formData = $(this).serialize(); // 폼 데이터 직렬화
 
             $.ajax({
@@ -55,16 +58,10 @@
                 url: "/admin/update",
                 data: formData,
                 success: function(response) {
-                    // 서버로부터의 응답 처리
-                    console.log('폼 제출 성공', response);
-
-                    // 커스텀 이벤트 발동
-                    var pageNumber = sessionStorage.getItem('pageNumber');
-                    $(document).trigger('updateAfter', [pageNumber]);
-                    console.log('updateAfter 이벤트 발동, 페이지 번호:', pageNumber);
+                    $('.container-xxl').html(response);
+                    sessionStorage.removeItem('pageNumber');
                 },
                 error: function(error) {
-                    // 에러 처리
                     console.log('폼 제출 실패', error);
                 }
             });

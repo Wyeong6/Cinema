@@ -41,5 +41,9 @@
         </div>
     </div>
 </div>
+<script>
+    var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+    document.getElementById('memberEmail').value = userInfo.email;
+</script>
 </body>
 </html>

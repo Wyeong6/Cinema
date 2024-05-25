@@ -141,9 +141,9 @@ public String eventList(Model model, @RequestParam(defaultValue = "1") int page,
 
     int totalPages = eventDTO.getTotalPages();
     int startPage = Math.max(1, page - 5);
-    int endPage = Math.min(totalPages, page + 4); // 페이지를 5개 보여주되, 첫 페이지에서 시작할 경우 보정
+    int endPage = Math.min(totalPages, page + 4);
 
-    // 모델에 데이터 추가
+
     model.addAttribute("eventList", eventDTO); //이벤트 게시글
     model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
     model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
@@ -155,31 +155,30 @@ public String eventList(Model model, @RequestParam(defaultValue = "1") int page,
 }
 
 //이벤트 수정 페이지
-@GetMapping("/update/{id}")
-public String editEvent(@PathVariable("id") Long eventId, Model model) {
-    System.out.println("업데이트 기능 ");
+@GetMapping("/update")
+public String editEvent(@RequestParam(name = "eventId") long eventId, Model model) {
+
     EventDTO event = eventService.getEvent(eventId);
     model.addAttribute("event", event);
-    System.out.println("업데이트 후");
+
     return "admin/admin_event_update"; // 수정 페이지로 이동
 }
 //이벤트 수정 기능
 @PostMapping("/update")
-public String updateEvent(@ModelAttribute EventDTO eventDTO) {
-    System.out.println(" 수정시작 기능 ");
-    eventService.updateEvent(eventDTO);
-    System.out.println("업데이트 기능 ");
+public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int pageNumber) {
 
-    return "redirect:/admin/eventList";
+    eventService.updateEvent(eventDTO);
+
+    return "redirect:/admin/eventList?page=" + pageNumber;
 }
 
 //이벤트 삭제기능
 @GetMapping("/delete/{id}")
-    public String deleteEvent(@PathVariable("id") Long eventId) {
+    public String deleteEvent(@PathVariable("id") Long eventId, @RequestParam int pageNumber) {
 
         eventService.delete(eventId);
 
-    return "redirect:/admin/eventList";
+    return "redirect:/admin/eventList?page=" + pageNumber;
     }
 
 
