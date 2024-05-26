@@ -3,6 +3,7 @@ package com.busanit.entity;
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.entity.movie.Comment;
+import com.busanit.entity.movie.Genre;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -56,6 +57,11 @@ public class Member extends BaseTimeEntity {
         this.comment.add(comment);
         comment.setMember(this);
     }
+    //멤버와 이벤트게시글 연관관계
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    private List<Event> events;
+
+
 
     // 일반 폼 회원 생성
     public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {

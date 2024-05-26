@@ -174,6 +174,7 @@
 
 <!-- Core JS -->
 <!-- build:js assets/vendor/js/core.js -->
+
 <script src="/assets/vendor/libs/jquery/jquery.js"></script>
 <script src="/assets/vendor/libs/popper/popper.js"></script>
 <script src="/assets/vendor/js/bootstrap.js"></script>
@@ -192,43 +193,51 @@
 <script th:inline="javascript">
     $(document).ready(function() {
         // 멤버 관리
-        $('.member_btn').on('click', function() {
+        $('.member_btn').on('click', function () {
             $('.container-xxl').load('admin_member_list.html');
         });
         // 영화 관리
-        $('.movie_btn').on('click', function() {
+        $('.movie_btn').on('click', function () {
             $('.container-xxl').load('admin_movie_list.html');
         });
         // 스낵 관리
-        $('.snack_reg_btn').on('click', function(e) {
+        $('.snack_reg_btn').on('click', function (e) {
             e.preventDefault()
             $('.container-xxl').load('/admin/snackRegister');
         });
-        $('.snack_btn').on('click', function() {
+        $('.snack_btn').on('click', function () {
             $('.container-xxl').load('/admin/snackList');
         });
-        // 이벤트 관리
-        $('.event_btn').on('click', function() {
-            $('.container-xxl').load('admin_event_list.html');
+        //이벤트 추가
+        $('.event_reg_btn').on('click', function () {
+            $('.container-xxl').load('/admin/eventRegister');
         });
-        // 공지사항 관리
-        $('.notice_btn').on('click', function() {
-            $('.container-xxl').load('/admin/notice');
+        //이벤트 목록페이지
+        $('.event_btn').on('click', function () {
+            $('.container-xxl').load('/admin/eventList');
         });
-    });
 
-    function goPage(page, size) {
-        $('.container-xxl').load('/admin/notice?page=' + page + '&size=' + size);
-    }
+            // 공지사항 관리
+            $('.notice_btn').on('click', function () {
+                $('.container-xxl').load('/admin/notice');
+            });
+        });
 
-    /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
-    $(document).ready(function() {
-        var urlLoad = [[${urlLoad}]];
-        if(urlLoad != null) {
-            // 페이지가 로드될 때 실행되는 코드
-            $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
+        function goPage(page, size) {
+            $('.container-xxl').load('/admin/notice?page=' + page + '&size=' + size);
         }
-    });
+
+        /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
+        $(document).ready(function () {
+            var urlLoad = [[${urlLoad}]];
+            if (urlLoad != null) {
+                // 페이지가 로드될 때 실행되는 코드
+                $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
+
+
+            }
+        });
+
 
 </script>
 

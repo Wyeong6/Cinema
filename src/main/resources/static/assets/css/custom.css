@@ -496,10 +496,10 @@ td p {
     width: 20%;
 }
 #cart_list_section table tr th:nth-child(2) {
-    width: 40%;
+    width: 35%;
 }
 #cart_list_section table tr th:nth-child(3) {
-    width: 5%;
+    width: 10%;
 }
 #cart_list_section table tr th:nth-child(4) {
     width: 20%;
@@ -507,18 +507,23 @@ td p {
 #cart_list_section table tr th:nth-child(5) {
     width: 10%;
 }
-#cart_list_section table tr td:nth-child(1) {
-    width: 20%;
+#cart_list_section table tr td:nth-child(1) img {
+    width: 100%;
 }
 #cart_list_section table tr td:nth-child(2) {
-    width: 40%;
+    width: 25%;
 }
 #cart_list_section table tr td:nth-child(3) {
-    width: 10%;
+    width: 20%;
 }
-#cart_list_section table tr td:nth-child(3) input {
+#cart_list_section table tr td:nth-child(3) div {
     width: 100%;
-    padding: 2%;
+}
+#cart_list_section table tr td:nth-child(3) div button:first-child {
+    padding: 0.3em 0.8em 0.3em 0.8em;
+}
+#cart_list_section table tr td:nth-child(3) div button {
+    padding: 0.3em 0.65em 0.3em 0.65em;
 }
 #cart_list_section table tr td:nth-child(4) {
     width: 20%;
@@ -574,7 +579,7 @@ article#pay h2 {
     margin: 1.5em 0 0 0.5em;
 }
 article#pay .row {
-    margin: 3em 1em;
+    margin: 5em 1em;
 }
 article#pay .row > * {
     padding: 0;

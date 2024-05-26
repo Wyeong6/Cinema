@@ -1,4 +1,5 @@
 package com.busanit.service;
+
 import com.busanit.domain.MovieDTO;
 import com.busanit.domain.MovieDetailDTO;
 import com.busanit.domain.MovieStillCutDTO;
@@ -20,8 +21,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.busanit.domain.MovieDTO.convertToDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +73,8 @@ public class MovieService {
             }
         }
     }
+
+    //개봉예정 영화
     public List<MovieDTO> fetchAndStoreUpcoming() throws IOException {
         List<MovieDTO> upcomingMovies = new ArrayList<>();
         for (int page = 1; page <= 8; page++) {
@@ -88,6 +92,16 @@ public class MovieService {
         }
         return upcomingMovies;
     }
+
+    //개봉예정영화 페이지 당 12개씩
+    public Page<MovieDTO> getUpcomingMovies(Pageable pageable) throws IOException {
+        List<MovieDTO> allMovies = fetchAndStoreUpcoming();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), allMovies.size());
+        List<MovieDTO> moviesOnPage = allMovies.subList(start, end);
+        return new PageImpl<>(moviesOnPage, pageable, allMovies.size());
+    }
+
 
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
@@ -179,6 +193,7 @@ public class MovieService {
         movie.setOverview(movieDTO.getOverview());
 
     }
+
     // Movie 객체를 가져오거나 새로 생성
     private Movie getOrCreateMovie(MovieDTO movieDTO) {
         return movieRepository.findById(movieDTO.getId()).orElse(new Movie());
@@ -288,14 +303,14 @@ public class MovieService {
     }
 
 
-private boolean hasImage(List<MovieImage> images, String posterPath, String backdropPath) {
-    for (MovieImage image : images) {
-        if (image.getPosterPath().equals(posterPath) && image.getBackdropPath().equals(backdropPath)) {
-            return true;
+    private boolean hasImage(List<MovieImage> images, String posterPath, String backdropPath) {
+        for (MovieImage image : images) {
+            if (image.getPosterPath().equals(posterPath) && image.getBackdropPath().equals(backdropPath)) {
+                return true;
+            }
         }
+        return false;
     }
-    return false;
-}
 
     private void processImageData(JsonNode node, Movie movie) {
         Optional<Movie> optionalMovie = movieRepository.findById(movie.getMovieId());
@@ -320,7 +335,6 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
             // 수정된 movie를 저장
         }
     }
-
 
     public void fetchAndStoreCertificationData() throws IOException {
         List<Long> movieIds = getAllMovieIds(); // 모든 movie ID를 가져오는 메서드
@@ -352,7 +366,7 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
             certification = "15세 이상 관람가";
         } else if ("12".equals(certification)) {
             certification = "12세 이상 관람가";
-        } else if ("ALL".equals(certification)||"All".equals(certification)) {
+        } else if ("ALL".equals(certification) || "All".equals(certification)) {
             certification = "전체 관람가";
         }
 
@@ -364,31 +378,37 @@ private boolean hasImage(List<MovieImage> images, String posterPath, String back
             movieDetailRepository.save(movieDetail);
         }
     }
-//    public List<MovieDTO> getAll() {
-//        List<Movie> movieList = movieRepository.findAll();
-//        // MapStruct를 사용한 변환
-//        return MovieMapper.INSTANCE.moviesToMovieDTOs(movieList);
-//    }
-    public List<MovieDTO> getAll(){
+
+    //상영 중인 전체 영화
+    public List<MovieDTO> getAll() {
         List<Movie> movieList = movieRepository.findAll();
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<MovieDTO> getHotMovies(){
+    public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size); // 페이지 번호, 페이지당 항목 수 및 정렬 필드 설정
+        Page<Movie> movieList = movieRepository.findAll(pageable);
+        return movieList.map(MovieDTO::convertToDTO); // DTO로 변환
+    }
+
+    //인기순 영화 정렬
+    public List<MovieDTO> getHotMovies() {
         List<Movie> movieList = movieRepository.findAllByOrderByMovieDetailPopularityDesc();
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<MovieDTO> getVideoMovies(){
+    //인기순 영화 중 영상있는 것
+    public List<MovieDTO> getVideoMovies() {
         Pageable topFive = PageRequest.of(0, 5);
         List<Movie> movieList = movieRepository.findByVideoTrueOrderByPopularityDesc(topFive);
 
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
-    // 영화 상세보기
+
+    //영화 상세보기
     public List<MovieDTO> getMovieDetailInfo(Long movieID) {
         Optional<Movie> movieList = movieRepository.findById(movieID);
         return movieList.stream().map(MovieDTO::convertToDTO)

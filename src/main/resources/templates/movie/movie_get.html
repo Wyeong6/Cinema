@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -12,7 +13,7 @@
     <link rel="stylesheet" href="/assets/css/custom_player.css" />
     <link rel="stylesheet" href="/assets/css/nav.css" />
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
-<!--    댓글-->
+    <!--    댓글-->
 
     <style>
 
@@ -92,434 +93,493 @@
 </head>
 <body class="right-sidebar is-preload">
 <th:block layout:fragment="content">
-<div id="page-wrapper">
+    <div id="page-wrapper">
 
-    <header data-include-path="./header.html"></header>
+        <header data-include-path="./header.html"></header>
 
-    <!-- Main -->
-    <div class="wrapper style1">
+        <!-- Main -->
+        <div class="wrapper style1">
 
-        <div class="container" th:each="movie, iterStat : ${movieInfos}">
-            <input type="hidden" id="movieId" th:value="${movie.id}">
-            <div class="row">
-                    <div class="col-12-mobile" id="content">
-                    <article id="main">
-                        <div class="movie_info_background" >
-                        <header id="get_info">
-                            <a href="#" class="image featured">
-                                <img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
-                                     th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
-                                     style="width: 400px; height: 600px;" /></a>
-                            <div class="movie_info">
-                                <div class="info_header">
-                                    <h2 th:text="${movie.title}" class="movie_title"></h2>
-                                    <a href="#" class="button" style="height: 3em;">지금 예매하기</a>
-                                </div>
-                                <span th:text="${movie.releaseDate} + ' | '">releasedate</span>
-                                <span th:text="${movie.genres} + ' | '">genres</span>
-                                <span th:text="${movie.runtime} + '분'">runtime</span>
-                                <div style="text-align: right;">
-<!--                                    <a th:href="@{'https://www.youtube.com/watch?v=' + ${movie.video}}" class="button" style="height: 3em;">트레일러 보기</a>-->
-                                    <button id="videoModalBtn" class="button" style="height: 3em;" th:data-video-id="${movie.video}">트레일러 보기</button>
-                                </div>
-                                <p><b>감독 : </b>director <b>각본 : </b>writer</p>
-
-                                <p th:text="${movie.overview}">
-                                    ~ overview ~
-                                </p>
-
-                                <div class="movie_data_box">
-                                    <div class="movie_data">
-                                        <h4>누적 관객수</h4>
-                                        <p>cnv</p>
-                                    </div>
-                                    <div class="movie_data">
-                                        <h4>인기도</h4>
-                                        <p th:text="${movie.popularity}">popularity (%)</p>
-                                    </div>
-                                    <div class="movie_data">
-                                        <h4>평점</h4>
-<!--                                        <p th:text="${movie.voteAverage}">vote rating</p>-->
-                                    </div>
-                                </div>
-                            </div>
-                        </header>
-                        </div>
-                        <h3>출연진</h3>
-                        <div id="movie-info">
-                        </div>
-                    </article>
-                </div>
-            </div>
-
-            <!-- 비디오 트레일러 모달 -->
-            <div id="videoModal" class="modal">
-                <div class="video-modal-content">
-                    <span class="close">&times;</span>
-                    <iframe id="videoFrame" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
-                </div>
-            </div>
-
-
-
-            <section class="movie_etc">
-                <div class="etc_btn">
-                    <button type="button" class="button stillcut_btn clicked">스틸컷</button>
-                    <button type="button" class="button reviews_btn">리뷰</button>
-                </div>
-            </section>
-
-            <!-- 스틸컷 for each (반복) -->
-            <div id="stillcut" th:each="movie, iterStat : ${movieInfos}" >
+            <div class="container" th:each="movie, iterStat : ${movieInfos}">
+                <input type="hidden" id="movieId" th:value="${movie.id}">
                 <div class="row">
-                    <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}" th:class="${iterStat.count > 4} ? 'hide stillCut' : 'stillCut'" >
-                        <article class="col-4 col-12-mobile special still-cut-article">
-                            <a href="#" class="image featured">
-                                <img th:src="@{'https://image.tmdb.org/t/p/original/' + ${stillCutPath}}" alt="스틸컷"
-                                     onclick="openModal(this.getAttribute('src'))"
-                                />
-                            </a>
+                    <div class="col-12-mobile" id="content">
+                        <article id="main">
+                            <div class="movie_info_background" >
+                                <header id="get_info">
+                                    <a href="#" class="image featured">
+                                        <img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
+                                             th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
+                                             style="width: 400px; height: 600px;" /></a>
+                                    <div class="movie_info">
+                                        <div class="info_header">
+                                            <h2 th:text="${movie.title}" class="movie_title"></h2>
+                                            <a href="#" class="button" style="height: 3em;">지금 예매하기</a>
+                                        </div>
+                                        <span th:text="${movie.releaseDate} + ' | '">releasedate</span>
+                                        <span th:text="${movie.genres} + ' | '">genres</span>
+                                        <span th:text="${movie.runtime} + '분'">runtime</span>
+                                        <div style="text-align: right;">
+                                            <!--                                    <a th:href="@{'https://www.youtube.com/watch?v=' + ${movie.video}}" class="button" style="height: 3em;">트레일러 보기</a>-->
+                                            <button id="videoModalBtn" class="button" style="height: 3em;" th:data-video-id="${movie.video}">트레일러 보기</button>
+                                        </div>
+                                        <p><b>감독 : </b>director <b>각본 : </b>writer</p>
+
+                                        <p th:text="${movie.overview}">
+                                            ~ overview ~
+                                        </p>
+
+                                        <div class="movie_data_box">
+                                            <div class="movie_data">
+                                                <h4>누적 관객수</h4>
+                                                <p>cnv</p>
+                                            </div>
+                                            <div class="movie_data">
+                                                <h4>인기도</h4>
+                                                <p th:text="${movie.popularity}">popularity (%)</p>
+                                            </div>
+                                            <div class="movie_data_averageRating">
+                                                <h4>평점</h4>
+                                                <!--                                        <p th:text="${movie.voteAverage}">vote rating</p>-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </header>
+                            </div>
+                            <h3>출연진</h3>
+                            <div id="movie-info">
+                            </div>
                         </article>
                     </div>
                 </div>
-                <p id="showMore" style="cursor: pointer;"><a>more</a></p>
-                <p id="showLess" style="cursor: pointer; display:none;"><a>접기</a></p>
-            </div>
-            <div id="reviews" style="display: none">
-                <button onclick="openReviewModal()" class="modal_open">관람평 작성하기</button>
-                <div class="row">
-                    <table class="default" id="reviews-table">
-                        <!-- 댓글이 여기에 추가될 것입니다 -->
-                    </table>
-                    <!--스틸컷 더보기 접기-->
+
+                <!-- 비디오 트레일러 모달 -->
+                <div id="videoModal" class="modal">
+                    <div class="video-modal-content">
+                        <span class="close">&times;</span>
+                        <iframe id="videoFrame" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+                    </div>
                 </div>
-                <p id="showMore_review" style="cursor: pointer;"><a>more</a></p>
-                <p id="showLess_review" style="cursor: pointer; display:none;"><a>접기</a></p>
-            </div>
-            <!-- 이미지 상세보기 모달 -->
-            <div id="myModal" class="modal">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <img class="modal-content" id="modalImage">
+
+                <button type="button" onclick="addReaction(1, `${movieId}`, 'LIKE')">좋아요</button>
+                <span id="likeCount_${movie.id}">0</span>
+                <button type="button" onclick="addReaction(1, `${movieId}`, 'SAD')">슬퍼요</button>
+                <span id="sadCount_${movie.id}">0</span> <!-- 초기값을 0으로 설정 -->
+
+
+                <section class="movie_etc">
+                    <div class="etc_btn">
+                        <button type="button" class="button stillcut_btn clicked">스틸컷</button>
+                        <button type="button" class="button reviews_btn">리뷰</button>
+                    </div>
+                </section>
+
+                <!-- 스틸컷 for each (반복) -->
+                <div id="stillcut" th:each="movie, iterStat : ${movieInfos}" >
+                    <div class="row">
+                        <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}" th:class="${iterStat.count > 4} ? 'hide stillCut' : 'stillCut'" >
+                            <article class="col-4 col-12-mobile special still-cut-article">
+                                <a href="#" class="image featured">
+                                    <img th:src="@{'https://image.tmdb.org/t/p/original/' + ${stillCutPath}}" alt="스틸컷"
+                                         onclick="openModal(this.getAttribute('src'))"
+                                    />
+                                </a>
+                            </article>
+                        </div>
+                    </div>
+                    <p id="showMore" style="cursor: pointer;"><a>more</a></p>
+                    <p id="showLess" style="cursor: pointer; display:none;"><a>접기</a></p>
+                </div>
+                <div id="reviews" style="display: none">
+                    <button onclick="openReviewModal()" class="modal_open">관람평 작성하기</button>
+                    <div class="row">
+                        <table class="default" id="reviews-table">
+                            <!-- 댓글이 여기에 추가될 것입니다 -->
+                        </table>
+                        <!--스틸컷 더보기 접기-->
+                    </div>
+                    <p id="showMore_review" style="cursor: pointer;"><a>more</a></p>
+                    <p id="showLess_review" style="cursor: pointer; display:none;"><a>접기</a></p>
+                </div>
+                <!-- 이미지 상세보기 모달 -->
+                <div id="myModal" class="modal">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <img class="modal-content" id="modalImage">
+                </div>
             </div>
         </div>
+        <footer data-include-path="footer.html"></footer>
     </div>
-    <footer data-include-path="footer.html"></footer>
-</div>
 
-<!-- Scripts -->
-<script src="/assets/js/jquery.min.js"></script>
-<script src="/assets/js/jquery.dropotron.min.js"></script>
-<script src="/assets/js/jquery.scrolly.min.js"></script>
-<script src="/assets/js/jquery.scrollex.min.js"></script>
-<script src="/assets/js/browser.min.js"></script>
-<script src="/assets/js/breakpoints.min.js"></script>
-<script src="/assets/js/util.js"></script>
-<script src="/assets/js/main.js"></script>
+    <!-- Scripts -->
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/jquery.dropotron.min.js"></script>
+    <script src="/assets/js/jquery.scrolly.min.js"></script>
+    <script src="/assets/js/jquery.scrollex.min.js"></script>
+    <script src="/assets/js/browser.min.js"></script>
+    <script src="/assets/js/breakpoints.min.js"></script>
+    <script src="/assets/js/util.js"></script>
+    <script src="/assets/js/main.js"></script>
 
 
 
-<!--              댓글         ------------------             -->
-<script>
-    // include.js
-    window.addEventListener('load', function () {
-        var allElements = document.getElementsByTagName('*');
-        Array.prototype.forEach.call(allElements, function (el) {
-            var includePath = el.dataset.includePath;
-            if (includePath) {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        el.outerHTML = this.responseText;
-                    }
-                };
-                xhttp.open('GET', includePath, true);
-                xhttp.send();
+    <!--              댓글         ------------------             -->
+    <script>
+        // include.js
+        window.addEventListener('load', function () {
+            var allElements = document.getElementsByTagName('*');
+            Array.prototype.forEach.call(allElements, function (el) {
+                var includePath = el.dataset.includePath;
+                if (includePath) {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            el.outerHTML = this.responseText;
+                        }
+                    };
+                    xhttp.open('GET', includePath, true);
+                    xhttp.send();
+                }
+            });
+        });
+        // credits api 제작진 사진
+        const options = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
+            }
+        };
+
+        async function fetchMovieCredits(movieId) {
+
+            try {
+                const apiKey = '547e2cd4d0e26e68fb907dafef4f90ac';
+                const url = `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR&api_key=${apiKey}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // 영화 정보를 담을 요소 생성
+                const movieInfoDiv = document.getElementById('movie-info');
+                movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
+                movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
+
+                // 감독 정보 출력 (이미지 포함)
+                const director = data.crew.find(person => person.job === 'Director');
+                if (director) {
+                    const directorDiv = createPersonDiv(director.name, director.profile_path, true);
+                    movieInfoDiv.appendChild(directorDiv); // directorDiv를 movieInfoDiv에 추가
+                }
+
+                // 출연진 정보 출력 (이미지 포함)
+                data.cast.slice(0, 5).forEach(cast => {
+                    const castDiv = createPersonDiv(cast.name, cast.profile_path);
+                    movieInfoDiv.appendChild(castDiv); // castDiv를 movieInfoDiv에 추가
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 인물 정보와 이미지를 담은 div 생성 함수
+        function createPersonDiv(name, profilePath, isDirector = false) {
+            const personDiv = document.createElement('div'); // 새로운 div 생성
+            personDiv.style.margin = '8px'; // 간격 설정
+            personDiv.style.width = '200px';
+            personDiv.style.height = '300px';
+
+            const p = document.createElement('p');
+            p.innerHTML = isDirector ? `<p>감독 : ${name}</p>` : `<p>${name}</p>`;
+            p.style.fontSize = '1em'; // 글자 크기 작게 설정
+
+            const img = document.createElement('img');
+            img.src = `https://image.tmdb.org/t/p/w200${profilePath}`; // 이미지 경로 설정
+            img.alt = `${name}'s profile image`;
+            img.style.width = '100%';
+            img.style.height = 'auto'; // 높이를 자동으로 설정
+
+            personDiv.appendChild(img);
+            personDiv.appendChild(p);
+
+            return personDiv;
+        }
+        //
+        // const movieId = [[${movieId}]]
+        //
+        // fetchMovieCredits(movieId);
+
+        const api = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
+            }
+        };
+
+
+        // 스틸컷 더보기(more), 접기 클릭 함수
+        // 현재 표시된 항목의 수를 추적하는 변수
+        var visibleCount = 4; // 처음에 보이는 항목 수
+        var increment = 8; // 한 번에 표시할 추가 항목 수
+
+        document.getElementById("showMore").addEventListener("click", function () {
+            var stillCuts = document.querySelectorAll(".stillCut");
+            var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
+
+            for (var i = visibleCount; i < newVisibleCount; i++) {
+                stillCuts[i].classList.remove("hide");
+            }
+
+            visibleCount = newVisibleCount; // 업데이트된 표시된 항목의 수
+
+            // "접기" 버튼을 항상 보여줌
+            document.getElementById("showLess").style.display = 'block';
+
+            // 모든 항목이 표시되었는지 확인
+            if (visibleCount >= stillCuts.length) {
+                // "더보기"를 숨김
+                this.style.display = 'none';
+            } else {
+                // 아직 표시되지 않은 항목이 있다면 "더보기"를 계속 보여줌
+                this.style.display = 'block';
             }
         });
-    });
-    // credits api 제작진 사진
-    const options = {
-        method: 'GET',
-        headers: {
-            accept: 'application/json',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
-        }
-    };
 
-    async function fetchMovieCredits(movieId) {
-
-        try {
-            const apiKey = '547e2cd4d0e26e68fb907dafef4f90ac';
-            const url = `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR&api_key=${apiKey}`;
-            const response = await fetch(url);
-            const data = await response.json();
-
-            // 영화 정보를 담을 요소 생성
-            const movieInfoDiv = document.getElementById('movie-info');
-            movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
-            movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
-
-            // 감독 정보 출력 (이미지 포함)
-            const director = data.crew.find(person => person.job === 'Director');
-            if (director) {
-                const directorDiv = createPersonDiv(director.name, director.profile_path, true);
-                movieInfoDiv.appendChild(directorDiv); // directorDiv를 movieInfoDiv에 추가
+        document.getElementById("showLess").addEventListener("click", function () {
+            var stillCuts = document.querySelectorAll(".stillCut");
+            for (var i = 0; i < stillCuts.length; i++) {
+                if (i > 3) { // 처음 4개를 제외한 나머지를 숨깁니다.
+                    stillCuts[i].classList.add("hide");
+                }
             }
-
-            // 출연진 정보 출력 (이미지 포함)
-            data.cast.slice(0, 5).forEach(cast => {
-                const castDiv = createPersonDiv(cast.name, cast.profile_path);
-                movieInfoDiv.appendChild(castDiv); // castDiv를 movieInfoDiv에 추가
-            });
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    // 인물 정보와 이미지를 담은 div 생성 함수
-    function createPersonDiv(name, profilePath, isDirector = false) {
-        const personDiv = document.createElement('div'); // 새로운 div 생성
-        personDiv.style.margin = '8px'; // 간격 설정
-        personDiv.style.width = '200px';
-        personDiv.style.height = '300px';
-
-        const p = document.createElement('p');
-        p.innerHTML = isDirector ? `<p>감독 : ${name}</p>` : `<p>${name}</p>`;
-        p.style.fontSize = '1em'; // 글자 크기 작게 설정
-
-        const img = document.createElement('img');
-        img.src = `https://image.tmdb.org/t/p/w200${profilePath}`; // 이미지 경로 설정
-        img.alt = `${name}'s profile image`;
-        img.style.width = '100%';
-        img.style.height = 'auto'; // 높이를 자동으로 설정
-
-        personDiv.appendChild(img);
-        personDiv.appendChild(p);
-
-        return personDiv;
-    }
-
-    const movieId = [[${movieId}]]
-
-    fetchMovieCredits(movieId);
-
-    const api = {
-        method: 'GET',
-        headers: {
-            accept: 'application/json',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
-        }
-    };
+            visibleCount = 4; // "접기" 후 처음 표시된 항목의 수로 리셋
+            this.style.display = 'none'; // "접기"를 숨깁니다.
+            document.getElementById("showMore").style.display = 'block'; // "더보기"가 다시 보여질 상황을 위해
+        });
 
 
-    // 스틸컷 더보기(more), 접기 클릭 함수
-    // 현재 표시된 항목의 수를 추적하는 변수
-    var visibleCount = 4; // 처음에 보이는 항목 수
-    var increment = 8; // 한 번에 표시할 추가 항목 수
+        // 이미지 클릭시 원본크기로 볼수있게 띄우는 모달 관련 변수 및 함수들
+        var currentScrollPosition = 0;
 
-    document.getElementById("showMore").addEventListener("click", function () {
-        var stillCuts = document.querySelectorAll(".stillCut");
-        var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
+        function openModal(imageSrc) {
 
-        for (var i = visibleCount; i < newVisibleCount; i++) {
-            stillCuts[i].classList.remove("hide");
+            var header = document.getElementById("header")
+            header.style.display = "hide"
+            currentScrollPosition = window.scrollY;
+            document.body.style.overflow = 'hide';
+            var modal = document.getElementById("myModal");
+            var modalImg = document.getElementById("modalImage");
+            modal.style.display = "block";
+            modalImg.src = imageSrc;
         }
 
-        visibleCount = newVisibleCount; // 업데이트된 표시된 항목의 수
+        function closeModal() {
+            var header = document.getElementById("header");
+            header.style.display = '';
+            var modal = document.getElementById("myModal");
+            modal.style.display = "none";
+            document.body.style.overflow = '';
+            // 자꾸 모달 닫을때 포스터 이미지 크기가 바껴서
+            // 걍 모달 함수에서 닫을때 포스터이미지 크기를 강제로 설정해서 크기변동이 없는것처럼 보이게함.
+            document.querySelector('.image.featured img').style.width = '400px';
+            document.querySelector('.image.featured img').style.height = '600px';
 
-        // "접기" 버튼을 항상 보여줌
-        document.getElementById("showLess").style.display = 'block';
-
-        // 모든 항목이 표시되었는지 확인
-        if (visibleCount >= stillCuts.length) {
-            // "더보기"를 숨김
-            this.style.display = 'none';
-        } else {
-            // 아직 표시되지 않은 항목이 있다면 "더보기"를 계속 보여줌
-            this.style.display = 'block';
+            window.scrollTo(0, currentScrollPosition);
         }
-    });
 
-    document.getElementById("showLess").addEventListener("click", function () {
-        var stillCuts = document.querySelectorAll(".stillCut");
-        for (var i = 0; i < stillCuts.length; i++) {
-            if (i > 3) { // 처음 4개를 제외한 나머지를 숨깁니다.
-                stillCuts[i].classList.add("hide");
-            }
-        }
-        visibleCount = 4; // "접기" 후 처음 표시된 항목의 수로 리셋
-        this.style.display = 'none'; // "접기"를 숨깁니다.
-        document.getElementById("showMore").style.display = 'block'; // "더보기"가 다시 보여질 상황을 위해
-    });
+        /*--------- 이미지 상세보기 모달 끝 --------*/
 
+        /* 유튜브 트레일러 관련 모달 시작 */
 
-    // 이미지 클릭시 원본크기로 볼수있게 띄우는 모달 관련 변수 및 함수들
-    var currentScrollPosition = 0;
-
-    function openModal(imageSrc) {
-
-        var header = document.getElementById("header")
-        header.style.display = "hide"
-        currentScrollPosition = window.scrollY;
-        document.body.style.overflow = 'hide';
-        var modal = document.getElementById("myModal");
-        var modalImg = document.getElementById("modalImage");
-        modal.style.display = "block";
-        modalImg.src = imageSrc;
-    }
-
-    function closeModal() {
-        var header = document.getElementById("header");
-        header.style.display = '';
-        var modal = document.getElementById("myModal");
-        modal.style.display = "none";
-        document.body.style.overflow = '';
-        // 자꾸 모달 닫을때 포스터 이미지 크기가 바껴서
-        // 걍 모달 함수에서 닫을때 포스터이미지 크기를 강제로 설정해서 크기변동이 없는것처럼 보이게함.
-        document.querySelector('.image.featured img').style.width = '400px';
-        document.querySelector('.image.featured img').style.height = '600px';
-
-        window.scrollTo(0, currentScrollPosition);
-    }
-
-    /*--------- 이미지 상세보기 모달 끝 --------*/
-
-    /* 유튜브 트레일러 관련 모달 시작 */
-
-    //     document.getElementById('videoModalBtn').addEventListener('click', function() {
-    //     var modal = document.getElementById('videoModal');
-    //     var videoUrl = 'https://www.youtube.com/watch?v=' + '@{${movie.video}}';
-    //     document.getElementById('videoFrame').src = videoUrl;
-    //     modal.style.display = "block";
-    // });
-    //
-    //     document.getElementsByClassName('close')[0].addEventListener('click', function() {
-    //     document.getElementById('videoModal').style.display = "none";
-    //     document.getElementById('videoFrame').src = ""; // 비디오 정지
-    // });
+        //     document.getElementById('videoModalBtn').addEventListener('click', function() {
+        //     var modal = document.getElementById('videoModal');
+        //     var videoUrl = 'https://www.youtube.com/watch?v=' + '@{${movie.video}}';
+        //     document.getElementById('videoFrame').src = videoUrl;
+        //     modal.style.display = "block";
+        // });
+        //
+        //     document.getElementsByClassName('close')[0].addEventListener('click', function() {
+        //     document.getElementById('videoModal').style.display = "none";
+        //     document.getElementById('videoFrame').src = ""; // 비디오 정지
+        // });
 
         // 자바스크립트에서 타임리프를 이용한 변수 가져오기위한 코드 포함
-    document.addEventListener('DOMContentLoaded', function() {
-        var openModalButton = document.getElementById('videoModalBtn');
-        if (openModalButton) {
-            openModalButton.addEventListener('click', function() {
-                var modal = document.getElementById('videoModal');
-                var videoId = openModalButton.getAttribute('data-video-id');
-                if(videoId == null) {
-                    videoId = 'dQw4w9WgXcQ'; // 기본 비디오 ID 설정
-                }
-                var videoUrl = 'https://www.youtube.com/embed/' + videoId;
-                document.getElementById('videoFrame').src = videoUrl;
-                modal.style.display = "flex"; // flex로 변경
-                document.body.style.overflow = 'hide'; // 스크롤 막기
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            var openModalButton = document.getElementById('videoModalBtn');
+            if (openModalButton) {
+                openModalButton.addEventListener('click', function() {
+                    var modal = document.getElementById('videoModal');
+                    var videoId = openModalButton.getAttribute('data-video-id');
+                    if(videoId == null) {
+                        videoId = 'dQw4w9WgXcQ'; // 기본 비디오 ID 설정
+                    }
+                    var videoUrl = 'https://www.youtube.com/embed/' + videoId;
+                    document.getElementById('videoFrame').src = videoUrl;
+                    modal.style.display = "flex"; // flex로 변경
+                    document.body.style.overflow = 'hide'; // 스크롤 막기
+                });
 
-            document.getElementsByClassName('close')[0].addEventListener('click', function() {
-                var modal = document.getElementById('videoModal');
-                modal.style.display = "none";
-                document.getElementById('videoFrame').src = ""; // 비디오 중지
-                document.body.style.overflow = ''; // 스크롤 복원
-            });
-        }
-    });
-
-
-    /* 유튜브 트레일러 관련 모달 끝 */
-
-    // 버튼 클릭 시 스틸컷 또는 리뷰 테이블
-    document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('img').forEach(function(img) {
-    img.addEventListener('click', function() {
-    this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
-    });
-    });
-
-    var stillCutBtn = document.querySelector(".stillcut_btn");
-    var reviewsBtn = document.querySelector(".reviews_btn");
-    var stillCutDiv = document.getElementById("stillcut");
-    var reviewsDiv = document.getElementById("reviews");
-
-        stillCutBtn.addEventListener("click", function() {
-            stillCutDiv.style.display = "block";
-            reviewsDiv.style.display = "none";
-            stillCutBtn.classList.add("clicked");
-            reviewsBtn.classList.remove("clicked");
-        });
-
-        reviewsBtn.addEventListener("click", function() {
-            stillCutDiv.style.display = "none";
-            reviewsDiv.style.display = "block";
-            reviewsBtn.classList.add("clicked");
-            stillCutBtn.classList.remove("clicked");
-        });
-    });
-
-
-    // 리뷰 작성 모달을 팝업 창으로 열기
-    function openReviewModal() {
-        const movieId = $('#movieId').val();
-        console.log("movieId: " + movieId);
-        var reviewWindow = window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=400');
-        var checkWindowClosed = setInterval(function() {
-            if (reviewWindow.closed) {
-                clearInterval(checkWindowClosed);
-                loadComments();
+                document.getElementsByClassName('close')[0].addEventListener('click', function() {
+                    var modal = document.getElementById('videoModal');
+                    modal.style.display = "none";
+                    document.getElementById('videoFrame').src = ""; // 비디오 중지
+                    document.body.style.overflow = ''; // 스크롤 복원
+                });
             }
-        }, 500); // 0.5초마다 상태 확인
-
-    }
-
-
-    const loadComments = () => {
-        const movieId = $('#movieId').val();
-        console.log("겟페이지 무비아이디 = " + movieId);
-
-
-
-//            댓글리스트    --------------------------------------------------
-        $.ajax({
-            url: `/movies/` + movieId ,
-            method: 'GET',
-            dataType: 'json',
-            success: (data) => {
-                console.log(data)
-
-                const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
-                reviewsSection.empty(); // 기존 내용을 비웁니다.
-                data.forEach(({memberEmail, comment,grade }) => {
-                    // 각 댓글마다의 HTML 구조를 생성합니다.
-                    const reviewRow = `
-                    <tr>
-                        <td>
-                            <h4>${memberEmail}</h4>
-                            <p>${new Date().toISOString().slice(0, 10)}</p>
-                            <div>
-                                <input type="radio" id="5-stars" name="rating" value="5" v-model="ratings"/>
-                                <label for="5-stars" class="star pr-4">★</label>
-                            </div>
-                            <p>${comment}</p>
-                        </td>
-                    </tr>
-                `;
-                    reviewsSection.append(reviewRow); // 생성된 HTML을 테이블에 추가합니다.
-            });
-        },
-        error: (xhr, status, error) => {
-            console.error("댓글을 불러오지 못했습니다:", error);
-            $('#comments').append(
-                `<div class="error">
-                    <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
-                   </div>`
-            );
-        }
         });
-    };
-    loadComments();
+
+
+        /* 유튜브 트레일러 관련 모달 끝 */
+
+        // 버튼 클릭 시 스틸컷 또는 리뷰 테이블
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('img').forEach(function(img) {
+                img.addEventListener('click', function() {
+                    this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
+                });
+            });
+
+            var stillCutBtn = document.querySelector(".stillcut_btn");
+            var reviewsBtn = document.querySelector(".reviews_btn");
+            var stillCutDiv = document.getElementById("stillcut");
+            var reviewsDiv = document.getElementById("reviews");
+
+            stillCutBtn.addEventListener("click", function() {
+                stillCutDiv.style.display = "block";
+                reviewsDiv.style.display = "none";
+                stillCutBtn.classList.add("clicked");
+                reviewsBtn.classList.remove("clicked");
+            });
+
+            reviewsBtn.addEventListener("click", function() {
+                stillCutDiv.style.display = "none";
+                reviewsDiv.style.display = "block";
+                reviewsBtn.classList.add("clicked");
+                stillCutBtn.classList.remove("clicked");
+            });
+        });
+
+        const movieId = $('#movieId').val();
+
+        fetchMovieCredits(movieId);
+
+        // 리뷰 작성 모달을 팝업 창으로 열기
+        function openReviewModal() {
+            var member = JSON.parse(sessionStorage.getItem("userInfo"));
+
+            if(member == null){
+                alert("로그인 후 이용해주세요.");
+                return;
+            }else {
+                var MemberEmail = member.email;
+            }
+            console.log(member)
+            console.log(MemberEmail);
+
+            // 댓글 작성 여부 확인
+            $.ajax({
+                url: `/movies/hasCommented/${MemberEmail}/${movieId}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(hasCommented) {
+                    console.log("hasCommented 값:", hasCommented);
+
+                    if (hasCommented) {
+                        alert("이미 댓글을 작성하셨습니다.");
+                    } else {
+                        var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=400');
+                        var checkWindowClosed = setInterval(function () {
+                            if (reviewWindow.closed) {
+                                clearInterval(checkWindowClosed);
+                                loadComments();
+                            }
+                        }, 500); // 0.5초마다 상태 확인
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("댓글 작성 여부를 확인하는 중 오류가 발생했습니다:", error);
+                }
+            });
+        }
+
+        //            댓글리스트    --------------------------------------------------
+        const loadComments = () => {
+            const emojiMap = {
+                1: '😡',
+                2: '😠',
+                3: '😐',
+                4: '😊',
+                5: '😍'
+            };
+
+            $.ajax({
+                url: `/movies/` + movieId,
+                method: 'GET',
+                dataType: 'json',
+                success: (data) => {
+                    console.log(data)
+                    //평점
+                    const movieDataSection = $('.movie_data_averageRating');
+                    movieDataSection.html(`<h4>평점</h4><p>${data.averageRating !== null ? data.averageRating : 0}</p>`);
+                    //댓글정보
+                    const reviewsSection = $('#reviews-table');
+                    reviewsSection.empty();
+                    data.comments.forEach((comment) => {
+                        appendReviewRow(reviewsSection, comment, emojiMap);
+                    });
+                },
+                error: (xhr, status, error) => {
+                    console.error("댓글을 불러오지 못했습니다:", error);
+                    $('#comments').append(`<div class="error"><p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p></div>`);
+                }
+            });
+        };
+
+        //이메일 처리
+        function maskEmail(email) {
+            const atIndex = email.indexOf('@');
+            let emailName = email.slice(0, atIndex);
+            const emailDomain = email.slice(atIndex + 1);
+
+            if (emailName.length > 3) {
+                emailName = `${emailName.slice(0, -3)}***`;
+            } else {
+                emailName = '***';
+            }
+
+            return `${emailName}@${emailDomain}`;
+        }
+
+        function generateStars(grade) {
+            return '★'.repeat(grade);
+        }
+        //댓글 수만큼 반복생성
+        function appendReviewRow(reviewsSection, comment, emojiMap) {
+            const maskedEmail = maskEmail(comment.memberEmail);
+            const stars = generateStars(comment.grade);
+            const emoji = emojiMap[comment.grade] || '';
+            const reviewRow = `
+        <tr>
+            <td>
+                <div>
+                    <span>${emoji}</span>${stars}
+                    <input type="radio" id="${comment.grade}-stars" value="${comment.grade}" checked="checked" />
+                    <span>${new Date().toISOString().slice(0, 10)}</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <h4>${maskedEmail}</h4><span style="margin-left: 40px">${comment.comment}</span>
+                </div>
+            </td>
+        </tr>
+    `;
+            reviewsSection.append(reviewRow);
+        }
+        loadComments();
 
 
 
+    </script>
 
-</script>
 </th:block>
 </body>
 </html>

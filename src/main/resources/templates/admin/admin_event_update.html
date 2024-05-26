@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이벤트 등록</title>
+    <!-- 필요한 CSS 파일 및 기타 헤더 내용 -->
+</head>
+<body>
+<h4 class="fw-bold py-3 mb-4">이벤트 수정</h4>
+<!-- Basic Layout -->
+
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="/admin/update" method="post">
+                    <input type="hidden" name="pageNumber" id="pageNumber">
+                    <input type="hidden" name="id" id="id" th:value="${event.id}">
+                    <div class="mb-3">
+                        <label class="form-label" for="event_name">이벤트 제목</label>
+                        <input class="form-control" id="event_name" name="event_name" placeholder="이벤트 제목을 입력해주세요."
+                               required type="text" th:value="${event.event_name}"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="event_detail">이벤트 상세 설명</label>
+                        <input class="form-control" id="event_detail" name="event_detail"
+                               placeholder="이벤트 상세 설명을 입력해주세요." required type="text" th:value="${event.event_detail}"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="event_image">이미지 이름</label>
+                        <input class="form-control" id="event_image" name="event_image"
+                               placeholder="이미지 파일명을 입력해주세요. ex) event01.png" required type="text" th:value="${event.event_image}"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="event_alt">이미지 alt 설명</label>
+                        <input class="form-control" id="event_alt" name="event_alt" placeholder="이미지 alt 설명을 입력해주세요."
+                               required type="text" th:value="${event.event_alt}"/>
+                    </div>
+                    <button class="updatePageBt" type="submit">수정하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('form').on('submit', function(e) {
+            e.preventDefault();
+
+            var pageNumber = sessionStorage.getItem('pageNumber');
+            $('#pageNumber').val(pageNumber);
+            var formData = $(this).serialize(); // 폼 데이터 직렬화
+
+            $.ajax({
+                type: "POST",
+                url: "/admin/update",
+                data: formData,
+                success: function(response) {
+                    $('.container-xxl').html(response);
+                    sessionStorage.removeItem('pageNumber');
+                },
+                error: function(error) {
+                    console.log('폼 제출 실패', error);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
