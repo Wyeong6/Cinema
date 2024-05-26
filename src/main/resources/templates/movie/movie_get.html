@@ -722,7 +722,11 @@
 
     function react(reactionType) {
         // 비회원 체크
-        checkAnonymousUser()
+
+        if(checkAnonymousUser()) {
+            return;
+        }
+
 
         // 이전에 선택한 리액션을 서버에서 삭제
         if (userCurrentReaction === reactionType) {

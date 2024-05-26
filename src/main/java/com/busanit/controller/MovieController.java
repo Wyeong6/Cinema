@@ -87,7 +87,7 @@ public class MovieController {
     }
 
     // 업코밍 디테일
-    @PostMapping("/upcoming/{movieId}")
+    @GetMapping("/upcoming/{movieId}")
     public String upcomingDetailinfo(@ModelAttribute Movie movie,Model model) throws IOException {
         System.out.println("movieId = " + movie.getMovieId());
         System.out.println("title = " + movie.getTitle());
