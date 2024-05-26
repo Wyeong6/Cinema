@@ -4,81 +4,132 @@
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
-	<head>
-		<title>Cinemacast</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="/assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
-	</head>
-	<body class="no-sidebar is-preload">
-		<div id="page-wrapper">
-			<header data-include-path="header.html"></header>
+<html lang="en"
+	  layout:decorate="~{layout/layout_total}"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Cinemacast</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-			<!-- Main -->
-				<div class="wrapper style1">
+	<meta property="og:title" content="${event.event_name}">
+	<meta property="og:description" content="${event.event_detail}">
+	<meta property="og:url" content="http://localhost:8080/event_get/${eventId}">
+	<meta property="og:image" content="http://localhost:8080/images/event/${event.event_image}">
 
-					<div class="container">
-						<article id="main" class="special">
-							<header>
-								<h2>
-									극장판 하이큐!! 쓰레기장의 결전<br />
-									개봉주 주말 현장 이벤트
-								</h2>
-								<p>
-									2024-5-18(토) ~ 2024-5-21(화)
-								</p>
-							</header>
-							<section>
-								<img src="images/pic06.jpg" alt="" />
-								<p>
-									영화 < 극장판 하이큐!! 쓰레기장의 결전 > 관람하시면 <br />
-									카라스노vs네코마 응원 문구가 새겨진 L홀더(A3)를 선물로 드립니다.<br />
-									지금 바로 롯데시네마에서 예매하세요!
-									<b>진행극장</b> 건대입구, 광복, 노원, 대전센트럴, 동성로, 부산본점, 상인, 수완(아울렛),<br />
-									수원(수원역), 신림, 영등포, 울산(백화점), 원주무실, 월드타워, 청량리,<br />
-									평촌(범계역), 홍대입구
-								</p>
-							</section>
-						</article>
-					</div>
 
-				</div>
+	<link href="/assets/css/main.css" rel="stylesheet"/>
+	<link href="/assets/css/custom.css" rel="stylesheet"/>
+	<link href="/assets/css/nav.css" rel="stylesheet"/>
+	<noscript>
+		<link href="/assets/css/noscript.css" rel="stylesheet"/>
+	</noscript>
+	<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+</head>
+<body class="no-sidebar is-preload">
+<th:block layout:fragment="content">
+	<div id="page-wrapper">
+		<header data-include-path="header.html"></header>
 
-			<footer data-include-path="footer.html"></footer>
-
+		<!-- Main -->
+		<div class="wrapper style1">
+			<div class="container">
+				<article id="main" class="special">
+					<header>
+						<h2 th:text="${event.event_name}">이벤트 제목</h2>
+						<p th:text="${event.regDate}">이벤트 등록 날짜</p>
+					</header>
+					<section>
+						<img id="input-file" th:src="@{'/images/event/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/>
+						<p class="event-detail" th:text="${event.event_detail}">
+							이벤트 상세 내용
+						</p>
+						<div class="btn_box">
+							<a href="javascript:shareMessage()">
+								<button type="button" class="kakao_btn">
+									<img src="/img/front/icon/kakao_sh.png" alt="카카오톡 공유">
+								</button>
+							</a>
+							<span>카카오톡 공유</span>
+						</div>
+					</section>
+				</article>
+			</div>
 		</div>
 
-		<!-- Scripts -->
-			<script src="/assets/js/jquery.min.js"></script>
-			<script src="/assets/js/jquery.dropotron.min.js"></script>
-			<script src="/assets/js/jquery.scrolly.min.js"></script>
-			<script src="/assets/js/jquery.scrollex.min.js"></script>
-			<script src="/assets/js/browser.min.js"></script>
-			<script src="/assets/js/breakpoints.min.js"></script>
-			<script src="/assets/js/util.js"></script>
-			<script src="/assets/js/main.js"></script>
+		<footer data-include-path="footer.html"></footer>
 
-		<script>
-			// include.js
-			window.addEventListener('load', function() {
-				var allElements = document.getElementsByTagName('*');
-				Array.prototype.forEach.call(allElements, function (el) {
-					var includePath = el.dataset.includePath;
-					if (includePath) {
-						var xhttp = new XMLHttpRequest();
-						xhttp.onreadystatechange = function () {
-							if (this.readyState == 4 && this.status == 200) {
-								el.outerHTML = this.responseText;
-							}
-						};
-						xhttp.open('GET', includePath, true);
-						xhttp.send();
+	</div>
+
+	<!-- Scripts -->
+	<script src="/assets/js/jquery.min.js"></script>
+	<script src="/assets/js/jquery.dropotron.min.js"></script>
+	<script src="/assets/js/jquery.scrolly.min.js"></script>
+	<script src="/assets/js/jquery.scrollex.min.js"></script>
+	<script src="/assets/js/browser.min.js"></script>
+	<script src="/assets/js/breakpoints.min.js"></script>
+	<script src="/assets/js/util.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+	<script>
+		// include.js
+		window.addEventListener('load', function() {
+			var allElements = document.getElementsByTagName('*');
+			Array.prototype.forEach.call(allElements, function (el) {
+				var includePath = el.dataset.includePath;
+				if (includePath) {
+					var xhttp = new XMLHttpRequest();
+					xhttp.onreadystatechange = function () {
+						if (this.readyState == 4 && this.status == 200) {
+							el.outerHTML = this.responseText;
+						}
+					};
+					xhttp.open('GET', includePath, true);
+					xhttp.send();
+				}
+			});
+
+			// Kakao SDK 초기화
+			Kakao.init('3d074cbbda365535b831c90baead22c2'); // 여기에 실제 Kakao 앱 키를 입력하세요.
+		});
+
+		// Kakao 공유 함수
+		function shareMessage() {
+			var currentUrl = window.location.href;
+			var urlSegments = currentUrl.split('/');
+			var eventId = urlSegments[urlSegments.length - 1];
+
+
+
+			var titleElement = document.querySelector('h2');
+			var detailElement = document.querySelector('.event-detail');
+			var imageElement = document.querySelector('img');
+
+
+
+			if (titleElement && detailElement && imageElement) {
+				var title = titleElement.innerText;
+				var detail = detailElement.innerText;
+				var imageUrl = imageElement.src;
+
+				Kakao.Link.sendDefault({
+					objectType: 'feed',
+					content: {
+						title: title, // 이벤트 제목
+						description: detail, // 이벤트 상세 내용
+						imageUrl: imageUrl, // 이벤트 이미지 URL
+						link: {
+							mobileWebUrl: `http://localhost:8080/event_get/${eventId}`, // 동적 이벤트 ID를 포함한 URL
+							webUrl: `http://localhost:8080/event_get/${eventId}`
+						}
 					}
 				});
-			});
-		</script>
-
-	</body>
+			} else {
+				console.error('필요한 요소를 찾을 수 없습니다.');
+			}
+		}
+	</script>
+</th:block>
+</body>
 </html>

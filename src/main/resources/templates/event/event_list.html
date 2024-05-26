@@ -39,7 +39,7 @@ xmlns:th="http://www.thymeleaf.org">
 						<div class="row">
 							<article class="col-3 col-12-mobile special" th:each="event : ${eventList}">
 								<input type="hidden" th:value="${event.id}" />
-								<a href="#" class="image featured">
+								<a th:href="@{'/event_get/' + ${event.id}}" class="image featured">
 									<img th:src="@{'/images/event/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/>
 
 								</a>
@@ -56,6 +56,9 @@ xmlns:th="http://www.thymeleaf.org">
 						<div style="text-align: center" th:unless="${eventList.totalElements > 0}">
 							<h3>상품을 준비중 입니다.</h3>
 						</div>
+					</div>
+					<div>
+						<a th:href="@{'/event/eventList?page=' + ${i}}" th:each="i : ${#numbers.sequence(startPage, endPage)}" class="paging-btn" th:text="${i}"></a>
 					</div>
 				</div>
 
@@ -74,6 +77,7 @@ xmlns:th="http://www.thymeleaf.org">
 	</th:block>
 
 		<script>
+
 			// include.js
 			window.addEventListener('load', function() {
 				var allElements = document.getElementsByTagName('*');
@@ -91,6 +95,30 @@ xmlns:th="http://www.thymeleaf.org">
 					}
 				});
 			}); // 이 부분을 추가하여 괄호를 닫습니다.
+
+
+			$(document).ready(function() {
+				function loadPage(page) {
+					$.ajax({
+						url: '/event/eventList?page=' + page,
+						type: 'GET',
+						success: function(response) {
+							$('#page-wrapper').html(response);
+							// URL 업데이트
+							window.history.replaceState({page: page}, "", '/event/eventList?page=' + page);
+						},
+						error: function(error) {
+							alert("Failed to load the page. Please try again.");
+						}
+					});
+				}
+
+				$(document).on('click', '.paging-btn', function(e) {
+					e.preventDefault();
+					var page = $(this).data('page');
+					loadPage(page);
+				});
+			});
 		</script>
 	</body>
 </html>

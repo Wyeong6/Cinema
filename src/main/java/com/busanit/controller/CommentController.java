@@ -40,4 +40,17 @@ public class CommentController {
 
         return new ResponseEntity<>(commentService.hasCommented(memberEmail, movieId), HttpStatus.OK);
     }
+
+    @DeleteMapping("/movies/delete/{cno}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long cno){
+        System.out.println("commentId0" +cno);
+        try{
+            commentService.deleteComment(cno);
+            System.out.println(" 지우기 성공");
+            return ResponseEntity.ok("댓글이 삭제되었습니다.");
+        }catch (Exception e){
+            System.out.println("지우기 실패");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글을 삭제하는 중 오류가 발생했습니다.");
+        }
+    }
 }

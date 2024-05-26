@@ -65,4 +65,9 @@ public class CommentService {
         return comment.isPresent();
 
     }
+
+    public void deleteComment(Long cno) {
+
+        commentRepository.deleteById(cno);
+    }
 }

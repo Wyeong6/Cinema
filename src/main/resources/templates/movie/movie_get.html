@@ -558,6 +558,8 @@
             const maskedEmail = maskEmail(comment.memberEmail);
             const stars = generateStars(comment.grade);
             const emoji = emojiMap[comment.grade] || '';
+            const member = JSON.parse(sessionStorage.getItem("userInfo"));
+            const isOwner = member && member.email === comment.memberEmail;
             const reviewRow = `
         <tr>
             <td>
@@ -568,6 +570,7 @@
                 </div>
                 <div style="display: flex; align-items: center;">
                     <h4>${maskedEmail}</h4><span style="margin-left: 40px">${comment.comment}</span>
+                      ${isOwner ? `<button class="delete-btn" data-comment-id="${comment.cno}" style="margin-left: 20px;">삭제</button>` : ''}
                 </div>
             </td>
         </tr>
@@ -576,7 +579,27 @@
         }
         loadComments();
 
+        $(document).on('click', '.delete-btn', function() {
 
+            const cno = $(this).data('comment-id');
+            console.log(cno);
+            deleteComment(cno);
+        });
+
+        function deleteComment(cno) {
+            $.ajax({
+                url: `/movies/delete/${cno}`,
+                method: 'DELETE',
+                success: function(response) {
+                    alert("댓글이 삭제되었습니다.");
+                    loadComments(); // 댓글 목록 다시 로드
+                },
+                error: function(xhr, status, error) {
+                    console.error("댓글 삭제 중 오류가 발생했습니다:", error);
+                    alert("댓글을 삭제하는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
+                }
+            });
+        }
 
     </script>
 
