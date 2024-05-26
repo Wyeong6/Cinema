@@ -16,6 +16,13 @@
 
     <style>
 
+        button.active {
+            background-color: #ffeb3b; /* 버튼 색상을 노란색으로 변경 */
+            box-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffeb3b, 0 0 30px #ffeb3b; /* 빛나는 효과 */
+            color: #333;
+            font-weight: bold;
+        }
+
         .hide {
             display: none;
         }
@@ -128,6 +135,21 @@
                                     ~ overview ~
                                 </p>
 
+
+
+
+                                <button id="likeButton" type="button" onclick="react('LIKE')">재밌어요</button>
+                                <span class="like-count">0</span>
+                                <button id="dislikeButton" type="button" onclick="react('DISLIKE')">재미없어요</button>
+                                <span class="dislike-count">0</span>
+                                <button id="sadButton" type="button" onclick="react('SAD')">슬퍼요</button>
+                                <span class="sad-count">0</span>
+                                <button id="funnyButton" type="button" onclick="react('FUNNY')">웃겨요</button>
+                                <span class="funny-count">0</span>
+                                <button id="scaryButton" type="button" onclick="react('SCARY')">무서워요</button>
+                                <span class="scary-count">0</span>
+
+
                                 <div class="movie_data_box">
                                     <div class="movie_data">
                                         <h4>누적 관객수</h4>
@@ -160,23 +182,6 @@
                 </div>
             </div>
 
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-
-            <button id="likeButton" type="button" onclick="react('LIKE')">재밌어요</button>
-            <span class="like-count">0</span>
-            <button type="button" onclick="react('DISLIKE')">재미없어요</button>
-            <span class="dislike-count">0</span>
-            <button type="button" onclick="react('SAD')">슬퍼요</button>
-            <span class="sad-count">0</span>
-            <button type="button" onclick="react('FUNNY')">웃겨요</button>
-            <span class="funny-count">0</span>
-            <button type="button" onclick="react('SCARY')">무서워요</button>
-            <span class="scary-count">0</span>
 
             <section class="movie_etc">
                 <div class="etc_btn">
@@ -236,12 +241,6 @@
 
 <!--              댓글         ------------------             -->
 <script th:inline="javascript">
-
-
-    $(document).ready(function() {
-        // 페이지 로드 시 초기화 함수 호출
-        initializeReactions();
-    });
 
 
 
@@ -554,19 +553,33 @@
     console.log(userEmail);
 
 
+    // 비회원 체크
+    function checkAnonymousUser() {
+        if (!userEmail || userEmail === 'anonymousUser') {
+            alert('로그인이 필요합니다.');
+            return true;
+        }
+        return false;
+    }
+
+
+
     async function addReaction(userEmail, movieId, reactionType) {
+
+
         if (isRequestPending) {
             return; // 비동기 요청 중이면 클릭을 무시
         }
         isRequestPending = true; // 비동기 요청 시작
 
-        if (!(movieId in currentReactions)) {
-            currentReactions[movieId] = {};
-        }
-
-        var currentMemberReaction = currentReactions[movieId][userEmail];
-
         try {
+
+            if (!(movieId in currentReactions)) {
+                currentReactions[movieId] = {};
+            }
+
+            var currentMemberReaction = currentReactions[movieId][userEmail];
+
             if (currentMemberReaction === reactionType) {
                 await removeReaction(userEmail, movieId, reactionType);
                 delete currentReactions[movieId][userEmail];
@@ -575,15 +588,12 @@
                     await removeReaction(userEmail, movieId, currentMemberReaction);
                 }
                 await sendReaction(userEmail, movieId, reactionType);
-                if (!(movieId in currentReactions)) {
-                    currentReactions[movieId] = {};
-                }
                 currentReactions[movieId][userEmail] = reactionType;
             }
         } catch (error) {
             console.error('Error processing reaction:', error);
         } finally {
-            isRequestPending = false; // 비동기 요청 완료
+            isRequestPending = false;
         }
     }
 
@@ -635,6 +645,11 @@
             reactionType: reactionType
         };
 
+        if (!userEmail || !movieId) {
+            console.error('Error removing reaction: userEmail or movieId is missing');
+            return;
+        }
+
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: '/remove',
@@ -678,12 +693,7 @@
             success: function(response) {
                 // 응답에서 현재 리액션 상태를 받아와 버튼 상태를 업데이트
                 userCurrentReaction = response.reactionType;
-                if (userCurrentReaction === 'LIKE') {
-                    $('#likeButton').addClass('active');
-                } else if (userCurrentReaction === 'DISLIKE') {
-                    $('#dislikeButton').addClass('active');
-                }
-                // 다른 리액션에 대한 처리도 동일하게 추가
+                updateButtonState()
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching current reaction:', status, error);
@@ -691,17 +701,43 @@
         });
     }
 
+    // 버튼 상태 업데이트 함수 추가
+    function updateButtonState() { // 새로 추가된 함수
+        // 모든 버튼에서 active 클래스를 제거
+        $('#likeButton, #dislikeButton, #sadButton, #funnyButton, #scaryButton').removeClass('active');
+
+        // 현재 리액션에 해당하는 버튼에 active 클래스 추가
+        if (userCurrentReaction === 'LIKE') {
+            $('#likeButton').addClass('active');
+        } else if (userCurrentReaction === 'DISLIKE') {
+            $('#dislikeButton').addClass('active');
+        } else if (userCurrentReaction === 'SAD') {
+            $('#sadButton').addClass('active');
+        } else if (userCurrentReaction === 'FUNNY') {
+            $('#funnyButton').addClass('active');
+        } else if (userCurrentReaction === 'SCARY') {
+            $('#scaryButton').addClass('active');
+        }
+    }
+
     function react(reactionType) {
+        // 비회원 체크
+        checkAnonymousUser()
+
         // 이전에 선택한 리액션을 서버에서 삭제
         if (userCurrentReaction === reactionType) {
-            removeReaction(userEmail, movieId, reactionType);
+            removeReaction(userEmail, movieId, reactionType)
+            userCurrentReaction = null;// 이전 리액션 상태를 초기화
+            updateButtonState()
             return;
         } else if (userCurrentReaction) {
             removeReaction(userEmail, movieId, reactionType);
+            updateButtonState()
         }
         // 새로운 리액션을 추가하고 클라이언트 측의 리액션 상태 업데이트
-        addReaction(userEmail, movieId, reactionType);
-        userCurrentReaction = reactionType;
+        addReaction(userEmail, movieId, reactionType)
+        userCurrentReaction = reactionType; // 새로운 리액션 상태 설정
+        updateButtonState()
     }
 
 
@@ -730,7 +766,10 @@
             span.id = 'scaryCount_' + movieId;
         });
         updateReactionCount(movieId);
+        initializeReactions();
     });
+
+
 
 
 

@@ -80,6 +80,7 @@ public class MovieService {
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 JsonNode results = objectMapper.readTree(response.body().string()).get("results");
+                System.out.println("results === " + results );
                 results.forEach(node -> {
                     String posterPath = node.get("poster_path").asText(null);
                     if (posterPath != null && !posterPath.isEmpty()) {
@@ -88,6 +89,7 @@ public class MovieService {
                 });
             }
         }
+        System.out.println("업커밍 무비즈 fetchAndStore" + upcomingMovies);
         return upcomingMovies;
     }
 

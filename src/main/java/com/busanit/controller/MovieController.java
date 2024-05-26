@@ -81,38 +81,51 @@ public class MovieController {
         System.out.println("movieInfos = " + movieInfos);
         System.out.println("movieId = " + movieId);
         System.out.println("userEmail = " + userEmail);
-//        model.addAttribute("upcoming",)
+
+//        model.addAttribute("movieInfos",upcomingInfos);
         return "movie/movie_get";
     }
 
     // 업코밍 디테일
     @PostMapping("/upcoming/{movieId}")
-    public String upcomingDetailinfo(@ModelAttribute Movie movie
-                                     ,Model model) throws IOException {
+    public String upcomingDetailinfo(@ModelAttribute Movie movie,Model model) throws IOException {
         System.out.println("movieId = " + movie.getMovieId());
         System.out.println("title = " + movie.getTitle());
 
-
-
         List<MovieDTO> upcomingMovies = movieService2.fetchAndStoreUpcoming();
 
-        MovieDTO matchingMovie = null;
-        for (MovieDTO movieDTO : upcomingMovies) {
-            if (movieDTO.getId().equals(movie.getMovieId())) {
-                matchingMovie = movieDTO;
-                break;
-            }
-        }
+        System.out.println("업커밍 무비즈 = -----------" + upcomingMovies);
+
+        System.out.println("업커밍 디테일 인포 modelAttribute로 받아온 movie = " + movie);
+
+        MovieDTO matchingMovie = findMovieById((movie.getMovieId()));
+
+        System.out.println("matchingMovie ===== " + matchingMovie);
+
+//        for (MovieDTO movieDTO : upcomingMovies) {
+//            if (movieDTO.getId().equals(movie.getMovieId()) || movieDTO.getTitle().equals(movie.getTitle())) {
+//                matchingMovie = movieDTO;
+//                break;
+//            }
+//        }
 
         // 필터링된 영화 정보를 모델에 추가
         if (matchingMovie != null) {
-            model.addAttribute("movieInfo", matchingMovie);
+            model.addAttribute("movieInfos", matchingMovie);
         }
         model.addAttribute("movieId", movie.getMovieId());
 
-
-
         return "movie/movie_get";
+    }
+
+    private MovieDTO findMovieById(Long movieId) throws IOException {
+        List<MovieDTO> upcomingMovies = movieService2.fetchAndStoreUpcoming();
+        for (MovieDTO movieDTO : upcomingMovies) {
+            if (movieDTO.getId().equals(movieId)) {
+                return movieDTO;
+            }
+        }
+        return null;
     }
 
 

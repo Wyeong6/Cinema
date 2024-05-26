@@ -148,14 +148,12 @@
                     <input type="hidden" th:name="posterPath" th:value="${movie.posterPath}"/>
                     <input type="hidden" th:name="genres" th:value="${movie.genres}"/>
                     <input type="hidden" th:name="overview" th:value="${movie.overview}"/>
-
-
-                <a href="javascript:void(0);" onclick="document.forms['detailForm'].submit();" class="image featured">
+                <a th:href="@{'/upcoming/' + ${movie.id}}"  onclick="document.forms['detailForm'].submit();" class="image featured">
                     <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진" width="150" height="400" />
                 </a>
                  <header>
                      <h3>
-                         <a href="javascript:void(0);" onclick="document.forms['detailForm'].submit();" >
+                         <a href="javascript:void(1);" onclick="document.forms['detailForm'].submit();" >
                              <span th:utext="${#strings.length(movie.title) &gt; 20 ? #strings.substring(movie.title, 0, 20) + '...' : movie.title}">...</span>
                          </a>
                      </h3>

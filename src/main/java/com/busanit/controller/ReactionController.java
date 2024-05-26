@@ -20,13 +20,13 @@ import java.util.Map;
 public class ReactionController {
 
     private final ReactionService reactionService;
-    private final MovieRepository movieRepository;
+
 
 
     ////// 멤버아이디 동적으로 가져와야함 - 해결
     ////// 숫자 실시간으로 변하는거 해야함 - 해결
     ////// 연결되는 링크 해결해야함 -
-    ////// 새로고침했을때 다시 눌러지는거 해결해야함 -
+    ////// 새로고침했을때 다시 눌러지는거 해결해야함 - 해결(반쯤)
     ////// 로그인안하고 눌렀을때 로그인하라고 모달띄워야함 -
 
     @GetMapping("/movie/{movieId}")
