@@ -8,7 +8,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -53,6 +55,13 @@ public class Movie {
     //댓글 관계
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
+
+    //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MovieReaction> reactions = new ArrayList<>();
+
+
+
 
     public void addComment(Comment comment){
         this.comment.add(comment);

@@ -30,7 +30,7 @@ public class SecurityConfig {
 //                        httpSecuritySessionManagementConfigurer.sessionFixation().none())
                 .authorizeHttpRequests(authorizeHttpRequestConfigurer -> authorizeHttpRequestConfigurer
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**").permitAll()
+                        .requestMatchers("/assets/**", "/images/**", "/jquery/**").permitAll()
                         .requestMatchers("/", "/member/**", "/**").permitAll() // 모든 사용자에게 허용 (수정예정) /** 부분 수정하기(개발하기 편하려고 다 오픈한거임)
                         .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN 에게만 허용 (수정예정) admin 전부를 거부하는건 너무 광범위함 보안에 취약해지는듯 관리자 페이지를 전부 구현하면 해당 페이지만 거부해야겠음
                         .anyRequest().authenticated() // 나머지 요청은 인증된 사용자만 접근 가능
@@ -54,11 +54,11 @@ public class SecurityConfig {
 
                 .logout(logoutConfigurer -> logoutConfigurer
                         .logoutUrl("/member/logout")
-                        //.logoutUrl("/logout") // 주석 처리하면 기본 시큐리티 페이지로 사용 가능
-                        .logoutSuccessUrl("/member/login") // 로그아웃 성공시 이동할 url
-                        .invalidateHttpSession(true)    // 로그아웃 이후 세션 전체 삭제 여부
-                        .clearAuthentication(true)      // 로그아웃 시 인증정보 삭제 여부
-                ) // logout setting
+                        .invalidateHttpSession(true) // 세션 무효화
+                        .deleteCookies("JSESSIONID") // 쿠키 삭제
+                        .clearAuthentication(true) // 인증 정보 삭제
+                        .logoutSuccessUrl("/member/login") // 로그아웃 성공 시 이동할 URL
+                )
 
                 .build();
     }

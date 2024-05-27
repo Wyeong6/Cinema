@@ -32,9 +32,13 @@ public class CommentService {
     //댓글쓰기
     public void register(CommentDTO commentDTO) {
 
-
         Movie movie = movieRepository.findById(commentDTO.getMovieId())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 movieId: " + commentDTO.getMovieId()));
+                .orElseGet(() -> {
+                    Movie newMovie = new Movie();
+                    newMovie.setMovieId(commentDTO.getMovieId());
+                    return newMovie;
+                });
+
         Member member = memberRepository.findByEmail(commentDTO.getMemberEmail())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 memberId: " + commentDTO.getMemberEmail()));
 

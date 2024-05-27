@@ -56,7 +56,6 @@
                         <th>이벤트 이미지</th>
                         <th>이벤트 이미지 상세글</th>
                         <th>등록일자</th>
-                        <th>수정일자</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -68,10 +67,7 @@
                             <td><img th:src="@{'/images/event/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/></td>
                             <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.event_alt}"></strong></td>
                             <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${#temporals.format(event.regDate, 'yyyy-MM-dd')}"></strong></td>
-                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${#temporals.format(event.updateDate, 'yyyy-MM-dd')}"></strong></td>
-
                             <td style="text-align: right; width: 50px;">
-                    <!--            <a th:href="@{'/admin/update/'+${event.id}}" class="update-btn" data-id="${event.id}">-->
                             <a class="update-btn" th:data-page="${currentPage}" th:data-id="${event.id}">
                                 <img alt="상품 수정 버튼" src="/images/magnifier.png" style="width: 24px; height: auto; margin-right: 20px;"/>
                             </a>

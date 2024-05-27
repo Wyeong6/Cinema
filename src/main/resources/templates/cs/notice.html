@@ -87,7 +87,7 @@
                                 </div>
                                 <span th:unless="${notice.pinned}" th:text="${notice.id}"></span>
                             </td>
-                            <td><a th:href="@{/cs/notice/{id}(id=${notice.id})}" th:text="${notice.title}"></a></td>
+                            <td><a th:href="@{/cs/notice/{id}(id=${notice.id}, page=${currentPage}, size=${size})}" th:text="${notice.title}"></a></td>
                             <td th:text="${notice.viewCount}"></td>
                             <td th:text="${notice.regDate}"></td>
                         </tr>
@@ -95,9 +95,9 @@
                 </table>
                 <div class="paging_btn">
                     <ul>
-                        <a th:href="@{/cs/notice(page=${1})}"
+                        <a th:href="@{/cs/notice(page=${firstPage})}"
                            th:onclick="${currentPage == 1} ? 'return false;'"><<</a><a>&nbsp;</a>
-                        <a th:href="@{/cs/notice(page=${currentPage - 1})}"
+                        <a th:href="@{/cs/notice(page=${previousPage})}"
                             th:onclick="${currentPage == 1} ? 'return false;'">&lt;</a><a>&nbsp;</a>
                         <li th:each="pageNum : ${pageNumbers}">
                             <a th:href="@{/cs/notice(page=${pageNum}, size=${size})}"
@@ -105,7 +105,7 @@
                                th:onclick="${pageNum == currentPage} ? 'return false;'"></a>
                         </li><span>&nbsp;</span>
                         <a>&nbsp;</a>
-                        <a th:href="@{/cs/notice(page=${currentPage + 1})}"
+                        <a th:href="@{/cs/notice(page=${nextPage})}"
                            th:onclick="${currentPage == totalPages} ? 'return false;'">&gt;</a><a>&nbsp;</a>
                         <span></span>
                         <a th:href="@{/cs/notice(page=${totalPages})}"

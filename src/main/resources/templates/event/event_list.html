@@ -104,8 +104,6 @@ xmlns:th="http://www.thymeleaf.org">
 						type: 'GET',
 						success: function(response) {
 							$('#page-wrapper').html(response);
-							// URL 업데이트
-							window.history.replaceState({page: page}, "", '/event/eventList?page=' + page);
 						},
 						error: function(error) {
 							alert("Failed to load the page. Please try again.");

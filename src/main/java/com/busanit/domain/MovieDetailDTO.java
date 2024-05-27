@@ -21,11 +21,6 @@ public class MovieDetailDTO {
 
 
 
-
-
-
-
-
     // ---- JSON타입의 배열속의 배열속 에있는 데이터들을 추출하기위한 추가적인 DTO;
     // -- Detail에서만 사용되기때문에 DetailDTO내부에 작성하였음.
     @Getter

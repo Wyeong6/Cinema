@@ -25,6 +25,8 @@ import org.springframework.data.domain.*;
 
 
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,6 +84,7 @@ public class MovieService {
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 JsonNode results = objectMapper.readTree(response.body().string()).get("results");
+                System.out.println("results === " + results );
                 results.forEach(node -> {
                     String posterPath = node.get("poster_path").asText(null);
                     if (posterPath != null && !posterPath.isEmpty()) {
@@ -93,6 +96,19 @@ public class MovieService {
         return upcomingMovies;
     }
 
+    // MovieController에서 사용
+    public MovieDTO findMovieById(Long movieId) throws IOException {
+        List<MovieDTO> upcomingMovies = fetchAndStoreUpcoming();
+        for (MovieDTO movieDTO : upcomingMovies) {
+            if (movieDTO.getId().equals(movieId)) {
+                return movieDTO;
+            }
+        }
+        return null;
+    }
+
+
+
     //개봉예정영화 페이지 당 12개씩
     public Page<MovieDTO> getUpcomingMovies(Pageable pageable) throws IOException {
         List<MovieDTO> allMovies = fetchAndStoreUpcoming();
@@ -101,7 +117,6 @@ public class MovieService {
         List<MovieDTO> moviesOnPage = allMovies.subList(start, end);
         return new PageImpl<>(moviesOnPage, pageable, allMovies.size());
     }
-
 
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
@@ -191,7 +206,6 @@ public class MovieService {
         movie.setMovieId(movieDTO.getId());
         movie.setTitle(movieDTO.getTitle());
         movie.setOverview(movieDTO.getOverview());
-
     }
 
     // Movie 객체를 가져오거나 새로 생성
@@ -409,10 +423,72 @@ public class MovieService {
     }
 
     //영화 상세보기
-    public List<MovieDTO> getMovieDetailInfo(Long movieID) {
-        Optional<Movie> movieList = movieRepository.findById(movieID);
+    public List<MovieDTO> getMovieDetailInfo(Long movieId) {
+        Optional<Movie> movieList = movieRepository.findById(movieId);
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // 상세보기 들어갈때 로그인되어있는 유저 email받아오기
+    public String getUserEmail() {
+        String userEmail = null;
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+        return userEmail;
+    }
+
+
+
+    /* upcoming 상세보기를 위한 전용함수들  시작 */
+//
+//    public void fetchAndStoreMoviesUpcoming() throws IOException {
+//        int totalPages = fetchTotalPages();
+//        for (int page = 1; page <= totalPages; page++) {
+//            // https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=1&api_key=547e2cd4d0e26e68fb907dafef4f90ac&region=KR
+//            String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
+//            Request request = new Request.Builder().url(url).build();
+//            try (Response response = client.newCall(request).execute()) {
+//                String responseBody = response.body().string();
+//                processResponse(responseBody);
+//            }
+//        }
+//    }
+//
+//    public void fetchAndStoreMovieRuntimeAndReleaseDataUpcoming(Long movieId) throws IOException {
+//            String url = "https://api.themoviedb.org/3/movie/" + movieId + "?language=ko-KR&api_key=" + apiKey;
+//            Request request = new Request.Builder().url(url).build();
+//            try (Response response = client.newCall(request).execute()) {
+//                String responseBody = response.body().string();
+//                processRuntimeAndReleaseDataResponse(responseBody);
+//        }
+//    }
+//
+//    public void fetchAndStoreMovieStillCutsUpcoming(Long movieId) throws IOException {
+//
+//            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/images?include_image_language=kr%2Cnull&language=KR&api_key=" + apiKey;
+//            Request request = new Request.Builder().url(url).build();
+//            try (Response response = client.newCall(request).execute()) {
+//                String responseBody = response.body().string();
+//                processStillCutsResponse(responseBody);
+//            }
+//        }
+//
+//    public void fetchAndStoreCertificationDataUpcoming(Long movieId) throws IOException {
+//            String url = "https://api.themoviedb.org/3/movie/" + movieId + "/release_dates?api_key=" + apiKey;
+//            Request request = new Request.Builder().url(url).build();
+//            try (Response response = client.newCall(request).execute()) {
+//                String responseBody = response.body().string();
+//                processCertificationResponse(responseBody, movieId);
+//            }
+//
+//    }
+
+
+
+
 
 }
