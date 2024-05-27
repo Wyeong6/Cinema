@@ -7,7 +7,6 @@ import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieReaction;
 import com.busanit.entity.movie.ReactionType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,6 +84,11 @@ public class Member extends BaseTimeEntity {
         this.comment.add(comment);
         comment.setMember(this);
     }
+    //멤버와 이벤트게시글 연관관계
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    private List<Event> events;
+
+
 
 
 

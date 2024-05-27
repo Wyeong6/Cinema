@@ -71,6 +71,12 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         return count > 0; // count가 0보다 크면 true, 그렇지 않으면 false 반환
     }
 
+    // (비밀번호 변경시) 기존 비밀번호 확인용
+    public String passwordCheck(String email) {
+        String passwordCheck = memberRepository.findByPassword(email);
+        return passwordCheck;
+    }
+
     // 비밀번호 수정
     public void updatePassword(String password, String email) {
         memberRepository.updatePassword(password, email);

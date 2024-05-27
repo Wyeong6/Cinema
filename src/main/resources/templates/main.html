@@ -12,6 +12,11 @@
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+<style>
+    a#movie_title:hover ~ hr {
+        visibility: hidden; /* <hr> 태그 숨기기 */
+    }
+</style>
 </head>
 
 <body class="homepage is-preload">
@@ -25,27 +30,22 @@
         <!-- Inner -->
         <div class="inner">
             <header>
-                <h1><a href="index.html" id="movie_title">Movie Title</a></h1>
+
+                <h1><a id="movie_title">Movie Title</a></h1>
                 <hr />
                 <p>Another fine freebie by HTML5 UP</p>
             </header>
             <footer>
                 <a href="#banner" class="button circled scrolly">예매</a>
-                <a class="button circled scrolly" id="videoButton">비디오</a>
+
+<!--                <a class="button circled scrolly" id="videoButton">비디오</a>-->
+
             </footer>
         </div>
-
-
 
         <!-- info -->
         <div id="info" th:data-username="${#authentication.name}">
             <ul>
-                <li sec:authorize="hasRole('USER')">
-                    <span sec:authentication="name"/> 님 환영합니다.
-                </li>
-                <li sec:authorize="hasRole('ADMIN')">
-                    <a th:href="@{/admin/adminMain}" th:text="'관리자 페이지'"></a>
-                </li>
                 <li sec:authorize="isAnonymous()">
                     <a href="/member/new">회원가입</a>
                 </li>
@@ -54,6 +54,12 @@
                 </li>
                 <li sec:authorize="isAuthenticated()">
                     <a href="/member/logout">로그아웃</a>
+                </li>
+                <li sec:authorize="hasRole('USER')">
+                    <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
+                </li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/adminMain}" th:text="'관리자페이지'"></a>
                 </li>
                 <li><a href="/payment/cartList">장바구니</a></li>
             </ul>
@@ -78,17 +84,17 @@
                     </ul>
                 </li>
                 <li><a href="/snack/snackList">스낵 스토어</a></li>
-                <li><a href="event_list.html">이벤트</a></li>
-                <li><a href="notice_list.html">공지사항</a></li>
+                <li><a href="/event/eventList">이벤트</a></li>
+                <li><a href="/cs/notice">공지사항</a></li>
             </ul>
         </nav>
 
         <div id="img_btn">
-            <button class="btn clicked" onclick="changeBackgroundAndTitle(0)">1</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(1)">2</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(2)">3</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(3)">4</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(4)">5</button>
+            <button class="btn clicked" onclick="changeBackgroundAndTitle(0)">01</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(1)">02</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(2)">03</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(3)">04</button>
+            <button class="btn" onclick="changeBackgroundAndTitle(4)">05</button>
         </div>
 
     </div>
@@ -108,7 +114,7 @@
     <section class="carousel">
         <div class="section_title">
             <h2>Weekly Hot Movies</h2>
-            <p><a href="/nowMovie">더보기</a></p>
+            <p><a href="/nowMovies">더보기</a></p>
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${allMovies}" th:if="${iterStat.index < 9}" >
@@ -137,7 +143,7 @@
     <section class="carousel">
         <div class="section_title">
             <h2>Comming Soon</h2>
-            <p><a href="/comingMove">more</a></p>
+            <p><a href="/comingMoves">more</a></p>
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 9}">
@@ -167,36 +173,6 @@
             </article>
         </div>
     </section>
-
-    <!-- Main -->
-    <!--				<div class="wrapper style2">-->
-
-    <!--					<article id="main" class="container special">-->
-    <!--						<a href="#" class="image featured"><img src="images/pic06.jpg" alt="" /></a>-->
-    <!--						<header>-->
-    <!--							<h2><a href="#">Sed massa imperdiet magnis</a></h2>-->
-    <!--							<p>-->
-    <!--								Sociis aenean eu aenean mollis mollis facilisis primis ornare penatibus aenean. Cursus ac enim-->
-    <!--								pulvinar curabitur morbi convallis. Lectus malesuada sed fermentum dolore amet.-->
-    <!--							</p>-->
-    <!--						</header>-->
-    <!--						<p>-->
-    <!--							Commodo id natoque malesuada sollicitudin elit suscipit. Curae suspendisse mauris posuere accumsan massa-->
-    <!--							posuere lacus convallis tellus interdum. Amet nullam fringilla nibh nulla convallis ut venenatis purus-->
-    <!--							sit arcu sociis. Nunc fermentum adipiscing tempor cursus nascetur adipiscing adipiscing. Primis aliquam-->
-    <!--							mus lacinia lobortis phasellus suscipit. Fermentum lobortis non tristique ante proin sociis accumsan-->
-    <!--							lobortis. Auctor etiam porttitor phasellus tempus cubilia ultrices tempor sagittis. Nisl fermentum-->
-    <!--							consequat integer interdum integer purus sapien. Nibh eleifend nulla nascetur pharetra commodo mi augue-->
-    <!--							interdum tellus. Ornare cursus augue feugiat sodales velit lorem. Semper elementum ullamcorper lacinia-->
-    <!--							natoque aenean scelerisque.-->
-    <!--						</p>-->
-    <!--						<footer>-->
-    <!--							<a href="#" class="button">Continue Reading</a>-->
-    <!--						</footer>-->
-    <!--					</article>-->
-
-    <!--				</div>-->
-
     <!-- Features -->
     <div class="wrapper style1">
 
@@ -344,7 +320,7 @@
                 const movieTitle = document.getElementById('movie_title');
                 const buttons = document.querySelectorAll('.btn');
 
-                $('#videoButton').off('click').on('click', function () {
+                $('#movie_title').off('click').on('click', function () {
                     const videoUrl = movieVideos[index];
                     console.log("videoUrl" + videoUrl)
                     $('#videoFrame').attr('src', videoUrl);

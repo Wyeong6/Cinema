@@ -17,7 +17,10 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@RequiredArgsConstructor
 public class Movie {
+
+
 
     @Id
     private Long movieId;
@@ -59,6 +62,8 @@ public class Movie {
     //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MovieReaction> reactions = new ArrayList<>();
+
+
 
 
     public void addComment(Comment comment){

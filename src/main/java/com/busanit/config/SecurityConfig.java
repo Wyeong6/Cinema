@@ -24,9 +24,13 @@ public class SecurityConfig {
         return http
                 .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable()) // csrf 끄기
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable()) // cors 끄기
+//                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+//                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션 생성 정책 설정
+//                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+//                        httpSecuritySessionManagementConfigurer.sessionFixation().none())
                 .authorizeHttpRequests(authorizeHttpRequestConfigurer -> authorizeHttpRequestConfigurer
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**").permitAll()
+                        .requestMatchers("/assets/**", "/images/**", "/jquery/**").permitAll()
                         .requestMatchers("/", "/member/**", "/**").permitAll() // 모든 사용자에게 허용 (수정예정) /** 부분 수정하기(개발하기 편하려고 다 오픈한거임)
                         .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN 에게만 허용 (수정예정) admin 전부를 거부하는건 너무 광범위함 보안에 취약해지는듯 관리자 페이지를 전부 구현하면 해당 페이지만 거부해야겠음
                         .anyRequest().authenticated() // 나머지 요청은 인증된 사용자만 접근 가능

@@ -19,6 +19,11 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+
+//        // 사용자 인증 후 세션에 userId 저장
+//        String userEmail = authentication.getName();
+//        request.getSession().setAttribute("userEmail", userEmail);
+
         OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) authentication.getPrincipal();
 
         // 암호화된 패스워드 값

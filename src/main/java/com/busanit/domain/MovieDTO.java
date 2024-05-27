@@ -51,13 +51,11 @@ public class MovieDTO {
 
         Optional.ofNullable(movie.getMovieDetail()).ifPresentOrElse(detail -> {
             movieDTO.setPopularity(detail.getPopularity());
-//            movieDTO.setVoteAverage(detail.getVoteAverage());
             movieDTO.setVideo(detail.getVideo());
             movieDTO.setReleaseDate(detail.getReleaseDate());
             movieDTO.setRuntime(detail.getRuntime());
             movieDTO.setCertifications(detail.getCertification());
         }, () -> {
-//            movieDTO.setVoteAverage(0);
             movieDTO.setVideo(null);
         });
 
@@ -77,4 +75,6 @@ public class MovieDTO {
 
         return movieDTO;
     }
+
+
 }
