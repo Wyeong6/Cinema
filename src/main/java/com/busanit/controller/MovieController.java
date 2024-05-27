@@ -98,8 +98,8 @@ public class MovieController {
 
     @GetMapping("/comingMovies")
     public String upcomingMovies(Model model,
-                            @RequestParam(defaultValue = "0") int page,
-                            @RequestParam(defaultValue = "12") int size) {
+                                 @RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "12") int size) {
         Page<MovieDTO> upcomingMoviesPage = movieService2.getUpcomingMoviesPagingAndSorting(page, size);
         model.addAttribute("moviePage", upcomingMoviesPage);
         return "movie/movie_list_comming";

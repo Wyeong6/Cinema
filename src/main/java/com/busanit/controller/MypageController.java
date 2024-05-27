@@ -78,6 +78,8 @@ public class MypageController {
         return "/mypage/mypage_review";
     }
 
+
+
     @GetMapping("/infoEdit")
     public String mypageEdit(@AuthenticationPrincipal Object principal, Model model) {
         String userEmail = null;
