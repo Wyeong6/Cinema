@@ -3,14 +3,15 @@ package com.busanit.entity;
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.entity.movie.Comment;
-import com.busanit.entity.movie.Genre;
+import com.busanit.entity.movie.Movie;
+import com.busanit.entity.movie.MovieReaction;
+import com.busanit.entity.movie.ReactionType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "member")
@@ -53,6 +54,32 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comment = new ArrayList<>();
 
+    //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MovieReaction> reactions = new ArrayList<>();
+
+    // 리액션 연관관계 및 그외 메서드 시작
+    @Transactional
+    public void addReaction(Movie movie, ReactionType reactionType) {
+        MovieReaction reaction = new MovieReaction(this, movie, reactionType);
+        reactions.add(reaction);
+        movie.getReactions().add(reaction);
+    }
+
+    public void removeReaction(Movie movie) {
+        for (Iterator<MovieReaction> iterator = reactions.iterator(); iterator.hasNext();) {
+            MovieReaction reaction = iterator.next();
+
+            if (reaction.getMember().equals(this) && reaction.getMovie().equals(movie)) {
+                iterator.remove();
+                reaction.getMovie().getReactions().remove(reaction);
+                reaction.setMember(null);
+                reaction.setMovie(null);
+            }
+        }
+    }
+    // 리액션 연관관계 및 그외 메서드 끝
+
     public void addComment(Comment comment){
         this.comment.add(comment);
         comment.setMember(this);
@@ -60,6 +87,8 @@ public class Member extends BaseTimeEntity {
     //멤버와 이벤트게시글 연관관계
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Event> events;
+
+
 
 
 
