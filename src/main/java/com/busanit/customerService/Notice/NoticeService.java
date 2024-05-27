@@ -1,15 +1,20 @@
 package com.busanit.customerService.Notice;
 
 import com.busanit.customerService.util.PaginationUtil;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NoticeService {
@@ -28,6 +33,18 @@ public class NoticeService {
     public void NoticeSave(NoticeDTO noticeDTO) {
         Notice notice = noticeMapper.toNotice(noticeDTO);
         noticeRepository.save(notice);
+    }
+
+    @Transactional
+    public void NoticeMod(Long id, NoticeDTO noticeDTO) {
+        Notice notice = noticeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Notice not found"));
+        if (notice != null) {
+            // 수정된 내용을 엔티티에 반영합니다.
+            notice.setTitle(noticeDTO.getTitle());
+            notice.setContent(noticeDTO.getContent());
+            notice.setPinned(noticeDTO.isPinned());
+            noticeRepository.save(notice);
+        }
     }
 
     public NoticeDTO findById(Long id) {
@@ -49,45 +66,42 @@ public class NoticeService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Notice> noticePage = noticeRepository.findAllOrderedByPinnedAndId(pageable);
 
-
         return noticePage.map(noticeMapper::toNoticeDTO);
     }
 
 
+    // 조회수
     public void incrementViewCount(com.busanit.customerService.Notice.Notice notice) {
         notice.setViewCount(notice.getViewCount() + 1);
         noticeRepository.save(notice);
     }
 
-
-
+    // 상세 게시물 보기
     public Notice getNoticeById(Long id) {
         return noticeRepository.findById(id).orElse(null);
     }
 
-    public com.busanit.customerService.Notice.Notice getPreviousNotice(Long id) {
-        for (int i = 0; i < noticeList.size(); i++) {
-            if (noticeList.get(i).getId().equals(id)) {
-                if (i > 0) {
-                    return noticeList.get(i - 1);
-                } else {
-                    return null;
-                }
-            }
-        }
-        return null;
+    // 이전 게시물
+    public Notice getPreviousNotice(Long id) {
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Notice> previousNoticePage = noticeRepository.findPreviousNotice(id, pageable);
+        return previousNoticePage.getContent().isEmpty() ? null : previousNoticePage.getContent().get(0);
     }
 
-    public com.busanit.customerService.Notice.Notice getNextNotice(Long id) {
-        for (int i = 0; i < noticeList.size(); i++) {
-            if (noticeList.get(i).getId().equals(id)) {
-                if (i < noticeList.size() - 1) {
-                    return noticeList.get(i + 1);
-                } else {
-                    return null;
-                }
-            }
-        }
-        return null;
+    // 다음 게시물
+    public Notice getNextNotice(Long id) {
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Notice> nextNoticePage = noticeRepository.findNextNotice(id, pageable);
+        return nextNoticePage.getContent().isEmpty() ? null : nextNoticePage.getContent().get(0);
     }
+
+    public boolean deleteNoticeById(Long id) {
+        Optional<Notice> noticeOptional = noticeRepository.findById(id);
+        if (noticeOptional.isPresent()) {
+            noticeRepository.deleteById(id);
+            return true; // Deletion successful
+        }
+        return false; // Notice not found
+    }
+
 }

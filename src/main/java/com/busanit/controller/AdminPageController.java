@@ -1,12 +1,11 @@
 package com.busanit.controller;
 
+import com.busanit.customerService.Notice.*;
 
 import com.busanit.domain.EventDTO;
 import com.busanit.customerService.Notice.NoticeDTO;
 import com.busanit.customerService.Notice.NoticeService;
-import com.busanit.customerService.util.PaginationUtil;
 import com.busanit.domain.SnackDTO;
-import com.busanit.entity.Event;
 import com.busanit.entity.Snack;
 import com.busanit.service.EventService;
 import com.busanit.service.SnackService;
@@ -14,15 +13,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -32,15 +33,14 @@ import java.util.List;
 @Slf4j
 public class AdminPageController {
 
+    // 병합시점에서 log 사용자가 없고 @Slf4j 와 log 가 중복된거라 log 부분을 주석처리 했습니다.
+//    private static final Logger log = LoggerFactory.getLogger(AdminPageController.class);
     private final SnackService snackService;
-
     private final EventService eventService;
-
     private final NoticeService noticeService;
 
-
     @GetMapping("/adminMain")
-    public String adminMain(){
+    public String adminMain() {
         return "admin/admin_layout";
     }
 
@@ -51,7 +51,7 @@ public class AdminPageController {
     }
 
     @PostMapping("/movie")
-    public String movie(){
+    public String movie() {
         return "admin/adminMoviePage";
     }
 
@@ -225,7 +225,9 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
     }
 
     @PostMapping("/help")
-    public String help(){ return "admin/adminHelpPage"; }
+    public String help() {
+        return "admin/adminHelpPage";
+    }
 
     @GetMapping("/notice")
     public String showNoticeList(Model model,
@@ -233,5 +235,66 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
                                  @RequestParam(defaultValue = "10") int size) {
         noticeService.prepareNoticeList(model, page, size);
         return "/cs/noticeAdmin";
+    }
+
+    @GetMapping("/notice/{id}")
+    public String showNoticeDetails(Model model,
+                                    @PathVariable Long id,
+                                    @RequestParam(value = "currentPage", required = false) Integer currentPage) {
+        Notice notice = noticeService.getNoticeById(id);
+        if (notice == null) {
+            return "redirect:/admin/notice";
+        }
+        noticeService.incrementViewCount(notice);
+
+        model.addAttribute("currentPage", currentPage);
+
+        model.addAttribute("notice", notice);
+        return "cs/noticeDetailAdmin";
+    }
+
+    @DeleteMapping("/notice/{id}")
+    public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
+        return noticeService.deleteNoticeById(id)
+                ? ResponseEntity.ok("삭제 완료")
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제 실패");
+    }
+
+    @GetMapping("/notice/add")
+    public String addNotice() {
+        return "/cs/noticeAddAdmin";
+    }
+
+    @PostMapping("/notice/add")
+    public String addNotice(Model model,
+                            @RequestParam(value = "currentPage", required = false) Integer currentPage,
+                            NoticeDTO noticeDTO, BindingResult result) {
+        Long id = noticeDTO.getId();
+        if (id == null) {
+            noticeService.NoticeSave(noticeDTO);
+            model.addAttribute("urlLoad", "/admin/notice");
+        } else {
+            noticeService.NoticeMod(id, noticeDTO);
+            model.addAttribute("urlLoad", "/admin/notice/" + id + "?page=" + currentPage);
+            model.addAttribute("currentPage", currentPage);
+            System.out.println("수정 완료해서 보낼 때: " + currentPage);
+        }
+
+        return "admin/admin_layout";
+    }
+
+    @GetMapping("/notice/mod/{id}")
+    public String modNotice(@PathVariable Long id, Model model,
+                            @RequestParam(value = "currentPage", required = false) Integer currentPage ) {
+        NoticeDTO noticeDTO = noticeService.findById(id);
+
+        model.addAttribute("id", id);
+        model.addAttribute("title", noticeDTO.getTitle());
+        model.addAttribute("content", noticeDTO.getContent());
+        model.addAttribute("pinned", noticeDTO.isPinned());
+        model.addAttribute("currentPage", currentPage);
+        System.out.println("수정 페이지로 들어갔을 때 " + currentPage);
+
+        return "cs/noticeAddAdmin";
     }
 }

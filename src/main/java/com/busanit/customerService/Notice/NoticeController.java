@@ -1,6 +1,7 @@
 package com.busanit.customerService.Notice;
 
 import com.busanit.customerService.util.PaginationUtil;
+import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/cs")
+@Log
 public class NoticeController {
 
     private final NoticeService noticeService;
@@ -30,8 +32,11 @@ public class NoticeController {
     }
 
     @GetMapping("/notice/{id}")
-    public String showNoticeDetails(@PathVariable Long id, Model model) {
+    public String showNoticeDetails(@PathVariable Long id, Model model,
+                                    @RequestParam(defaultValue = "1") int page,
+                                    @RequestParam(defaultValue = "10") int size) {
         Notice notice = noticeService.getNoticeById(id);
+        noticeService.prepareNoticeList(model, page, size);
         if (notice == null) {
             return "redirect:/cs/notice";
         }
