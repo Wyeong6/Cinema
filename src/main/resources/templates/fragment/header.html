@@ -27,7 +27,7 @@
                 <a href="/member/login">로그인</a>
             </li>
             <li sec:authorize="isAuthenticated()">
-                <a href="/member/logout">로그아웃</a>
+                <a href="/member/logout" id="logoutLink">로그아웃</a>
             </li>
             <li sec:authorize="hasRole('USER')">
                 <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
@@ -65,5 +65,14 @@
 
 </div>
 </body>
+<script th:inline="javascript">
+    // 로그아웃시 session storage값 삭제
+    $("#logoutLink").click(function(event) {
+        event.preventDefault();
+        sessionStorage.removeItem("userInfo");
+
+        window.location.href = "/member/logout";
+    });
+</script>
 </th:block>
 </html>

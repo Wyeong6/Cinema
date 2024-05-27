@@ -32,7 +32,6 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
-    //    private final TermsService termsService;
     private final CustomOAuth2UserDetailsService customOAuth2UserDetailsService;
 
     @GetMapping("/login")
@@ -133,37 +132,7 @@ public class MemberController {
         return "member/findResult";
     }
 
-    // password 수정
-    @PostMapping("/modify")
-    public String modifyPassword(String basicPassword, String password, @AuthenticationPrincipal Object principal, Model model) {
-        // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
-        if(principal instanceof OAuth2MemberDTO) {
-            OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
-//            // socialMemberDTO를 사용하여 처리
-//            memberService.updatePassword(passwordEncoder.encode(password), oAuth2MemberDTO.getEmail());
-            return "redirect:/";
-        } else if(principal instanceof FormMemberDTO) {
-            FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
-            // formMemberDTO를 사용하여 처리
-            String passwordCheck = null;
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null) {
-                String userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
-                passwordCheck = memberService.passwordCheck(userEmail);
-            }
-
-            if (passwordEncoder.matches(basicPassword, passwordCheck)) {
-                memberService.updatePassword(passwordEncoder.encode(password), formMemberDTO.getEmail());
-                return "redirect:/mypage/main"; // redirect - html 파일을 반환하는게 아닌 매핑된 다른 컨트롤러 메서드를 호출
-            } else {
-                model.addAttribute("errorMessage", "비밀번호를 다시 확인해주세요.");
-                return "mypage/mypage_private_password";
-            }
-        }
-        return "redirect:/mypage/";
-    }
-
-    // 소셜 로그인 특정 조건(비밀번호 재설정x or 나이 재설정x)일때 뜨는 페이지
+    // 소셜 로그인 특정 조건(비밀번호 재설정x or 나이 재설정x)일때 뜨는 info 수정 페이지 (로그인시 자동으로 뜸)
     @GetMapping("/modifySocialInfo")
     public String modifySocialInfo() {
         return "member/memberSocialInfoModify";

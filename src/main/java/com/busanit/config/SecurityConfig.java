@@ -54,11 +54,11 @@ public class SecurityConfig {
 
                 .logout(logoutConfigurer -> logoutConfigurer
                         .logoutUrl("/member/logout")
-                        //.logoutUrl("/logout") // 주석 처리하면 기본 시큐리티 페이지로 사용 가능
-                        .logoutSuccessUrl("/member/login") // 로그아웃 성공시 이동할 url
-                        .invalidateHttpSession(true)    // 로그아웃 이후 세션 전체 삭제 여부
-                        .clearAuthentication(true)      // 로그아웃 시 인증정보 삭제 여부
-                ) // logout setting
+                        .invalidateHttpSession(true) // 세션 무효화
+                        .deleteCookies("JSESSIONID") // 쿠키 삭제
+                        .clearAuthentication(true) // 인증 정보 삭제
+                        .logoutSuccessUrl("/member/login") // 로그아웃 성공 시 이동할 URL
+                )
 
                 .build();
     }

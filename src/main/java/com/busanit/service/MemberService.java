@@ -1,6 +1,7 @@
 package com.busanit.service;
 
 import com.busanit.domain.FormMemberDTO;
+import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.entity.Member;
 import com.busanit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +81,17 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
     // 비밀번호 수정
     public void updatePassword(String password, String email) {
         memberRepository.updatePassword(password, email);
+    }
+
+    // mypage 개인정보수정 info 가져오기(form + social 회원)
+    public MemberRegFormDTO getFormMemberInfo(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("formMember null"));
+        return MemberRegFormDTO.toDTO(member);
+    }
+
+    // mypage 개인정보수정
+    public void editMemberInfo(MemberRegFormDTO memberRegFormDTO){
+        memberRepository.save(Member.toEntity(memberRegFormDTO));
     }
 
     // 개인정보(이메일(단수)) masking
