@@ -465,23 +465,12 @@
 
         // 리뷰 작성 모달을 팝업 창으로 열기
         function openReviewModal() {
-            var member = JSON.parse(sessionStorage.getItem("userInfo"));
-
-            if(member == null){
-                alert("로그인 후 이용해주세요.");
-                return;
-            }else {
-                var MemberEmail = member.email;
-            }
-            console.log(member)
-            console.log(MemberEmail);
-
             // 댓글 작성 여부 확인
             $.ajax({
-                url: `/movies/hasCommented/${MemberEmail}/${movieId}`,
+                url: `/movies/hasCommented/${movieId}`,
                 method: 'GET',
                 dataType: 'json',
-                success: function(hasCommented) {
+                success: function(hasCommented, textStatus, xhr) {
                     console.log("hasCommented 값:", hasCommented);
 
                     if (hasCommented) {
@@ -497,11 +486,15 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error("댓글 작성 여부를 확인하는 중 오류가 발생했습니다:", error);
+                    if (xhr.status === 401) {
+                        alert("로그인해주세요.");
+                        }else {
+                        console.error("댓글 작성 여부를 확인하는 중 오류가 발생했습니다:", error);
+
+                    }
                 }
             });
         }
-
         //            댓글리스트    --------------------------------------------------
         const loadComments = () => {
             const emojiMap = {

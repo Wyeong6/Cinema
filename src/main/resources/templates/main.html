@@ -18,7 +18,15 @@
     }
     .custom-modal-xl {
         max-width: 90%; /* 또는 원하는 크기 */
+        z-index: 99999999;
     }
+    .modal-backdrop.show {
+        opacity: 0.85 !important; /* 투명도 조절 */
+    }
+    .custom-modal-border {
+        border: 2px solid #000; /* 테두리 두께와 색상 */
+    }
+
 </style>
 </head>
 

@@ -82,9 +82,10 @@
                     </tr>
                 </tbody>
             </table>
-        <div>
-        <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}" th:text="${i}" class="paging-btn"></a>
+        <div  style="text-align: center;">
+        <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}" th:text="'[' + ${i} + ']'" class="paging-btn"></a>
         </div>
+
     </div>
 <script>
     $(document).ready(function() {

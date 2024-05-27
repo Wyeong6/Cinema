@@ -50,7 +50,7 @@ public class Member extends BaseTimeEntity {
 
     private Boolean checkedTermsS;
     //멤버와 댓글 연관관계
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
 
     public void addComment(Comment comment){

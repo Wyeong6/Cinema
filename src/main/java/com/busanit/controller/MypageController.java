@@ -1,7 +1,10 @@
 package com.busanit.controller;
 
+import com.busanit.domain.CommentDTO;
 import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.OAuth2MemberDTO;
+import com.busanit.service.CommentService;
+import com.busanit.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -9,10 +12,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/mypage")
 @RequiredArgsConstructor
 public class MypageController {
+
+    private final CommentService commentService;
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
@@ -54,7 +61,10 @@ public class MypageController {
         return "/mypage/mypage_point";
     }
     @GetMapping("/review")
-    public String mypageReview() {
+    public String mypageReview(Model model) {
+        String memberEmail = commentService.getAuthenticatedUserEmail();
+        List<CommentDTO> comments = commentService.getAllComments(memberEmail);
+        model.addAttribute("comments", comments);
 
         return "/mypage/mypage_review";
     }

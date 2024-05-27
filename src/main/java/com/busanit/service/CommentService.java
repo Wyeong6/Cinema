@@ -10,6 +10,8 @@ import com.busanit.repository.MemberRepository;
 import com.busanit.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,19 +55,38 @@ public class CommentService {
 
         return CommentDTO.toDTOList(commentList);
     }
+    //마이페이지의 리뷰리스트
+    public List<CommentDTO> getAllComments(String memberEmail){
+        List<Comment> commentList = commentRepository.findAllByMemberEmail(memberEmail);
+
+        return CommentDTO.toDTOList(commentList);
+    }
 
     //평균평점
     public Double getAverageRating(String movieId){
         return commentRepository.findAvgRatingByMovieId(Long.valueOf(movieId));
     }
-
+    //회원이 등록한 댓글여부 확인
     public Boolean hasCommented(String memberEmail , Long movieId){
 
         Optional<Comment> comment = commentRepository.findCommentByMemberEmailAndMovieMovieId(memberEmail, movieId);
         return comment.isPresent();
 
     }
-
+    //로그인한 유저 검사
+    public boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getName());
+    }
+    //로그인한 유저의 이메일을 리턴
+    public String getAuthenticatedUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getName())) {
+            return authentication.getName();
+        }
+        return null;
+    }
+    //댓글 삭제
     public void deleteComment(Long cno) {
 
         commentRepository.deleteById(cno);

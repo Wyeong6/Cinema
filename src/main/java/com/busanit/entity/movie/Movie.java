@@ -51,7 +51,7 @@ public class Movie {
     private List<MovieStillCut> stillCuts = new ArrayList<>();
 
     //댓글 관계
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
 
     public void addComment(Comment comment){

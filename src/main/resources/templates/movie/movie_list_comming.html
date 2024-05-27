@@ -13,6 +13,12 @@
     <noscript>
         <link rel="stylesheet" href="/assets/css/noscript.css"/>
     </noscript>
+    <style>
+        .pagination{
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
@@ -55,13 +61,13 @@
                 <!-- 페이지네이션 -->
                 <div class="pagination">
                     <a href="#" th:if="${moviePage.hasPrevious()}"
-                       th:href="@{/comingMoves(page=${moviePage.number - 1 + 1})}">이전</a>
+                       th:href="@{/nowMovies(page=${moviePage.number - 1})}">이전</a>
                     <span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
-            <a th:href="@{/comingMoves(page=${pageNum + 1})}" th:text="${pageNum + 1}"
+            <a th:href="@{/comingMoves(page=${pageNum + 1})}"th:text="'[' + (${pageNum + 1}) + ']'"
                th:classappend="${pageNum == moviePage.number} ? 'active' : ''"></a>
-        </span>
+                    </span>
                     <a href="#" th:if="${moviePage.hasNext()}"
-                       th:href="@{/comingMoves(page=${moviePage.number + 1 + 1})}">다음</a>
+                       th:href="@{/nowMovies(page=${moviePage.number + 1})}">다음</a>
                 </div>
             </div>
         </div>
