@@ -1,12 +1,15 @@
 package com.busanit.domain;
 
+import com.busanit.entity.Member;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberRegFormDTO {
 
     @NotBlank(message = "이름은 필수 입력 값입니다.")
@@ -32,16 +35,17 @@ public class MemberRegFormDTO {
     private Boolean checkedTermsE;
 
     private Boolean checkedTermsS;
+
+    public static MemberRegFormDTO toDTO(Member member) {
+        return MemberRegFormDTO.builder()
+                .name(member.getName())
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .age(member.getAge())
+                .social(member.isSocial())
+                .grade_code(member.getGrade_code())
+                .checkedTermsE(member.getCheckedTermsE())
+                .checkedTermsS(member.getCheckedTermsS())
+                .build();
+    }
 }
-
-/*
-    NotEmpty - NULL 체크 및 문자열의 경우 길이 0인지 검사
-    NotBlank - NULL 체크 및 문자열의 경우 0 및 빈 문자열(" ") 검사
-    Length(min=, max=) - 최소, 최대 길이 검사
-    Email - 이메일 형식인지 검사
-    Max(숫자) - 지정한 값보다 작은지 검사
-    Min(숫자) - 지정한 값보다 큰지 검사
-    Null - 값이 NULL인지 검사
-    NotNull - 값이 NULL이 아닌지 검사
-
- */

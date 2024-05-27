@@ -1,7 +1,6 @@
 package com.busanit.controller;
 
 import com.busanit.customerService.Notice.*;
-
 import com.busanit.domain.EventDTO;
 import com.busanit.customerService.Notice.NoticeDTO;
 import com.busanit.customerService.Notice.NoticeService;

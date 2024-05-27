@@ -10,7 +10,7 @@
                                     <label for="name">이름 <b>*</b></label>
                                 </td>
                                 <td>
-                                    <input type="text" id="name" />
+                                    <input type="text" id="name" th:value="${member.name}"/>
                                 </td>
                             </tr>
                             <tr>
@@ -18,7 +18,7 @@
                                     <label for="birth_date">생년월일 <b>*</b></label>
                                 </td>
                                 <td>
-                                    <input type="text" id="birth_date" />
+                                    <input type="text" id="birth_date" th:value="${member.age}"/>
                                     <div>
                                         <ul>
                                             <li>생일 쿠폰은 생일 당월 동안 사용 가능합니다.</li>
@@ -31,7 +31,7 @@
                                 <td>
                                     <label for="email">이메일 <b>*</b></label></td>
                                 <td>
-                                    <input type="text" id="email" />
+                                    <input type="text" id="email" th:value="${member.email}"/>
                                     <button class="button">중복 확인</button>
                                     <div>
                                         <p style="color: #00C73C">사용가능한 이메일 입니다.</p>
@@ -39,7 +39,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr th:if="${formUser == 'formUser'}">
                                 <td>
                                     <label for="password_chk">패스워드 확인 <b>*</b></label>
                                 </td>

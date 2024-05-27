@@ -133,7 +133,7 @@ public class MemberController {
         return "member/findResult";
     }
 
-    // password 수정
+    // mypage 비밀번호수정
     @PostMapping("/modify")
     public String modifyPassword(String basicPassword, String password, @AuthenticationPrincipal Object principal, Model model) {
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
@@ -163,7 +163,7 @@ public class MemberController {
         return "redirect:/mypage/";
     }
 
-    // 소셜 로그인 특정 조건(비밀번호 재설정x or 나이 재설정x)일때 뜨는 페이지
+    // 소셜 로그인 특정 조건(비밀번호 재설정x or 나이 재설정x)일때 뜨는 info 수정 페이지 (로그인시 자동으로 뜸)
     @GetMapping("/modifySocialInfo")
     public String modifySocialInfo() {
         return "member/memberSocialInfoModify";
