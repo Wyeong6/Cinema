@@ -17,10 +17,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class Movie {
-
-
 
     @Id
     private Long movieId;
