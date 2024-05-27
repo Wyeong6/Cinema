@@ -112,11 +112,19 @@ public class MypageController {
 
     // 개인정보수정 - 저장하기
     @PostMapping("/infoEdit")
-    public String mypageEdit2(String password, @AuthenticationPrincipal Object principal, Model model) {
+    public String mypageEdit2(MemberRegFormDTO memberRegFormDTO, @AuthenticationPrincipal Object principal, Model model) {
+        // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용
+        if(principal instanceof OAuth2MemberDTO) {
+            OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
 
+        } else if(principal instanceof FormMemberDTO) {
+            FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
+
+            memberService.editMemberInfo(memberRegFormDTO);
+
+        }
         return "redirect:/mypage/";
     }
-
 
     @GetMapping("/passwordEdit")
     public String mypagePasswordEdit() {

@@ -89,6 +89,11 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         return MemberRegFormDTO.toDTO(member);
     }
 
+    // mypage 개인정보수정
+    public void editMemberInfo(MemberRegFormDTO memberRegFormDTO){
+        memberRepository.save(Member.toEntity(memberRegFormDTO));
+    }
+
     // 개인정보(이메일(단수)) masking
     public String maskingEmail(String email) {
         if (email == null) return null;

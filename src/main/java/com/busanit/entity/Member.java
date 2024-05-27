@@ -95,4 +95,14 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
+    // 마이페이지 개인정보수정
+    public static Member toEntity(MemberRegFormDTO regFormDTO) {
+        return Member.builder()
+                .id(regFormDTO.getId())
+                .name(regFormDTO.getName())
+                .email(regFormDTO.getEmail())
+                .age(regFormDTO.getAge())
+                .grade_code(regFormDTO.getGrade_code())
+                .build();
+    }
 }

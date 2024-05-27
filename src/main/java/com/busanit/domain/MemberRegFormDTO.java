@@ -12,6 +12,8 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 public class MemberRegFormDTO {
 
+    private Long id;
+
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     private String name;
 

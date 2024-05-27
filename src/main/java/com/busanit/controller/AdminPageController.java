@@ -113,6 +113,49 @@ public class AdminPageController {
 
         return "admin/admin_layout";
     }
+
+    @GetMapping("/snackEdit")
+    public String snackEdit(@RequestParam(name = "snackItemId") long snackItemId,
+                            Model model) {
+
+        SnackDTO snackDTO2 = snackService.get(snackItemId);
+        model.addAttribute("snack", snackDTO2);
+
+        return "/admin/admin_snack_edit";
+    }
+
+    @PostMapping("/snackEdit")
+    public String snackEdit(SnackDTO snackDTO, Model model) {
+
+        snackService.editSnack(snackDTO);
+
+        model.addAttribute("urlLoad", "/admin/snackList"); // javascript load function 에 필요함
+
+        return "/admin/admin_layout";
+    }
+
+    @PostMapping("/snackDelete")
+    public String snackDelete(@RequestParam(name = "page", defaultValue = "0") int page,
+                              @RequestParam(name = "snackItemId") long snackItemId,
+                              Model model,
+                              @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                              SnackDTO snackDTO) {
+
+        snackService.deleteSnack(snackItemId);
+
+        Page<SnackDTO> snackDTOList = null;
+
+        snackDTOList = snackService.getSnackList(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "/admin/admin_snack_list";
+    }
+
     //이벤트 등록페이지 이동
     @GetMapping("/eventRegister")
     public String eventRegister() { return "admin/admin_event_register"; }
@@ -178,49 +221,6 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
         eventService.delete(eventId);
 
     return "redirect:/admin/eventList?page=" + pageNumber;
-    }
-
-
-    @GetMapping("/snackEdit")
-    public String snackEdit(@RequestParam(name = "snackItemId") long snackItemId,
-                            Model model) {
-
-        SnackDTO snackDTO2 = snackService.get(snackItemId);
-        model.addAttribute("snack", snackDTO2);
-
-        return "/admin/admin_snack_edit";
-    }
-
-    @PostMapping("/snackEdit")
-    public String snackEdit(SnackDTO snackDTO, Model model) {
-
-        snackService.editSnack(snackDTO);
-
-        model.addAttribute("urlLoad", "/admin/snackList"); // javascript load function 에 필요함
-
-        return "/admin/admin_layout";
-    }
-
-    @PostMapping("/snackDelete")
-    public String snackDelete(@RequestParam(name = "page", defaultValue = "0") int page,
-                              @RequestParam(name = "snackItemId") long snackItemId,
-                              Model model,
-                              @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-                              SnackDTO snackDTO) {
-
-        snackService.deleteSnack(snackItemId);
-
-        Page<SnackDTO> snackDTOList = null;
-
-        snackDTOList = snackService.getSnackList(pageable);
-        model.addAttribute("snackList", snackDTOList);
-
-        int startPage = Math.max(1, snackDTOList.getPageable().getPageNumber() - 5);
-        int endPage = Math.min(snackDTOList.getTotalPages(), snackDTOList.getPageable().getPageNumber() + 5);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
-
-        return "/admin/admin_snack_list";
     }
 
     @PostMapping("/help")
