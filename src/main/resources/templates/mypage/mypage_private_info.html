@@ -32,10 +32,10 @@
                                     <label for="email">이메일 <b>*</b></label></td>
                                 <td>
                                     <input type="text" id="email" th:value="${member.email}"/>
-                                    <button class="button">중복 확인</button>
+                                    <button class="button" id="checkEmail">중복 확인</button>
                                     <div>
-                                        <p style="color: #00C73C">사용가능한 이메일 입니다.</p>
-                                        <p style="color: #ff0000">사용 중인 이메일 입니다.</p>
+                                        <p style="color: #00C73C; display: none;" id="email-available">사용가능한 이메일 입니다.</p>
+                                        <p style="color: #ff0000; display: none;" id="email-taken">사용 중인 이메일 입니다.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -54,3 +54,32 @@
                         </div>
                     </section>
                 </article>
+
+                <script>
+                    $(document).ready(function() {
+                        $('#checkEmail').click(function(e) {
+                            e.preventDefault(); // 폼 제출 방지
+
+                            var email = $('#email').val();
+
+                            $.ajax({
+                                type: 'POST',
+                                url: '/mypage/infoEditCheckEmail',
+                                data: JSON.stringify({ email: email }),
+                                contentType: 'application/json',
+                                success: function(response) {
+                                    if(response.available) {
+                                        $('#email-available').show();
+                                        $('#email-taken').hide();
+                                    } else {
+                                        $('#email-available').hide();
+                                        $('#email-taken').show();
+                                    }
+                                },
+                                error: function() {
+                                    alert('이메일 확인 중 오류가 발생했습니다.');
+                                }
+                            });
+                        });
+                    });
+                </script>

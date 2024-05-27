@@ -3,15 +3,19 @@ package com.busanit.controller;
 import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.domain.OAuth2MemberDTO;
+import com.busanit.entity.Member;
 import com.busanit.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/mypage")
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MypageController {
 
     private final MemberService memberService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
@@ -73,14 +78,13 @@ public class MypageController {
             userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
         }
 
-        // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
+        // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
             model.addAttribute("socialUser", "socialUser");
 
             MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
             model.addAttribute("member", memberRegFormDTO);
-
 
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
@@ -92,10 +96,62 @@ public class MypageController {
         return "/mypage/mypage_private_info";
     }
 
+    // 개인정보수정 - 이메일 중복확인
+    @PostMapping("/infoEditCheckEmail")
+    @ResponseBody // JSON 응답
+    public Map<String, Boolean> mypageEdit1(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        Long findUser = memberService.findUserIdx(email);
+        boolean isAvailable = (findUser == null);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("available", isAvailable);
+
+        return response;
+    }
+
+    // 개인정보수정 - 저장하기
+    @PostMapping("/infoEdit")
+    public String mypageEdit2(String password, @AuthenticationPrincipal Object principal, Model model) {
+
+        return "redirect:/mypage/";
+    }
+
+
     @GetMapping("/passwordEdit")
     public String mypagePasswordEdit() {
 
         return "/mypage/mypage_private_password";
+    }
+
+    // mypage 비밀번호수정
+    @PostMapping("/passwordEdit")
+    public String mypagePasswordEdit(String basicPassword, String password, @AuthenticationPrincipal Object principal, Model model) {
+        // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
+        if(principal instanceof OAuth2MemberDTO) {
+            OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
+//            // socialMemberDTO를 사용하여 처리
+//            memberService.updatePassword(passwordEncoder.encode(password), oAuth2MemberDTO.getEmail());
+            return "redirect:/";
+        } else if(principal instanceof FormMemberDTO) {
+            FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
+            // formMemberDTO를 사용하여 처리
+            String passwordCheck = null;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if(authentication != null) {
+                String userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+                passwordCheck = memberService.passwordCheck(userEmail);
+            }
+
+            if(passwordEncoder.matches(basicPassword, passwordCheck)) {
+                memberService.updatePassword(passwordEncoder.encode(password), formMemberDTO.getEmail());
+                return "redirect:/mypage/main"; // redirect - html 파일을 반환하는게 아닌 매핑된 다른 컨트롤러 메서드를 호출
+            } else {
+                model.addAttribute("errorMessage", "비밀번호를 다시 확인해주세요.");
+                return "mypage/mypage_private_password";
+            }
+        }
+        return "redirect:/mypage/";
     }
 
 }
