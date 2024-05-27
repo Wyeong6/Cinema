@@ -89,7 +89,6 @@ public class MovieService {
                 });
             }
         }
-        System.out.println("업커밍 무비즈 fetchAndStore" + upcomingMovies);
         return upcomingMovies;
     }
 
@@ -182,8 +181,8 @@ public class MovieService {
         movie.setMovieId(movieDTO.getId());
         movie.setTitle(movieDTO.getTitle());
         movie.setOverview(movieDTO.getOverview());
-
     }
+
     // Movie 객체를 가져오거나 새로 생성
     private Movie getOrCreateMovie(MovieDTO movieDTO) {
         return movieRepository.findById(movieDTO.getId()).orElse(new Movie());

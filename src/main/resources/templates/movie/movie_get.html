@@ -36,7 +36,7 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 9999999;
+            z-index: z;
             padding-top: 60px;
             left: 0;
             top: 0;
@@ -621,6 +621,8 @@
         });
     }
 
+
+
     function updateReactionCount(movieId) {
         $.ajax({
             url: '/movie/' + movieId,
@@ -638,6 +640,7 @@
         });
     }
 
+    // 리액션 삭제
     function removeReaction(userEmail, movieId, reactionType) {
         var data = {
             userEmail: userEmail,
@@ -645,6 +648,8 @@
             reactionType: reactionType
         };
 
+        // movieId(영화식별정보)가 없거나 userEmail(회원정보,로그인정보)가 없으면 return
+        // 버튼연타시 ajax 요청 꼬이는거 방지할려고 추가함
         if (!userEmail || !movieId) {
             console.error('Error removing reaction: userEmail or movieId is missing');
             return;
@@ -707,6 +712,7 @@
         $('#likeButton, #dislikeButton, #sadButton, #funnyButton, #scaryButton').removeClass('active');
 
         // 현재 리액션에 해당하는 버튼에 active 클래스 추가
+        // active 클래스 활용해서 선택한버튼에만 css를 추가해 꾸밀수있음
         if (userCurrentReaction === 'LIKE') {
             $('#likeButton').addClass('active');
         } else if (userCurrentReaction === 'DISLIKE') {
@@ -721,12 +727,11 @@
     }
 
     function react(reactionType) {
-        // 비회원 체크
 
+        // 비회원 체크
         if(checkAnonymousUser()) {
             return;
         }
-
 
         // 이전에 선택한 리액션을 서버에서 삭제
         if (userCurrentReaction === reactionType) {

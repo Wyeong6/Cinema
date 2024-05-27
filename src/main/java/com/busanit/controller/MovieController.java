@@ -102,17 +102,20 @@ public class MovieController {
 
         System.out.println("matchingMovie ===== " + matchingMovie);
 
-//        for (MovieDTO movieDTO : upcomingMovies) {
-//            if (movieDTO.getId().equals(movie.getMovieId()) || movieDTO.getTitle().equals(movie.getTitle())) {
-//                matchingMovie = movieDTO;
-//                break;
-//            }
-//        }
+        for (MovieDTO movieDTO : upcomingMovies) {
+            if (movieDTO.getId().equals(movie.getMovieId()) || movieDTO.getTitle().equals(movie.getTitle())) {
+                matchingMovie = movieDTO;
+                break;
+            }
+        }
 
         // 필터링된 영화 정보를 모델에 추가
-        if (matchingMovie != null) {
-            model.addAttribute("movieInfos", matchingMovie);
-        }
+//        if (matchingMovie != null) {
+//            model.addAttribute("movieInfos", matchingMovie);
+//        }
+//        model.addAttribute("movieId", movie.getMovieId());
+
+        model.addAttribute("movieInfos", matchingMovie);
         model.addAttribute("movieId", movie.getMovieId());
 
         return "movie/movie_get";
