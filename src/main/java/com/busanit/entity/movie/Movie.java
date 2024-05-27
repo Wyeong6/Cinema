@@ -19,8 +19,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class Movie {
 
-
-
     @Id
     private Long movieId;
 
@@ -55,7 +53,7 @@ public class Movie {
     private List<MovieStillCut> stillCuts = new ArrayList<>();
 
     //댓글 관계
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
 
     //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)

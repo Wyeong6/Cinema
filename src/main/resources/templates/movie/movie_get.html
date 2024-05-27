@@ -468,91 +468,47 @@
             });
         });
 
-//         const loadComments = () => {
-// //            댓글리스트    --------------------------------------------------
-//             $.ajax({
-//                 url: `/movies/` + movieId,
-//                 method: 'GET',
-//                 dataType: 'json',
-//                 success: (data) => {
-//                     console.log(data)
-//
-//                     const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
-//                     reviewsSection.empty(); // 기존 내용을 비웁니다.
-//                     data.forEach(({memberEmail, comment}) => {
-//                         // 각 댓글마다의 HTML 구조를 생성합니다.
-//                         const reviewRow = `
-//                     <tr>
-//                         <td>
-//                             <h4>${memberEmail}</h4>
-//                             <p>${new Date().toISOString().slice(0, 10)}</p>
-//                             <div>
-//                                 <input type="radio" id="5-stars" name="rating" value="5" v-model="ratings"/>
-//                                 <label for="5-stars" class="star pr-4">★</label>
-//                             </div>
-//                             <p>${comment}</p>
-//                         </td>
-//                     </tr>
-//                 `;
-//                         reviewsSection.append(reviewRow); // 생성된 HTML을 테이블에 추가합니다.
-//                     });
-//                 },
-//                 error: (xhr, status, error) => {
-//                     console.error("댓글을 불러오지 못했습니다:", error);
-//                     $('#comments').append(
-//                         `<div class="error">
-//                     <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
-//                    </div>`
-//                     );
-//                 }
-//             });
-//         }
 
-            // 리뷰 작성 모달을 팝업 창으로 열기
-            function openReviewModal() {
-                var member = JSON.parse(sessionStorage.getItem("userInfo"));
+        // 리뷰 작성 모달을 팝업 창으로 열기
+        function openReviewModal() {
+            // 댓글 작성 여부 확인
+            $.ajax({
+                url: `/movies/hasCommented/${movieId}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(hasCommented, textStatus, xhr) {
+                    console.log("hasCommented 값:", hasCommented);
 
-                if (member == null) {
-                    alert("로그인 후 이용해주세요.");
-                    return;
-                } else {
-                    var MemberEmail = member.email;
-                }
-
-                // 댓글 작성 여부 확인
-                $.ajax({
-                    url: `/movies/hasCommented/${MemberEmail}/${movieId}`,
-                    method: 'GET',
-                    dataType: 'json',
-                    success: function (hasCommented) {
-                        console.log("hasCommented 값:", hasCommented);
-
-                        if (hasCommented) {
-                            alert("이미 관람평을 작성하셨습니다.");
-                        } else {
-                            var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=400');
-                            var checkWindowClosed = setInterval(function () {
-                                if (reviewWindow.closed) {
-                                    clearInterval(checkWindowClosed);
-                                    loadComments();
-                                }
-                            }, 500); // 0.5초마다 상태 확인
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("관람평 작성 여부를 확인하는 중 오류가 발생했습니다:", error);
+                    if (hasCommented) {
+                        alert("이미 댓글을 작성하셨습니다.");
+                    } else {
+                        var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=400');
+                        var checkWindowClosed = setInterval(function () {
+                            if (reviewWindow.closed) {
+                                clearInterval(checkWindowClosed);
+                                loadComments();
+                            }
+                        }, 500); // 0.5초마다 상태 확인
                     }
-                });
-            }
+                },
+                error: function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        alert("로그인해주세요.");
+                        }else {
+                        console.error("댓글 작성 여부를 확인하는 중 오류가 발생했습니다:", error);
 
-            //            댓글리스트    --------------------------------------------------
-            const loadComments = () => {
-                const emojiMap = {
-                    1: '😡',
-                    2: '😠',
-                    3: '😐',
-                    4: '😊',
-                    5: '😍'
+                    }
+                }
+            });
+        }
+        //            댓글리스트    --------------------------------------------------
+        const loadComments = () => {
+            const emojiMap = {
+                1: '😡',
+                2: '😠',
+                3: '😐',
+                4: '😊',
+                5: '😍'
                 };
 
                 $.ajax({
@@ -576,6 +532,7 @@
                         $('#comments').append(`<div class="error"><p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p></div>`);
                     }
                 });
+
             };
 
             loadComments();
@@ -595,16 +552,18 @@
                 return `${emailName}@${emailDomain}`;
             }
 
-            function generateStars(grade) {
-                return '★'.repeat(grade);
-            }
+        function generateStars(grade) {
+            return '★'.repeat(grade);
+        }
+        //댓글 수만큼 반복생성
+        function appendReviewRow(reviewsSection, comment, emojiMap) {
+            const maskedEmail = maskEmail(comment.memberEmail);
+            const stars = generateStars(comment.grade);
+            const emoji = emojiMap[comment.grade] || '';
+            const member = JSON.parse(sessionStorage.getItem("userInfo"));
+            const isOwner = member && member.email === comment.memberEmail;
+            const reviewRow = `
 
-            //댓글 수만큼 반복생성
-            function appendReviewRow(reviewsSection, comment, emojiMap) {
-                const maskedEmail = maskEmail(comment.memberEmail);
-                const stars = generateStars(comment.grade);
-                const emoji = emojiMap[comment.grade] || '';
-                const reviewRow = `
         <tr>
             <td>
                 <div>
@@ -614,6 +573,7 @@
                 </div>
                 <div style="display: flex; align-items: center;">
                     <h4>${maskedEmail}</h4><span style="margin-left: 40px">${comment.comment}</span>
+                      ${isOwner ? `<button class="delete-btn" data-comment-id="${comment.cno}" style="margin-left: 20px;">삭제</button>` : ''}
                 </div>
             </td>
         </tr>
@@ -849,10 +809,28 @@
                 initializeReactions();
             });
 
+        $(document).on('click', '.delete-btn', function() {
 
+            const cno = $(this).data('comment-id');
+            console.log(cno);
+            deleteComment(cno);
+        });
 
+        function deleteComment(cno) {
+            $.ajax({
+                url: `/movies/delete/${cno}`,
+                method: 'DELETE',
+                success: function(response) {
+                    alert("댓글이 삭제되었습니다.");
+                    loadComments(); // 댓글 목록 다시 로드
+                },
+                error: function(xhr, status, error) {
+                    console.error("댓글 삭제 중 오류가 발생했습니다:", error);
+                    alert("댓글을 삭제하는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
+                }
+            });
+        }
     </script>
-
 </th:block>
 </body>
 </html>

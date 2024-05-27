@@ -51,7 +51,7 @@ public class Member extends BaseTimeEntity {
 
     private Boolean checkedTermsS;
     //멤버와 댓글 연관관계
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
 
     //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
@@ -124,4 +124,14 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
+    // 마이페이지 개인정보수정
+    public static Member toEntity(MemberRegFormDTO regFormDTO) {
+        return Member.builder()
+                .id(regFormDTO.getId())
+                .name(regFormDTO.getName())
+                .email(regFormDTO.getEmail())
+                .age(regFormDTO.getAge())
+                .grade_code(regFormDTO.getGrade_code())
+                .build();
+    }
 }
