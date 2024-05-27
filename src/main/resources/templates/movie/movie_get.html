@@ -127,7 +127,8 @@
                                         </div>
                                         <span th:text="${movie.releaseDate} + ' | '">releasedate</span>
                                         <span th:text="${movie.genres} + ' | '">genres</span>
-                                        <span th:text="${movie.runtime} + '분'">runtime</span>
+                                        <span th:text="${movie.runtime} + '분 | '">runtime</span>
+                                        <span th:text="${movie.certifications}">certification</span>
                                         <div style="text-align: right;">
                                             <!--                                    <a th:href="@{'https://www.youtube.com/watch?v=' + ${movie.video}}" class="button" style="height: 3em;">트레일러 보기</a>-->
                                             <button id="videoModalBtn" class="button" style="height: 3em;"

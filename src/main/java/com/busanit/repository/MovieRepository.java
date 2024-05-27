@@ -1,12 +1,15 @@
 package com.busanit.repository;
 
 import com.busanit.entity.movie.Movie;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,4 +24,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     //    @EntityGraph(attributePaths = {"movieDetail", "genre", "movieImage", "movieStillCut"})
 
     List<Movie> findAll();
+
+    @Query("SELECT m FROM Movie m JOIN m.movieDetail md WHERE md.releaseDate BETWEEN :startDate AND :endDate")
+    Page<Movie> findAllByReleaseDateBetween(@Param("startDate") String startDate, @Param("endDate") String endDate, Pageable pageable);
+
 }
