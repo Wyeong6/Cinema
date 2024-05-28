@@ -58,3 +58,37 @@
     text-decoration: none;
     cursor: pointer;
 }
+
+/* 관리자 페이지 - 상영관관리 */
+div.card-body {
+    padding: 3em;
+}
+div.mb-3 {
+    margin-bottom: 1.5em !important;
+}
+.schedule_reg div.row {
+    margin-top: 1%;
+}
+.button {
+    background: #e5e5e5;
+}
+.active-btn {
+    background: #6d70ff !important;
+    color: #fff;
+}
+.select-theater-cnt {
+    display: flex;
+    flex-direction: row;
+}
+.select-theater-cnt button {
+    margin-left: 0.5%;
+    width: 5%;
+}
+.btn-primary {
+    margin: 2em 0;
+}
+.col-4.mb-3 input{
+    width: 100%;
+    padding: 0.5em 1em;
+    margin-top: 0.5em;
+}

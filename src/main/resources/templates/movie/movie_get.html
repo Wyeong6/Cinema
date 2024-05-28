@@ -121,14 +121,18 @@
                                              th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
                                              style="width: 400px; height: 600px;"/></a>
                                     <div class="movie_info">
-                                        <div class="info_header">
+                                        <header class="info_header">
                                             <h2 th:text="${movie.title}" class="movie_title"></h2>
                                             <a href="#" class="button" style="height: 3em;">지금 예매하기</a>
+                                        </header>
+                                        <div>
+                                            <span th:text="${movie.releaseDate}">releasedate</span>
+                                            <span th:text="${#strings.arrayJoin(movie.genres, ', ')}"></span>
+                                            <span th:text="${movie.runtime} + '분'">runtime</span>
+                                            <img id="certification-image" src="" alt="영화심의등급 이미지">
+                                            <span id="certification" th:text="${movie.certifications}">certification</span>
                                         </div>
-                                        <span th:text="${movie.releaseDate} + ' | '">releasedate</span>
-                                        <span th:text="${movie.genres} + ' | '">genres</span>
-                                        <span th:text="${movie.runtime} + '분 | '">runtime</span>
-                                        <span th:text="${movie.certifications}">certification</span>
+
                                         <div style="text-align: right;">
                                             <!--                                    <a th:href="@{'https://www.youtube.com/watch?v=' + ${movie.video}}" class="button" style="height: 3em;">트레일러 보기</a>-->
                                             <button id="videoModalBtn" class="button" style="height: 3em;"
@@ -230,7 +234,6 @@
                 </div>
             </div>
         </div>
-        <footer data-include-path="footer.html"></footer>
     </div>
 
     <!-- Scripts -->
@@ -248,24 +251,6 @@
     <script th:inline="javascript">
 
         const movieId = $('#movieId').val();
-
-        // include.js
-        window.addEventListener('load', function () {
-            var allElements = document.getElementsByTagName('*');
-            Array.prototype.forEach.call(allElements, function (el) {
-                var includePath = el.dataset.includePath;
-                if (includePath) {
-                    var xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            el.outerHTML = this.responseText;
-                        }
-                    };
-                    xhttp.open('GET', includePath, true);
-                    xhttp.send();
-                }
-            });
-        });
 
         // credits api 제작진 사진
         const options = {
@@ -288,6 +273,26 @@
                 const movieInfoDiv = document.getElementById('movie-info');
                 movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
                 movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
+
+                // 영화 관람 등급
+                const certificationElement = document.getElementById('certification');
+                const certificationValue = certificationElement.textContent;
+                const imgElement = document.getElementById('certification-image');
+
+                switch(certificationValue) {
+                    case '12세 이상 관람가':
+                        imgElement.src = '/images/ratings/12.png';
+                        break;
+                    case '15세 이상 관람가':
+                        imgElement.src = '/images/ratings/15.png';
+                        break;
+                    case '19':
+                        certificationElement.textContent = '청소년 관람불가';
+                        imgElement.src = '/images/ratings/18.png';
+                        break;
+                    default:
+                        imgElement.src ='/images/ratings/all.svg';
+                }
 
                 // 감독 정보 출력 (이미지 포함)
                 const director = data.crew.find(person => person.job === 'Director');
