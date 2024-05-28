@@ -18,11 +18,59 @@
 
     <style>
 
-        button.active {
-            background-color: #ffeb3b; /* 버튼 색상을 노란색으로 변경 */
-            box-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffeb3b, 0 0 30px #ffeb3b; /* 빛나는 효과 */
-            color: #333;
-            font-weight: bold;
+        .active {
+            width: 50px !important;
+            height: 50px !important;
+            filter: drop-shadow(0 0 3px #597aff) drop-shadow(0 0 4px #597aff) drop-shadow(0 0 5px #597aff); /* 이미지 부분만 그림자 적용가능하게함 (필터로) */
+        }
+
+        #likeButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        #dislikeButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        #sadButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        #funnyButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        #scaryButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        .reaction-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reaction-item {
+            text-align: center;
+            margin: 0 20px; /* 각 항목 사이의 간격 조절 */
+            width: 95px;
+        }
+
+        .reaction-item img {
+            width: 50px; /* 이미지 너비 설정 */
+            height: 50px; /* 이미지 높이 설정 */
+            cursor: pointer;
+        }
+
+        .reaction-item p {
+            text-align: center;
+            font-size: 13px;
+            margin: 0; /* 설명과 카운트 간격 조절 */
         }
 
         .hide {
@@ -135,23 +183,40 @@
                                                     th:data-video-id="${movie.video}">트레일러 보기
                                             </button>
                                         </div>
-                                        <p><b>감독 : </b>director <b>각본 : </b>writer</p>
+<!--                                        <p><b>감독 : </b>director <b>각본 : </b>writer</p>-->
 
                                         <p th:text="${movie.overview}">
                                             ~ overview ~
                                         </p>
 
 
-                                        <button id="likeButton" type="button" onclick="react('LIKE')">재밌어요</button>
-                                        <span class="like-count">0</span>
-                                        <button id="dislikeButton" type="button" onclick="react('DISLIKE')">재미없어요</button>
-                                        <span class="dislike-count">0</span>
-                                        <button id="sadButton" type="button" onclick="react('SAD')">슬퍼요</button>
-                                        <span class="sad-count">0</span>
-                                        <button id="funnyButton" type="button" onclick="react('FUNNY')">웃겨요</button>
-                                        <span class="funny-count">0</span>
-                                        <button id="scaryButton" type="button" onclick="react('SCARY')">무서워요</button>
-                                        <span class="scary-count">0</span>
+                                        <div class="reaction-container">
+                                            <div class="reaction-item">
+                                                <img id="likeButton" src="/images/like.png" alt="재밌어요" onclick="react('LIKE')">
+                                                <p>재미있어요</p>
+                                                <span class="count like-count">0</span>
+                                            </div>
+                                            <div class="reaction-item">
+                                                <img id="dislikeButton" src="/images/dislike.png" alt="재미없어요" onclick="react('DISLIKE')">
+                                                <p>재미없어요</p>
+                                                <span class="count dislike-count">0</span>
+                                            </div>
+                                            <div class="reaction-item">
+                                                <img id="sadButton" src="/images/sad.png" alt="슬퍼요" onclick="react('SAD')">
+                                                <p>슬퍼요</p>
+                                                <span class="count sad-count">0</span>
+                                            </div>
+                                            <div class="reaction-item">
+                                                <img id="funnyButton" src="/images/funny.png" alt="웃겨요" onclick="react('FUNNY')">
+                                                <p>웃겨요</p>
+                                                <span class="count funny-count">0</span>
+                                            </div>
+                                            <div class="reaction-item">
+                                                <img id="scaryButton" src="/images/scary.png" alt="무서워요" onclick="react('SCARY')">
+                                                <p>무서워요</p>
+                                                <span class="count scary-count">0</span>
+                                            </div>
+                                        </div>
 
 
                                         <div class="movie_data_box">
