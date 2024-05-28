@@ -2,10 +2,7 @@ package com.busanit.entity;
 
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
-import com.busanit.entity.movie.Comment;
-import com.busanit.entity.movie.Movie;
-import com.busanit.entity.movie.MovieReaction;
-import com.busanit.entity.movie.ReactionType;
+import com.busanit.entity.movie.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +47,11 @@ public class Member extends BaseTimeEntity {
     private Boolean checkedTermsE;
 
     private Boolean checkedTermsS;
+
+    // 영화 찜
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoriteMovie> favoriteMovies = new ArrayList<>();
+
     //멤버와 댓글 연관관계
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
@@ -57,6 +59,7 @@ public class Member extends BaseTimeEntity {
     //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MovieReaction> reactions = new ArrayList<>();
+
 
     // 리액션 연관관계 및 그외 메서드 시작
     @Transactional
@@ -88,7 +91,16 @@ public class Member extends BaseTimeEntity {
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Event> events;
 
+    // 찜하기 연관관계 메서드
+    public void addFavoriteMovie(FavoriteMovie favoriteMovie) {
+        favoriteMovies.add(favoriteMovie);
+        favoriteMovie.setMember(this);
+    }
 
+    public void removeFavoriteMovie(FavoriteMovie favoriteMovie) {
+        favoriteMovies.remove(favoriteMovie);
+        favoriteMovie.setMember(null);
+    }
 
 
 
