@@ -53,6 +53,12 @@ public class Member extends BaseTimeEntity {
 
     private Boolean checkedTermsS;
 
+    @OneToMany(mappedBy = "sender")
+    private List<Message> sentMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Message> receivedMessages = new ArrayList<>();
+
     @ManyToMany
     @JoinTable(name = "member_chatroom",
             joinColumns = @JoinColumn(name = "member_id"),
@@ -78,11 +84,40 @@ public class Member extends BaseTimeEntity {
 //        }
 //    }
 
+    public void addSentMessage(Message message) {
+        this.sentMessages.add(message);
+        if (message.getSender() != this) {
+            message.setSender(this);
+        }
+    }
+
+    public void removeSentMessage(Message message) {
+        this.sentMessages.remove(message);
+        if (message.getSender() == this) {
+            message.setSender(null);
+        }
+    }
+
+    public void removeReceivedMessage(Message message) {
+        this.receivedMessages.remove(message);
+        if (message.getReceiver() == this) {
+            message.setReceiver(null);
+        }
+    }
+    public void addReceivedMessage(Message message) {
+        this.receivedMessages.add(message);
+        if (message.getReceiver() != this) {
+            message.setReceiver(this);
+        }
+    }
+
     //채팅룸 연관관계
     public void addChatRoom(ChatRoom chatRoom) {
         this.chatRooms.add(chatRoom);
         chatRoom.getMembers().add(this);
     }
+
+
 
     // 리액션 연관관계 및 그외 메서드 시작
     @Transactional

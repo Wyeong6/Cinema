@@ -19,7 +19,7 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String title;
 
     @ManyToMany(mappedBy = "chatRooms")
     private List<Member> members = new ArrayList<>();
@@ -31,8 +31,10 @@ public class ChatRoom {
         this.messages.add(message);
         message.setChatRoom(this);
     }
-    public void addMembers(List<Member> members) {
-        this.members.addAll(members);
-        members.forEach(member -> member.addChatRoom(this));
+    public void addMembers(List<Member> newMembers) {
+        if (newMembers != null) {
+            this.members.addAll(newMembers);
+            newMembers.forEach(member -> member.addChatRoom(this));
+        }
     }
 }
