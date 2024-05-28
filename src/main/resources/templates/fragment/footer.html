@@ -24,8 +24,7 @@
           <h3>궁금하신 점 있으신가요 ?</h3>
         </header>
         <p>아래 버튼을 클릭하시면 FAQ, 1:1 채팅방, 문의하기로 이동하실 수 있습니다.</p>
-        <button class="button" onclick="location.href='service_center.html'">Customer Service Center</button>
-      </section>
+        <button class="button" onclick="redirectToChat()">Customer Service Center</button>      </section>
 
     </div>
     <hr />
@@ -45,6 +44,18 @@
     </div>
   </div>
 </div>
+
+<script>
+  function redirectToChat() {
+    fetch('/chat')
+            .then(response => response.text())
+            .then(html => {
+              document.open();
+              document.write(html);
+              document.close();
+            });
+  }
+</script>
   </body>
 </th:block>
 </html>

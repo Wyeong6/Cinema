@@ -2,6 +2,8 @@ package com.busanit.entity;
 
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
+import com.busanit.entity.chat.ChatRoom;
+import com.busanit.entity.chat.Message;
 import com.busanit.entity.movie.Comment;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieReaction;
@@ -50,6 +52,13 @@ public class Member extends BaseTimeEntity {
     private Boolean checkedTermsE;
 
     private Boolean checkedTermsS;
+
+    @ManyToMany
+    @JoinTable(name = "member_chatroom",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "chatroom_id"))
+    private List<ChatRoom> chatRooms = new ArrayList<>();
+
     //멤버와 댓글 연관관계
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
@@ -57,6 +66,23 @@ public class Member extends BaseTimeEntity {
     //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MovieReaction> reactions = new ArrayList<>();
+
+//    //회원 삭제시 채팅룸 삭제
+//    @PreRemove
+//    private void preRemove() {
+//        for (ChatRoom chatRoom : chatRooms) {
+//            chatRoom.getMembers().remove(this);
+//            if (chatRoom.getMembers().isEmpty()) {
+//                chatRoomRepository.delete(chatRoom); // chatRoomRepository를 주입받아 사용해야 합니다.
+//            }
+//        }
+//    }
+
+    //채팅룸 연관관계
+    public void addChatRoom(ChatRoom chatRoom) {
+        this.chatRooms.add(chatRoom);
+        chatRoom.getMembers().add(this);
+    }
 
     // 리액션 연관관계 및 그외 메서드 시작
     @Transactional
