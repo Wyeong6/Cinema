@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -112,28 +114,23 @@ public class MypageController {
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
             model.addAttribute("socialUser", "socialUser");
-
-            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-            model.addAttribute("member", memberRegFormDTO);
-
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
             model.addAttribute("formUser", "formUser"); // formUser면 패스워드도 확인
-
-            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-            model.addAttribute("member", memberRegFormDTO);
-
-            // javascript에서 값을 사용
-            try {
-                String memberJson = objectMapper.writeValueAsString(memberRegFormDTO);
-                model.addAttribute("memberJson", memberJson);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                model.addAttribute("memberJson", "{}");
-            }
-
-
         }
+
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("member", memberRegFormDTO);
+
+        // javascript에서 값을 사용
+        try {
+            String memberJson = objectMapper.writeValueAsString(memberRegFormDTO);
+            model.addAttribute("memberJson", memberJson);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            model.addAttribute("memberJson", "{}");
+        }
+
         return "/mypage/mypage_private_info";
     }
 
@@ -157,6 +154,24 @@ public class MypageController {
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
+
+            // 사용자 정보를 업데이트
+            memberService.editMemberInfo(memberRegFormDTO);
+            // 사용자의 새로운 UserDetails를 로드
+            OAuth2MemberDTO oAuth2Member = (OAuth2MemberDTO) principal;
+            OAuth2User updatedOAuth2User = memberService.loadOAuth2UserByUsername(memberRegFormDTO.getEmail());
+
+
+            // 새로운 Authentication 객체 생성
+//            OAuth2AuthenticationToken newAuth = new OAuth2AuthenticationToken(
+//                    updatedOAuth2User,
+//                    updatedOAuth2User.getAuthorities(),
+//                    oAuth2Member.getAuthorizedClientRegistrationId()
+//            );
+//            // SecurityContext에 새로운 Authentication 객체 설정
+//            SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+
 
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;

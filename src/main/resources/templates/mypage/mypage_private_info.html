@@ -97,6 +97,10 @@
             const email = $('#email').val();
             const password_chk = $('#password_chk').val();
 
+            if(member.email === email){
+                checkEmailButton = 1;
+            }
+
             if(checkEmailButton === 1) {
                 $.ajax({
                     type: 'POST',
@@ -114,7 +118,8 @@
                         checkedTermsS: member.checkedTermsS
                     },
                     success: function(response) {
-                        $('#content').html(response);
+                        // $('#content').html(response);
+                        window.location.href = "/mypage/";
                     },
                     error: function(xhr, status, error) {
                         console.error('Update Info Error:', error);

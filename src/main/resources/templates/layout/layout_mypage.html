@@ -169,9 +169,9 @@
                         data: {
                             memberId: memberId
                         },
-                        success: function(response) {
+                        success: function() {
                             // 회원탈퇴 처리 성공
-                            sessionStorage.removeItem("userInfo");
+                            sessionStorage.removeItem("userInfo"); // session storage값 삭제
                             window.location.href = "/";
                         },
                         error: function(xhr, status, error) {

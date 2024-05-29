@@ -2,6 +2,7 @@ package com.busanit.service;
 
 import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.MemberRegFormDTO;
+import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.entity.Member;
 import com.busanit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -52,6 +54,27 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
                 findMember.get().getPassword(),
                 findMember.get().isSocial(),
                 Arrays.asList(new SimpleGrantedAuthority("ROLE_" + findMember.get().getRole()))
+        );
+
+        return dto;
+    }
+
+    public OAuth2User loadOAuth2UserByUsername(String email) throws UsernameNotFoundException {
+        Optional<Member> findMember = memberRepository.findByEmail(email);
+
+        if (!findMember.isPresent()) {
+            throw new UsernameNotFoundException(email);
+        }
+
+        OAuth2MemberDTO dto = new OAuth2MemberDTO(
+                findMember.get().getName(),
+                findMember.get().getPassword(),
+                findMember.get().getEmail(),
+                findMember.get().isSocial(),
+                findMember.get().getAge(),
+                Arrays.asList(new SimpleGrantedAuthority("ROLE_" + findMember.get().getRole())),
+                findMember.get().getCheckedTermsE(),
+                findMember.get().getCheckedTermsS()
         );
 
         return dto;
