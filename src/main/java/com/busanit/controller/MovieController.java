@@ -28,7 +28,7 @@ public class MovieController {
     private final MovieService movieService2;
 
     @Transactional
-    @GetMapping("/movies/Main")
+    @GetMapping("/")
     public String getDetailMovies(Model model) throws IOException {
 
         // 메인페이지에 상영작 / 상영예정작을 오늘날짜 기준 2개월 전 / 후 로 나눌려고 추가한 날짜 변수들.
