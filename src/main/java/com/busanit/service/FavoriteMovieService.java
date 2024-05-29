@@ -23,18 +23,16 @@ public class FavoriteMovieService {
 
     @Transactional
     public void addFavorite(FavoriteMovieDTO favoriteMovieDTO) {
-        Long memberId = favoriteMovieDTO.getMemberId();
-        Long movieId = favoriteMovieDTO.getMovieId();
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByEmail(favoriteMovieDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("Member not found"));
-        Movie movie = movieRepository.findById(movieId)
+        Movie movie = movieRepository.findById(favoriteMovieDTO.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         FavoriteMovie favoriteMovie = new FavoriteMovie();
-        favoriteMovie.setFavoritedAt(LocalDateTime.now());
         favoriteMovie.setMember(member);
         favoriteMovie.setMovie(movie);
+        favoriteMovie.setFavoritedAt(LocalDateTime.now());
 
         member.addFavoriteMovie(favoriteMovie);
         movie.addFavoritedBy(favoriteMovie);
@@ -45,20 +43,23 @@ public class FavoriteMovieService {
     @Transactional
     public void removeFavorite(FavoriteMovieDTO favoriteMovieDTO) {
 
-        Long memberId = favoriteMovieDTO.getMemberId();
-        Long movieId = favoriteMovieDTO.getMovieId();
-
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByEmail(favoriteMovieDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("Member not found"));
-        Movie movie = movieRepository.findById(movieId)
+        Movie movie = movieRepository.findById(favoriteMovieDTO.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
         FavoriteMovie favoriteMovie = favoriteMovieRepository.findByMemberAndMovie(member, movie)
                 .orElseThrow(() -> new RuntimeException("FavoriteMovie not found"));
+
 
         member.removeFavoriteMovie(favoriteMovie);
         movie.removeFavoritedBy(favoriteMovie);
 
         favoriteMovieRepository.delete(favoriteMovie);
     }
+
+    public boolean checkFavoriteStatus(String userEmail, Long movieId) {
+        return favoriteMovieRepository.existsByMember_EmailAndMovie_MovieId(userEmail, movieId);
+    }
+
 
 }

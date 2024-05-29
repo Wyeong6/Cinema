@@ -18,6 +18,27 @@
 
     <style>
 
+        .fav-icon {
+            width: 33px !important;
+            height: 30px !important;
+            cursor: pointer;
+            transition: background-color 0.3s; /* 부드러운 색상 전환 효과 */
+
+        }
+
+
+        .favorite-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .favorited {
+            filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-50deg) drop-shadow(0 0 3px rgba(255, 0, 0, 0.5)); /* 빨간색으로 변환 */
+        }
+
+
+
+        /* 리액션 관련 css 시작 */
         .active {
             width: 50px !important;
             height: 50px !important;
@@ -72,6 +93,8 @@
             font-size: 13px;
             margin: 0; /* 설명과 카운트 간격 조절 */
         }
+
+        /* 리액션 관련 css 끝 */
 
         .hide {
             display: none;
@@ -235,6 +258,9 @@
                                             <!--찜하기 구현할것~ (컨트롤러에 연결만하면됨)-->
                                             <div class="movie_data">
                                                 <h4>찜하기</h4>
+                                                <div class="favorite-container">
+                                                    <img id="favoriteButton" class="fav-icon" src="/images/heart%20icon.png" alt="찜하기(좋아요)">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -649,6 +675,82 @@
     `;
                 reviewsSection.append(reviewRow);
             }
+
+        // 찜하기 관련 함수 시작 //
+
+
+        $(document).ready(function (){
+
+            var isFavorited = false; // 현재 사용자의 찜하기(좋아요) 상태를 저장할 변수임
+
+
+                // 현재 찜하기 상태를 가져오기 위해 API 호출
+                $.ajax({
+                    url: '/favorites/check/' + userEmail + '/' + movieId,
+                    type: 'GET',
+                    data: {
+                        userEmail: userEmail,
+                        movieId: movieId
+                    },
+                    success: function (response) {
+                        // 응답에서 현재 리액션 상태를 받아와 버튼 상태를 업데이트
+                        isFavorited = response.isFavorited;
+                        console.log("현재 리액션 상태 가져오기 성공! 현재상태 = " + isFavorited)
+                        updateFavoriteButton(isFavorited)
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching current reaction:', status, error);
+                    }
+                });
+
+
+            $("#favoriteButton").click(function (){
+
+                checkAnonymousUser();
+
+                if(isFavorited === false) {
+                    // 좋아요 요청 (POST 요청)
+                    $.ajax({
+                        url: '/favorites/' + userEmail + '/' + movieId,
+                        type: 'POST',
+                        success: function (response) {
+                            console.log("좋아요 등록성공")
+                            isFavorited = true;
+                            updateFavoriteButton(isFavorited)
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("좋아요 등록 실패", error)
+                        }
+                    });
+                } else {
+                    // 좋아요 삭제요청 (DELETE 요청)
+                    $.ajax({
+                        url: '/favorites/' + userEmail + '/' + movieId,
+                        type: 'DELETE',
+                        success: function (response) {
+                            console.log("좋아요 삭제 성공")
+                            isFavorited = false;
+                            updateFavoriteButton(isFavorited)
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("좋아요 등록 실패", error)
+                        }
+                    });
+                }
+            });
+
+            // 버튼상태 함수 (임시!!!)
+            function updateFavoriteButton(isFavorited) {
+                var favoriteButton = $('#favoriteButton');
+                if (isFavorited) {
+                    favoriteButton.addClass('favorited'); // 찜한 상태 클래스 추가
+                } else {
+                    favoriteButton.removeClass('favorited'); // 찜한 상태 클래스 제거
+                }
+            }
+
+
+        });
 
 
 

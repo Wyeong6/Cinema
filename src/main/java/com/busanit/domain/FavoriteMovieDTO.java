@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FavoriteMovieDTO {
         private Long favoriteId;
-        private Long memberId;
+        private String email;
         private Long movieId;
         private LocalDateTime favoritedAt;
 }

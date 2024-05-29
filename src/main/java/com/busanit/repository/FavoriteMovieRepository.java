@@ -11,5 +11,6 @@ public interface FavoriteMovieRepository extends JpaRepository<FavoriteMovie,Lon
 
         Optional<FavoriteMovie> findByMemberAndMovie(Member member, Movie movie);
 
+        boolean existsByMember_EmailAndMovie_MovieId(String userEmail, Long movieId);
 
 }
