@@ -1,10 +1,8 @@
 package com.busanit.controller;
 
-import com.busanit.domain.CommentDTO;
-import com.busanit.domain.FormMemberDTO;
-import com.busanit.domain.MemberRegFormDTO;
-import com.busanit.domain.OAuth2MemberDTO;
+import com.busanit.domain.*;
 import com.busanit.service.CommentService;
+import com.busanit.service.FavoriteMovieService;
 import com.busanit.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -28,6 +26,7 @@ public class MypageController {
     private final CommentService commentService;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final FavoriteMovieService favoriteMovieService;
 
 
     @GetMapping("/")
@@ -76,6 +75,15 @@ public class MypageController {
         model.addAttribute("comments", comments);
 
         return "/mypage/mypage_review";
+    }
+
+    @GetMapping("/favorite")
+    public String mypageFavorite(Model model) {
+        String memberEmail = commentService.getAuthenticatedUserEmail();
+        List<FavoriteMovieDTO> favoriteMovies = favoriteMovieService.getFavoriteMoviesByEmail(memberEmail);
+        model.addAttribute("favoriteMovies", favoriteMovies);
+        System.out.println("favoriteMovies === " + favoriteMovies.size());
+        return "/mypage/mypage_favorite";
     }
 
     @GetMapping("/infoEdit")

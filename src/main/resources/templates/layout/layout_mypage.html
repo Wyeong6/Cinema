@@ -82,6 +82,7 @@
                                         <a>리뷰관리</a>
                                         <ul>
                                             <li><a class="review_btn">나의 리뷰</a></li>
+                                            <li><a class="favorite_btn">나의 찜목록</a></li>
                                         </ul>
                                     </li>
                                     <li>
@@ -140,6 +141,10 @@
         // 나의리뷰 버튼 클릭 이벤트 설정
         $('#sidebar').on('click', '.review_btn', function() {
             $('#content').load('/mypage/review');
+        });
+        // 나의찜목록 버튼 클릭 이벤트 설정
+        $('#sidebar').on('click', '.favorite_btn', function() {
+            $('#content').load('/mypage/favorite');
         });
         // 개인정보수정 버튼 클릭 이벤트 설정
         $('#sidebar').on('click', '.info_edit_btn', function() {

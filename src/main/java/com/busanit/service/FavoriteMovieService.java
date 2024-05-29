@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +63,20 @@ public class FavoriteMovieService {
         return favoriteMovieRepository.existsByMember_EmailAndMovie_MovieId(userEmail, movieId);
     }
 
+    public List<FavoriteMovieDTO> getFavoriteMoviesByEmail(String email) {
+        List<FavoriteMovie> favoriteMovies = favoriteMovieRepository.findByMember_Email(email);
+        return favoriteMovies.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private FavoriteMovieDTO convertToDto(FavoriteMovie favoriteMovie) {
+        FavoriteMovieDTO favoriteMovieDTO = new FavoriteMovieDTO();
+        favoriteMovieDTO.setFavoriteId(favoriteMovie.getFavoriteId());
+        favoriteMovieDTO.setEmail(favoriteMovie.getMember().getEmail()); // 가정: FavoriteMovie 엔티티에 Member 엔티티가 연결되어 있고, 이메일을 가져올 수 있음
+        favoriteMovieDTO.setMovieId(favoriteMovie.getMovie().getMovieId()); // 가정: FavoriteMovie 엔티티에 Movie 엔티티가 연결되어 있고, ID를 가져올 수 있음
+        favoriteMovieDTO.setFavoritedAt(favoriteMovie.getFavoritedAt());
+        return favoriteMovieDTO;
+    }
 
 }

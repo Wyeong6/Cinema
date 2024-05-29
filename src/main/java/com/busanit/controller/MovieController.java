@@ -33,8 +33,8 @@ public class MovieController {
 
         // 메인페이지에 상영작 / 상영예정작을 오늘날짜 기준 2개월 전 / 후 로 나눌려고 추가한 날짜 변수들.
         LocalDate today = LocalDate.now();
-        LocalDate twoMonthsAgo = today.minusMonths(2);
-        LocalDate twoMonthsLater = today.plusMonths(2);
+        LocalDate twoMonthsAgo = today.minusMonths(3);
+        LocalDate twoMonthsLater = today.plusMonths(3);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 //        movieService2.fetchAndStoreMoviesNowPlaying();
