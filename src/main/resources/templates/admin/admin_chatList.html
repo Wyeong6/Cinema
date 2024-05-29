@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event List</title>
+    <style>
+        td, th {
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar" style="margin-bottom: 10px;">
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <input aria-label="Search..." class="form-control border-0 shadow-none" placeholder="Search..." type="text" />
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+<!-- / Navbar -->
+
+<h5 class="card-header">Event List</h5>
+<div class="table-responsive text-nowrap">
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>방 번호</th>
+            <th>카테고리</th>
+            <th>회원 이메일</th>
+            <th>회원 이름</th>
+        </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+        <!-- 채팅방 리스트 출력 -->
+        <tr th:each="chatRoom : ${eventList.content}" th:data-room-id="${chatRoom.id}" onclick="openChatModal(this)">
+            <td th:text="${chatRoom.id}">Room ID</td>
+            <td th:text="${chatRoom.messageTitle}">Room Title</td>
+            <td th:text="${chatRoom.userEmail}">User Email</td>
+            <td th:text="${chatRoom.userName}">User Name</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    <div style="text-align: center;">
+        <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}" th:text="'[' + ${i} + ']'" class="paging-btn"></a>
+    </div>
+</div>
+
+<!-- 모달 창 -->
+<div id="chatModal" style="display:none;">
+    <div>
+        <h2>Chat Room</h2>
+        <div id="chatMessages"></div>
+        <input type="text" id="chatInput" placeholder="Type a message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    let socket;
+    let roomId;
+
+    function openChatModal(element) {
+        roomId = element.getAttribute('data-room-id');
+        document.getElementById('chatModal').style.display = 'block';
+        connectToWebSocket(roomId);
+    }
+
+    function connectToWebSocket(roomId) {
+        socket = new WebSocket(`ws://your-server-address/chat/${roomId}`);
+
+        socket.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            displayMessage(message);
+        };
+
+        socket.onopen = function() {
+            console.log('WebSocket connection opened');
+            // 이전 메시지 로드 (선택 사항)
+            loadPreviousMessages(roomId);
+        };
+
+        socket.onclose = function() {
+            console.log('WebSocket connection closed');
+        };
+    }
+
+    function loadPreviousMessages(roomId) {
+        fetch(`/api/chat/${roomId}/messages`)
+            .then(response => response.json())
+            .then(messages => {
+                messages.forEach(message => displayMessage(message));
+            });
+    }
+
+    function displayMessage(message) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message.content;
+        chatMessages.appendChild(messageElement);
+    }
+
+    function sendMessage() {
+        const chatInput = document.getElementById('chatInput');
+        const message = chatInput.value;
+        if (message && socket) {
+            socket.send(JSON.stringify({ content: message }));
+            chatInput.value = '';
+        }
+    }
+</script>
+</body>
+</html>

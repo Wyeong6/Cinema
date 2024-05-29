@@ -5,7 +5,12 @@ import com.busanit.domain.EventDTO;
 import com.busanit.customerService.Notice.NoticeDTO;
 import com.busanit.customerService.Notice.NoticeService;
 import com.busanit.domain.SnackDTO;
+import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.entity.Snack;
+import com.busanit.entity.chat.Message;
+import com.busanit.repository.MemberRepository;
+import com.busanit.repository.MessageRepository;
+import com.busanit.service.ChatService;
 import com.busanit.service.EventService;
 import com.busanit.service.SnackService;
 import jakarta.validation.Valid;
@@ -37,6 +42,8 @@ public class AdminPageController {
     private final SnackService snackService;
     private final EventService eventService;
     private final NoticeService noticeService;
+    private final ChatService chatService;
+    private final MessageRepository messageRepository;
 
     @GetMapping("/adminMain")
     public String adminMain() {
@@ -196,6 +203,9 @@ public String eventList(Model model, @RequestParam(defaultValue = "1") int page,
 
 }
 
+
+
+
 //이벤트 수정 페이지
 @GetMapping("/update")
 public String editEvent(@RequestParam(name = "eventId") long eventId, Model model) {
@@ -295,5 +305,34 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
         System.out.println("수정 페이지로 들어갔을 때 " + currentPage);
 
         return "cs/noticeAddAdmin";
+    }
+
+    //채팅리스트
+    @GetMapping("/chatList")
+    public String chatList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size){
+        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page-1, size);
+
+        int totalPages = chatRoom.getTotalPages();
+        int startPage = Math.max(1, page - 5);
+        int endPage = Math.min(totalPages, page + 4);
+
+
+        model.addAttribute("eventList", chatRoom); //이벤트 게시글
+        model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
+        model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_chatList";
+    }
+    //메세지 확인 여부
+    @PostMapping("/{messageId}/read")
+    public void markMessageAsRead(@PathVariable Long messageId) {
+        chatService.markAsRead(messageId);
+    }
+
+    @GetMapping("/unread/{receiverId}")
+    public List<Message> getUnreadMessages(@PathVariable Long receiverId) {
+        return messageRepository.findByReceiverIdAndIsReadFalse(receiverId);
     }
 }

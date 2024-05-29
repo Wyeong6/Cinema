@@ -17,6 +17,16 @@ public class MessageDTO {
     private boolean isRead;
     private String messageTitle;
 
-
+    public static MessageDTO toDTO(Message message) {
+        return MessageDTO.builder()
+                .id(message.getId())
+                .sender(message.getSender().getEmail())
+                .recipient(message.getReceiver().getEmail())
+                .messageTitle(message.getChatRoom().getTitle())
+                .content(message.getContent())
+                .messageTitle(message.getMessageTitle())
+                .isRead(message.isRead())
+                .build();
+    }
 
 }

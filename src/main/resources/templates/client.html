@@ -73,7 +73,35 @@
         window.onload = function() {
             connect();
             showMessage('안녕하세요 고객님 카테고리를 선택해주세요');
+            fetchMessages();
         };
+
+        function fetchMessages() {
+            fetch(`/chat/private/${userEmail}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    try {
+                        const messages = JSON.parse(text);
+                        if (Array.isArray(messages)) {
+                            messages.forEach(message => {
+                                let displayMessage = message.sender === userEmail ? `나: ${message.content}` : `관리자 - ${message.sender}: ${message.content}`;
+                                showMessage(displayMessage);
+                            });
+                        } else {
+                            throw new TypeError('Expected an array but got ' + typeof messages);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        console.error('Received text:', text);
+                    }
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }
     </script>
 </head>
 <body>

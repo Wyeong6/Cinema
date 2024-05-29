@@ -138,6 +138,12 @@
                         <div data-i18n="Form Layouts">Notices List</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link chat_btn">
+                        <i class="menu-icon tf-icons bx bx-detail"></i>
+                        <div data-i18n="Form interface">chat List</div>
+                    </a>
+                </li>
 
 <!--                Main Page -->
                 <li class=" small text-uppercase"><span class="menu-header-text"></span></li>
@@ -222,6 +228,9 @@
         });
         $('.notice_btn').on('click', function() {
             $('.container-xxl').load('/admin/notice');
+        });
+        $('.chat_btn').on('click', function() {
+            $('.container-xxl').load('/admin/chatList');
         });
     });
 
