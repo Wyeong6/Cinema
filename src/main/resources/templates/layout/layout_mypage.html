@@ -116,6 +116,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
+    const memberId = [[${memberId}]];
+
     $(document).ready(function() {
         // 마이페이지 메인
         $('#sidebar').on('click', '.main_btn', function() {
@@ -161,10 +163,21 @@
                 confirmButtonText: "네, 탈퇴하겠습니다."
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: "Deleted!",
-                        text: "Your file has been deleted.",
-                        icon: "success"
+                    $.ajax({
+                        type: 'POST',
+                        url: '/mypage/memberDelete',
+                        data: {
+                            memberId: memberId
+                        },
+                        success: function(response) {
+                            // 회원탈퇴 처리 성공
+                            sessionStorage.removeItem("userInfo");
+                            window.location.href = "/";
+                        },
+                        error: function(xhr, status, error) {
+                            // 에러 처리 코드
+                            console.error("회원탈퇴 요청 중 에러 발생:", error);
+                        }
                     });
                 }
             });

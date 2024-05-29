@@ -96,6 +96,11 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         memberRepository.save(Member.toEntity(memberRegFormDTO));
     }
 
+    // mypage 회원탈퇴
+    public void memberDelete(Long memberId) {
+        memberRepository.deleteById(memberId);
+    }
+
     // 개인정보(이메일(단수)) masking
     public String maskingEmail(String email) {
         if (email == null) return null;

@@ -41,13 +41,26 @@ public class MypageController {
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
             model.addAttribute("socialUser", "socialUser");
+            // 사용자의 Id
+            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+            model.addAttribute("memberId", memberRegFormDTO.getId());
+
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
             model.addAttribute("formUser", "formUser");
+            // 사용자의 Id
+            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+            model.addAttribute("memberId", memberRegFormDTO.getId());
         }
         return "/layout/layout_mypage";
     }
@@ -93,8 +106,6 @@ public class MypageController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
-            log.info("useremail::"+userEmail);
-
         }
 
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용
@@ -197,6 +208,13 @@ public class MypageController {
             }
         }
         return "redirect:/mypage/";
+    }
+
+    @PostMapping("/memberDelete")
+    public String memberDelete(Long memberId) {
+        memberService.memberDelete(memberId);
+
+        return "redirect:/member/logout";
     }
 
 }
