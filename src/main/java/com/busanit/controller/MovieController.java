@@ -28,7 +28,7 @@ public class MovieController {
     private final MovieService movieService2;
 
     @Transactional
-    @GetMapping("/movies/Main")
+    @GetMapping("/")
     public String getDetailMovies(Model model) throws IOException {
 
         // 메인페이지에 상영작 / 상영예정작을 오늘날짜 기준 2개월 전 / 후 로 나눌려고 추가한 날짜 변수들.
@@ -37,21 +37,18 @@ public class MovieController {
         LocalDate twoMonthsLater = today.plusMonths(2);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        movieService2.fetchAndStoreMoviesNowPlaying();
-
-        // 개봉예정작
-        movieService2.fetchAndStoreMoviesUpcoming();
-
-        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
-        movieService2.fetchAndStoreMovieStillCuts();
-        movieService2.fetchAndStoreCertificationData();
+//        movieService2.fetchAndStoreMoviesNowPlaying();
+//        movieService2.fetchAndStoreMoviesUpcoming();
+//        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
+//        movieService2.fetchAndStoreMovieStillCuts();
+//        movieService2.fetchAndStoreCertificationData();
 
         //비디오가 있는 인기순영화
-        List<MovieDTO> videoMovies = movieService2.getVideoMovies();
+        List<MovieDTO> videoMovies = movieService2.getCachedVideoMovies();
         model.addAttribute("videoMovies", videoMovies);
 
         //모든 영화
-        List<MovieDTO> allMovies = movieService2.getAll();
+        List<MovieDTO> allMovies = movieService2.getCachedAllMovies();
 
         //모든 영화에서 개봉일자가 2개월 전 부터 오늘날짜 까지인거만 가져옴 즉 현재 상영작임.
         List<MovieDTO> filteredMovies = allMovies.stream()
@@ -77,9 +74,8 @@ public class MovieController {
                 }).collect(Collectors.toList());
         model.addAttribute("upcomingMovies", filteredUpcomingMovies);
 
-
         //인기순
-        List<MovieDTO> hotMovies = movieService2.getHotMovies();
+        List<MovieDTO> hotMovies = movieService2.getCachedHotMovies();
         model.addAttribute("hotMovies", hotMovies);
 
         return "main";

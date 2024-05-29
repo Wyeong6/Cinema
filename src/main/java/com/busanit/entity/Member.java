@@ -2,10 +2,7 @@ package com.busanit.entity;
 
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
-import com.busanit.entity.movie.Comment;
-import com.busanit.entity.movie.Movie;
-import com.busanit.entity.movie.MovieReaction;
-import com.busanit.entity.movie.ReactionType;
+import com.busanit.entity.movie.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +47,11 @@ public class Member extends BaseTimeEntity {
     private Boolean checkedTermsE;
 
     private Boolean checkedTermsS;
+
+    // 영화 찜
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoriteMovie> favoriteMovies = new ArrayList<>();
+
     //멤버와 댓글 연관관계
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comment = new ArrayList<>();
@@ -87,6 +89,18 @@ public class Member extends BaseTimeEntity {
     //멤버와 이벤트게시글 연관관계
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Event> events;
+
+    // 찜하기 연관관계 메서드
+    public void addFavoriteMovie(FavoriteMovie favoriteMovie) {
+        favoriteMovies.add(favoriteMovie);
+        favoriteMovie.setMember(this);
+    }
+
+    public void removeFavoriteMovie(FavoriteMovie favoriteMovie) {
+        favoriteMovies.remove(favoriteMovie);
+        favoriteMovie.setMember(null);
+    }
+
 
 
     // 일반 폼 회원 생성
