@@ -53,13 +53,12 @@ public class Member extends BaseTimeEntity {
     private List<FavoriteMovie> favoriteMovies = new ArrayList<>();
 
     //멤버와 댓글 연관관계
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comment = new ArrayList<>();
 
     //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MovieReaction> reactions = new ArrayList<>();
-
 
     // 리액션 연관관계 및 그외 메서드 시작
     @Transactional
@@ -142,8 +141,13 @@ public class Member extends BaseTimeEntity {
                 .id(regFormDTO.getId())
                 .name(regFormDTO.getName())
                 .email(regFormDTO.getEmail())
+                .password(regFormDTO.getPassword())
                 .age(regFormDTO.getAge())
+                .role(Role.USER)
+                .social(regFormDTO.isSocial())
                 .grade_code(regFormDTO.getGrade_code())
+                .checkedTermsE(regFormDTO.getCheckedTermsE())
+                .checkedTermsS(regFormDTO.getCheckedTermsS())
                 .build();
     }
 }

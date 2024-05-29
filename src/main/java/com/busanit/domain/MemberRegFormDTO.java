@@ -40,6 +40,7 @@ public class MemberRegFormDTO {
 
     public static MemberRegFormDTO toDTO(Member member) {
         return MemberRegFormDTO.builder()
+                .id(member.getId())
                 .name(member.getName())
                 .email(member.getEmail())
                 .password(member.getPassword())
