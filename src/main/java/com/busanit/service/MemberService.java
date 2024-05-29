@@ -5,6 +5,7 @@ import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.entity.Member;
 import com.busanit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService implements UserDetailsService { /* UserDetailsService 로그인을 위한 처리 */
     private final MemberRepository memberRepository;
 

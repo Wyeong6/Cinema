@@ -6,10 +6,16 @@ import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.service.CommentService;
 import com.busanit.service.MemberService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,12 +29,15 @@ import java.util.List;
 @Controller
 @RequestMapping("/mypage")
 @RequiredArgsConstructor
+@Slf4j
 public class MypageController {
 
     private final CommentService commentService;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
@@ -84,6 +93,8 @@ public class MypageController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+            log.info("useremail::"+userEmail);
+
         }
 
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용
@@ -100,6 +111,17 @@ public class MypageController {
 
             MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
             model.addAttribute("member", memberRegFormDTO);
+
+            // javascript에서 값을 사용
+            try {
+                String memberJson = objectMapper.writeValueAsString(memberRegFormDTO);
+                model.addAttribute("memberJson", memberJson);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                model.addAttribute("memberJson", "{}");
+            }
+
+
         }
         return "/mypage/mypage_private_info";
     }
@@ -128,7 +150,14 @@ public class MypageController {
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
 
+            // 사용자 정보를 업데이트
             memberService.editMemberInfo(memberRegFormDTO);
+            // 사용자의 새로운 UserDetails를 로드
+            UserDetails updatedUserDetails = memberService.loadUserByUsername(memberRegFormDTO.getEmail());
+            // 새로운 Authentication 객체 생성
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUserDetails, null, updatedUserDetails.getAuthorities());
+            // SecurityContext에 새로운 Authentication 객체 설정
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         }
         return "redirect:/mypage/";

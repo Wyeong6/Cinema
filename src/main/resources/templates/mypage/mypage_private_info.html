@@ -57,7 +57,8 @@
 </article>
 
 <script th:inline="javascript">
-    var member = [[${member}]]
+    const memberJson = [[${memberJson}]]
+    const member = JSON.parse(memberJson);
 
     $(document).ready(function() {
         var checkEmailButton = null; // 이메일 중복확인 버튼 누르기 + 사용가능한 이메일(1) 체크용
@@ -101,11 +102,16 @@
                     type: 'POST',
                     url: '/mypage/infoEdit',
                     data: {
+                        id: member.id,
                         name: name,
-                        age: birth_date,
                         email: email,
-                        password: password_chk,
-                        grade_code: member.grade_code
+                        age: birth_date,
+                        // password: password_chk,
+                        password: member.password,
+                        social: member.social,
+                        grade_code: member.grade_code,
+                        checkedTermsE: member.checkedTermsE,
+                        checkedTermsS: member.checkedTermsS
                     },
                     success: function(response) {
                         $('#content').html(response);
