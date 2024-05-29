@@ -20,7 +20,7 @@
 
 #info {
     position: absolute;
-    top: 2%;
+    top: 0.5em;
     right:1em;
     width: auto;
     height: 37px;
@@ -192,6 +192,42 @@ a#movie_title:not(:hover) {
 }
 #get_info .movie_info {
     margin-left: 5%;
+    vertical-align: center;
+}
+#get_info .movie_info div > span {
+    border-right: 1px solid #000;
+    padding: 0 10px;
+}
+#get_info .movie_info div > span.genres {
+    border-right: none;
+    padding: 0 5px;
+}
+.last-genre {
+    border-right: 1px solid #000 !important;
+    padding: 0 10px 0 5px !important;
+}
+#get_info .movie_info span:nth-child(1) {
+    padding-left: 0;
+}
+#get_info .movie_info span:last-child {
+    padding: 0;
+    border-right: none;
+}
+#get_info .movie_info img {
+    vertical-align: middle;
+    margin-left: 10px;
+    width: 3%;
+}
+.certification-container {
+    display: flex;
+    align-items: center;
+}
+.certification-container img {
+    max-height: 100%;
+    margin-right: 10px; /* 간격 조절 */
+}
+.certification-container span {
+    line-height: 1.5em; /* 높이 맞추기 */
 }
 #get_info .movie_data_box {
     margin: 5% 0 2% 0;
@@ -795,4 +831,14 @@ article#pay > button {
 }
 #mypage_private_info ul li {
     list-style-type: disc;
+}
+/* 상영시간표 */
+#select-city .button {
+    display: block;
+    padding-left: 0;
+    text-align: left;
+    background: #fafafa;
+    color: #3B353C;
+    font-size: 1em;
+
 }

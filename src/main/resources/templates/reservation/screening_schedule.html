@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout/layout_total}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cinemacast</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/custom.css" />
+    <link rel="stylesheet" href="/assets/css/custom_player.css" />
+    <link rel="stylesheet" href="/assets/css/nav.css" />
+    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+</head>
+<body class="right-sidebar is-preload">
+<th:block layout:fragment="content">
+<div id="page-wrapper">
+
+    <!-- Main -->
+    <div class="wrapper style1 screening-schedule">
+        <div class="container">
+            <article id="main" class="special">
+                <header>
+                    <h2>상영시간표</h2>
+                </header>
+                <hr />
+                <div class="row">
+                    <table class="default">
+                        <thead>
+                        <tr>
+                            <th id="select-theater">영화관 선택</th>
+                            <th id="select-movie">영화 선택</th>
+                            <th id="select-time">시간 선택</th>
+                        </tr>
+                        </thead>
+                        <tr>
+                            <td>
+                                <div id="select-city">
+                                    <button class="button">서울특별시</button>
+                                </div>
+                                <div>
+                                    <button class="button">강남</button>
+                                </div>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </div>
+
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/jquery.dropotron.min.js"></script>
+<script src="/assets/js/jquery.scrolly.min.js"></script>
+<script src="/assets/js/jquery.scrollex.min.js"></script>
+<script src="/assets/js/browser.min.js"></script>
+<script src="/assets/js/breakpoints.min.js"></script>
+<script src="/assets/js/util.js"></script>
+<script src="/assets/js/main.js"></script>
+
+
+
+<!--              댓글         ------------------             -->
+<script>
+    // include.js
+    window.addEventListener('load', function () {
+        var allElements = document.getElementsByTagName('*');
+        Array.prototype.forEach.call(allElements, function (el) {
+            var includePath = el.dataset.includePath;
+            if (includePath) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        el.outerHTML = this.responseText;
+                    }
+                };
+                xhttp.open('GET', includePath, true);
+                xhttp.send();
+            }
+        });
+    });
+    // credits api 제작진 사진
+    const options = {
+        method: 'GET',
+        headers: {
+            accept: 'application/json',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
+        }
+    };
+
+    async function fetchMovieCredits(movieId) {
+
+        try {
+            const apiKey = '547e2cd4d0e26e68fb907dafef4f90ac';
+            const url = `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR&api_key=${apiKey}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            // 영화 정보를 담을 요소 생성
+            const movieInfoDiv = document.getElementById('movie-info');
+            movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
+            movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
+
+            // 감독 정보 출력 (이미지 포함)
+            const director = data.crew.find(person => person.job === 'Director');
+            if (director) {
+                const directorDiv = createPersonDiv(director.name, director.profile_path, true);
+                movieInfoDiv.appendChild(directorDiv); // directorDiv를 movieInfoDiv에 추가
+            }
+
+            // 출연진 정보 출력 (이미지 포함)
+            data.cast.slice(0, 5).forEach(cast => {
+                const castDiv = createPersonDiv(cast.name, cast.profile_path);
+                movieInfoDiv.appendChild(castDiv); // castDiv를 movieInfoDiv에 추가
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // 인물 정보와 이미지를 담은 div 생성 함수
+    function createPersonDiv(name, profilePath, isDirector = false) {
+        const personDiv = document.createElement('div'); // 새로운 div 생성
+        personDiv.style.margin = '8px'; // 간격 설정
+        personDiv.style.width = '200px';
+        personDiv.style.height = '300px';
+
+        const p = document.createElement('p');
+        p.innerHTML = isDirector ? `<p>감독 : ${name}</p>` : `<p>${name}</p>`;
+        p.style.fontSize = '1em'; // 글자 크기 작게 설정
+
+        const img = document.createElement('img');
+        img.src = `https://image.tmdb.org/t/p/w200${profilePath}`; // 이미지 경로 설정
+        img.alt = `${name}'s profile image`;
+        img.style.width = '100%';
+        img.style.height = 'auto'; // 높이를 자동으로 설정
+
+        personDiv.appendChild(img);
+        personDiv.appendChild(p);
+
+        return personDiv;
+    }
+
+    const movieId = [[${movieId}]]
+
+    fetchMovieCredits(movieId);
+
+    const api = {
+        method: 'GET',
+        headers: {
+            accept: 'application/json',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3N2UzMWU5NWVjZmE3ZjBlODY5YTE3NmQwMjU0YWQwMiIsInN1YiI6IjY2NDJiMWM1ZTJlZjM4N2Y1MjM1OTNjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hBVsW7eVrC2M3FdWc2OJEAWq0h4v-NiiM2YEDQoy7OU'
+        }
+    };
+
+
+    // 스틸컷 더보기(more), 접기 클릭 함수
+    // 현재 표시된 항목의 수를 추적하는 변수
+    var visibleCount = 4; // 처음에 보이는 항목 수
+    var increment = 8; // 한 번에 표시할 추가 항목 수
+
+    document.getElementById("showMore").addEventListener("click", function () {
+        var stillCuts = document.querySelectorAll(".stillCut");
+        var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
+
+        for (var i = visibleCount; i < newVisibleCount; i++) {
+            stillCuts[i].classList.remove("hide");
+        }
+
+        visibleCount = newVisibleCount; // 업데이트된 표시된 항목의 수
+
+        // "접기" 버튼을 항상 보여줌
+        document.getElementById("showLess").style.display = 'block';
+
+        // 모든 항목이 표시되었는지 확인
+        if (visibleCount >= stillCuts.length) {
+            // "더보기"를 숨김
+            this.style.display = 'none';
+        } else {
+            // 아직 표시되지 않은 항목이 있다면 "더보기"를 계속 보여줌
+            this.style.display = 'block';
+        }
+    });
+
+    document.getElementById("showLess").addEventListener("click", function () {
+        var stillCuts = document.querySelectorAll(".stillCut");
+        for (var i = 0; i < stillCuts.length; i++) {
+            if (i > 3) { // 처음 4개를 제외한 나머지를 숨깁니다.
+                stillCuts[i].classList.add("hide");
+            }
+        }
+        visibleCount = 4; // "접기" 후 처음 표시된 항목의 수로 리셋
+        this.style.display = 'none'; // "접기"를 숨깁니다.
+        document.getElementById("showMore").style.display = 'block'; // "더보기"가 다시 보여질 상황을 위해
+    });
+
+
+    // 이미지 클릭시 원본크기로 볼수있게 띄우는 모달 관련 변수 및 함수들
+    var currentScrollPosition = 0;
+
+    function openModal(imageSrc) {
+
+        var header = document.getElementById("header")
+        header.style.display = "hide"
+        currentScrollPosition = window.scrollY;
+        document.body.style.overflow = 'hide';
+        var modal = document.getElementById("myModal");
+        var modalImg = document.getElementById("modalImage");
+        modal.style.display = "block";
+        modalImg.src = imageSrc;
+    }
+
+    function closeModal() {
+        var header = document.getElementById("header");
+        header.style.display = '';
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+        document.body.style.overflow = '';
+        // 자꾸 모달 닫을때 포스터 이미지 크기가 바껴서
+        // 걍 모달 함수에서 닫을때 포스터이미지 크기를 강제로 설정해서 크기변동이 없는것처럼 보이게함.
+        document.querySelector('.image.featured img').style.width = '400px';
+        document.querySelector('.image.featured img').style.height = '600px';
+
+        window.scrollTo(0, currentScrollPosition);
+    }
+
+    /*--------- 이미지 상세보기 모달 끝 --------*/
+
+    /* 유튜브 트레일러 관련 모달 시작 */
+
+    //     document.getElementById('videoModalBtn').addEventListener('click', function() {
+    //     var modal = document.getElementById('videoModal');
+    //     var videoUrl = 'https://www.youtube.com/watch?v=' + '@{${movie.video}}';
+    //     document.getElementById('videoFrame').src = videoUrl;
+    //     modal.style.display = "block";
+    // });
+    //
+    //     document.getElementsByClassName('close')[0].addEventListener('click', function() {
+    //     document.getElementById('videoModal').style.display = "none";
+    //     document.getElementById('videoFrame').src = ""; // 비디오 정지
+    // });
+
+        // 자바스크립트에서 타임리프를 이용한 변수 가져오기위한 코드 포함
+    document.addEventListener('DOMContentLoaded', function() {
+        var openModalButton = document.getElementById('videoModalBtn');
+        if (openModalButton) {
+            openModalButton.addEventListener('click', function() {
+                var modal = document.getElementById('videoModal');
+                var videoId = openModalButton.getAttribute('data-video-id');
+                if(videoId == null) {
+                    videoId = 'dQw4w9WgXcQ'; // 기본 비디오 ID 설정
+                }
+                var videoUrl = 'https://www.youtube.com/embed/' + videoId;
+                document.getElementById('videoFrame').src = videoUrl;
+                modal.style.display = "flex"; // flex로 변경
+                document.body.style.overflow = 'hide'; // 스크롤 막기
+            });
+
+            document.getElementsByClassName('close')[0].addEventListener('click', function() {
+                var modal = document.getElementById('videoModal');
+                modal.style.display = "none";
+                document.getElementById('videoFrame').src = ""; // 비디오 중지
+                document.body.style.overflow = ''; // 스크롤 복원
+            });
+        }
+    });
+
+
+    /* 유튜브 트레일러 관련 모달 끝 */
+
+    // 버튼 클릭 시 스틸컷 또는 리뷰 테이블
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('img').forEach(function(img) {
+    img.addEventListener('click', function() {
+    this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
+    });
+    });
+
+    var stillCutBtn = document.querySelector(".stillcut_btn");
+    var reviewsBtn = document.querySelector(".reviews_btn");
+    var stillCutDiv = document.getElementById("stillcut");
+    var reviewsDiv = document.getElementById("reviews");
+
+        stillCutBtn.addEventListener("click", function() {
+            stillCutDiv.style.display = "block";
+            reviewsDiv.style.display = "none";
+            stillCutBtn.classList.add("clicked");
+            reviewsBtn.classList.remove("clicked");
+        });
+
+        reviewsBtn.addEventListener("click", function() {
+            stillCutDiv.style.display = "none";
+            reviewsDiv.style.display = "block";
+            reviewsBtn.classList.add("clicked");
+            stillCutBtn.classList.remove("clicked");
+        });
+    });
+
+
+    // 리뷰 작성 모달을 팝업 창으로 열기
+    function openReviewModal() {
+        const movieId = $('#movieId').val();
+        console.log("movieId: " + movieId);
+        var reviewWindow = window.open('/review/' + movieId , 'ReviewModal', 'width=600,height=400');
+        var checkWindowClosed = setInterval(function() {
+            if (reviewWindow.closed) {
+                clearInterval(checkWindowClosed);
+                loadComments();
+            }
+        }, 500); // 0.5초마다 상태 확인
+
+    }
+
+
+    const loadComments = () => {
+        const movieId = $('#movieId').val();
+        console.log("겟페이지 무비아이디 = " + movieId);
+
+
+
+//            댓글리스트    --------------------------------------------------
+        $.ajax({
+            url: `/movies/` + movieId ,
+            method: 'GET',
+            dataType: 'json',
+            success: (data) => {
+                console.log(data)
+
+                const reviewsSection = $('#reviews-table'); // 리뷰를 넣을 테이블 선택
+                reviewsSection.empty(); // 기존 내용을 비웁니다.
+                data.forEach(({memberEmail, comment,grade }) => {
+                    // 각 댓글마다의 HTML 구조를 생성합니다.
+                    const reviewRow = `
+                    <tr>
+                        <td>
+                            <h4>${memberEmail}</h4>
+                            <p>${new Date().toISOString().slice(0, 10)}</p>
+                            <div>
+                                <input type="radio" id="5-stars" name="rating" value="5" v-model="ratings"/>
+                                <label for="5-stars" class="star pr-4">★</label>
+                            </div>
+                            <p>${comment}</p>
+                        </td>
+                    </tr>
+                `;
+                    reviewsSection.append(reviewRow); // 생성된 HTML을 테이블에 추가합니다.
+            });
+        },
+        error: (xhr, status, error) => {
+            console.error("댓글을 불러오지 못했습니다:", error);
+            $('#comments').append(
+                `<div class="error">
+                    <p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p>
+                   </div>`
+            );
+        }
+        });
+    };
+    loadComments();
+
+
+
+
+</script>
+</th:block>
+</body>
+</html>
