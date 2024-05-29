@@ -129,6 +129,8 @@ public class MovieService {
     public String fetchMovieVideoKey(int movieId) throws IOException {
         // TMDB API URL을 포맷팅하여 생성합니다. 영화 ID와 API 키를 사용
         String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=ko-KR&api_key=%s", movieId, apiKey);
+
+        System.out.println("String.format key === " + url);
         // 요청을 생성
         Request request = new Request.Builder().url(url).build();
 
@@ -400,7 +402,7 @@ public class MovieService {
     // 상영중 영화 목록 더보기 화면 페이징 및 정렬
     public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size) {
         LocalDate today = LocalDate.now();
-        LocalDate twoMonthsAgo = today.minusMonths(2);
+        LocalDate twoMonthsAgo = today.minusMonths(4);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String startDateString = twoMonthsAgo.format(formatter);
@@ -414,7 +416,7 @@ public class MovieService {
     // 상영예정 영화 목록 더보기 화면 페이징 및 정렬
     public Page<MovieDTO> getUpcomingMoviesPagingAndSorting(int page, int size) {
         LocalDate today = LocalDate.now();
-        LocalDate twoMonthsLater = today.plusMonths(2);
+        LocalDate twoMonthsLater = today.plusMonths(4);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String startDateString = today.format(formatter);
@@ -424,7 +426,6 @@ public class MovieService {
         Page<Movie> movieList = movieRepository.findAllByReleaseDateBetween(startDateString, endDateString, pageable);
         return movieList.map(MovieDTO::convertToDTO); // DTO로 변환
     }
-
 
     //인기순 영화 정렬
     public List<MovieDTO> getHotMovies() {

@@ -37,18 +37,13 @@ public class MovieController {
         LocalDate twoMonthsLater = today.plusMonths(3);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-//        movieService2.fetchAndStoreMoviesNowPlaying();
-//        movieService2.fetchAndStoreMoviesUpcoming();
-//        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
-//        movieService2.fetchAndStoreMovieStillCuts();
-//        movieService2.fetchAndStoreCertificationData();
-
         //비디오가 있는 인기순영화
         List<MovieDTO> videoMovies = movieService2.getCachedVideoMovies();
         model.addAttribute("videoMovies", videoMovies);
 
         //모든 영화
         List<MovieDTO> allMovies = movieService2.getCachedAllMovies();
+
 
         //모든 영화에서 개봉일자가 2개월 전 부터 오늘날짜 까지인거만 가져옴 즉 현재 상영작임.
         List<MovieDTO> filteredMovies = allMovies.stream()
