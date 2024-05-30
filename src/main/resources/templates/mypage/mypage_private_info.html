@@ -46,18 +46,6 @@
                         <input id="email2" th:value="${member.email}" type="text" name="email" readonly disabled/>
                     </td>
                 </tr>
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <label for="email">이메일 <b>*</b></label></td>-->
-<!--                    <td>-->
-<!--                        <input id="email" th:value="${member.email}" type="text" name="email"/>-->
-<!--                        <button class="button" id="checkEmail">중복 확인</button>-->
-<!--                        <div>-->
-<!--                            <p id="email-available" style="color: #00C73C; display: none;">사용가능한 이메일 입니다.</p>-->
-<!--                            <p id="email-taken" style="color: #ff0000; display: none;">사용 중인 이메일 입니다.</p>-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                </tr>-->
                 <tr th:if="${formUser == 'formUser'}">
                     <td>
                         <label for="password_chk">패스워드 확인 <b>*</b></label>
@@ -132,7 +120,7 @@
                 finalEmail = email2;
             }
 
-            if(member.email === email || member.email === email2){
+            if(member.email === finalEmail){
                 checkEmailButton = 1;
             }
 
@@ -154,10 +142,6 @@
                     },
                     success: function(response) {
                         $('#content').html(response);
-                        // // 동적으로 로드된 컨텐츠 내에서 중복 선언 방지
-                        // if (typeof window.memberJson === 'undefined') {
-                        //     window.memberJson = response.memberJson || {};
-                        // }
                     },
                     error: function(xhr, status, error) {
                         console.error('Update Info Error:', error);

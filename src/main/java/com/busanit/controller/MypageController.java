@@ -194,7 +194,6 @@ public class MypageController {
 
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "비밀번호를 다시 확인해주세요.");
-//                return "mypage/mypage_private_info";
                 return "redirect:/mypage/infoEdit";
             }
         }
