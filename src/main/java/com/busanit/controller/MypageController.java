@@ -1,10 +1,8 @@
 package com.busanit.controller;
 
-import com.busanit.domain.CommentDTO;
-import com.busanit.domain.FormMemberDTO;
-import com.busanit.domain.MemberRegFormDTO;
-import com.busanit.domain.OAuth2MemberDTO;
+import com.busanit.domain.*;
 import com.busanit.service.CommentService;
+import com.busanit.service.FavoriteMovieService;
 import com.busanit.service.MemberService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/mypage")
@@ -37,6 +36,7 @@ public class MypageController {
     private final CommentService commentService;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final FavoriteMovieService favoriteMovieService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -102,7 +102,17 @@ public class MypageController {
         return "/mypage/mypage_review";
     }
 
+    @GetMapping("/favorite")
+    public String mypageFavorite(Model model) {
+        String memberEmail = commentService.getAuthenticatedUserEmail();
+        List<FavoriteMovieDTO> favoriteMovies = favoriteMovieService.getFavoriteMoviesByEmail(memberEmail);
 
+        System.out.println("favoriteMovieDTOs title === " + favoriteMovies.get(0).getMovieTitle());
+        System.out.println("favoriteMovieDTOs poster === " + favoriteMovies.get(0).getMoviePosterUrl());
+        model.addAttribute("favoriteMovies", favoriteMovies);
+        System.out.println("favoriteMovies === " + favoriteMovies.size());
+        return "/mypage/mypage_favorite";
+    }
 
     @GetMapping("/infoEdit")
     public String mypageEdit(@AuthenticationPrincipal Object principal, Model model) {

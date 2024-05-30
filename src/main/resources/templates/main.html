@@ -30,7 +30,7 @@
     a:hover {
         color: inherit;
     }
-    </style>
+</style>
 </head>
 
 <body class="homepage is-preload">
@@ -116,18 +116,17 @@
     <!-- Banner -->
     <section id="banner">
         <header>
-            <h2>Hi. You're looking at <strong>Helios</strong>.</h2>
-            <p>
-                A (free) responsive site template by <a href="http://html5up.net">HTML5 UP</a>.
-                Built with HTML5/CSS3 and released under the <a href="http://html5up.net/license">CCA</a> license.
-            </p>
+            <form id="searchForm" method="get" action="/search" class="search-form">
+                <input class="search-input" type="text" name="query" placeholder="영화 검색" required />
+            </form>
+            <button type="submit">검색</button>
         </header>
     </section>
 
-    <!-- Weekly Hot Movies -->
+    <!-- Now Playing -->
     <section class="carousel">
         <div class="section_title">
-            <h2>Weekly Hot Movies</h2>
+            <h2>Now Playing</h2>
             <p><a href="/nowMovies">더보기</a></p>
         </div>
         <div class="reel">
