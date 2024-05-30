@@ -194,8 +194,10 @@
                                     <div class="movie_info">
                                         <header class="info_header">
                                             <h2 th:text="${movie.title}" class="movie_title"></h2>
-                                            <a href="#" class="button" style="height: 3em;">지금 예매하기</a>
+                                            <a href="#" class="button" style="height: 3em;">예매하기</a>
+                                            <a id="videoModalBtn" th:data-video-id="${movie.video}" href="#" class="button" style="height: 3em;">트레일러 보기</a>
                                         </header>
+                                        <br>
                                         <div>
                                             <span th:text="${movie.releaseDate}">releasedate</span>
                                             <span th:text="${#strings.arrayJoin(movie.genres, ', ')}"></span>
@@ -204,13 +206,6 @@
                                             <span id="certification" th:text="${movie.certifications}">certification</span>
                                         </div>
 
-                                        <div style="text-align: right;">
-                                            <!--                                    <a th:href="@{'https://www.youtube.com/watch?v=' + ${movie.video}}" class="button" style="height: 3em;">트레일러 보기</a>-->
-                                            <button id="videoModalBtn" class="button" style="height: 3em;"
-                                                    th:data-video-id="${movie.video}">트레일러 보기
-                                            </button>
-                                        </div>
-<!--                                        <p><b>감독 : </b>director <b>각본 : </b>writer</p>-->
 
                                         <p th:text="${movie.overview}">
                                             ~ overview ~
@@ -420,7 +415,7 @@
             p.style.fontSize = '1em'; // 글자 크기 작게 설정
 
             const img = document.createElement('img');
-            img.src = `https://image.tmdb.org/t/p/w200${profilePath}`; // 이미지 경로 설정
+            img.src = profilePath ? `https://image.tmdb.org/t/p/w200${profilePath}` : '/images/img_not_ready2.png';
             img.alt = `${name}'s profile image`;
             img.style.width = '100%';
             img.style.height = 'auto'; // 높이를 자동으로 설정
@@ -520,11 +515,28 @@
                 openModalButton.addEventListener('click', function () {
                     var modal = document.getElementById('videoModal');
                     var videoId = openModalButton.getAttribute('data-video-id');
-                    if (videoId == null) {
-                        videoId = 'dQw4w9WgXcQ'; // 기본 비디오 ID 설정
+                    var videoFrame = document.getElementById('videoFrame');
+
+                    var preparingImage = videoFrame.parentNode.querySelector('img');
+                    if (preparingImage) {
+                        preparingImage.remove();
                     }
-                    var videoUrl = 'https://www.youtube.com/embed/' + videoId;
-                    document.getElementById('videoFrame').src = videoUrl;
+
+                    if (videoId == null) {
+                        // 비디오 ID가 없는 경우, 준비중 이미지 표시
+                        videoFrame.style.display = 'none';
+                        var preparingImage = document.createElement('img');
+                        preparingImage.src = '/images/video_not_ready.jpg'; // 준비중 이미지 URL
+                        preparingImage.style.width = '100%';
+                        preparingImage.style.height = '100%';
+                        videoFrame.parentNode.appendChild(preparingImage);
+                    } else {
+                        // 비디오 ID가 있는 경우, 비디오 표시
+                        var videoUrl = 'https://www.youtube.com/embed/' + videoId;
+                        videoFrame.src = videoUrl;
+                        videoFrame.style.display = 'block';
+                    }
+
                     modal.style.display = "flex"; // flex로 변경
                     document.body.style.overflow = 'hide'; // 스크롤 막기
                 });

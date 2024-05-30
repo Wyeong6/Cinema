@@ -75,6 +75,8 @@ public class FavoriteMovieService {
         favoriteMovieDTO.setFavoriteId(favoriteMovie.getFavoriteId());
         favoriteMovieDTO.setEmail(favoriteMovie.getMember().getEmail()); // 가정: FavoriteMovie 엔티티에 Member 엔티티가 연결되어 있고, 이메일을 가져올 수 있음
         favoriteMovieDTO.setMovieId(favoriteMovie.getMovie().getMovieId()); // 가정: FavoriteMovie 엔티티에 Movie 엔티티가 연결되어 있고, ID를 가져올 수 있음
+        favoriteMovieDTO.setMovieTitle(favoriteMovie.getMovie().getTitle());
+        favoriteMovieDTO.setMoviePosterUrl(favoriteMovie.getMovie().getImages().get(0).getPosterPath());
         favoriteMovieDTO.setFavoritedAt(favoriteMovie.getFavoritedAt());
         return favoriteMovieDTO;
     }

@@ -1,23 +1,30 @@
+<style>
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-gap: 20px;
+    }
+
+    .movie-item {
+        text-align: center;
+    }
+
+    .movie-item img {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+
 <article id="mypage_favorite">
-    <header>내가 작성한 관람평 전체보기</header>
+    <header>찜한 영화 전체보기</header>
     <section>
-        <table class="default">
-            <tr>
-                <th>날짜</th>
-                <th>영화명</th>
-                <th>내용</th>
-                <th>별점</th>
-                <th></th>
-            </tr>
-            <tr>
-                <td>2024-5-23</td>
-                <td>범죄도시4</td>
-                <td>범죄도시 시리즈는 꼭 봅니다 ~ 조아요</td>
-                <td>4.5</td>
-                <td>
-                    <img src="/images/delete.png" alt="삭제 버튼" />
-                </td>
-            </tr>
-        </table>
+        <div class="movie-grid">
+            <div class="movie-item" th:each="movie : ${favoriteMovies}">
+                <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.moviePosterUrl}}" alt="포스터" />
+                <p th:text="${movie.movieTitle}"></p>
+                <p th:text="${#temporals.format(movie.favoritedAt, 'yyyy-MM-dd')}"></p>
+                <img src="/images/delete.png" alt="삭제 버튼" />
+            </div>
+        </div>
     </section>
 </article>

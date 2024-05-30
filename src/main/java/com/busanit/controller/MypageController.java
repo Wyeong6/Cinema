@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/mypage")
@@ -81,6 +82,9 @@ public class MypageController {
     public String mypageFavorite(Model model) {
         String memberEmail = commentService.getAuthenticatedUserEmail();
         List<FavoriteMovieDTO> favoriteMovies = favoriteMovieService.getFavoriteMoviesByEmail(memberEmail);
+
+        System.out.println("favoriteMovieDTOs title === " + favoriteMovies.get(0).getMovieTitle());
+        System.out.println("favoriteMovieDTOs poster === " + favoriteMovies.get(0).getMoviePosterUrl());
         model.addAttribute("favoriteMovies", favoriteMovies);
         System.out.println("favoriteMovies === " + favoriteMovies.size());
         return "/mypage/mypage_favorite";
