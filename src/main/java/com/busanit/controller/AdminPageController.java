@@ -7,16 +7,19 @@ import com.busanit.customerService.Notice.NoticeService;
 import com.busanit.domain.SeatsDTO;
 import com.busanit.domain.SnackDTO;
 import com.busanit.domain.TheaterDTO;
+import com.busanit.entity.Seats;
 import com.busanit.entity.Snack;
 import com.busanit.entity.Theater;
 import com.busanit.service.EventService;
 import com.busanit.service.SnackService;
 import com.busanit.service.TheaterService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.sql.ast.tree.from.TableJoin;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,10 +31,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import static com.busanit.entity.QTheater.theater;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
@@ -45,6 +47,9 @@ public class AdminPageController {
     private final SnackService snackService;
     private final EventService eventService;
     private final NoticeService noticeService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @GetMapping("/adminMain")
     public String adminMain() {
@@ -68,7 +73,18 @@ public class AdminPageController {
     }
 
     @GetMapping("/theaterList")
-    public String theaterList() {
+    public String theaterList(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
+                              @PageableDefault(size = 15, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<TheaterDTO> theaterDTOList = null;
+
+        theaterDTOList = theaterService.getTheaterAll(pageable);
+        model.addAttribute("theaterDTOList", theaterDTOList);
+
+        int startPage= Math.max(1, theaterDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(theaterDTOList.getTotalPages(), theaterDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "admin/admin_theater_list";
     }
 
@@ -95,6 +111,33 @@ public class AdminPageController {
         }
 
         return "admin/admin_layout";
+    }
+
+    @GetMapping("/theaterGet")
+    public String theaterGet(@RequestParam(name = "theaterId") long theaterId, Model model) {
+        TheaterDTO theaterDTO = theaterService.getTheaterById(theaterId);
+        SeatsDTO seatsDTO = theaterService.getSeatsByTheaterId(theaterId);
+
+        model.addAttribute("theaterDTO", theaterDTO);
+        model.addAttribute("seatsDTO", seatsDTO);
+
+        return "admin/admin_theater_edit";
+    }
+
+    @PostMapping("/theaterDelete")
+    public String theaterDelete(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "theaterId") long theaterId,
+                                Model model, @PageableDefault(size = 15) Pageable pageable, TheaterDTO theaterDTO) {
+        theaterService.deleteTheaterById(theaterId);
+
+        Page<TheaterDTO> theaterDTOList = theaterService.getTheaterAll(pageable);
+        model.addAttribute("theaterDTOList", theaterDTOList);
+
+        int startPage = Math.max(1, theaterDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(theaterDTOList.getTotalPages(), theaterDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_theater_list";
     }
 
     @GetMapping("/scheduleList")
@@ -229,7 +272,6 @@ public String eventList(Model model, @RequestParam(defaultValue = "1") int page,
     int startPage = Math.max(1, page - 5);
     int endPage = Math.min(totalPages, page + 4);
 
-
     model.addAttribute("eventList", eventDTO); //이벤트 게시글
     model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
     model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
@@ -237,7 +279,6 @@ public String eventList(Model model, @RequestParam(defaultValue = "1") int page,
     model.addAttribute("endPage", endPage);
 
     return "admin/admin_event_list";
-
 }
 
 //이벤트 수정 페이지

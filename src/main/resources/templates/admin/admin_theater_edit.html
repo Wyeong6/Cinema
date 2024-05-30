@@ -1,0 +1,131 @@
+ <nav
+            class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+            id="layout-navbar"
+          >
+            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+              <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                <i class="bx bx-menu bx-sm"></i>
+              </a>
+            </div>
+
+            <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+              <!-- Search -->
+              <div class="navbar-nav align-items-center">
+                <div class="nav-item d-flex align-items-center">
+                  <i class="bx bx-search fs-4 lh-0"></i>
+                  <input
+                    type="text"
+                    class="form-control border-0 shadow-none"
+                    placeholder="Search..."
+                    aria-label="Search..."
+                  />
+                </div>
+              </div>
+              <!-- /Search -->
+            </div>
+          </nav>
+
+          <!-- / Navbar -->
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <!-- Content -->
+
+            <div class="container-xxl flex-grow-1 container-p-y">
+                <h4 class="fw-bold py-3 mb-4" id="theater_name" th:text="'시네마캐스트 ' + ${theaterDTO.theaterName} + '점'"></h4>
+                <p>지역 : <span id="region" th:text="${theaterDTO.region}">지역</span></p>
+                <p>총 보유한 상영관 수 : <span id="theater_count" th:text="${theaterDTO.theaterCount} + '관'">상영관 수</span></p>
+                <input type="hidden" id="theater_id" th:value="${theaterDTO.id}">
+
+              <!-- Basic Layout & Basic with Icons -->
+              <div class="row">
+                <!-- Basic Layout -->
+                <div class="col-xxl-6" th:each="index : ${#numbers.sequence(0, theaterDTO.theaterNumber.size() - 1)}">
+                  <div class="card mb-4" th:with="theaterId=${theaterDTO.theaterNumber[index]}">
+                      <div class="card-header d-flex align-items-center justify-content-between">
+                          <img src="/images/delete_form.png" alt="폼 삭제버튼" class="delete_form_btn"/>
+                          <h5 class="mb-0" th:text="${theaterDTO.theaterName} + '점' + ' ' + ${theaterDTO.theaterNumber[index]} + '관'">지점명</h5>
+<!--                          <small class="text-muted float-end">Merged input group</small>-->
+                      </div>
+                      <div class="card-body">
+                          <form>
+                              <div class="row mb-3">
+                                  <label class="col-sm-2 col-form-label" for="theaterIdx">상영관 식별자</label>
+                                  <div class="col-sm-10">
+                                      <div class="input-group input-group-merge">
+                              <span id="basic-icon-default-fullname2" class="input-group-text" style="background: #eceef1;"
+                              ><i class="bx bx-user"></i
+                              ></span>
+                                          <input
+                                                  type="text"
+                                                  class="form-control"
+                                                  id="theaterIdx"
+                                                  th:value="${theaterDTO.theaterIdx[index]}"
+                                                  disabled
+                                          />
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row mb-3">
+                                  <label class="col-sm-2 col-form-label" for="theaterNumber">상영관 번호</label>
+                                  <div class="col-sm-10">
+                                      <div class="input-group input-group-merge">
+                              <span id="basic-icon-default-company2" class="input-group-text" style="background: #eceef1;"
+                              ><i class="bx bx-buildings"></i
+                              ></span>
+                                          <input
+                                                  type="text"
+                                                  id="theaterNumber"
+                                                  class="form-control"
+                                                  th:value="${theaterDTO.theaterNumber[index]}"
+                                                  disabled
+                                          />
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row mb-3">
+                                  <label class="col-sm-2 col-form-label" for="seatsPerTheater">좌석 수</label>
+                                  <div class="col-sm-10">
+                                      <div class="input-group input-group-merge">
+                                          <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                          <input
+                                                  type="number"
+                                                  id="seatsPerTheater"
+                                                  class="form-control"
+                                                  th:value="${theaterDTO.seatsPerTheater[index]}"
+                                          />
+                                      </div>
+                                      <div class="form-text">최소 50석 이상이어야 합니다.</div>
+                                  </div>
+                              </div>
+                              <div class="row mb-3">
+                                  <label class="col-sm-2 form-label" for="basic-icon-default-message">Message</label>
+                                  <div class="col-sm-10">
+                                      <div class="input-group input-group-merge">
+                              <span id="basic-icon-default-message2" class="input-group-text"
+                              ><i class="bx bx-comment"></i
+                              ></span>
+                                          <textarea
+                                                  id="basic-icon-default-message"
+                                                  class="form-control"
+                                                  placeholder="특별 관리사항 작성해주세요."
+                                          ></textarea>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row justify-content-end">
+                                  <div class="col-sm-10">
+                                      <button type="submit" class="btn btn-primary">저장</button>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            <!-- / Content -->
+
+
+

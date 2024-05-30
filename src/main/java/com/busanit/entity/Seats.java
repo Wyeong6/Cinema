@@ -13,6 +13,9 @@ public class Seats {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "theater_idx")
+    private String theaterIdx; // 지점내 상영관 고유 번호
+
     @Column(name = "theater_number")
     private Long theaterNumber; // 지점내 상영관 고유 번호
 
