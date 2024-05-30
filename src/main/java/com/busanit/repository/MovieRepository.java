@@ -28,4 +28,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("SELECT m FROM Movie m JOIN m.movieDetail md WHERE md.releaseDate BETWEEN :startDate AND :endDate")
     Page<Movie> findAllByReleaseDateBetween(@Param("startDate") String startDate, @Param("endDate") String endDate, Pageable pageable);
 
+    List<Movie> findByTitleContaining(String title);
+
 }

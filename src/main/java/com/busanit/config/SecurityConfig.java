@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/assets/**", "/images/**", "/jquery/**").permitAll()
                         .requestMatchers("/", "/member/**", "/**").permitAll() // 모든 사용자에게 허용 (수정예정) /** 부분 수정하기(개발하기 편하려고 다 오픈한거임)
                         .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN 에게만 허용 (수정예정) admin 전부를 거부하는건 너무 광범위함 보안에 취약해지는듯 관리자 페이지를 전부 구현하면 해당 페이지만 거부해야겠음
+                        .requestMatchers("/ws/**").permitAll() // // WebSocket 엔드포인트는 인증 없이 접근 가능
                         .anyRequest().authenticated() // 나머지 요청은 인증된 사용자만 접근 가능
                 ) // 인증별 권한 설정
 
@@ -62,6 +64,7 @@ public class SecurityConfig {
 
                 .build();
     }
+
 
     // 패스워드 암호화
     @Bean

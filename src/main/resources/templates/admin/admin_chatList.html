@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event List</title>
+    <style>
+        td, th {
+            padding: 15px;
+        }
+    </style>
+    <script>
+        function openChatModal(row) {
+            if (!row) {
+                console.error("Row is null");
+                return;
+            }
+
+            // 클릭한 행의 이메일 값을 가져옴
+            const userEmail = row.querySelector('td:nth-child(3)').innerText;
+            if (!userEmail) {
+                console.error("User email not found");
+                return;
+            }
+
+            // AJAX를 사용하여 모달창 HTML 파일을 로드하고 데이터를 전달
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/admin/chatModal', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 모달 HTML을 페이지에 추가
+                    document.body.insertAdjacentHTML('beforeend', xhr.responseText);
+
+                    // 모달창의 이메일 필드를 업데이트
+                    const modal = document.getElementById('myModal');
+                    modal.querySelector('#userEmail').innerText = userEmail;
+
+                    // 모달창 표시
+                    modal.style.display = 'block';
+                }
+            };
+            xhr.send();
+        }
+
+        // 모달창 닫기 함수
+        function closeModal() {
+            const modal = document.getElementById('chatModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.remove();
+            }
+        }
+    </script>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar" style="margin-bottom: 10px;">
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <input aria-label="Search..." class="form-control border-0 shadow-none" placeholder="Search..." type="text" />
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+<!-- / Navbar -->
+
+<h5 class="card-header">Event List</h5>
+<div class="table-responsive text-nowrap">
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>방 번호</th>
+            <th>카테고리</th>
+            <th>회원 이메일</th>
+            <th>회원 이름</th>
+        </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+        <!-- 채팅방 리스트 출력 -->
+        <tr th:each="chatRoom : ${eventList.content}" th:data-room-id="${chatRoom.id}" onclick="openChatModal(this)">
+            <td th:text="${chatRoom.id}">Room ID</td>
+            <td th:text="${chatRoom.messageTitle}">Room Title</td>
+            <td th:text="${chatRoom.userEmail}">User Email</td>
+            <td th:text="${chatRoom.userName}">User Name</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    <div style="text-align: center;">
+        <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}" th:text="'[' + ${i} + ']'" class="paging-btn"></a>
+    </div>
+</div>
+</body>
+</html>

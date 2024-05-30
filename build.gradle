@@ -60,6 +60,8 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 
+    // Spring Boot 웹소켓 스타터 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 }
 

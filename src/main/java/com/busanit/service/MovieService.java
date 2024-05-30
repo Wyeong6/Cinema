@@ -56,9 +56,10 @@ public class MovieService {
     private List<MovieDTO> cachedVideoMovies = new ArrayList<>();
     private List<MovieDTO> cachedAllMovies = new ArrayList<>();
     private List<MovieDTO> cachedHotMovies = new ArrayList<>();
-//    private List<MovieDTO> cachedUpcomingMovies = new ArrayList<>();
-//    private List<MovieDTO> cachedMovieDetails = new ArrayList<>();
     private LocalDate lastFetchDate = LocalDate.now().minusDays(1);
+
+    // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
     public void fetchAndStoreMovies() throws IOException {
@@ -74,12 +75,6 @@ public class MovieService {
         cachedHotMovies = getHotMovies();
         lastFetchDate = LocalDate.now();
     }
-
-
-
-
-
-
 
     /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
 
@@ -129,6 +124,8 @@ public class MovieService {
     public String fetchMovieVideoKey(int movieId) throws IOException {
         // TMDB API URL을 포맷팅하여 생성합니다. 영화 ID와 API 키를 사용
         String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=ko-KR&api_key=%s", movieId, apiKey);
+
+        System.out.println("String.format key === " + url);
         // 요청을 생성
         Request request = new Request.Builder().url(url).build();
 
@@ -185,7 +182,6 @@ public class MovieService {
         // 영화 상세 정보를 업데이트하거나 생성
         MovieDetail movieDetail = getOrCreateMovieDetail(movie);
         movieDetail.setVideo(videoKey);
-//        movieDetail.setVoteAverage(movieDTO.getVoteAverage());
         movieDetail.setPopularity(movieDTO.getPopularity());
         movieDetail.setReleaseDate(movieDTO.getReleaseDate());
         movie.setMovieDetail(movieDetail);
@@ -398,33 +394,34 @@ public class MovieService {
     }
 
     // 상영중 영화 목록 더보기 화면 페이징 및 정렬
-    public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size) {
+    public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size, boolean isUpcoming) {
         LocalDate today = LocalDate.now();
-        LocalDate twoMonthsAgo = today.minusMonths(2);
+        LocalDate startDate;
+        LocalDate endDate;
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String startDateString = twoMonthsAgo.format(formatter);
-        String endDateString = today.format(formatter);
+        if (isUpcoming) {
+            startDate = today;
+            endDate = today.plusMonths(4);
+        } else {
+            startDate = today.minusMonths(4);
+            endDate = today;
+        }
+
+        String startDateString = startDate.format(formatter);
+        String endDateString = endDate.format(formatter);
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Movie> movieList = movieRepository.findAllByReleaseDateBetween(startDateString, endDateString, pageable);
-        return movieList.map(MovieDTO::convertToDTO); // DTO로 변환
+        return movieList.map(MovieDTO::convertToDTO);
     }
-
-    // 상영예정 영화 목록 더보기 화면 페이징 및 정렬
+    // 상영예정작 전체목록보기
     public Page<MovieDTO> getUpcomingMoviesPagingAndSorting(int page, int size) {
-        LocalDate today = LocalDate.now();
-        LocalDate twoMonthsLater = today.plusMonths(2);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String startDateString = today.format(formatter);
-        String endDateString = twoMonthsLater.format(formatter);
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Movie> movieList = movieRepository.findAllByReleaseDateBetween(startDateString, endDateString, pageable);
-        return movieList.map(MovieDTO::convertToDTO); // DTO로 변환
+        return getMoviesPagingAndSorting(page, size, true);
     }
-
+    // 상영작 전체목록보기
+    public Page<MovieDTO> getCurrentMoviesPagingAndSorting(int page, int size) {
+        return getMoviesPagingAndSorting(page, size, false);
+    }
 
     //인기순 영화 정렬
     public List<MovieDTO> getHotMovies() {
@@ -460,12 +457,38 @@ public class MovieService {
         return userEmail;
     }
 
+    //모든 영화에서 개봉일자가 4개월 전/후 로 필터링 하는 함수
+    //매개변수의 boolean 값으로 4개월 전으로 나눌지 4개월 후로 나눌지 선택할수있음!
+    public List<MovieDTO> getFilteredMovies(List<MovieDTO> allMovies, boolean isUpcoming) {
+        LocalDate referenceDate = LocalDate.now();
+        LocalDate startDate;
+        LocalDate endDate;
 
+        if (isUpcoming) {
+            startDate = referenceDate;
+            endDate = referenceDate.plusMonths(4);
+        } else {
+            startDate = referenceDate.minusMonths(4);
+            endDate = referenceDate;
+        }
 
+        return allMovies.stream()
+                .filter(movie -> {
+                    String releaseDateString = movie.getReleaseDate();
+                    if (releaseDateString != null && !releaseDateString.isEmpty()) {
+                        LocalDate releaseDate = LocalDate.parse(releaseDateString, formatter);
+                        return !releaseDate.isBefore(startDate) && !releaseDate.isAfter(endDate);
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+    }
 
-
-
-
-
+    // 검색기능
+    public List<MovieDTO> searchMovies(String query) {
+        List<Movie> searchResults = movieRepository.findByTitleContaining(query);
+        return searchResults.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
 }
