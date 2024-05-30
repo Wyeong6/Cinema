@@ -23,11 +23,12 @@ public class OAuth2MemberDTO extends User implements OAuth2User {
     private Map<String, Object> attr; // 소셜 로그인 정보
     private Boolean checkedTermsE; // 약관 필수
     private Boolean checkedTermsS; // 약관 선택
+    private String authorizedClientRegistrationId; // 클라이언트 등록 ID 추가
 
     public OAuth2MemberDTO(String username, String password, String email,
                            boolean social, String age,
                            Collection<? extends GrantedAuthority> authorities, boolean checkedTermsE, boolean checkedTermsS){
-        super(username, password, authorities);
+        super(email, password, authorities);
         this.id = username;
         this.password = password;
         this.email = email;
@@ -35,6 +36,7 @@ public class OAuth2MemberDTO extends User implements OAuth2User {
         this.age = age;
         this.checkedTermsE = checkedTermsE;
         this.checkedTermsS = checkedTermsS;
+        this.authorizedClientRegistrationId = "social"; // 하드코딩된 기본값 설정
     }
 
     @Override
@@ -44,7 +46,6 @@ public class OAuth2MemberDTO extends User implements OAuth2User {
 
     @Override
     public String getName() {
-        return this.id;
+        return this.email;
     }
-
 }

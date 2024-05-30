@@ -160,18 +160,14 @@ public class MypageController {
             // 사용자의 새로운 UserDetails를 로드
             OAuth2MemberDTO oAuth2Member = (OAuth2MemberDTO) principal;
             OAuth2User updatedOAuth2User = memberService.loadOAuth2UserByUsername(memberRegFormDTO.getEmail());
-
-
             // 새로운 Authentication 객체 생성
-//            OAuth2AuthenticationToken newAuth = new OAuth2AuthenticationToken(
-//                    updatedOAuth2User,
-//                    updatedOAuth2User.getAuthorities(),
-//                    oAuth2Member.getAuthorizedClientRegistrationId()
-//            );
-//            // SecurityContext에 새로운 Authentication 객체 설정
-//            SecurityContextHolder.getContext().setAuthentication(newAuth);
-
-
+            OAuth2AuthenticationToken newAuth = new OAuth2AuthenticationToken(
+                    updatedOAuth2User,
+                    updatedOAuth2User.getAuthorities(),
+                    oAuth2Member.getAuthorizedClientRegistrationId() != null ? oAuth2MemberDTO.getAuthorizedClientRegistrationId() : "social" // 클라이언트 등록 ID 사용
+            );
+            // SecurityContext에 새로운 Authentication 객체 설정
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
