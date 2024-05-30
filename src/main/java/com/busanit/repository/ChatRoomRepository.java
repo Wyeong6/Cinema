@@ -17,7 +17,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     Page<ChatRoom> findAll(Pageable pageable);
     @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m WHERE m.email = :email")
-    List<ChatRoom> findByUserEmail(@Param("email") String email);
+    List<ChatRoom> findByMembersEmail(@Param("email") String email);
 
 
 }

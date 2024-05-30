@@ -29,8 +29,9 @@ public class ChatRoom {
 
     public void addMessage(Message message) {
         this.messages.add(message);
-        message.setChatRoom(this);
+          message.setChatRoom(this);
     }
+
     public void addMembers(List<Member> newMembers) {
         if (newMembers != null) {
             this.members.addAll(newMembers);

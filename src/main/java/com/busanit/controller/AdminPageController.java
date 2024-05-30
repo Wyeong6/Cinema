@@ -325,6 +325,12 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
 
         return "admin/admin_chatList";
     }
+    //채팅 모달창
+    @GetMapping("/chatModal")
+    public String chatModal(){
+        return "admin/admin_chatModal";
+    }
+
     //메세지 확인 여부
     @PostMapping("/{messageId}/read")
     public void markMessageAsRead(@PathVariable Long messageId) {

@@ -21,13 +21,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.busanit.domain.chat.ChatRoomDTO.toDTO;
+import static com.busanit.domain.chat.ChatRoomDTO.toChatRoomDTO;
+import static com.busanit.domain.chat.MessageDTO.toMessageDTO;
+
 
 @Transactional
 @Service
@@ -38,84 +37,121 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final MemberRepository memberRepository;
 
+    // 메시지를 저장하는 메소드
     public void saveMessage(MessageDTO messageDTO) {
+        // 발신자 이메일로 회원을 찾음
         Member sender = memberRepository.findByEmail(messageDTO.getSender())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid sender email: " + messageDTO.getSender()));
+
+        // 수신자 이메일로 회원을 찾음
         Member receiver = memberRepository.findByEmail(messageDTO.getRecipient())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid recipient email: " + messageDTO.getRecipient()));
 
-        ChatRoom chatRoom = getOrCreateChatRoom(messageDTO.getMessageTitle() , messageDTO.getSender());
+        // 메시지 제목, 발신자 이메일, 수신자 이메일을 기반으로 채팅방을 가져오거나 생성
+        ChatRoom chatRoom = getOrCreateChatRoom(messageDTO.getMessageTitle(), messageDTO.getSender(), messageDTO.getRecipient());
 
+        // 새로운 Message 객체 생성 및 설정
         Message message = new Message();
         message.setSender(sender);
         message.setReceiver(receiver);
         message.setContent(messageDTO.getContent());
         message.setMessageTitle(messageDTO.getMessageTitle());
-        message.setChatRoom(chatRoom); // Message에 ChatRoom 설정 (필요한 경우)
+        message.setChatRoom(chatRoom);
 
+        // 발신자와 수신자의 메시지 목록에 메시지 추가
         sender.addSentMessage(message);
         receiver.addReceivedMessage(message);
+        chatRoom.addMessage(message);
 
+        // 메시지를 저장소에 저장
         messageRepository.save(message);
     }
 
-    public Page<ChatRoomDTO> getChatList(int page, int size){
+    // 채팅방 목록을 페이징하여 가져오는 메소드
+    public Page<ChatRoomDTO> getChatList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<ChatRoom> chatRoomPage = chatRoomRepository.findAll(pageable);
 
         List<ChatRoomDTO> chatRoomList = chatRoomPage.getContent().stream()
-                .map(chatRoom -> {
-                    // 유저 역할을 가진 멤버를 한 번에 찾습니다.
-                    Optional<Member> userMemberOpt = chatRoom.getMembers().stream()
-                            .filter(member -> member.getRole() == Role.USER)
-                            .findFirst();
-
-                    // 찾은 멤버에서 이메일과 이름을 가져옵니다. 멤버가 없다면 기본값을 사용합니다.
-                    String userEmail = userMemberOpt.map(Member::getEmail).orElse("유저가 존재하지 않습니다.");
-                    String userName = userMemberOpt.map(Member::getName).orElse("유저가 존재하지 않습니다.");
-
-                    // ChatRoomDTO를 생성합니다.
-                    return toDTO(chatRoom, userEmail, userName);
-                })
+                .map(this::convertToChatRoomDTO)
                 .collect(Collectors.toList());
+
         return new PageImpl<>(chatRoomList, pageable, chatRoomPage.getTotalElements());
     }
 
-    public ChatRoom getOrCreateChatRoom(String messageTitle , String getSender) {
-        // 주어진 email로 Member 찾기
-        Member member = memberRepository.findByEmail(getSender)
-                .orElseThrow(() -> new RuntimeException("멤버를 찾을 수 없습니다."));
+    // ChatRoom 엔티티를 ChatRoomDTO로 변환하는 메소드
+    private ChatRoomDTO convertToChatRoomDTO(ChatRoom chatRoom) {
+        Optional<Member> userMemberOpt = chatRoom.getMembers().stream()
+                .filter(member -> member.getRole() == Role.USER)
+                .findFirst();
 
-        // 해당 Member가 이미 참여하고 있는 ChatRoom 찾기 (여기서는 단순화를 위해 첫 번째 참여한 방을 선택)
-        Optional<ChatRoom> existingChatRoom = member.getChatRooms().stream().findFirst();
+        String userEmail = userMemberOpt.map(Member::getEmail).orElse("유저가 존재하지 않습니다.");
+        String userName = userMemberOpt.map(Member::getName).orElse("유저가 존재하지 않습니다.");
 
-        if (existingChatRoom.isPresent()) {
-            // 이미 존재하는 ChatRoom 반환
-            return existingChatRoom.get();
+        return toChatRoomDTO(chatRoom, userEmail, userName);
+    }
+
+    // 새로운 채팅방을 생성하거나 기존 채팅방을 가져오는 메소드
+    public ChatRoom getOrCreateChatRoom(String messageTitle, String senderEmail, String recipientEmail) {
+        if ("admin@admin.com".equals(senderEmail)) {
+            return handleAdminMessage(recipientEmail);
         } else {
-            // 새로운 ChatRoom 생성
-            ChatRoom newChatRoom = ChatRoom.builder()
-                    .title(messageTitle) // 채팅방 타이틀 설정
-                    .members(new ArrayList<>())
-                    .build();
-            newChatRoom.addMembers(Arrays.asList(member)); // Member를 새 채팅방에 추가
-            return chatRoomRepository.save(newChatRoom); // 채팅방 저장
+            return handleUserMessage(messageTitle, senderEmail);
         }
     }
 
-    //이전 메세지 내역 가져오기
-    public List<ChatRoomDTO> findMessagesByUserEmail(String userEmail) {
-        // 데이터베이스에서 사용자 이메일에 해당하는 ChatRoom 엔티티를 조회
-        List<ChatRoom> chatRooms = chatRoomRepository.findByUserEmail(userEmail);
-        String userName = memberRepository.findNameByEmail(userEmail).orElse("이름 없음");
+    // 관리자 메시지를 처리하는 메소드, 수신자의 첫 번째 채팅방을 반환
+    private ChatRoom handleAdminMessage(String recipientEmail) {
+        Member recipient = findMemberByEmail(recipientEmail);
+        return recipient.getChatRooms().stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("채팅방이 없습니다."));
+    }
 
+    // 사용자 메시지를 처리하는 메소드, 새 채팅방을 생성하거나 기존 채팅방 반환
+    private ChatRoom handleUserMessage(String messageTitle, String senderEmail) {
+        Member sender = findMemberByEmail(senderEmail);
 
-        // 조회된 ChatRoom 엔티티를 ChatRoomDTO로 변환
-        List<ChatRoomDTO> chatRoomDTOs = chatRooms.stream()
-                .map(chatRoom -> toDTO(chatRoom, userEmail, userName)) // "사용자 이름"은 실제 사용자 이름을 가져오는 로직으로 대체해야 함
+        return sender.getChatRooms().stream().findFirst()
+                .orElseGet(() -> createNewChatRoom(messageTitle, sender));
+    }
+
+    // 이메일로 회원을 찾는 메소드
+    private Member findMemberByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException(email + "에 해당하는 사용자를 찾을 수 없습니다."));
+    }
+
+    // 새로운 채팅방을 생성하는 메소드
+    private ChatRoom createNewChatRoom(String title, Member sender) {
+        ChatRoom newChatRoom = ChatRoom.builder()
+                .title(title)
+                .messages(new ArrayList<>())
+                .members(new ArrayList<>())
+                .build();
+        newChatRoom.addMembers(Collections.singletonList(sender));
+        return chatRoomRepository.save(newChatRoom);
+    }
+
+    // 사용자 이메일을 기반으로 채팅방을 찾는 메소드
+    public List<ChatRoomDTO> findChatRoomByUserEmail(String userEmail) {
+        List<ChatRoom> chatRooms = chatRoomRepository.findByMembersEmail(userEmail);
+
+        return chatRooms.stream()
+                .map(chatRoom -> convertToChatRoomDTOWithMessages(chatRoom, userEmail))
+                .collect(Collectors.toList());
+    }
+
+    // 채팅방과 메시지를 포함한 ChatRoomDTO를 생성하는 메소드
+    private ChatRoomDTO convertToChatRoomDTOWithMessages(ChatRoom chatRoom, String userEmail) {
+        List<Message> messages = messageRepository.findByChatRoomId(chatRoom.getId());
+
+        List<MessageDTO> messageDTOs = messages.stream()
+                .map(MessageDTO::toMessageDTO)
                 .collect(Collectors.toList());
 
-        return chatRoomDTOs;
+        String userName = memberRepository.findNameByEmail(userEmail).orElse("이름 없음");
+
+        return toChatRoomDTO(chatRoom, userEmail, userName, messageDTOs);
     }
 
     //로그인한 유저 검사

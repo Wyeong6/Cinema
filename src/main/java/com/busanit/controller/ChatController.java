@@ -53,10 +53,6 @@ public class ChatController {
         System.out.println("Saving message: " + messageDTO);
         chatService.saveMessage(messageDTO);
 
-        // 채팅방을 생성하기 전에 데이터 확인
-        System.out.println("Creating chat room with title: " + messageDTO.getMessageTitle());
-        chatService.getOrCreateChatRoom(messageDTO.getMessageTitle(), messageDTO.getSender());
-
     }
     //관리자 챗메세지
     @GetMapping("/chatAdmin")
@@ -64,13 +60,15 @@ public class ChatController {
 
             String adminEmail = chatService.getAuthenticatedUserEmail();
             model.addAttribute("adminEmail", adminEmail);
-            return "service";
 
+            return "service";
     }
 
     //유저에게 메세지 보내기
     @MessageMapping("/chat/admin")
     public void sendAdminMessage(@Payload MessageDTO messageDTO) {
+
+        chatService.saveMessage(messageDTO);
 
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private", messageDTO);
     }
@@ -79,7 +77,7 @@ public class ChatController {
     @GetMapping("/chat/private/{userEmail}")
     @ResponseBody
     public List<ChatRoomDTO> fetchMessages(@PathVariable String userEmail) {
-        return chatService.findMessagesByUserEmail(userEmail);
+        return chatService.findChatRoomByUserEmail(userEmail);
     }
 
         //모든 구독자에게 메세지전송

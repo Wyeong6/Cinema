@@ -17,7 +17,7 @@ public class MessageDTO {
     private boolean isRead;
     private String messageTitle;
 
-    public static MessageDTO toDTO(Message message) {
+    public static MessageDTO toMessageDTO(Message message) {
         return MessageDTO.builder()
                 .id(message.getId())
                 .sender(message.getSender().getEmail())

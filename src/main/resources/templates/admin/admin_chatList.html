@@ -10,6 +10,48 @@
             padding: 15px;
         }
     </style>
+    <script>
+        function openChatModal(row) {
+            if (!row) {
+                console.error("Row is null");
+                return;
+            }
+
+            // 클릭한 행의 이메일 값을 가져옴
+            const userEmail = row.querySelector('td:nth-child(3)').innerText;
+            if (!userEmail) {
+                console.error("User email not found");
+                return;
+            }
+
+            // AJAX를 사용하여 모달창 HTML 파일을 로드하고 데이터를 전달
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/admin/chatModal', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 모달 HTML을 페이지에 추가
+                    document.body.insertAdjacentHTML('beforeend', xhr.responseText);
+
+                    // 모달창의 이메일 필드를 업데이트
+                    const modal = document.getElementById('myModal');
+                    modal.querySelector('#userEmail').innerText = userEmail;
+
+                    // 모달창 표시
+                    modal.style.display = 'block';
+                }
+            };
+            xhr.send();
+        }
+
+        // 모달창 닫기 함수
+        function closeModal() {
+            const modal = document.getElementById('chatModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.remove();
+            }
+        }
+    </script>
 </head>
 <body>
 <!-- Navbar -->
@@ -54,69 +96,5 @@
         <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}" th:text="'[' + ${i} + ']'" class="paging-btn"></a>
     </div>
 </div>
-
-<!-- 모달 창 -->
-<div id="chatModal" style="display:none;">
-    <div>
-        <h2>Chat Room</h2>
-        <div id="chatMessages"></div>
-        <input type="text" id="chatInput" placeholder="Type a message...">
-        <button onclick="sendMessage()">Send</button>
-    </div>
-</div>
-
-<script>
-    let socket;
-    let roomId;
-
-    function openChatModal(element) {
-        roomId = element.getAttribute('data-room-id');
-        document.getElementById('chatModal').style.display = 'block';
-        connectToWebSocket(roomId);
-    }
-
-    function connectToWebSocket(roomId) {
-        socket = new WebSocket(`ws://your-server-address/chat/${roomId}`);
-
-        socket.onmessage = function(event) {
-            const message = JSON.parse(event.data);
-            displayMessage(message);
-        };
-
-        socket.onopen = function() {
-            console.log('WebSocket connection opened');
-            // 이전 메시지 로드 (선택 사항)
-            loadPreviousMessages(roomId);
-        };
-
-        socket.onclose = function() {
-            console.log('WebSocket connection closed');
-        };
-    }
-
-    function loadPreviousMessages(roomId) {
-        fetch(`/api/chat/${roomId}/messages`)
-            .then(response => response.json())
-            .then(messages => {
-                messages.forEach(message => displayMessage(message));
-            });
-    }
-
-    function displayMessage(message) {
-        const chatMessages = document.getElementById('chatMessages');
-        const messageElement = document.createElement('div');
-        messageElement.textContent = message.content;
-        chatMessages.appendChild(messageElement);
-    }
-
-    function sendMessage() {
-        const chatInput = document.getElementById('chatInput');
-        const message = chatInput.value;
-        if (message && socket) {
-            socket.send(JSON.stringify({ content: message }));
-            chatInput.value = '';
-        }
-    }
-</script>
 </body>
 </html>

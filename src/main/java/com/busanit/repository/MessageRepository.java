@@ -15,7 +15,7 @@ public interface MessageRepository  extends JpaRepository<Message, Long> {
     //메세지 확인여부
     List<Message> findByReceiverIdAndIsReadFalse(Long receiverId);
 
-    List<Message> findBySender(Member sender);
+    List<Message> findByChatRoomId(Long chatRoomId);
 
 
 

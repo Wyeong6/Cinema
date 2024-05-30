@@ -20,6 +20,7 @@
         var stompClient = null; // STOMP 클라이언트 변수 선언
         var messageTitle = '';  // 선택한 카테고리 제목 변수
 
+
         // WebSocket 연결 함수
         function connect() {
             var socket = new SockJS('/ws'); // SockJS를 사용하여 '/ws' 엔드포인트에 연결
@@ -33,7 +34,6 @@
                     var parsedMessage = JSON.parse(message.body);
                     showMessage('관리자 - ' + parsedMessage.sender + ': ' + parsedMessage.content); // 수신한 메시지를 화면에 표시
 
-                    // showMessage(JSON.parse(message.body).content); // 수신한 메시지를 화면에 표시
                 });
             });
         }
@@ -41,8 +41,9 @@
         // 메시지 전송 함수
         function sendMessage() {
             var messageContent = document.getElementById('message').value; // 입력된 메시지 내용 가져오기
+            document.getElementById('categoryButtons').style.display = 'none'; // 카테고리 버튼 숨기기
 
-            if (messageContent && messageTitle) { // 메시지 내용과 제목이 있을 때만 전송
+            if (messageContent) { // 메시지 내용과 제목이 있을 때만 전송
                 var message = {
                     sender: userEmail, // 발신자 이메일
                     recipient: recipientEmail, // 수신자 이메일
@@ -53,6 +54,7 @@
                 stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
                 showMessage('나: ' + messageContent); // 전송한 메시지를 화면에 표시
                 document.getElementById('message').value = ''; // 입력 필드를 비움
+
             }
         }
         function showMessage(message) {
@@ -72,7 +74,6 @@
 
         window.onload = function() {
             connect();
-            showMessage('안녕하세요 고객님 카테고리를 선택해주세요');
             fetchMessages();
         };
 
@@ -82,18 +83,29 @@
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
                     }
+                    console.log("response :" + response);
                     return response.text();
                 })
                 .then(text => {
                     try {
-                        const messages = JSON.parse(text);
-                        if (Array.isArray(messages)) {
-                            messages.forEach(message => {
-                                let displayMessage = message.sender === userEmail ? `나: ${message.content}` : `관리자 - ${message.sender}: ${message.content}`;
-                                showMessage(displayMessage);
-                            });
-                        } else {
-                            throw new TypeError('Expected an array but got ' + typeof messages);
+                        const data = JSON.parse(text);
+                        console.log('Data:', data);
+                        let messageExist = false;
+                        // 각 메시지 객체를 순회합니다.
+                        data.forEach(item => {
+                            // 여기서 'messages' 필드가 실제 메시지 배열을 가지고 있음
+                            if (Array.isArray(item.messages) && item.messages.length > 0) {
+                                messageExist = true; // 메시지가 존재함을 표시
+                                item.messages.forEach(message => {
+                                    document.getElementById('categoryButtons').style.display = 'none';
+                                    let displayMessage = message.userName === userEmail ? `${message.sender}: ${message.content}` : ` ${message.sender}: ${message.content}`;
+                                    showMessage(displayMessage);
+                                });
+                            }
+                        });
+                        // 메시지가 없을 경우에만 카테고리 메시지를 표시합니다.
+                        if (!messageExist) {
+                            showMessage('안녕하세요 고객님 카테고리를 선택해주세요');
                         }
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
