@@ -1,12 +1,14 @@
 <article id="mypage_main">
     <header id="mypage_main_header">
-        <h2 style="font-size: 2em"><b>user</b>님 반갑습니다.</h2>
+        <h2 style="font-size: 2em"><b th:text="${myPageMemberInfo.name}">user</b>님 반갑습니다.</h2>
         <div class="user_info">
             <div>
-                <img src="/images/grade/green.png" alt="멤버십 등급 이미지">
+                <img alt="멤버십 등급 이미지" src="/images/grade/green.png">
                 <div>
-                    <p>user님의 등급은 <b>green</b> 입니다</p>
-                    <button class="button membership_btn">등급혜택 보기</button>
+                    <p>
+                        <span th:text="${myPageMemberInfo.name}">user</span>님의 등급은 <b>green</b> 입니다
+                    </p>
+                    <button class="button membership_btn" id="membership_btn">등급혜택 보기</button>
                 </div>
             </div>
             <div class="point">
@@ -32,7 +34,7 @@
                         <h3>2024-05-23</h3>
                     </header>
                     <div class="history_data">
-                        <img src="/images/movieposter.webp" alt="영화 포스터">
+                        <img alt="영화 포스터" src="/images/movieposter.webp">
                         <div>
                             <h4>예매번호 : </h4>
                             <p>범죄도시 4</p>
@@ -60,7 +62,7 @@
                         <h3>2024-05-22</h3>
                     </header>
                     <div class="history_data">
-                        <img src="/images/menu/menu1.png" alt="스낵 이미지">
+                        <img alt="스낵 이미지" src="/images/menu/menu1.png">
                         <div>
                             <h4>주문번호 : </h4>
                             <p class="snack_nm">팝콘</p>
@@ -72,3 +74,20 @@
         </div>
     </section>
 </article>
+
+<script th:inline="javascript">
+    $(document).ready(function() {
+        $('#membership_btn').click(function(e) {
+            $.ajax({
+                type: 'GET',
+                url: '/mypage/membership',
+                success: function(response) {
+                    $('#content').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('btn click Error:', error);
+                }
+            })
+        })
+    });
+</script>

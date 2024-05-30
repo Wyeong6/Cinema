@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,23 +54,28 @@ public class MypageController {
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
             model.addAttribute("socialUser", "socialUser");
-            // 사용자의 Id
-            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-            model.addAttribute("memberId", memberRegFormDTO.getId());
-
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
             model.addAttribute("formUser", "formUser");
-            // 사용자의 Id
-            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-            model.addAttribute("memberId", memberRegFormDTO.getId());
         }
+
+        // 사용자의 Id
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("memberId", memberRegFormDTO.getId());
         return "/layout/layout_mypage";
     }
 
     @GetMapping("/main")
-    public String mypageMain() {
+    public String mypageMain(Model model) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
 
+        // 사용자의 정보
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("myPageMemberInfo", memberRegFormDTO);
         return "/mypage/mypage_main";
     }
     @GetMapping("/reservation")
@@ -137,10 +143,10 @@ public class MypageController {
         // javascript에서 값을 사용
         try {
             String memberJson = objectMapper.writeValueAsString(memberRegFormDTO);
-            model.addAttribute("memberJson", memberJson);
+            model.addAttribute("memberJsonModel", memberJson);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            model.addAttribute("memberJson", "{}");
+            model.addAttribute("memberJsonModel", "{}");
         }
 
         return "/mypage/mypage_private_info";
@@ -162,7 +168,7 @@ public class MypageController {
 
     // 개인정보수정 - 저장하기
     @PostMapping("/infoEdit")
-    public String mypageEdit2(MemberRegFormDTO memberRegFormDTO, @AuthenticationPrincipal Object principal, Model model) {
+    public String mypageEdit2(@RequestParam(name = "basicPassword", required = false) String basicPassword, MemberRegFormDTO memberRegFormDTO, @AuthenticationPrincipal Object principal, Model model, RedirectAttributes redirectAttributes) {
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
@@ -172,33 +178,43 @@ public class MypageController {
             // 사용자의 새로운 UserDetails를 로드
             OAuth2MemberDTO oAuth2Member = (OAuth2MemberDTO) principal;
             OAuth2User updatedOAuth2User = memberService.loadOAuth2UserByUsername(memberRegFormDTO.getEmail());
-
-
             // 새로운 Authentication 객체 생성
-//            OAuth2AuthenticationToken newAuth = new OAuth2AuthenticationToken(
-//                    updatedOAuth2User,
-//                    updatedOAuth2User.getAuthorities(),
-//                    oAuth2Member.getAuthorizedClientRegistrationId()
-//            );
-//            // SecurityContext에 새로운 Authentication 객체 설정
-//            SecurityContextHolder.getContext().setAuthentication(newAuth);
-
-
+            OAuth2AuthenticationToken newAuth = new OAuth2AuthenticationToken(
+                    updatedOAuth2User,
+                    updatedOAuth2User.getAuthorities(),
+                    oAuth2Member.getAuthorizedClientRegistrationId() != null ? oAuth2MemberDTO.getAuthorizedClientRegistrationId() : "social" // 클라이언트 등록 ID 사용
+            );
+            // SecurityContext에 새로운 Authentication 객체 설정
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
 
-            // 사용자 정보를 업데이트
-            memberService.editMemberInfo(memberRegFormDTO);
-            // 사용자의 새로운 UserDetails를 로드
-            UserDetails updatedUserDetails = memberService.loadUserByUsername(memberRegFormDTO.getEmail());
-            // 새로운 Authentication 객체 생성
-            Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUserDetails, null, updatedUserDetails.getAuthorities());
-            // SecurityContext에 새로운 Authentication 객체 설정
-            SecurityContextHolder.getContext().setAuthentication(newAuth);
+            // 비밀번호 확인
+            String passwordCheck = null;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if(authentication != null) {
+                String userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+                passwordCheck = memberService.passwordCheck(userEmail);
+            }
 
+            if(passwordEncoder.matches(basicPassword, passwordCheck)) { // 비밀번호 일치
+                // 사용자 정보를 업데이트
+                memberService.editMemberInfo(memberRegFormDTO);
+                // 사용자의 새로운 UserDetails를 로드
+                UserDetails updatedUserDetails = memberService.loadUserByUsername(memberRegFormDTO.getEmail());
+                // 새로운 Authentication 객체 생성
+                Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUserDetails, null, updatedUserDetails.getAuthorities());
+                // SecurityContext에 새로운 Authentication 객체 설정
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+                return "redirect:/mypage/main"; // redirect - html 파일을 반환하는게 아닌 매핑된 다른 컨트롤러 메서드를 호출
+
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "비밀번호를 다시 확인해주세요.");
+                return "redirect:/mypage/infoEdit";
+            }
         }
-        return "redirect:/mypage/";
+        return "redirect:/mypage/main";
     }
 
     @GetMapping("/passwordEdit")
