@@ -54,23 +54,28 @@ public class MypageController {
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
             model.addAttribute("socialUser", "socialUser");
-            // 사용자의 Id
-            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-            model.addAttribute("memberId", memberRegFormDTO.getId());
-
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
             model.addAttribute("formUser", "formUser");
-            // 사용자의 Id
-            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-            model.addAttribute("memberId", memberRegFormDTO.getId());
         }
+
+        // 사용자의 Id
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("memberId", memberRegFormDTO.getId());
         return "/layout/layout_mypage";
     }
 
     @GetMapping("/main")
-    public String mypageMain() {
+    public String mypageMain(Model model) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
 
+        // 사용자의 정보
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("myPageMemberInfo", memberRegFormDTO);
         return "/mypage/mypage_main";
     }
     @GetMapping("/reservation")
