@@ -1,16 +1,22 @@
 package com.busanit.controller;
 
-import com.busanit.domain.CommentDTO;
-import com.busanit.domain.FormMemberDTO;
-import com.busanit.domain.MemberRegFormDTO;
-import com.busanit.domain.OAuth2MemberDTO;
+import com.busanit.domain.*;
 import com.busanit.service.CommentService;
+import com.busanit.service.FavoriteMovieService;
 import com.busanit.service.MemberService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,26 +25,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/mypage")
 @RequiredArgsConstructor
+@Slf4j
 public class MypageController {
 
     private final CommentService commentService;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final FavoriteMovieService favoriteMovieService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
             model.addAttribute("socialUser", "socialUser");
+            // 사용자의 Id
+            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+            model.addAttribute("memberId", memberRegFormDTO.getId());
+
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
             model.addAttribute("formUser", "formUser");
+            // 사용자의 Id
+            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+            model.addAttribute("memberId", memberRegFormDTO.getId());
         }
         return "/layout/layout_mypage";
     }
@@ -78,6 +102,18 @@ public class MypageController {
         return "/mypage/mypage_review";
     }
 
+    @GetMapping("/favorite")
+    public String mypageFavorite(Model model) {
+        String memberEmail = commentService.getAuthenticatedUserEmail();
+        List<FavoriteMovieDTO> favoriteMovies = favoriteMovieService.getFavoriteMoviesByEmail(memberEmail);
+
+        System.out.println("favoriteMovieDTOs title === " + favoriteMovies.get(0).getMovieTitle());
+        System.out.println("favoriteMovieDTOs poster === " + favoriteMovies.get(0).getMoviePosterUrl());
+        model.addAttribute("favoriteMovies", favoriteMovies);
+        System.out.println("favoriteMovies === " + favoriteMovies.size());
+        return "/mypage/mypage_favorite";
+    }
+
     @GetMapping("/infoEdit")
     public String mypageEdit(@AuthenticationPrincipal Object principal, Model model) {
         String userEmail = null;
@@ -90,17 +126,23 @@ public class MypageController {
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
             model.addAttribute("socialUser", "socialUser");
-
-            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-            model.addAttribute("member", memberRegFormDTO);
-
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
             model.addAttribute("formUser", "formUser"); // formUser면 패스워드도 확인
-
-            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-            model.addAttribute("member", memberRegFormDTO);
         }
+
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("member", memberRegFormDTO);
+
+        // javascript에서 값을 사용
+        try {
+            String memberJson = objectMapper.writeValueAsString(memberRegFormDTO);
+            model.addAttribute("memberJson", memberJson);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            model.addAttribute("memberJson", "{}");
+        }
+
         return "/mypage/mypage_private_info";
     }
 
@@ -125,10 +167,35 @@ public class MypageController {
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
 
+            // 사용자 정보를 업데이트
+            memberService.editMemberInfo(memberRegFormDTO);
+            // 사용자의 새로운 UserDetails를 로드
+            OAuth2MemberDTO oAuth2Member = (OAuth2MemberDTO) principal;
+            OAuth2User updatedOAuth2User = memberService.loadOAuth2UserByUsername(memberRegFormDTO.getEmail());
+
+
+            // 새로운 Authentication 객체 생성
+//            OAuth2AuthenticationToken newAuth = new OAuth2AuthenticationToken(
+//                    updatedOAuth2User,
+//                    updatedOAuth2User.getAuthorities(),
+//                    oAuth2Member.getAuthorizedClientRegistrationId()
+//            );
+//            // SecurityContext에 새로운 Authentication 객체 설정
+//            SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+
+
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
 
+            // 사용자 정보를 업데이트
             memberService.editMemberInfo(memberRegFormDTO);
+            // 사용자의 새로운 UserDetails를 로드
+            UserDetails updatedUserDetails = memberService.loadUserByUsername(memberRegFormDTO.getEmail());
+            // 새로운 Authentication 객체 생성
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUserDetails, null, updatedUserDetails.getAuthorities());
+            // SecurityContext에 새로운 Authentication 객체 설정
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         }
         return "redirect:/mypage/";
@@ -168,6 +235,13 @@ public class MypageController {
             }
         }
         return "redirect:/mypage/";
+    }
+
+    @PostMapping("/memberDelete")
+    public String memberDelete(Long memberId) {
+        memberService.memberDelete(memberId);
+
+        return "redirect:/member/logout";
     }
 
 }

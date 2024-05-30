@@ -82,6 +82,7 @@
                                         <a>리뷰관리</a>
                                         <ul>
                                             <li><a class="review_btn">나의 리뷰</a></li>
+                                            <li><a class="favorite_btn">나의 찜목록</a></li>
                                         </ul>
                                     </li>
                                     <li>
@@ -116,6 +117,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
+    const memberId = [[${memberId}]];
+
     $(document).ready(function() {
         // 마이페이지 메인
         $('#sidebar').on('click', '.main_btn', function() {
@@ -141,6 +144,10 @@
         $('#sidebar').on('click', '.review_btn', function() {
             $('#content').load('/mypage/review');
         });
+        // 나의찜목록 버튼 클릭 이벤트 설정
+        $('#sidebar').on('click', '.favorite_btn', function() {
+            $('#content').load('/mypage/favorite');
+        });
         // 개인정보수정 버튼 클릭 이벤트 설정
         $('#sidebar').on('click', '.info_edit_btn', function() {
             $('#content').load('/mypage/infoEdit');
@@ -161,10 +168,21 @@
                 confirmButtonText: "네, 탈퇴하겠습니다."
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: "Deleted!",
-                        text: "Your file has been deleted.",
-                        icon: "success"
+                    $.ajax({
+                        type: 'POST',
+                        url: '/mypage/memberDelete',
+                        data: {
+                            memberId: memberId
+                        },
+                        success: function() {
+                            // 회원탈퇴 처리 성공
+                            sessionStorage.removeItem("userInfo"); // session storage값 삭제
+                            window.location.href = "/";
+                        },
+                        error: function(xhr, status, error) {
+                            // 에러 처리 코드
+                            console.error("회원탈퇴 요청 중 에러 발생:", error);
+                        }
                     });
                 }
             });

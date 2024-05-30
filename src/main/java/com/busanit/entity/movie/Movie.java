@@ -60,7 +60,18 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MovieReaction> reactions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoriteMovie> favoritedBy = new ArrayList<>();
 
+    public void addFavoritedBy(FavoriteMovie favoriteMovie) {
+        favoritedBy.add(favoriteMovie);
+        favoriteMovie.setMovie(this);
+    }
+
+    public void removeFavoritedBy(FavoriteMovie favoriteMovie) {
+        favoritedBy.remove(favoriteMovie);
+        favoriteMovie.setMovie(null);
+    }
 
 
     public void addComment(Comment comment){

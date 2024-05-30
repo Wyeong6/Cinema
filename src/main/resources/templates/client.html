@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js" async></script>
+
+    <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" async></script>
+
+    <!-- JavaScript 코드를 인라인으로 작성 (Thymeleaf 사용) -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var userEmail = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
+        /*]]>*/
+
+        var recipientEmail = 'admin@admin.com';  // 수신자 이메일을 고정
+        var stompClient = null; // STOMP 클라이언트 변수 선언
+        var messageTitle = '';  // 선택한 카테고리 제목 변수
+
+
+        // WebSocket 연결 함수
+        function connect() {
+            var socket = new SockJS('/ws'); // SockJS를 사용하여 '/ws' 엔드포인트에 연결
+            stompClient = Stomp.over(socket); // STOMP 프로토콜을 사용하여 SockJS 소켓을 Wrapping
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame); // 연결 성공 시 콘솔에 로그 출력
+                console.log('User Email: ' + userEmail); // 사용자 이메일 출력
+
+                // 특정 사용자 큐에 구독 (개인 메시지 수신)
+                stompClient.subscribe('/user/queue/private', function (message) {
+                    var parsedMessage = JSON.parse(message.body);
+                    showMessage('관리자 - ' + parsedMessage.sender + ': ' + parsedMessage.content); // 수신한 메시지를 화면에 표시
+
+                });
+            });
+        }
+
+        // 메시지 전송 함수
+        function sendMessage() {
+            var messageContent = document.getElementById('message').value; // 입력된 메시지 내용 가져오기
+            document.getElementById('categoryButtons').style.display = 'none'; // 카테고리 버튼 숨기기
+
+            if (messageContent) { // 메시지 내용과 제목이 있을 때만 전송
+                var message = {
+                    sender: userEmail, // 발신자 이메일
+                    recipient: recipientEmail, // 수신자 이메일
+                    content: messageContent, // 메시지 내용
+                    messageTitle: messageTitle // 메시지 제목 (카테고리)
+                };
+                console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
+                stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
+                showMessage('나: ' + messageContent); // 전송한 메시지를 화면에 표시
+                document.getElementById('message').value = ''; // 입력 필드를 비움
+
+            }
+        }
+        function showMessage(message) {
+            var messages = document.getElementById('messages');
+            var messageElement = document.createElement('p');
+            messageElement.appendChild(document.createTextNode(message));
+            messages.appendChild(messageElement);
+        }
+
+        function selectCategory(category) {
+            messageTitle = category;
+            showMessage('문의사항을 남겨주시면 신속히 답변해드리겠습니다.');
+
+            // 카테고리 버튼들을 숨기는 코드
+            document.getElementById('categoryButtons').style.display = 'none';
+        }
+
+        window.onload = function() {
+            connect();
+            fetchMessages();
+        };
+
+        function fetchMessages() {
+            fetch(`/chat/private/${userEmail}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    console.log("response :" + response);
+                    return response.text();
+                })
+                .then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('Data:', data);
+                        let messageExist = false;
+                        // 각 메시지 객체를 순회합니다.
+                        data.forEach(item => {
+                            // 여기서 'messages' 필드가 실제 메시지 배열을 가지고 있음
+                            if (Array.isArray(item.messages) && item.messages.length > 0) {
+                                messageExist = true; // 메시지가 존재함을 표시
+                                item.messages.forEach(message => {
+                                    document.getElementById('categoryButtons').style.display = 'none';
+                                    let displayMessage = message.userName === userEmail ? `${message.sender}: ${message.content}` : ` ${message.sender}: ${message.content}`;
+                                    showMessage(displayMessage);
+                                });
+                            }
+                        });
+                        // 메시지가 없을 경우에만 카테고리 메시지를 표시합니다.
+                        if (!messageExist) {
+                            showMessage('안녕하세요 고객님 카테고리를 선택해주세요');
+                        }
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        console.error('Received text:', text);
+                    }
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }
+    </script>
+</head>
+<body>
+
+<div id="messages"></div> <!-- 메시지를 보여주는 부분을 버튼 위로 이동 -->
+<div id="categoryButtons">
+    <!-- 카테고리 선택 버튼 -->
+    <button onclick="selectCategory('예매')">예매</button>
+    <button onclick="selectCategory('판매')">판매</button>
+    <button onclick="selectCategory('이벤트')">이벤트</button>
+    <button onclick="selectCategory('기타')">기타</button>
+</div>
+<div>
+    <input type="text" id="message" placeholder="Type a message..."/>
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+</body>
+</html>

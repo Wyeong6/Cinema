@@ -15,36 +15,31 @@ import com.busanit.repository.GenreRepository;
 import com.busanit.util.GenreUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
-
-
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.busanit.domain.MovieDTO.convertToDTO;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Getter
 public class MovieService {
 
     private final OkHttpClient client = new OkHttpClient();
@@ -52,22 +47,44 @@ public class MovieService {
     private final MovieDetailRepository movieDetailRepository;
     private final MovieStillCutRepository movieStillCutRepository;
     private final GenreRepository genreRepository;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${TMDB.apiKey}")
     private String apiKey;
 
+    // 캐시를 사용하기 위한 데이터 구조
+    private List<MovieDTO> cachedVideoMovies = new ArrayList<>();
+    private List<MovieDTO> cachedAllMovies = new ArrayList<>();
+    private List<MovieDTO> cachedHotMovies = new ArrayList<>();
+    private LocalDate lastFetchDate = LocalDate.now().minusDays(1);
+
+    // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
+    public void fetchAndStoreMovies() throws IOException {
+        fetchAndStoreMoviesNowPlaying();
+        fetchAndStoreMoviesUpcoming();
+        fetchAndStoreMovieRuntimeAndReleaseData();
+        fetchAndStoreMovieStillCuts();
+        fetchAndStoreCertificationData();
+
+        // 데이터 캐시 갱신
+        cachedVideoMovies = getVideoMovies();
+        cachedAllMovies = getAll();
+        cachedHotMovies = getHotMovies();
+        lastFetchDate = LocalDate.now();
+    }
+
     /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
 
-    // API에서 받아온 현재상영목록 리스트에서 모든 영화 ID 추출하는 메서드 (나중에 다른 api 데이터들도 영화id를 기준으로 데이터를가져오기때문에 씀)
+    // API에서 받아온 현재상영목록 리스트에서 모든 영화 ID 추출하는 메서드
+    // (나중에 다른 api 데이터들도 영화id를 기준으로 데이터를가져오기때문에 씀)
     public List<Long> getAllMovieIds() {
         List<Movie> movies = movieRepository.findAll();
         return movies.stream().map(Movie::getMovieId).collect(Collectors.toList());
     }
 
-
-    @Scheduled(cron = "0 0 * * * *") // 1시간마다 메소드 실행
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
         int totalPages = fetchTotalPages();
         for (int page = 1; page <= totalPages; page++) {
@@ -93,50 +110,6 @@ public class MovieService {
         }
     }
 
-
-
-//    //개봉예정 영화
-//    public List<MovieDTO> fetchAndStoreUpcoming() throws IOException {
-//        List<MovieDTO> upcomingMovies = new ArrayList<>();
-//        for (int page = 1; page <= 8; page++) {
-//            String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
-//            Request request = new Request.Builder().url(url).build();
-//            try (Response response = client.newCall(request).execute()) {
-//                JsonNode results = objectMapper.readTree(response.body().string()).get("results");
-//                System.out.println("results === " + results );
-//                results.forEach(node -> {
-//                    String posterPath = node.get("poster_path").asText(null);
-//                    if (posterPath != null && !posterPath.isEmpty()) {
-//                        upcomingMovies.add(objectMapper.convertValue(node, MovieDTO.class));
-//                    }
-//                });
-//            }
-//        }
-//        return upcomingMovies;
-//    }
-//
-//    // MovieController에서 사용
-//    public MovieDTO findMovieById(Long movieId) throws IOException {
-//        List<MovieDTO> upcomingMovies = fetchAndStoreUpcoming();
-//        for (MovieDTO movieDTO : upcomingMovies) {
-//            if (movieDTO.getId().equals(movieId)) {
-//                return movieDTO;
-//            }
-//        }
-//        return null;
-//    }
-//
-//
-
-    //개봉예정영화 페이지 당 12개씩
-//    public Page<MovieDTO> getUpcomingMovies(Pageable pageable) throws IOException {
-//        List<MovieDTO> allMovies = movieRepository.findAll();
-//        int start = (int) pageable.getOffset();
-//        int end = Math.min((start + pageable.getPageSize()), allMovies.size());
-//        List<MovieDTO> moviesOnPage = allMovies.subList(start, end);
-//        return new PageImpl<>(moviesOnPage, pageable, allMovies.size());
-//    }
-
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
         Request request = new Request.Builder().url(url).build();
@@ -151,6 +124,8 @@ public class MovieService {
     public String fetchMovieVideoKey(int movieId) throws IOException {
         // TMDB API URL을 포맷팅하여 생성합니다. 영화 ID와 API 키를 사용
         String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=ko-KR&api_key=%s", movieId, apiKey);
+
+        System.out.println("String.format key === " + url);
         // 요청을 생성
         Request request = new Request.Builder().url(url).build();
 
@@ -207,7 +182,6 @@ public class MovieService {
         // 영화 상세 정보를 업데이트하거나 생성
         MovieDetail movieDetail = getOrCreateMovieDetail(movie);
         movieDetail.setVideo(videoKey);
-//        movieDetail.setVoteAverage(movieDTO.getVoteAverage());
         movieDetail.setPopularity(movieDTO.getPopularity());
         movieDetail.setReleaseDate(movieDTO.getReleaseDate());
         movie.setMovieDetail(movieDetail);
@@ -420,33 +394,34 @@ public class MovieService {
     }
 
     // 상영중 영화 목록 더보기 화면 페이징 및 정렬
-    public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size) {
+    public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size, boolean isUpcoming) {
         LocalDate today = LocalDate.now();
-        LocalDate twoMonthsAgo = today.minusMonths(2);
+        LocalDate startDate;
+        LocalDate endDate;
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String startDateString = twoMonthsAgo.format(formatter);
-        String endDateString = today.format(formatter);
+        if (isUpcoming) {
+            startDate = today;
+            endDate = today.plusMonths(4);
+        } else {
+            startDate = today.minusMonths(4);
+            endDate = today;
+        }
+
+        String startDateString = startDate.format(formatter);
+        String endDateString = endDate.format(formatter);
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Movie> movieList = movieRepository.findAllByReleaseDateBetween(startDateString, endDateString, pageable);
-        return movieList.map(MovieDTO::convertToDTO); // DTO로 변환
+        return movieList.map(MovieDTO::convertToDTO);
     }
-
-    // 상영예정 영화 목록 더보기 화면 페이징 및 정렬
+    // 상영예정작 전체목록보기
     public Page<MovieDTO> getUpcomingMoviesPagingAndSorting(int page, int size) {
-        LocalDate today = LocalDate.now();
-        LocalDate twoMonthsLater = today.plusMonths(2);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String startDateString = today.format(formatter);
-        String endDateString = twoMonthsLater.format(formatter);
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Movie> movieList = movieRepository.findAllByReleaseDateBetween(startDateString, endDateString, pageable);
-        return movieList.map(MovieDTO::convertToDTO); // DTO로 변환
+        return getMoviesPagingAndSorting(page, size, true);
     }
-
+    // 상영작 전체목록보기
+    public Page<MovieDTO> getCurrentMoviesPagingAndSorting(int page, int size) {
+        return getMoviesPagingAndSorting(page, size, false);
+    }
 
     //인기순 영화 정렬
     public List<MovieDTO> getHotMovies() {
@@ -459,7 +434,6 @@ public class MovieService {
     public List<MovieDTO> getVideoMovies() {
         Pageable topFive = PageRequest.of(0, 5);
         List<Movie> movieList = movieRepository.findByVideoTrueOrderByPopularityDesc(topFive);
-
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -483,12 +457,38 @@ public class MovieService {
         return userEmail;
     }
 
+    //모든 영화에서 개봉일자가 4개월 전/후 로 필터링 하는 함수
+    //매개변수의 boolean 값으로 4개월 전으로 나눌지 4개월 후로 나눌지 선택할수있음!
+    public List<MovieDTO> getFilteredMovies(List<MovieDTO> allMovies, boolean isUpcoming) {
+        LocalDate referenceDate = LocalDate.now();
+        LocalDate startDate;
+        LocalDate endDate;
 
+        if (isUpcoming) {
+            startDate = referenceDate;
+            endDate = referenceDate.plusMonths(4);
+        } else {
+            startDate = referenceDate.minusMonths(4);
+            endDate = referenceDate;
+        }
 
+        return allMovies.stream()
+                .filter(movie -> {
+                    String releaseDateString = movie.getReleaseDate();
+                    if (releaseDateString != null && !releaseDateString.isEmpty()) {
+                        LocalDate releaseDate = LocalDate.parse(releaseDateString, formatter);
+                        return !releaseDate.isBefore(startDate) && !releaseDate.isAfter(endDate);
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+    }
 
-
-
-
-
+    // 검색기능
+    public List<MovieDTO> searchMovies(String query) {
+        List<Movie> searchResults = movieRepository.findByTitleContaining(query);
+        return searchResults.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
 }

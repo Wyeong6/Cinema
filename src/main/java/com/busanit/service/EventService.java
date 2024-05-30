@@ -49,6 +49,7 @@ public class EventService {
         return EventDTO.toDTO(event);
     }
 
+    //수정해야할 것         event.update(eventDTO);
     public void updateEvent(EventDTO eventDTO) {
         Event event = eventRepository.findById(eventDTO.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + eventDTO.getId()));

@@ -30,8 +30,6 @@ public class MovieDTO {
     private String posterPath;
     private String backdropPath;
     private String popularity;
-//    @JsonProperty("vote_average")
-//    private double voteAverage;
     @JsonProperty("genre_ids")
     private List<Integer> genreIds;
     private List<String> Genres;

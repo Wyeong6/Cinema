@@ -189,7 +189,17 @@ a#movie_title:not(:hover) {
 #get_info .info_header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
+
+#get_info .info_header h2 {
+    margin-right: auto; /* 제목을 왼쪽으로 정렬 */
+}
+
+#get_info .info_header .button {
+    margin-left: 1em; /* 버튼 사이의 여백 */
+}
+
 #get_info .movie_info {
     margin-left: 5%;
     vertical-align: center;
