@@ -483,4 +483,12 @@ public class MovieService {
                 })
                 .collect(Collectors.toList());
     }
+
+    // 검색기능
+    public List<MovieDTO> searchMovies(String query) {
+        List<Movie> searchResults = movieRepository.findByTitleContaining(query);
+        return searchResults.stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
 }

@@ -110,6 +110,15 @@ public class MovieController {
         model.addAttribute("movieId", movieId);
         return "movie/review_modal";
     }
+
+    // 검색 기능
+    @GetMapping("/search")
+    public String searchMovies(@RequestParam("query") String query, Model model) {
+        List<MovieDTO> searchResults = movieService2.searchMovies(query);
+        model.addAttribute("searchResults", searchResults);
+        return "movie/movie_search";
+    }
+
 }
 
 
