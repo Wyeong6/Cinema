@@ -8,16 +8,16 @@ import com.busanit.domain.SnackDTO;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.entity.Snack;
 import com.busanit.entity.chat.Message;
-import com.busanit.repository.MemberRepository;
 import com.busanit.repository.MessageRepository;
 import com.busanit.service.ChatService;
+import com.busanit.domain.TheaterDTO;
+import com.busanit.entity.Theater;
 import com.busanit.service.EventService;
 import com.busanit.service.SnackService;
+import com.busanit.service.TheaterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,8 +28,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
 
 @Controller
 @RequestMapping("/admin")
@@ -39,6 +39,7 @@ public class AdminPageController {
 
     // 병합시점에서 log 사용자가 없고 @Slf4j 와 log 가 중복된거라 log 부분을 주석처리 했습니다.
 //    private static final Logger log = LoggerFactory.getLogger(AdminPageController.class);
+    private final TheaterService theaterService;
     private final SnackService snackService;
     private final EventService eventService;
     private final NoticeService noticeService;
@@ -65,6 +66,42 @@ public class AdminPageController {
     public String memberManagement(){
         return "admin/adminMemberManagementPage";
     }
+
+    @GetMapping("/theaterList")
+    public String theaterList() {
+        return "admin/admin_theater_list";
+    }
+
+    @GetMapping("/theaterRegister")
+    public String showTheaterRegisterForm() {
+        return "admin/admin_theater_register";
+    }
+
+    @PostMapping("/theaterRegister")
+    public String theaterRegister(@Valid TheaterDTO theaterDTO, BindingResult bindingResult, Model model) {
+        model.addAttribute("urlLoad", "/admin/theaterRegister");
+        if (bindingResult.hasErrors()) {
+            return "admin/admin_theater_register";
+        }
+
+        try {
+            if (theaterDTO.getSeatsPerTheater() == null) {
+                throw new IllegalArgumentException("상영관 좌석 정보가 제공되지 않았습니다.");
+            } else {
+                theaterService.save(Theater.toEntity(theaterDTO));
+            }
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+        }
+
+        return "admin/admin_layout";
+    }
+
+    @GetMapping("/scheduleList")
+    public String scheduleList() { return "admin/admin_schedule_list"; }
+
+    @GetMapping("/scheduleRegister")
+    public String scheduleRegister() { return "admin/admin_schedule_register"; }
 
     @GetMapping("/snackList")
     public String snackList(Model model,

@@ -1,0 +1,78 @@
+<!-- Navbar -->
+
+<nav
+        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+        id="layout-navbar" style="margin-bottom: 10px;"
+>
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <input
+                        aria-label="Search..."
+                        class="form-control border-0 shadow-none"
+                        placeholder="Search..."
+                        type="text"
+                />
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+
+<!-- / Navbar -->
+
+<h4 class="fw-bold py-3 mb-4">스낵 스토어 상품 등록</h4>
+<!-- Basic Layout -->
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_name">상품명</label>
+                        <input class="form-control" id="snack_name" name="snack_nm" placeholder="상품명을 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_price">가격</label>
+                        <input class="form-control" id="snack_price" name="snack_price" placeholder="상품 가격을 입력해주세요. ex) 10000"
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_stock">구성품(세트)</label>
+                        <input class="form-control" id="snack_set" name="snack_set"
+                               placeholder="구성품을 입력해주세요. ex) 팝콘, 콜라" type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_stock">수량</label>
+                        <input class="form-control" id="snack_stock" name="snack_stock" placeholder="상품 수량을 입력해주세요. ex) 100"
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="basic-default-message">상품 상세 설명</label>
+                        <textarea
+                                class="form-control"
+                                id="basic-default-message"
+                                name="snack_detail"
+                                placeholder="상품 상세 설명을 입력해주세요." required
+                        ></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_image">이미지 이름</label>
+                        <input class="form-control" id="snack_image" name="snack_image"
+                               placeholder="상품 이미지명을 입력해주세요. ex) menu1.png" required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="snack_alt">이미지 alt 설명</label>
+                        <input class="form-control" id="snack_alt" name="snack_alt" placeholder="상품 이미지 alt 설명을 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <button class="btn btn-primary" type="submit">등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

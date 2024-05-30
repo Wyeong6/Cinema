@@ -12,13 +12,24 @@
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
-    <style>
-        .custom-modal-xl {
-            max-width: 85%; /* 또는 원하는 크기 */
-            z-index: 9999999999; /* 매우 높은 값으로 설정 */
-        }
 
-
+<style>
+    a#movie_title:hover ~ hr {
+        visibility: hidden; /* <hr> 태그 숨기기 */
+    }
+    .custom-modal-xl {
+        max-width: 85%; /* 또는 원하는 크기 */
+        z-index: 99999999;
+    }
+    .modal-backdrop.show {
+        opacity: 0.85 !important; /* 투명도 조절 */
+    }
+    .custom-modal-border {
+        border: 2px solid #000; /* 테두리 두께와 색상 */
+    }
+    a:hover {
+        color: inherit;
+    }
     </style>
 </head>
 
@@ -83,7 +94,7 @@
                     <a href="#">예매</a>
                     <ul>
                         <li><a href="#">예매</a></li>
-                        <li><a href="#">상영 시간표</a></li>
+                        <li><a th:href="@{/reservation/screeningSchedule}">상영 시간표</a></li>
                     </ul>
                 </li>
                 <li><a href="/snack/snackList">스낵 스토어</a></li>

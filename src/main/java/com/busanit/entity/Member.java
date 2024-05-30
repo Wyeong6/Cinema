@@ -8,6 +8,7 @@ import com.busanit.entity.movie.Comment;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieReaction;
 import com.busanit.entity.movie.ReactionType;
+import com.busanit.entity.movie.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,12 +66,16 @@ public class Member extends BaseTimeEntity {
             inverseJoinColumns = @JoinColumn(name = "chatroom_id"))
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
-    //멤버와 댓글 연관관계
+    // 영화 찜
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoriteMovie> favoriteMovies = new ArrayList<>();
+
+    //멤버와 댓글 연관관계
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comment = new ArrayList<>();
 
     //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MovieReaction> reactions = new ArrayList<>();
 
 //    //회원 삭제시 채팅룸 삭제
@@ -149,7 +154,16 @@ public class Member extends BaseTimeEntity {
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Event> events;
 
+    // 찜하기 연관관계 메서드
+    public void addFavoriteMovie(FavoriteMovie favoriteMovie) {
+        favoriteMovies.add(favoriteMovie);
+        favoriteMovie.setMember(this);
+    }
 
+    public void removeFavoriteMovie(FavoriteMovie favoriteMovie) {
+        favoriteMovies.remove(favoriteMovie);
+        favoriteMovie.setMember(null);
+    }
 
 
 
@@ -191,8 +205,13 @@ public class Member extends BaseTimeEntity {
                 .id(regFormDTO.getId())
                 .name(regFormDTO.getName())
                 .email(regFormDTO.getEmail())
+                .password(regFormDTO.getPassword())
                 .age(regFormDTO.getAge())
+                .role(Role.USER)
+                .social(regFormDTO.isSocial())
                 .grade_code(regFormDTO.getGrade_code())
+                .checkedTermsE(regFormDTO.getCheckedTermsE())
+                .checkedTermsS(regFormDTO.getCheckedTermsS())
                 .build();
     }
 }

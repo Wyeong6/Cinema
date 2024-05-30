@@ -227,9 +227,6 @@ a {
   color: #696cff;
   text-decoration: none;
 }
-a:hover {
-  color: #5f61e6;
-}
 
 a:not([href]):not([class]), a:not([href]):not([class]):hover {
   color: inherit;
@@ -353,6 +350,8 @@ select {
 
 select {
   word-wrap: normal;
+  padding: 0.7em 2em;
+  border: 1px solid #d9dee3;
 }
 select:disabled {
   opacity: 1;
@@ -2143,7 +2142,7 @@ progress {
 }
 .form-label {
   margin-bottom: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 500;
   color: #566a7f;
 }
@@ -2152,7 +2151,7 @@ progress {
   padding-top: calc(0.4375rem + 1px);
   padding-bottom: calc(0.4375rem + 1px);
   margin-bottom: 0;
-  font-size: inherit;
+  font-size: 1.5rem;
   font-weight: 500;
   line-height: 1.53;
   color: #566a7f;
@@ -2180,7 +2179,7 @@ progress {
   display: block;
   width: 100%;
   padding: 0.4375rem 0.875rem;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 400;
   line-height: 1.53;
   color: #697a8d;
@@ -2778,9 +2777,9 @@ textarea.form-control-lg {
     transition: none;
   }
 }
-.btn:hover {
-  color: #697a8d;
-}
+/*.btn:hover {*/
+/*  color: #697a8d;*/
+/*}*/
 .btn-check:focus + .btn, .btn:focus {
   outline: 0;
   box-shadow: none;
@@ -7608,7 +7607,6 @@ button:focus {
 
 .form-label,
 .col-form-label {
-  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: inherit;
 }

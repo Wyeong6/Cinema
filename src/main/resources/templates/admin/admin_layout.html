@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="/assets/vendor/css/core.css" class="template-customizer-core-css" />
     <link rel="stylesheet" href="/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="/assets/css/demo.css" />
+    <link rel="stylesheet" href="/assets/css/custom_player.css" />
 
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
@@ -63,79 +64,105 @@
 
             <div class="menu-inner-shadow"></div>
 
-            <ul class="menu-inner py-1">
+            <ul class="menu-inner py-1" style="margin-bottom: 5em">
             <!-- Members -->
                 <li class="menu-header small text-uppercase">
-                    <span class="menu-header-text">Members</span>
+                    <span class="menu-header-text">회원관리</span>
                 </li>
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link member_btn">
                         <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                        <div data-i18n="Account Settings">Members List</div>
+                        <div data-i18n="Account Settings">회원 목록</div>
                     </a>
                 </li>
 
                 <!-- Movies -->
-                <li class="menu-header small text-uppercase"><span class="menu-header-text">Movies</span></li>
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">영화 관리</span></li>
 
-                <li class="menu-item">
-                    <a href="cards-basic.html" class="menu-link movie_reg_btn">
-                        <i class="menu-icon tf-icons bx bx-collection"></i>
-                        <div data-i18n="Basic">Register</div>
-                    </a>
-                </li>
                 <li class="menu-item">
                     <a href="javascript:void(0)" class="menu-link movie_btn">
                         <i class="menu-icon tf-icons bx bx-box"></i>
-                        <div data-i18n="User interface">Movies List</div>
+                        <div data-i18n="User interface">영화목록</div>
                     </a>
                 </li>
 
-                <!-- Movies -->
-                <li class="menu-header small text-uppercase"><span class="menu-header-text">Snacks</span></li>
+                <!-- Theaters -->
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">상영관관리</span></li>
+
+                <li class="menu-item">
+                    <a href="#" class="menu-link theater_reg_btn">
+                        <i class="menu-icon tf-icons bx bx-collection"></i>
+                        <div data-i18n="Basic">상영관 등록하기</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0)" class="menu-link theater_btn">
+                        <i class="menu-icon tf-icons bx bx-box"></i>
+                        <div data-i18n="User interface">상영관 목록</div>
+                    </a>
+                </li>
+
+                <!-- screening schedule -->
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">상영스케줄관리</span></li>
+
+                <li class="menu-item">
+                    <a href="#" class="menu-link schedule_reg_btn">
+                        <i class="menu-icon tf-icons bx bx-collection"></i>
+                        <div data-i18n="Basic">상영스케줄 등록하기</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0)" class="menu-link schedule_btn">
+                        <i class="menu-icon tf-icons bx bx-box"></i>
+                        <div data-i18n="User interface">상영스케줄 목록</div>
+                    </a>
+                </li>
+
+                <!-- Snacks -->
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">스낵스토어 관리</span></li>
 
                 <li class="menu-item">
                     <a href="javascript:void(0)" class="menu-link snack_reg_btn">
                         <i class="menu-icon tf-icons bx bx-collection"></i>
-                        <div data-i18n="Basic">Register</div>
+                        <div data-i18n="Basic">스낵 등록하기</div>
                     </a>
                 </li>
                 <li class="menu-item">
                     <a href="javascript:void(0)" class="menu-link snack_btn">
                         <i class="menu-icon tf-icons bx bx-box"></i>
-                        <div data-i18n="User interface">Snacks List</div>
+                        <div data-i18n="User interface">스낵 목록</div>
                     </a>
                 </li>
 
                 <!-- Events -->
-                <li class="menu-header small text-uppercase"><span class="menu-header-text">Events</span></li>
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">이벤트관리</span></li>
 
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link event_reg_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form Elements">Register</div>
+                        <div data-i18n="Form Elements">이벤트 등록하기</div>
                     </a>
                 </li>
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link event_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form Layouts">Events List</div>
+                        <div data-i18n="Form Layouts">이벤트 목록</div>
                     </a>
                 </li>
 
                 <!-- Notices -->
-                <li class="menu-header small text-uppercase"><span class="menu-header-text">Notices</span></li>
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">공지사항관리</span></li>
 
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link notice_reg_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form Elements">Register</div>
+                        <div data-i18n="Form Elements">공지사항 등록하기</div>
                     </a>
                 </li>
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link notice_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form Layouts">Notices List</div>
+                        <div data-i18n="Form Layouts">공지사항 목록</div>
                     </a>
                 </li>
                 <li class="menu-item">
@@ -205,6 +232,22 @@
         $('.movie_btn').on('click', function () {
             $('.container-xxl').load('admin_movie_list.html');
         });
+        // 상영관 관리
+        $('.theater_reg_btn').on('click', function (e) {
+            e.preventDefault();
+            $('.container-xxl').load('/admin/theaterRegister');
+        });
+        $('.theater_btn').on('click', function () {
+            $('.container-xxl').load('/admin/theaterList');
+        });
+        // 상영시간 관리
+        $('.schedule_reg_btn').on('click', function (e) {
+            e.preventDefault();
+            $('.container-xxl').load('/admin/scheduleRegister');
+        });
+        $('.schedule_btn').on('click', function () {
+            $('.container-xxl').load('/admin/scheduleList');
+        });
         // 스낵 관리
         $('.snack_reg_btn').on('click', function (e) {
             e.preventDefault()
@@ -246,8 +289,6 @@
                 $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
             }
         });
-
-
 </script>
 
 <!-- Place this tag in your head or just before your close body tag. -->

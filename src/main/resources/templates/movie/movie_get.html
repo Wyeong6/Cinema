@@ -18,12 +18,83 @@
 
     <style>
 
-        button.active {
-            background-color: #ffeb3b; /* 버튼 색상을 노란색으로 변경 */
-            box-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffeb3b, 0 0 30px #ffeb3b; /* 빛나는 효과 */
-            color: #333;
-            font-weight: bold;
+        .fav-icon {
+            width: 33px !important;
+            height: 30px !important;
+            cursor: pointer;
+            transition: background-color 0.3s; /* 부드러운 색상 전환 효과 */
+
         }
+
+
+        .favorite-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .favorited {
+            filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-50deg) drop-shadow(0 0 3px rgba(255, 0, 0, 0.5)); /* 빨간색으로 변환 */
+        }
+
+
+
+        /* 리액션 관련 css 시작 */
+        .active {
+            width: 50px !important;
+            height: 50px !important;
+            filter: drop-shadow(0 0 3px #597aff) drop-shadow(0 0 4px #597aff) drop-shadow(0 0 5px #597aff); /* 이미지 부분만 그림자 적용가능하게함 (필터로) */
+        }
+
+        #likeButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        #dislikeButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        #sadButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        #funnyButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        #scaryButton {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        .reaction-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reaction-item {
+            text-align: center;
+            margin: 0 20px; /* 각 항목 사이의 간격 조절 */
+            width: 95px;
+        }
+
+        .reaction-item img {
+            width: 50px; /* 이미지 너비 설정 */
+            height: 50px; /* 이미지 높이 설정 */
+            cursor: pointer;
+        }
+
+        .reaction-item p {
+            text-align: center;
+            font-size: 13px;
+            margin: 0; /* 설명과 카운트 간격 조절 */
+        }
+
+        /* 리액션 관련 css 끝 */
 
         .hide {
             display: none;
@@ -121,37 +192,58 @@
                                              th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
                                              style="width: 400px; height: 600px;"/></a>
                                     <div class="movie_info">
-                                        <div class="info_header">
+                                        <header class="info_header">
                                             <h2 th:text="${movie.title}" class="movie_title"></h2>
                                             <a href="#" class="button" style="height: 3em;">지금 예매하기</a>
+                                        </header>
+                                        <div>
+                                            <span th:text="${movie.releaseDate}">releasedate</span>
+                                            <span th:text="${#strings.arrayJoin(movie.genres, ', ')}"></span>
+                                            <span th:text="${movie.runtime} + '분'">runtime</span>
+                                            <img id="certification-image" src="" alt="영화심의등급 이미지">
+                                            <span id="certification" th:text="${movie.certifications}">certification</span>
                                         </div>
-                                        <span th:text="${movie.releaseDate} + ' | '">releasedate</span>
-                                        <span th:text="${movie.genres} + ' | '">genres</span>
-                                        <span th:text="${movie.runtime} + '분 | '">runtime</span>
-                                        <span th:text="${movie.certifications}">certification</span>
+
                                         <div style="text-align: right;">
                                             <!--                                    <a th:href="@{'https://www.youtube.com/watch?v=' + ${movie.video}}" class="button" style="height: 3em;">트레일러 보기</a>-->
                                             <button id="videoModalBtn" class="button" style="height: 3em;"
                                                     th:data-video-id="${movie.video}">트레일러 보기
                                             </button>
                                         </div>
-                                        <p><b>감독 : </b>director <b>각본 : </b>writer</p>
+<!--                                        <p><b>감독 : </b>director <b>각본 : </b>writer</p>-->
 
                                         <p th:text="${movie.overview}">
                                             ~ overview ~
                                         </p>
 
 
-                                        <button id="likeButton" type="button" onclick="react('LIKE')">재밌어요</button>
-                                        <span class="like-count">0</span>
-                                        <button id="dislikeButton" type="button" onclick="react('DISLIKE')">재미없어요</button>
-                                        <span class="dislike-count">0</span>
-                                        <button id="sadButton" type="button" onclick="react('SAD')">슬퍼요</button>
-                                        <span class="sad-count">0</span>
-                                        <button id="funnyButton" type="button" onclick="react('FUNNY')">웃겨요</button>
-                                        <span class="funny-count">0</span>
-                                        <button id="scaryButton" type="button" onclick="react('SCARY')">무서워요</button>
-                                        <span class="scary-count">0</span>
+                                        <div class="reaction-container">
+                                            <div class="reaction-item">
+                                                <img id="likeButton" src="/images/like.png" alt="재밌어요" onclick="react('LIKE')">
+                                                <p>재미있어요</p>
+                                                <span class="count like-count">0</span>
+                                            </div>
+                                            <div class="reaction-item">
+                                                <img id="dislikeButton" src="/images/dislike.png" alt="재미없어요" onclick="react('DISLIKE')">
+                                                <p>재미없어요</p>
+                                                <span class="count dislike-count">0</span>
+                                            </div>
+                                            <div class="reaction-item">
+                                                <img id="sadButton" src="/images/sad.png" alt="슬퍼요" onclick="react('SAD')">
+                                                <p>슬퍼요</p>
+                                                <span class="count sad-count">0</span>
+                                            </div>
+                                            <div class="reaction-item">
+                                                <img id="funnyButton" src="/images/funny.png" alt="웃겨요" onclick="react('FUNNY')">
+                                                <p>웃겨요</p>
+                                                <span class="count funny-count">0</span>
+                                            </div>
+                                            <div class="reaction-item">
+                                                <img id="scaryButton" src="/images/scary.png" alt="무서워요" onclick="react('SCARY')">
+                                                <p>무서워요</p>
+                                                <span class="count scary-count">0</span>
+                                            </div>
+                                        </div>
 
 
                                         <div class="movie_data_box">
@@ -166,6 +258,13 @@
                                             <div class="movie_data_averageRating">
                                                 <h4>평점</h4>
                                                 <!--                                        <p th:text="${movie.voteAverage}">vote rating</p>-->
+                                            </div>
+                                            <!--찜하기 구현할것~ (컨트롤러에 연결만하면됨)-->
+                                            <div class="movie_data">
+                                                <h4>찜하기</h4>
+                                                <div class="favorite-container">
+                                                    <img id="favoriteButton" class="fav-icon" src="/images/heart%20icon.png" alt="찜하기(좋아요)">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -230,7 +329,6 @@
                 </div>
             </div>
         </div>
-        <footer data-include-path="footer.html"></footer>
     </div>
 
     <!-- Scripts -->
@@ -248,24 +346,6 @@
     <script th:inline="javascript">
 
         const movieId = $('#movieId').val();
-
-        // include.js
-        window.addEventListener('load', function () {
-            var allElements = document.getElementsByTagName('*');
-            Array.prototype.forEach.call(allElements, function (el) {
-                var includePath = el.dataset.includePath;
-                if (includePath) {
-                    var xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            el.outerHTML = this.responseText;
-                        }
-                    };
-                    xhttp.open('GET', includePath, true);
-                    xhttp.send();
-                }
-            });
-        });
 
         // credits api 제작진 사진
         const options = {
@@ -288,6 +368,26 @@
                 const movieInfoDiv = document.getElementById('movie-info');
                 movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
                 movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
+
+                // 영화 관람 등급
+                const certificationElement = document.getElementById('certification');
+                const certificationValue = certificationElement.textContent;
+                const imgElement = document.getElementById('certification-image');
+
+                switch(certificationValue) {
+                    case '12세 이상 관람가':
+                        imgElement.src = '/images/ratings/12.png';
+                        break;
+                    case '15세 이상 관람가':
+                        imgElement.src = '/images/ratings/15.png';
+                        break;
+                    case '19':
+                        certificationElement.textContent = '청소년 관람불가';
+                        imgElement.src = '/images/ratings/18.png';
+                        break;
+                    default:
+                        imgElement.src ='/images/ratings/all.svg';
+                }
 
                 // 감독 정보 출력 (이미지 포함)
                 const director = data.crew.find(person => person.job === 'Director');
@@ -580,6 +680,82 @@
     `;
                 reviewsSection.append(reviewRow);
             }
+
+        // 찜하기 관련 함수 시작 //
+
+
+        $(document).ready(function (){
+
+            var isFavorited = false; // 현재 사용자의 찜하기(좋아요) 상태를 저장할 변수임
+
+
+                // 현재 찜하기 상태를 가져오기 위해 API 호출
+                $.ajax({
+                    url: '/favorites/check/' + userEmail + '/' + movieId,
+                    type: 'GET',
+                    data: {
+                        userEmail: userEmail,
+                        movieId: movieId
+                    },
+                    success: function (response) {
+                        // 응답에서 현재 리액션 상태를 받아와 버튼 상태를 업데이트
+                        isFavorited = response.isFavorited;
+                        console.log("현재 리액션 상태 가져오기 성공! 현재상태 = " + isFavorited)
+                        updateFavoriteButton(isFavorited)
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching current reaction:', status, error);
+                    }
+                });
+
+
+            $("#favoriteButton").click(function (){
+
+                checkAnonymousUser();
+
+                if(isFavorited === false) {
+                    // 좋아요 요청 (POST 요청)
+                    $.ajax({
+                        url: '/favorites/' + userEmail + '/' + movieId,
+                        type: 'POST',
+                        success: function (response) {
+                            console.log("좋아요 등록성공")
+                            isFavorited = true;
+                            updateFavoriteButton(isFavorited)
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("좋아요 등록 실패", error)
+                        }
+                    });
+                } else {
+                    // 좋아요 삭제요청 (DELETE 요청)
+                    $.ajax({
+                        url: '/favorites/' + userEmail + '/' + movieId,
+                        type: 'DELETE',
+                        success: function (response) {
+                            console.log("좋아요 삭제 성공")
+                            isFavorited = false;
+                            updateFavoriteButton(isFavorited)
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("좋아요 등록 실패", error)
+                        }
+                    });
+                }
+            });
+
+            // 버튼상태 함수 (임시!!!)
+            function updateFavoriteButton(isFavorited) {
+                var favoriteButton = $('#favoriteButton');
+                if (isFavorited) {
+                    favoriteButton.addClass('favorited'); // 찜한 상태 클래스 추가
+                } else {
+                    favoriteButton.removeClass('favorited'); // 찜한 상태 클래스 제거
+                }
+            }
+
+
+        });
 
 
 
