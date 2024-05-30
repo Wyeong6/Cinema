@@ -27,7 +27,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr>
+                <tr th:if="${formUser == 'formUser'}">
                     <td>
                         <label for="email">이메일 <b>*</b></label></td>
                     <td>
@@ -39,6 +39,25 @@
                         </div>
                     </td>
                 </tr>
+                <tr th:unless="${formUser == 'formUser'}"> <!--소셜 로그인-->
+                    <td>
+                        <label for="email2">이메일</label></td>
+                    <td>
+                        <input id="email2" th:value="${member.email}" type="text" name="email" readonly disabled/>
+                    </td>
+                </tr>
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <label for="email">이메일 <b>*</b></label></td>-->
+<!--                    <td>-->
+<!--                        <input id="email" th:value="${member.email}" type="text" name="email"/>-->
+<!--                        <button class="button" id="checkEmail">중복 확인</button>-->
+<!--                        <div>-->
+<!--                            <p id="email-available" style="color: #00C73C; display: none;">사용가능한 이메일 입니다.</p>-->
+<!--                            <p id="email-taken" style="color: #ff0000; display: none;">사용 중인 이메일 입니다.</p>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                </tr>-->
                 <tr th:if="${formUser == 'formUser'}">
                     <td>
                         <label for="password_chk">패스워드 확인 <b>*</b></label>
@@ -48,6 +67,12 @@
                     </td>
                 </tr>
             </table>
+
+            <!-- 에러 메시지 표시 -->
+            <div class="error-message" style="text-align: center" th:if="${errorMessage}"
+                 th:text="${errorMessage}">
+            </div>
+
             <div class="info_submit_box">
                 <button class="button" type="reset">취소하기</button>
                 <button class="button" type="submit" id="submitButton">저장하기</button>
@@ -57,10 +82,11 @@
 </article>
 
 <script th:inline="javascript">
-    const memberJson = [[${memberJson}]];
-    const member = JSON.parse(memberJson);
-
     $(document).ready(function() {
+        const memberJson = [[${memberJsonModel}]];
+        const member = JSON.parse(memberJson);
+        const errorMessage = [[${errorMessage}]];
+
         var checkEmailButton = null; // 이메일 중복확인 버튼 누르기 + 사용가능한 이메일(1) 체크용
         $('#checkEmail').click(function(e) {
             e.preventDefault(); // 폼 제출 방지
@@ -92,12 +118,21 @@
         $('#submitButton').click(function(e) {
             e.preventDefault(); // 폼 제출 방지
 
+            const userType = [[${formUser}]];
             const name = $('#name').val();
             const birth_date = $('#birth_date').val();
-            const email = $('#email').val();
             const password_chk = $('#password_chk').val();
+            const email = $('#email').val();
+            const email2 = $('#email2').val();
+            let finalEmail; // email(form 회원), email2(social 회원)를 한번에 관리하기 위해서
 
-            if(member.email === email){
+            if (userType == 'formUser') {
+                finalEmail = email;
+            } else {
+                finalEmail = email2;
+            }
+
+            if(member.email === email || member.email === email2){
                 checkEmailButton = 1;
             }
 
@@ -108,18 +143,21 @@
                     data: {
                         id: member.id,
                         name: name,
-                        email: email,
+                        email: finalEmail,
                         age: birth_date,
-                        // password: password_chk,
                         password: member.password,
                         social: member.social,
                         grade_code: member.grade_code,
                         checkedTermsE: member.checkedTermsE,
-                        checkedTermsS: member.checkedTermsS
+                        checkedTermsS: member.checkedTermsS,
+                        basicPassword: password_chk // 비밀번호 확인용
                     },
                     success: function(response) {
-                        // $('#content').html(response);
-                        window.location.href = "/mypage/";
+                        $('#content').html(response);
+                        // // 동적으로 로드된 컨텐츠 내에서 중복 선언 방지
+                        // if (typeof window.memberJson === 'undefined') {
+                        //     window.memberJson = response.memberJson || {};
+                        // }
                     },
                     error: function(xhr, status, error) {
                         console.error('Update Info Error:', error);
