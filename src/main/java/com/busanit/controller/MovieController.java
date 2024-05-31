@@ -1,12 +1,16 @@
 package com.busanit.controller;
 
 import com.busanit.domain.MovieDTO;
+import com.busanit.domain.SnackDTO;
 import com.busanit.entity.movie.Movie;
 import com.busanit.service.MovieService;
+import com.busanit.service.SnackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -26,10 +30,11 @@ import java.util.stream.Collectors;
 public class MovieController {
 
     private final MovieService movieService2;
+    private final SnackService snackService;
 
     @Transactional
     @GetMapping("/")
-    public String getDetailMovies(Model model) {
+    public String getDetailMovies(Model model, @PageableDefault(size = 8, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
         //비디오가 있는 인기순영화
         List<MovieDTO> videoMovies = movieService2.getCachedVideoMovies();
@@ -49,6 +54,11 @@ public class MovieController {
         //인기순
         List<MovieDTO> hotMovies = movieService2.getCachedHotMovies();
         model.addAttribute("hotMovies", hotMovies);
+
+        //스낵스토어
+        Page<SnackDTO> snackDTOList = null;
+        snackDTOList = snackService.getSnackList(pageable);
+        model.addAttribute("snackList", snackDTOList);
 
         return "main";
     }
