@@ -4,11 +4,16 @@ import com.busanit.domain.*;
 import com.busanit.service.CommentService;
 import com.busanit.service.FavoriteMovieService;
 import com.busanit.service.MemberService;
+import com.busanit.service.PointService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,9 +43,8 @@ public class MypageController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final FavoriteMovieService favoriteMovieService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final PointService pointService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
@@ -66,7 +70,47 @@ public class MypageController {
     }
 
     @GetMapping("/main")
-    public String mypageMain(Model model) {
+    public String mypageMain(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+
+        // 사용자의 정보 + 포인트 정보
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("myPageMemberInfo", memberRegFormDTO);
+        Slice<PointDTO> pointDTOList = null;
+        pointDTOList = pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
+        model.addAttribute("pointInfo", pointDTOList);
+
+        // 사용자의 등급 변환
+        Integer userGradeInt = memberRegFormDTO.getGrade_code();
+        String gradeString = switch (userGradeInt) {
+            case 1 -> "BLACK";
+            case 2 -> "RED";
+            case 3 -> "BLUE";
+            default -> "GREEN";
+        };
+        model.addAttribute("myPageGrade", gradeString);
+
+        return "/mypage/mypage_main";
+    }
+
+    @GetMapping("/reservation")
+    public String mypageReservation() {
+
+        return "/mypage/mypage_reservation";
+    }
+
+    @GetMapping("/order")
+    public String mypageOrder() {
+
+        return "/mypage/mypage_order";
+    }
+
+    @GetMapping("/membership")
+    public String mypageMembership(Model model) {
         String userEmail = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
@@ -76,29 +120,38 @@ public class MypageController {
         // 사용자의 정보
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
         model.addAttribute("myPageMemberInfo", memberRegFormDTO);
-        return "/mypage/mypage_main";
-    }
-    @GetMapping("/reservation")
-    public String mypageReservation() {
 
-        return "/mypage/mypage_reservation";
-    }
-    @GetMapping("/order")
-    public String mypageOrder() {
-
-        return "/mypage/mypage_order";
-    }
-
-    @GetMapping("/membership")
-    public String mypageMembership() {
+        // 사용자의 등급 변환
+        Integer userGradeInt = memberRegFormDTO.getGrade_code();
+        String gradeString = switch (userGradeInt) {
+            case 1 -> "BLACK";
+            case 2 -> "RED";
+            case 3 -> "BLUE";
+            default -> "GREEN";
+        };
+        model.addAttribute("myPageGrade", gradeString);
 
         return "/mypage/mypage_membership";
     }
+
     @GetMapping("/point")
-    public String mypagePoint() {
+    public String mypagePoint(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+
+        // 사용자의 정보 + 포인트 정보
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("myPageMemberInfo", memberRegFormDTO);
+        Slice<PointDTO> pointDTOList = null;
+        pointDTOList = pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
+        model.addAttribute("pointInfo", pointDTOList);
 
         return "/mypage/mypage_point";
     }
+
     @GetMapping("/review")
     public String mypageReview(Model model) {
         String memberEmail = commentService.getAuthenticatedUserEmail();
@@ -259,5 +312,4 @@ public class MypageController {
 
         return "redirect:/member/logout";
     }
-
 }

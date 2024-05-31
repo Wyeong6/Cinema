@@ -89,6 +89,10 @@ public class Member extends BaseTimeEntity {
 //        }
 //    }
 
+    // 포인트
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    List<Point> pointList;
+
     public void addSentMessage(Message message) {
         this.sentMessages.add(message);
         if (message.getSender() != this) {

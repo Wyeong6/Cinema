@@ -3,17 +3,18 @@
         <h2 style="font-size: 2em"><b th:text="${myPageMemberInfo.name}">user</b>님 반갑습니다.</h2>
         <div class="user_info">
             <div>
-                <img alt="멤버십 등급 이미지" src="/images/grade/green.png">
+                <img alt="멤버십 등급 이미지" th:src="@{/images/grade/{image}.png(image=${myPageGrade})}">
                 <div>
                     <p>
-                        <span th:text="${myPageMemberInfo.name}">user</span>님의 등급은 <b>green</b> 입니다
+                        <span th:text="${myPageMemberInfo.name}">user</span>님의 등급은 <b th:text="${myPageGrade}">green</b> 입니다
                     </p>
                     <button class="button membership_btn" id="membership_btn">등급혜택 보기</button>
                 </div>
             </div>
-            <div class="point">
+            <div class="point" th:if="${not #lists.isEmpty(pointInfo)}">
                 <p>포인트</p>
-                <p style="color: #e45649; font-weight: 600">1400p</p>
+                <!-- 첫 번째 요소에 접근하기 위해 getContent() 메서드를 사용하고, 첫 번째 요소 (index 0)를 가져옴 -->
+                <p style="color: #e45649; font-weight: 600" th:text="${pointInfo.getContent().get(0).currentPoints}+p">1400p</p>
             </div>
         </div>
     </header>
