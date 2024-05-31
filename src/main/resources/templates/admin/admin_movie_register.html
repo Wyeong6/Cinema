@@ -1,0 +1,96 @@
+<!-- Navbar -->
+
+<nav
+        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+        id="layout-navbar" style="margin-bottom: 10px;"
+>
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <input
+                        aria-label="Search..."
+                        class="form-control border-0 shadow-none"
+                        placeholder="Search..."
+                        type="text"
+                />
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+
+<!-- / Navbar -->
+
+<h4 class="fw-bold py-3 mb-4">영화 등록</h4>
+<!-- Basic Layout -->
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="/movies/regist"  method="post" >
+                    <div class="mb-3">
+                        <label class="form-label" for="id">영화 ID</label>
+                        <input class="form-control" id="id" name="id" placeholder="ID를 입력해주세요."
+                               required type="number"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="title">영화 제목</label>
+                        <input class="form-control" id="title" name="sadfsda" placeholder="상품 제목을 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="overview">영화 줄거리</label>
+                        <textarea
+                                class="form-control"
+                                id="overview"
+                                name="overview"
+                                placeholder="영화 줄거리를 입력해주세요." required
+                        ></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="certifications">관람 등급</label>
+                        <input class="form-control" id="certifications" name="certifications"
+                               placeholder="관람 등급을 입력해주세요 ex) 12세 이상 관람가" type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="releaseDate">개봉 일자</label>
+                        <input class="form-control" id="releaseDate" name="releaseDate" placeholder="개봉 일자를 입력해주세요. ex) 2024-05-05"
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="posterPath">포스터 이미지</label>
+                        <input class="form-control" id="posterPath" name="posterPath"
+                               placeholder="포스터 이미지명을 입력해주세요. ex) menu1.png" required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="backdropPath">배경 이미지</label>
+                        <input class="form-control" id="backdropPath" name="backdropPath" placeholder="배경 이미지를 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="stillCutPaths">스틸컷 이미지</label>
+                        <input class="form-control" id="stillCutPaths" name="stillCutPaths[]" placeholder="스틸컷 이미지를 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="video">트레일러</label>
+                        <input class="form-control" id="video" name="video" placeholder="트레일러 키 를 입력해주세요 (ex. LU7ujHmsc-s)"
+                               required type="text"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="Genres">장르</label>
+                        <input class="form-control" id="Genres" name="genres[]" placeholder="장르를 입력해주세요."
+                               required type="text"/>
+                    </div>
+
+
+                    <button class="btn btn-primary" type="submit">등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,7 @@
 package com.busanit.controller;
 
 import com.busanit.domain.MovieDTO;
+import com.busanit.entity.movie.Genre;
 import com.busanit.entity.movie.Movie;
 import com.busanit.service.MovieService;
 import lombok.RequiredArgsConstructor;
@@ -117,6 +118,34 @@ public class MovieController {
         List<MovieDTO> searchResults = movieService2.searchMovies(query);
         model.addAttribute("searchResults", searchResults);
         return "movie/movie_search";
+    }
+
+    // 영화 등록 (어드민페이지에서)
+    @PostMapping("/movies/regist")
+    public String registMovie(@ModelAttribute MovieDTO movieDTO, Model model) {
+
+        Long movieId = movieDTO.getId();
+        System.out.println("movieId === " + movieId);
+        String movieTitle = movieDTO.getTitle();
+        System.out.println("movieTitle === " + movieTitle);
+        String movieOverview = movieDTO.getOverview();
+        String certifications = movieDTO.getCertifications();
+        String movieReleaseDate = movieDTO.getReleaseDate();
+        String posterImage = movieDTO.getPosterPath();
+        String backdropImage = movieDTO.getBackdropPath();
+        List<String> stillCut = movieDTO.getStillCutPaths();
+        List<String> genres = movieDTO.getGenres();
+        String video = movieDTO.getVideo();
+
+        movieService2.saveMovie(
+                movieId, movieTitle, movieOverview, certifications, movieReleaseDate,
+                posterImage, backdropImage, stillCut, genres, video
+        );
+
+        // 저장 성공 메시지를 모델에 추가
+        model.addAttribute("message", "영화 정보가 성공적으로 등록되었습니다.");
+
+        return "/admin/admin_layout";
     }
 
 }

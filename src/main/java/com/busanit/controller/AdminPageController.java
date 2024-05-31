@@ -4,17 +4,17 @@ import com.busanit.customerService.Notice.*;
 import com.busanit.domain.EventDTO;
 import com.busanit.customerService.Notice.NoticeDTO;
 import com.busanit.customerService.Notice.NoticeService;
+import com.busanit.domain.MovieDTO;
 import com.busanit.domain.SnackDTO;
 import com.busanit.domain.chat.ChatRoomDTO;
+import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
 import com.busanit.entity.chat.Message;
+import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MessageRepository;
-import com.busanit.service.ChatService;
+import com.busanit.service.*;
 import com.busanit.domain.TheaterDTO;
 import com.busanit.entity.Theater;
-import com.busanit.service.EventService;
-import com.busanit.service.SnackService;
-import com.busanit.service.TheaterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +45,8 @@ public class AdminPageController {
     private final NoticeService noticeService;
     private final ChatService chatService;
     private final MessageRepository messageRepository;
+    private final MemberService memberService;
+    private final MovieService movieService;
 
     @GetMapping("/adminMain")
     public String adminMain() {
@@ -57,15 +59,34 @@ public class AdminPageController {
         return "admin/testAdminMain";
     }
 
-    @PostMapping("/movie")
-    public String movie() {
-        return "admin/adminMoviePage";
+    @PostMapping("/memberList")
+    public String memberManagement(Model model){
+        List<Member> memberList = memberService.getAllMembers();
+        // 할일 - DTO로 바꿔서 담기
+        model.addAttribute("memberList", memberList);
+        return "admin/admin_member_list";
     }
 
-    @PostMapping("/member")
-    public String memberManagement(){
-        return "admin/adminMemberManagementPage";
+    @PostMapping("/movieList")
+    public String movieList(Model model, @RequestParam(defaultValue = "0") int page) {
+
+        int pageSize = 10; // 한 페이지에 표시할 데이터 수
+        List<MovieDTO> movieList = movieService.getMoviesWithPaging(page, pageSize);
+        int totalPages = (int) Math.ceil(movieService.getTotalMovies() / (double) pageSize);
+
+        model.addAttribute("movieList", movieList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
+        return "admin/admin_movie_list";
     }
+
+    @PostMapping("/movieRegister")
+    public String movieRegister(Model model) {
+        return "admin/admin_movie_register";
+    }
+
+
 
     @GetMapping("/theaterList")
     public String theaterList() {

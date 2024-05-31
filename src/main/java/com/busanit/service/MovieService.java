@@ -491,4 +491,67 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
+    // 페이징된  !!!모든영화!!!  무비리스트
+    public List<MovieDTO> getMoviesWithPaging(int page, int pageSize) {
+        // JPA 페이징 처리를 위한 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, pageSize);
+
+        // 페이징 처리된 Movie 데이터 조회
+        Page<Movie> moviePage = movieRepository.findAll(pageable);
+
+        List<MovieDTO> movieList = moviePage.getContent().stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+
+        // 페이징 처리된 Movie 데이터를 List로 반환
+        return movieList;
+    }
+
+    public long getTotalMovies() {
+        // 전체 영화 개수 조회
+        return movieRepository.count();
+    }
+
+    //어드민 페이지 영화 등록
+    public void saveMovie(
+            Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
+            String posterImage, String backdropImage, List<String> stillCut, List<String> genres, String video) {
+
+        Movie movie = new Movie();
+        movie.setMovieId(movieId);
+        movie.setTitle(movieTitle);
+        movie.setOverview(movieOverview);
+
+
+        MovieDetail movieDetail = new MovieDetail();
+        movieDetail.setCertification(certifications);
+        movieDetail.setReleaseDate(movieReleaseDate);
+        movieDetail.setVideo(video);
+        movie.setMovieDetail(movieDetail);
+
+
+        // 장르 추가
+        for (String genreStr : genres) {
+            Genre genre = new Genre(); // 새로운 장르 엔티티 생성
+            genre.setGenreName(genreStr); // 장르 이름 설정
+            genreRepository.save(genre);
+            movie.addGenre(genre); // 영화에 장르 추가
+        }
+
+        // 스틸컷 추가
+        for (String stillCutPath : stillCut) {
+            MovieStillCut stillCutEntity = new MovieStillCut(); // 새로운 스틸컷 엔티티 생성
+            stillCutEntity.setStillCuts(stillCutPath); // 스틸컷 경로 설정
+            movieStillCutRepository.save(stillCutEntity);
+            movie.addStillCut(stillCutEntity); // 영화에 스틸컷 추가
+        }
+
+        MovieImage posterImageEntity = new MovieImage();
+        posterImageEntity.setPosterPath(posterImage);
+        posterImageEntity.setBackdropPath(backdropImage);
+        movie.addImage(posterImageEntity);
+
+
+        movieRepository.save(movie);
+    }
+
 }
