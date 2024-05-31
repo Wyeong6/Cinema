@@ -4,11 +4,16 @@ import com.busanit.domain.*;
 import com.busanit.service.CommentService;
 import com.busanit.service.FavoriteMovieService;
 import com.busanit.service.MemberService;
+import com.busanit.service.PointService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,6 +43,7 @@ public class MypageController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final FavoriteMovieService favoriteMovieService;
+    private final PointService pointService;
     private final ObjectMapper objectMapper;
 
     @GetMapping("/")
@@ -64,7 +70,7 @@ public class MypageController {
     }
 
     @GetMapping("/main")
-    public String mypageMain(Model model) {
+    public String mypageMain(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         String userEmail = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
@@ -74,6 +80,9 @@ public class MypageController {
         // 사용자의 정보
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
         model.addAttribute("myPageMemberInfo", memberRegFormDTO);
+        Slice<PointDTO> pointDTOList = null;
+        pointDTOList = pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
+        model.addAttribute("pointInfo", pointDTOList);
 
         // 사용자의 등급 변환
         Integer userGradeInt = memberRegFormDTO.getGrade_code();
