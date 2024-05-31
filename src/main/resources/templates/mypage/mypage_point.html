@@ -4,35 +4,39 @@
     <section>
         <header>
             <h4>적립/사용 내역</h4>
-            <p>
-                잔여 포인트 : <b style="color: #e45649">2000p</b>
-            </p>
+            <div th:if="${not #lists.isEmpty(pointInfo)}">
+                <!-- 첫 번째 요소에 접근하기 위해 getContent() 메서드를 사용하고, 첫 번째 요소 (index 0)를 가져옴 -->
+                <p>잔여 포인트 : <b style="color: #e45649" th:text="${pointInfo.getContent().get(0).currentPoints}+p">2000p</b></p>
+            </div>
         </header>
         <table class="default">
-            <tr>
+            <tr th:each="point : ${pointInfo}">
                 <td>
                     <div>
-                        <p>시네마캐스트 강남점</p>
-                        <p>사용</p>
+                        <p th:text="${point.content}">시네마캐스트 강남점</p>
+                        <p th:switch="${point.pointType}">
+                            <span th:case="'+'" th:text="'적립'">적립</span>
+                            <span th:case="'-'" th:text="'사용'">사용</span>
+                        </p>
                     </div>
                     <div>
-                        <p class="price_minus">1000p</p>
-                        <p>2024.5.23 14:31</p>
+                        <p th:text="${point.pointType}+' '+${point.points}+p" >1000p</p>
+                        <p th:text="${#temporals.format(point.getRegDate(), 'yyyy-MM-dd HH:mm:ss')}">2024.5.23 14:31</p>
                     </div>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <div>
-                        <p>신규가입적립</p>
-                        <p>적립</p>
-                    </div>
-                    <div>
-                        <p>3000p</p>
-                        <p>2024.5.23 14:30</p>
-                    </div>
-                </td>
-            </tr>
+<!--            <tr>-->
+<!--                <td>-->
+<!--                    <div>-->
+<!--                        <p>시네마캐스트 강남점</p>-->
+<!--                        <p>사용</p>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                        <p class="price_minus">3000p</p>-->
+<!--                        <p>2024.5.23 14:30</p>-->
+<!--                    </div>-->
+<!--                </td>-->
+<!--            </tr>-->
         </table>
     </section>
 </article>

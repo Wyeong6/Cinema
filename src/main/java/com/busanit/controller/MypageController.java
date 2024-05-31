@@ -77,7 +77,7 @@ public class MypageController {
             userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
         }
 
-        // 사용자의 정보
+        // 사용자의 정보 + 포인트 정보
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
         model.addAttribute("myPageMemberInfo", memberRegFormDTO);
         Slice<PointDTO> pointDTOList = null;
@@ -135,7 +135,19 @@ public class MypageController {
     }
 
     @GetMapping("/point")
-    public String mypagePoint() {
+    public String mypagePoint(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+
+        // 사용자의 정보 + 포인트 정보
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("myPageMemberInfo", memberRegFormDTO);
+        Slice<PointDTO> pointDTOList = null;
+        pointDTOList = pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
+        model.addAttribute("pointInfo", pointDTOList);
 
         return "/mypage/mypage_point";
     }
