@@ -38,9 +38,7 @@ public class MypageController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final FavoriteMovieService favoriteMovieService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
@@ -76,13 +74,26 @@ public class MypageController {
         // 사용자의 정보
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
         model.addAttribute("myPageMemberInfo", memberRegFormDTO);
+
+        // 사용자의 등급 변환
+        Integer userGradeInt = memberRegFormDTO.getGrade_code();
+        String gradeString = switch (userGradeInt) {
+            case 1 -> "BLACK";
+            case 2 -> "RED";
+            case 3 -> "BLUE";
+            default -> "GREEN";
+        };
+        model.addAttribute("myPageGrade", gradeString);
+
         return "/mypage/mypage_main";
     }
+
     @GetMapping("/reservation")
     public String mypageReservation() {
 
         return "/mypage/mypage_reservation";
     }
+
     @GetMapping("/order")
     public String mypageOrder() {
 
@@ -90,15 +101,36 @@ public class MypageController {
     }
 
     @GetMapping("/membership")
-    public String mypageMembership() {
+    public String mypageMembership(Model model) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+
+        // 사용자의 정보
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        model.addAttribute("myPageMemberInfo", memberRegFormDTO);
+
+        // 사용자의 등급 변환
+        Integer userGradeInt = memberRegFormDTO.getGrade_code();
+        String gradeString = switch (userGradeInt) {
+            case 1 -> "BLACK";
+            case 2 -> "RED";
+            case 3 -> "BLUE";
+            default -> "GREEN";
+        };
+        model.addAttribute("myPageGrade", gradeString);
 
         return "/mypage/mypage_membership";
     }
+
     @GetMapping("/point")
     public String mypagePoint() {
 
         return "/mypage/mypage_point";
     }
+
     @GetMapping("/review")
     public String mypageReview(Model model) {
         String memberEmail = commentService.getAuthenticatedUserEmail();
@@ -259,5 +291,4 @@ public class MypageController {
 
         return "redirect:/member/logout";
     }
-
 }

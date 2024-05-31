@@ -3,10 +3,10 @@
         <h2 style="font-size: 2em"><b th:text="${myPageMemberInfo.name}">user</b>님 반갑습니다.</h2>
         <div class="user_info">
             <div>
-                <img alt="멤버십 등급 이미지" src="/images/grade/green.png">
+                <img alt="멤버십 등급 이미지" th:src="@{/images/grade/{image}.png(image=${myPageGrade})}">
                 <div>
                     <p>
-                        <span th:text="${myPageMemberInfo.name}">user</span>님의 등급은 <b>green</b> 입니다
+                        <span th:text="${myPageMemberInfo.name}">user</span>님의 등급은 <b th:text="${myPageGrade}">green</b> 입니다
                     </p>
                     <button class="button membership_btn" id="membership_btn">등급혜택 보기</button>
                 </div>
