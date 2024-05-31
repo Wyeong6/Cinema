@@ -4,8 +4,10 @@ import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.entity.Member;
+import com.busanit.entity.Point;
 import com.busanit.service.CustomOAuth2UserDetailsService;
 import com.busanit.service.MemberService;
+import com.busanit.service.PointService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ public class MemberController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final CustomOAuth2UserDetailsService customOAuth2UserDetailsService;
+    private final PointService pointService;
 
     @GetMapping("/login")
     public String login() {
@@ -63,6 +66,10 @@ public class MemberController {
         try {
             memberService.saveMember(Member.createMember(regFormDTO, passwordEncoder));
 //            termsService.saveTerms(termsService.createTermsAgree(regFormDTO, termsAgreeDTO));
+            // 회원가입으로 member 생성 후 해당 멤버 id를 FK로 point란 생성
+            pointService.savePoint(Point.createPoint(memberService.findUserIdx(regFormDTO.getEmail())));
+
+
         } catch(IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "member/join";
