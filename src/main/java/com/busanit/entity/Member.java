@@ -67,7 +67,7 @@ public class Member extends BaseTimeEntity {
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
     // 영화 찜
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<FavoriteMovie> favoriteMovies = new ArrayList<>();
 
     //멤버와 댓글 연관관계
@@ -88,6 +88,10 @@ public class Member extends BaseTimeEntity {
 //            }
 //        }
 //    }
+
+    // 포인트
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    List<Point> pointList;
 
     public void addSentMessage(Message message) {
         this.sentMessages.add(message);
@@ -164,8 +168,6 @@ public class Member extends BaseTimeEntity {
         favoriteMovies.remove(favoriteMovie);
         favoriteMovie.setMember(null);
     }
-
-
 
     // 일반 폼 회원 생성
     public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {
