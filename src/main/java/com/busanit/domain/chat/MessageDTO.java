@@ -3,6 +3,8 @@ package com.busanit.domain.chat;
 import com.busanit.entity.chat.Message;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -15,6 +17,7 @@ public class MessageDTO {
     private String sender;
     private String recipient;
     private boolean isRead;
+    private LocalDateTime timestamp;
     private String messageTitle;
 
     public static MessageDTO toMessageDTO(Message message) {

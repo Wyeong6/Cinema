@@ -4,70 +4,55 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
     <title>Event List</title>
     <style>
+        .modal {
+            display: none; /* 기본적으로 모달을 숨김 */
+            position: fixed;
+            z-index: 99999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100vh; /* 모달 창의 높이를 화면 전체로 설정 */
+            background-color: rgba(0,0,0,0.4); /* 반투명 배경 */
+            padding-top: 60px;
+        }
+
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-height: 60vh; /* 모달 내용의 최대 높이 설정 */
+            overflow-y: auto; /* 내용이 넘칠 경우 스크롤 생성 */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
         td, th {
             padding: 15px;
         }
     </style>
-    <script>
-        function openChatModal(row) {
-            if (!row) {
-                console.error("Row is null");
-                return;
-            }
-
-            // 클릭한 행의 이메일 값을 가져옴
-            const userEmail = row.querySelector('td:nth-child(3)').innerText;
-            if (!userEmail) {
-                console.error("User email not found");
-                return;
-            }
-
-            // AJAX를 사용하여 모달창 HTML 파일을 로드하고 데이터를 전달
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', '/admin/chatModal', true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    // 모달 HTML을 페이지에 추가
-                    document.body.insertAdjacentHTML('beforeend', xhr.responseText);
-
-                    // 모달창의 이메일 필드를 업데이트
-                    const modal = document.getElementById('myModal');
-                    modal.querySelector('#userEmail').innerText = userEmail;
-
-                    // 모달창 표시
-                    modal.style.display = 'block';
-                }
-            };
-            xhr.send();
-        }
-
-        // 모달창 닫기 함수
-        function closeModal() {
-            const modal = document.getElementById('chatModal');
-            if (modal) {
-                modal.style.display = 'none';
-                modal.remove();
-            }
-        }
-    </script>
 </head>
 <body>
-<!-- Navbar -->
-<nav class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar" style="margin-bottom: 10px;">
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <!-- Search -->
-        <div class="navbar-nav align-items-center">
-            <div class="nav-item d-flex align-items-center">
-                <i class="bx bx-search fs-4 lh-0"></i>
-                <input aria-label="Search..." class="form-control border-0 shadow-none" placeholder="Search..." type="text" />
-            </div>
-        </div>
-        <!-- /Search -->
-    </div>
-</nav>
-<!-- / Navbar -->
+<!-- Navbar 생략 -->
 
 <h5 class="card-header">Event List</h5>
 <div class="table-responsive text-nowrap">
@@ -76,24 +61,219 @@
         <tr>
             <th>방 번호</th>
             <th>카테고리</th>
+            <th>메세지</th>
             <th>회원 이메일</th>
             <th>회원 이름</th>
         </tr>
         </thead>
         <tbody class="table-border-bottom-0">
-        <!-- 채팅방 리스트 출력 -->
-        <tr th:each="chatRoom : ${eventList.content}" th:data-room-id="${chatRoom.id}" onclick="openChatModal(this)">
-            <td th:text="${chatRoom.id}">Room ID</td>
-            <td th:text="${chatRoom.messageTitle}">Room Title</td>
-            <td th:text="${chatRoom.userEmail}">User Email</td>
-            <td th:text="${chatRoom.userName}">User Name</td>
-        </tr>
+        <!-- 데이터는 자바스크립트로 동적으로 추가됩니다 -->
         </tbody>
     </table>
-
     <!-- 페이지네이션 -->
-    <div style="text-align: center;">
-        <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}" th:text="'[' + ${i} + ']'" class="paging-btn"></a>
+    <div id="pagination"></div>
+</div>
+
+<!-- 모달 -->
+
+<script>
+
+    $(document).ready(function() {
+        var currentPage = 1;
+        function loadChatList(page) {
+
+            $.ajax({
+                url: "/admin/api/chatList",
+                data: {
+                    page: page,
+                    size: 8
+                },
+                type: "GET",
+                success: function(response) {
+                    var chatList = response.chatRoom;
+                    var $chatListContainer = $(".table-border-bottom-0");
+                    $chatListContainer.empty(); // 기존 목록을 비우고
+
+                    // 새로운 목록 생성
+                    chatList.forEach(function(chatRoom) {
+                        var lastMessageContent = "";
+
+                        // 메시지가 존재하는지 확인
+                        if (chatRoom.messages && chatRoom.messages.length > 0) {
+                            var lastMessage = chatRoom.messages[chatRoom.messages.length - 1];
+                            if (lastMessage) { // 마지막 메시지가 존재하는지 확인
+                                lastMessageContent = lastMessage.content;
+                                console.log("Last Message:", lastMessageContent);
+                            }
+                        }
+
+                        var chatRoomRow =
+                            "<tr data-room-id='" + chatRoom.id + "' onclick='openChatModal(this)'>" +
+                            "<td>" + chatRoom.id + "</td>" +
+                            "<td>" + chatRoom.messageTitle + "</td>" +
+                            "<td>" + lastMessageContent + "</td>" +
+                            "<td>" + chatRoom.userEmail + "</td>" +
+                            "<td>" + chatRoom.userName + "</td>" +
+                            "</tr>";
+                        $chatListContainer.append(chatRoomRow);
+                    });
+                    // 마지막 메시지를 구독하여 새로운 메시지가 도착할 때마다 해당 행 업데이트
+
+
+                    // 페이징 정보 업데이트
+                    var $pagination = $("#pagination");
+                    $pagination.empty();
+
+                    for (var i = response.startPage; i <= response.endPage; i++) {
+                        $pagination.append(
+                            "<button onclick='loadChatList(" + i + ")'>" + i + "</button>"
+                        );
+                    }
+                },
+                error: function(error) {
+                    console.log("Error: ", error);
+                }
+            });
+        }
+        // 최초 페이지 로드 시 데이터 로드
+        loadChatList(currentPage);
+
+        // 클릭된 페이지에 대한 채팅 목록 로드
+        $(document).on('click', '.page-btn', function() {
+            currentPage = $(this).data('page');
+            loadChatList(currentPage);
+        });
+
+        // 3초마다 현재 페이지 데이터 자동 새로고침
+        setInterval(function() {
+            loadChatList(currentPage);
+        }, 5000);
+
+    });
+
+    var currentRecipient = ''; // 전역 변수로 선언
+    var isConnected = false;
+    var stompClient = null;
+
+    // DOM 요소를 가져오는 함수
+    function getElement(id) {
+        return document.getElementById(id);
+    }
+
+    // 메시지를 표시하는 함수
+    function showMessage(message) {
+        const messages = getElement('messages');
+        const messageElement = document.createElement('p');
+        messageElement.className = 'message-style'; // 메시지 스타일 클래스 추가
+        messageElement.textContent = message;
+        messages.appendChild(messageElement);
+    }
+
+    // Stomp 연결 함수
+    function connect() {
+        if (isConnected) return;
+        console.log("currentMessageTitle" + currentRecipient);
+
+        var socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function(frame) {
+            console.log('Connected: ' + frame);
+            subscribeToRecipient();
+        });
+        isConnected = true;
+    }
+
+    // 수신자 구독
+    function subscribeToRecipient() {
+        stompClient.subscribe('/user/queue/private/' + currentRecipient, function(message){
+            console.log("Private Message: " + message.body);
+            var parsedMessage = JSON.parse(message.body);
+            showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
+
+            currentRecipient = parsedMessage.sender;
+        });
+    }
+
+    // 연결 해제 함수
+    function disconnect() {
+        if (stompClient !== null) {
+            stompClient.disconnect();
+        }
+        isConnected = false;
+    }
+
+    // 메시지 전송 함수
+    function sendMessage() {
+        var messageContent = getElement('message').value;
+        if (messageContent && currentRecipient) {
+            var message = {
+                sender: 'admin@admin.com',
+                recipient: currentRecipient,
+                content: messageContent
+            };
+            console.log("Sending message:", message);
+            stompClient.send("/app/chat/admin", {}, JSON.stringify(message));
+            showMessage('관리자: ' + messageContent);
+            getElement('message').value = '';
+        }
+    }
+
+    // 메시지 가져오기 함수
+    function fetchMessages() {
+        console.log("currentRecipient 연결 " + currentRecipient);
+        fetch(`/chat/private/${currentRecipient}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok ' + response.statusText);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data:', data);
+                data.forEach(item => {
+                    if (Array.isArray(item.messages)) {
+                        item.messages.forEach(message => {
+                            let displayMessage = message.sender  === currentRecipient ? `${message.sender}: ${message.content}` : `관리자 : ${message.content}`;
+
+                            showMessage(displayMessage);
+                        });
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching messages:', error));
+    }
+
+    // 채팅 모달 열기 함수
+    function openChatModal(row) {
+        currentRecipient = row.querySelector('td:nth-child(4)').innerText; // 현재 수신자 업데이트
+        getElement('messages').innerHTML = ''; // 메시지 요소 초기화
+
+        if (isConnected) {
+            disconnect(); // 이미 연결된 경우, 연결 해제
+        }
+
+        connect();
+        fetchMessages();
+
+        const modal = getElement('myModal');
+        getElement('userEmail').innerText = currentRecipient;
+        modal.style.display = 'block';
+    }
+
+    // 채팅 모달 닫기 함수
+    function closeModal() {
+        currentRecipient = '';
+        const modal = getElement('myModal');
+        modal.style.display = 'none';
+    }
+</script>
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="userEmail"></div> <!-- 유저 이메일 표시 부분 추가 -->
+        <div id="messages"></div>
+        <div>
+            <input type="text" id="message" placeholder="Type a message..."/>
+            <button onclick="sendMessage()">Send</button>
+        </div>
     </div>
 </div>
 </body>

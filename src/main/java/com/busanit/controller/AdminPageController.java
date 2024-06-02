@@ -28,7 +28,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -346,36 +349,42 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
 
     //채팅리스트
     @GetMapping("/chatList")
-    public String chatList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size){
+    public String chatList(){
+        return "admin/admin_chatList";
+    }
+    @GetMapping("/api/chatList")
+    @ResponseBody
+    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size){
         Page<ChatRoomDTO> chatRoom = chatService.getChatList(page-1, size);
 
         int totalPages = chatRoom.getTotalPages();
         int startPage = Math.max(1, page - 5);
         int endPage = Math.min(totalPages, page + 4);
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("chatRoom", chatRoom.getContent());
+        response.put("currentPage", page);
+        response.put("totalPages", totalPages);
+        response.put("startPage", startPage);
+        response.put("endPage", endPage);
 
-        model.addAttribute("eventList", chatRoom); //이벤트 게시글
-        model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
-        model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
-
-        return "admin/admin_chatList";
+        return response;
     }
+
     //채팅 모달창
     @GetMapping("/chatModal")
     public String chatModal(){
         return "admin/admin_chatModal";
     }
 
-    //메세지 확인 여부
-    @PostMapping("/{messageId}/read")
-    public void markMessageAsRead(@PathVariable Long messageId) {
-        chatService.markAsRead(messageId);
-    }
-
-    @GetMapping("/unread/{receiverId}")
-    public List<Message> getUnreadMessages(@PathVariable Long receiverId) {
-        return messageRepository.findByReceiverIdAndIsReadFalse(receiverId);
-    }
+//    //메세지 확인 여부
+//    @PostMapping("/{messageId}/read")
+//    public void markMessageAsRead(@PathVariable Long messageId) {
+//        chatService.markAsRead(messageId);
+//    }
+//
+//    @GetMapping("/unread/{receiverId}")
+//    public List<Message> getUnreadMessages(@PathVariable Long receiverId) {
+//        return messageRepository.findByReceiverIdAndIsReadFalse(receiverId);
+//    }
 }

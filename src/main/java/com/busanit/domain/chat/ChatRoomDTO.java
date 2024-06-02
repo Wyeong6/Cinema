@@ -4,6 +4,7 @@ import com.busanit.entity.chat.ChatRoom;
 import com.busanit.entity.chat.Message;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,9 @@ public class ChatRoomDTO {
     private String userEmail;
     private String messageTitle;
     List<MessageDTO> messages;
+    private LocalDateTime lastReadTimestamp;
+    // 읽지 않은 메세지 수를 저장할 필드
+    private int unreadMessageCount;
 
     //채팅룸의 해당 메세지도 반환
     public static ChatRoomDTO toChatRoomDTO(ChatRoom chatRoom, String userEmail, String userName, List<MessageDTO> messageDTOs) {

@@ -27,12 +27,11 @@
             stompClient = Stomp.over(socket); // STOMP 프로토콜을 사용하여 SockJS 소켓을 Wrapping
             stompClient.connect({}, function (frame) {
                 console.log('Connected: ' + frame); // 연결 성공 시 콘솔에 로그 출력
-                console.log('User Email: ' + userEmail); // 사용자 이메일 출력
 
                 // 특정 사용자 큐에 구독 (개인 메시지 수신)
                 stompClient.subscribe('/user/queue/private', function (message) {
                     var parsedMessage = JSON.parse(message.body);
-                    showMessage('관리자 - ' + parsedMessage.sender + ': ' + parsedMessage.content); // 수신한 메시지를 화면에 표시
+                    showMessage('관리자 : ' + parsedMessage.content); // 수신한 메시지를 화면에 표시
 
                 });
             });
@@ -98,7 +97,7 @@
                                 messageExist = true; // 메시지가 존재함을 표시
                                 item.messages.forEach(message => {
                                     document.getElementById('categoryButtons').style.display = 'none';
-                                    let displayMessage = message.userName === userEmail ? `${message.sender}: ${message.content}` : ` ${message.sender}: ${message.content}`;
+                                    let displayMessage = message.sender  === userEmail ? `나 : ${message.content}` : `관리자 : ${message.content}`;
                                     showMessage(displayMessage);
                                 });
                             }

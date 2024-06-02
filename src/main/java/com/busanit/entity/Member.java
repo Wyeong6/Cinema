@@ -4,6 +4,7 @@ import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.entity.chat.ChatRoom;
 import com.busanit.entity.chat.Message;
+import com.busanit.entity.chat.MessageReadStatus;
 import com.busanit.entity.movie.Comment;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieReaction;
@@ -14,6 +15,7 @@ import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -54,12 +56,19 @@ public class Member extends BaseTimeEntity {
 
     private Boolean checkedTermsS;
 
-    @OneToMany(mappedBy = "sender")
+    //보낸 메세지
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     private List<Message> sentMessages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver")
+    //받은 메세지
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
     private List<Message> receivedMessages = new ArrayList<>();
 
+    //멤버별 메세지 읽음 상태를 관리
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MessageReadStatus> readStatuses = new ArrayList<>();
+
+    //채팅룸
     @ManyToMany
     @JoinTable(name = "member_chatroom",
             joinColumns = @JoinColumn(name = "member_id"),
@@ -95,20 +104,20 @@ public class Member extends BaseTimeEntity {
             message.setSender(this);
         }
     }
-
-    public void removeSentMessage(Message message) {
-        this.sentMessages.remove(message);
-        if (message.getSender() == this) {
-            message.setSender(null);
-        }
-    }
-
-    public void removeReceivedMessage(Message message) {
-        this.receivedMessages.remove(message);
-        if (message.getReceiver() == this) {
-            message.setReceiver(null);
-        }
-    }
+//
+//    public void removeSentMessage(Message message) {
+//        this.sentMessages.remove(message);
+//        if (message.getSender() == this) {
+//            message.setSender(null);
+//        }
+//    }
+//
+//    public void removeReceivedMessage(Message message) {
+//        this.receivedMessages.remove(message);
+//        if (message.getReceiver() == this) {
+//            message.setReceiver(null);
+//        }
+//    }
     public void addReceivedMessage(Message message) {
         this.receivedMessages.add(message);
         if (message.getReceiver() != this) {

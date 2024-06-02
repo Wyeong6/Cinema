@@ -47,7 +47,7 @@
 
 <script>
   function redirectToChat() {
-    fetch('/chat')
+    fetch('/chatUser')
             .then(response => response.text())
             .then(html => {
               document.open();

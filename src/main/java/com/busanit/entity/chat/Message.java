@@ -7,6 +7,10 @@ import com.busanit.repository.MemberRepository;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -35,7 +39,19 @@ public class Message extends BaseTimeEntity {
 
     private String messageTitle;
 
-    private boolean isRead;
+    private LocalDateTime timestamp;
+
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MessageReadStatus> readStatuses = new ArrayList<>();
+
+    public void addReadStatus(MessageReadStatus messageReadStatus) {
+        // 현재 메시지에 읽음 상태를 추가
+        this.readStatuses.add(messageReadStatus);
+        // messageReadStatus의 message 참조가 현재 메시지가 아니라면 업데이트
+        if (messageReadStatus.getMessage() != this) {
+            messageReadStatus.setMessage(this);
+        }
+    }
 
 
 }
