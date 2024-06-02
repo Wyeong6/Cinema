@@ -133,13 +133,14 @@ public class MovieController {
         String movieReleaseDate = movieDTO.getReleaseDate();
         String posterImage = movieDTO.getPosterPath();
         String backdropImage = movieDTO.getBackdropPath();
+        String runtime = movieDTO.getRuntime();
         List<String> stillCut = movieDTO.getStillCutPaths();
         List<String> genres = movieDTO.getGenres();
         String video = movieDTO.getVideo();
 
         movieService2.saveMovie(
                 movieId, movieTitle, movieOverview, certifications, movieReleaseDate,
-                posterImage, backdropImage, stillCut, genres, video
+                posterImage, backdropImage, stillCut, genres, video,runtime
         );
 
         // 저장 성공 메시지를 모델에 추가

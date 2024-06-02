@@ -255,8 +255,25 @@ public class MovieService {
 
 
     public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+
+        if (jsonNode.has("success") && !jsonNode.get("success").asBoolean()) {
+            int statusCode = jsonNode.get("status_code").asInt();
+            String statusMessage = jsonNode.get("status_message").asText();
+
+            System.out.println("responseBody = " + responseBody);
+            System.out.println("리소스를 찾을 수 없습니다. 상태 코드: " + statusCode + ", 상태 메시지: " + statusMessage);
+            return;
+        }
+
+
         MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
         System.out.println("responseBody = " + responseBody);
+        System.out.println("movieDetailDTO===" + movieDetailDTO);
+        System.out.println("널체크 == " + movieRepository.findById(movieDetailDTO.getId()));
+
         Movie movie = movieRepository.findById(movieDetailDTO.getId()).orElse(new Movie());
         MovieDetail movieDetail = getOrCreateMovieDetail(movie);
         movieDetail.setReleaseDate(movieDetailDTO.getRelease_date());
@@ -514,7 +531,7 @@ public class MovieService {
     //어드민 페이지 영화 등록
     public void saveMovie(
             Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
-            String posterImage, String backdropImage, List<String> stillCut, List<String> genres, String video) {
+            String posterImage, String backdropImage, List<String> stillCut, List<String> genres, String video, String runtime) {
 
         Movie movie = new Movie();
         movie.setMovieId(movieId);
@@ -526,6 +543,7 @@ public class MovieService {
         movieDetail.setCertification(certifications);
         movieDetail.setReleaseDate(movieReleaseDate);
         movieDetail.setVideo(video);
+        movieDetail.setRuntime(runtime);
         movie.setMovieDetail(movieDetail);
 
 
