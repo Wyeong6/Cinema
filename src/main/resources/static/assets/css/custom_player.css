@@ -107,6 +107,10 @@ div.mb-3 {
 #item-delete-btn {
     width: 1em;
 }
+.seats-column-group {
+    display: flex;
+    flex-direction: row;
+}
 /* paging_btn */
  .paging_btn {
      display: block;

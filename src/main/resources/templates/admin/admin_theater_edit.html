@@ -25,11 +25,7 @@
             </div>
           </nav>
 
-          <!-- / Navbar -->
-
-          <!-- Content wrapper -->
           <div class="content-wrapper">
-            <!-- Content -->
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4" id="theater_name" th:text="'시네마캐스트 ' + ${theaterDTO.theaterName} + '점'"></h4>
@@ -37,21 +33,23 @@
                 <p>총 보유한 상영관 수 : <span id="theater_count" th:text="${theaterDTO.theaterCount} + '관'">상영관 수</span></p>
                 <input type="hidden" id="theater_id" th:value="${theaterDTO.id}">
 
+                <div class="main">
               <!-- Basic Layout & Basic with Icons -->
-              <div class="row">
+              <div class="row theaterNumber-input">
                 <!-- Basic Layout -->
-                <div class="col-xxl-6" th:each="index : ${#numbers.sequence(0, theaterDTO.theaterNumber.size() - 1)}">
-                  <div class="card mb-4" th:with="theaterId=${theaterDTO.theaterNumber[index]}">
+                  <div class="col-xxl-6 theaterNumber-info" th:each="index : ${#numbers.sequence(0, theaterDTO.theaterNumbers.size() - 1)}">
+                      <div class="card mb-4" th:with="theaterId=${theaterDTO.theaterNumbers[index]}">
                       <div class="card-header d-flex align-items-center justify-content-between">
                           <img src="/images/delete_form.png" alt="폼 삭제버튼" class="delete_form_btn"/>
-                          <h5 class="mb-0" th:text="${theaterDTO.theaterName} + '점' + ' ' + ${theaterDTO.theaterNumber[index]} + '관'">지점명</h5>
-<!--                          <small class="text-muted float-end">Merged input group</small>-->
+                          <h5 class="mb-0" th:text="${'시네마캐스트 ' + theaterDTO.theaterName + '점' + ' ' + theaterDTO.theaterNumbers[index].theaterNumber + '관'}">지점명</h5>
+
+                          <!--                          <small class="text-muted float-end">Merged input group</small>-->
                       </div>
                       <div class="card-body">
                           <form>
                               <div class="row mb-3">
-                                  <label class="col-sm-2 col-form-label" for="theaterIdx">상영관 식별자</label>
-                                  <div class="col-sm-10">
+                                  <label class="col-sm-3 col-form-label" for="theaterIdx">상영관 식별자</label>
+                                  <div class="col-sm-9">
                                       <div class="input-group input-group-merge">
                               <span id="basic-icon-default-fullname2" class="input-group-text" style="background: #eceef1;"
                               ><i class="bx bx-user"></i
@@ -60,15 +58,15 @@
                                                   type="text"
                                                   class="form-control"
                                                   id="theaterIdx"
-                                                  th:value="${theaterDTO.theaterIdx[index]}"
+                                                  th:value="${theaterDTO.theaterNumbers[index].theaterIdx}"
                                                   disabled
                                           />
                                       </div>
                                   </div>
                               </div>
                               <div class="row mb-3">
-                                  <label class="col-sm-2 col-form-label" for="theaterNumber">상영관 번호</label>
-                                  <div class="col-sm-10">
+                                  <label class="col-sm-3 col-form-label" for="theaterNumber">상영관 번호</label>
+                                  <div class="col-sm-9">
                                       <div class="input-group input-group-merge">
                               <span id="basic-icon-default-company2" class="input-group-text" style="background: #eceef1;"
                               ><i class="bx bx-buildings"></i
@@ -77,30 +75,37 @@
                                                   type="text"
                                                   id="theaterNumber"
                                                   class="form-control"
-                                                  th:value="${theaterDTO.theaterNumber[index]}"
+                                                  th:value="${theaterDTO.theaterNumbers[index].theaterNumber}"
                                                   disabled
                                           />
                                       </div>
                                   </div>
                               </div>
                               <div class="row mb-3">
-                                  <label class="col-sm-2 col-form-label" for="seatsPerTheater">좌석 수</label>
-                                  <div class="col-sm-10">
+                                  <label class="col-sm-3 col-form-label" for="seatsPerTheater">보유한 총 좌석 수</label>
+                                  <div class="col-sm-9">
                                       <div class="input-group input-group-merge">
                                           <span class="input-group-text"><i class="bx bx-envelope"></i></span>
                                           <input
                                                   type="number"
                                                   id="seatsPerTheater"
                                                   class="form-control"
-                                                  th:value="${theaterDTO.seatsPerTheater[index]}"
+                                                  th:value="${theaterDTO.theaterNumbers[index].seatsPerTheater}"
+                                                  min="50"
                                           />
                                       </div>
                                       <div class="form-text">최소 50석 이상이어야 합니다.</div>
                                   </div>
                               </div>
                               <div class="row mb-3">
-                                  <label class="col-sm-2 form-label" for="basic-icon-default-message">Message</label>
-                                  <div class="col-sm-10">
+                                  <label class="col-sm-3 form-label"></label>
+                                  <div class="col-sm-9">
+                                      <button type="button" class="btn btn-outline-secondary seats-column-btn" style="width: 100%">좌석 배치하기</button>
+                                  </div>
+                              </div>
+                              <div class="row mb-3">
+                                  <label class="col-sm-3 form-label" for="basic-icon-default-message">Message</label>
+                                  <div class="col-sm-9">
                                       <div class="input-group input-group-merge">
                               <span id="basic-icon-default-message2" class="input-group-text"
                               ><i class="bx bx-comment"></i
@@ -114,7 +119,7 @@
                                   </div>
                               </div>
                               <div class="row justify-content-end">
-                                  <div class="col-sm-10">
+                                  <div class="col-sm-9">
                                       <button type="submit" class="btn btn-primary">저장</button>
                                   </div>
                               </div>
@@ -123,9 +128,214 @@
                   </div>
                 </div>
               </div>
+                  <div class="row">
+                      <div class="col-xxl-6" id="seats-column-edit">
+                          <div class="card mb-4">
+                              <div class="card-header d-flex align-items-center justify-content-between">
+                                  <h5 class="mb-0">지점명 1관</h5>
+                                  <!--                          <small class="text-muted float-end">Merged input group</small>-->
+                              </div>
+                              <div class="card-body">
+                                  <form>
+                                      <div class="row mb-3">
+                                          <label class="col-sm-3 col-form-label" for="">상영관 식별자</label>
+                                          <div class="col-sm-9">
+                                              <div class="input-group input-group-merge">
+                              <span class="input-group-text" style="background: #eceef1;"
+                              ><i class="bx bx-user"></i
+                              ></span>
+                                                  <input
+                                                          type="text"
+                                                          class="form-control"
+                                                          id=""
+                                                          disabled
+                                                  />
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="row mb-3">
+                                          <label class="col-sm-3 col-form-label" for="">상영관 번호</label>
+                                          <div class="col-sm-9">
+                                              <div class="input-group input-group-merge">
+                              <span  class="input-group-text" style="background: #eceef1;"
+                              ><i class="bx bx-buildings"></i
+                              ></span>
+                                                  <input
+                                                          type="text"
+                                                          class="form-control"
+                                                          disabled
+                                                  />
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="row mb-3">
+                                          <label class="col-sm-3 col-form-label" for="">보유한 총 좌석 수</label>
+                                          <div class="col-sm-9">
+                                              <div class="input-group input-group-merge">
+                                                  <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                  <input
+                                                          type="number"
+                                                          class="form-control"
+                                                          min="50"
+                                                  />
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="row mb-3">
+                                          <label class="col-sm-3 col-form-label">열 별 좌석 수</label>
+                                          <div class="col-sm-9">
+                                              <div class="row seats-column-group">
+                                                  <div class="col-sm-4"> <!-- 각 열당 4개의 열을 보여줍니다 -->
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">A열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">B열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">C열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">D열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">E열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">F열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">G열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">H열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">I열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">J열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">K열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      <div class="seats-column">
+                                                          <label class="col-form-label">L열</label>
+                                                          <div class="input-group input-group-merge">
+                                                              <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                                                              <input type="number" class="form-control">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="row justify-content-end">
+                                          <div class="col-sm-9">
+                                              <button type="submit" class="btn btn-gray" style="color: #3B353C; margin-right: 1em">취소</button>
+                                              <button type="submit" class="btn btn-primary">저장</button>
+                                          </div>
+                                      </div>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
             </div>
           </div>
             <!-- / Content -->
+
+ <script>
+     $(document).ready(function () {
+         const seatColumnBtn = $('.seats-column-btn');
+         const seatColumnEdit = $('#seats-column-edit');
+         const main = $('.main');
+         const theaterNumberInput = $('.theaterNumber-input');
+
+         seatColumnEdit.hide();
+
+         seatColumnBtn.on('click', function () {
+             seatColumnBtn.addClass('checked');
+             main.css('display', 'flex');
+             main.css('justify-content', 'space-between');
+             theaterNumberInput.addClass('col-xxl-6');
+             seatColumnEdit.show();
+             seatColumnEdit.removeClass('col-xxl-6');
+             seatColumnEdit.addClass('col-xxl-12');
+             $('.theaterNumber-info').each(function() {
+                 $(this).removeClass('col-xxl-6');
+                 $(this).addClass('col-xxl-11');
+             });
+         });
+     });
+ </script>
 
 
 

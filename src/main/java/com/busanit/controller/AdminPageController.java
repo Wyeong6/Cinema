@@ -4,26 +4,22 @@ import com.busanit.customerService.Notice.*;
 import com.busanit.domain.EventDTO;
 import com.busanit.customerService.Notice.NoticeDTO;
 import com.busanit.customerService.Notice.NoticeService;
-import com.busanit.domain.SeatsDTO;
+import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.SnackDTO;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.TheaterDTO;
-import com.busanit.entity.Seats;
 import com.busanit.entity.Snack;
 import com.busanit.entity.chat.Message;
 import com.busanit.repository.MessageRepository;
 import com.busanit.service.ChatService;
-import com.busanit.domain.TheaterDTO;
 import com.busanit.entity.Theater;
 import com.busanit.service.EventService;
 import com.busanit.service.SnackService;
 import com.busanit.service.TheaterService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.sql.ast.tree.from.TableJoin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,9 +32,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Controller
@@ -81,7 +75,18 @@ public class AdminPageController {
     }
 
     @GetMapping("/theaterList")
-    public String theaterList() {
+    public String theaterList(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
+                              @PageableDefault(size = 15, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<TheaterDTO> theaterDTOList = null;
+
+        theaterDTOList = theaterService.getTheaterAll(pageable);
+        model.addAttribute("theaterDTOList", theaterDTOList);
+
+        int startPage= Math.max(1, theaterDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(theaterDTOList.getTotalPages(), theaterDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "admin/admin_theater_list";
     }
 
@@ -98,13 +103,9 @@ public class AdminPageController {
         }
 
         try {
-            if (theaterDTO.getSeatsPerTheater() == null) {
-                throw new IllegalArgumentException("상영관 좌석 정보가 제공되지 않았습니다.");
-            } else {
-                theaterService.save(Theater.toEntity(theaterDTO));
-            }
-        } catch (IllegalStateException e) {
-            model.addAttribute("error", e.getMessage());
+            theaterService.save(Theater.toEntity(theaterDTO));
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("message", e.getMessage());
         }
 
         return "admin/admin_layout";
@@ -113,10 +114,10 @@ public class AdminPageController {
     @GetMapping("/theaterGet")
     public String theaterGet(@RequestParam(name = "theaterId") long theaterId, Model model) {
         TheaterDTO theaterDTO = theaterService.getTheaterById(theaterId);
-        SeatsDTO seatsDTO = theaterService.getSeatsByTheaterId(theaterId);
+        List<TheaterNumberDTO> theaterNumberDTOs = theaterService.getTheaterNumbersByTheaterId(theaterId);
 
         model.addAttribute("theaterDTO", theaterDTO);
-        model.addAttribute("seatsDTO", seatsDTO);
+        model.addAttribute("theaterNumberDTOs", theaterNumberDTOs);
 
         return "admin/admin_theater_edit";
     }

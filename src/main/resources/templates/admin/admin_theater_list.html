@@ -48,7 +48,7 @@
             </tr>
             <!-- theaterDTOList에 요소가 있는 경우 -->
             <tr th:each="theater: ${theaterDTOList}" th:if="${not #lists.isEmpty(theaterDTOList)}">
-                <td><i class="fab fa-angular fa-lg text-danger me-3"></i><strong id="theater_id" th:text="${theater.id}"></strong></td>
+                <td><i class="fab fa-angular fa-lg text-danger me-3"></i><strong class="theater_id" th:text="${theater.id}" th:value="${theater.id}"></strong></td>
                 <td><i class="fab fa-angular fa-lg text-danger me-3"></i><strong th:text="${theater.theaterName}"></strong></td>
                 <td th:text="${theater.theaterNameEng}"></td>
                 <td th:text="${theater.region}"></td>
@@ -110,11 +110,12 @@
         });
     }
 
-    // theater get
-    $('.btn-dark').on('click', function (e) {
+    // 상세보기 버튼에 대한 이벤트 핸들러 등록
+    $(document).on('click', '.btn-dark', function (e) {
         e.preventDefault();
 
-        const theaterId = document.getElementById("theater_id").innerText;
+        const theaterId = $(this).closest('tr').find('.theater_id').text().trim();
+
         const url = `http://localhost:8080/admin/theaterGet?theaterId=${theaterId}`;
 
         fetch(url, {
@@ -130,10 +131,12 @@
                 return response.text();
             })
             .then(html => {
+                // 응답을 .container-xxl 요소에 로드
                 $('.container-xxl').html(html);
             })
             .catch(error => console.error('There was a problem with your fetch operation:', error));
     });
+
 
     function removeTheater(theaterId, page) {
         Swal.fire({
