@@ -6,6 +6,7 @@ import com.busanit.entity.movie.MovieStillCut;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,8 @@ public class MovieDTO {
     private List<Integer> genreIds;
     private List<String> Genres;
     private List<String> stillCutPaths;
+
+    private List<MultipartFile> RegisteredStillCut;
 
     public static MovieDTO convertToDTO(Movie movie){
         MovieDTO movieDTO = new MovieDTO();

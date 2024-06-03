@@ -573,23 +573,5 @@ public class MovieService {
 
     // 영화 스틸컷 등록(저장) (어드민페이지)
 
-    public void saveImage(Movie movie, List<MultipartFile> stillCutFiles) throws IOException {
 
-        List<MovieStillCut> stillCuts = new ArrayList<>();
-
-        for (MultipartFile file : stillCutFiles) {
-            MovieStillCut stillCut = new MovieStillCut();
-            stillCut.setStillCutImage(file.getBytes());
-            // stillCut.setStillCuts(경로); // 필요한 경우 설정
-            stillCuts.add(stillCut);
-        }
-
-        movie.setStillCuts(stillCuts);
-        movieRepository.save(movie);
-
-        for (MovieStillCut stillCut : stillCuts) {
-            stillCut.getMovies().add(movie);
-            movieStillCutRepository.save(stillCut);
-        }
-    }
 }

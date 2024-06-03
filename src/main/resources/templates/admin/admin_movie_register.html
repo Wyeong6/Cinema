@@ -91,8 +91,8 @@
                                required type="text"/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="stillCutPaths">스틸컷 이미지</label>
-                        <input class="form-control" id="stillCutPaths" name="stillCutPaths[]" placeholder="스틸컷 이미지를 입력해주세요."
+                        <label class="form-label" for="RegisteredStillCut">스틸컷 이미지</label>
+                        <input class="form-control" id="RegisteredStillCut" name="RegisteredStillCut[]" placeholder="스틸컷 이미지를 입력해주세요."
                                required type="file" accept=".png, .jpg, .jpeg" multiple />
                     </div>
                     <div class="mb-3">
@@ -192,7 +192,7 @@
     const releaseDateInput = document.getElementById('releaseDate');
     const posterPathInput = document.getElementById('posterPath');
     const backdropPathInput = document.getElementById('backdropPath');
-    const stillCutPathsInput = document.getElementById('stillCutPaths');
+    const stillCutPathsInput = document.getElementById('RegisteredStillCut');
     const videoInput = document.getElementById('video');
 
 
@@ -311,40 +311,45 @@
 
 
         // 모든 유효성 검사 통과 시 폼 제출
-        document.getElementById('movieForm').submit();
-        return true;
-    }
+        const formData = new FormData(form);
 
-    function uploadStillCutImage(file) {
-        const formData = new FormData();
-        formData.append('file', file);
+        // 스틸컷 이미지를 FormData에 추가
+        const stillCutFiles = stillCutPathsInput.files;
 
-        fetch('/stillCutUpload', {
+        for (let i = 0; i < stillCutFiles.length; i++) {
+            formData.append('RegisteredStillCut', stillCutFiles[i]);
+        }
+        fetch('/movies/regist', {
             method: 'POST',
             body: formData
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Failed to upload image');
+                    throw new Error('Failed to submit form');
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Image uploaded successfully:', data);
-                // 이미지 업로드 성공 시 필요한 처리를 여기에 추가
+                console.log('Form submitted successfully:', data);
+                // 폼 제출 성공 시 필요한 처리를 여기에 추가
+                alert('영화가 성공적으로 등록되었습니다.');
             })
             .catch(error => {
-                console.error('Error uploading image:', error);
-                // 이미지 업로드 실패 시 필요한 처리를 여기에 추가
+                console.error('Error submitting form:', error);
+                // 폼 제출 실패 시 필요한 처리를 여기에 추가
+                alert('폼 제출 중 오류가 발생했습니다.');
             });
+
+        return false; // 기본 폼 제출 방지
+
     }
 
     // 파일 input 변경 시 이벤트 처리
-    document.getElementById('stillCutPaths').addEventListener('change', function(event) {
+    document.getElementById('RegisteredStillCut').addEventListener('change', function(event) {
         const files = event.target.files;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            uploadStillCutImage(file);
+            console.log('Selected file:', file);
         }
     });
 

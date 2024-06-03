@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -127,26 +129,62 @@ public class MovieController {
     }
 
     // 영화 등록 (어드민페이지에서)
-    @PostMapping("/movies/regist")
-    public String registMovie(@ModelAttribute MovieDTO movieDTO, Model model) {
+    @PostMapping("admin/movies/regist")
+    public String registMovie(
+            @RequestParam("id") Long movieId,
+            @RequestParam("title") String movieTitle,
+            @RequestParam("overview") String movieOverview,
+            @RequestParam("certifications") String certifications,
+            @RequestParam("releaseDate") String movieReleaseDate,
+            @RequestParam("posterPath") String posterImage,
+            @RequestParam("backdropPath") String backdropImage,
+            @RequestParam("runtime") String runtime,
+            @RequestParam("video") String video,
+            @RequestParam("genres") List<String> genres,
+            @RequestParam("RegisteredStillCut") List<MultipartFile> registeredStillCut,
+            Model model
+    ) {
 
-        Long movieId = movieDTO.getId();
-        System.out.println("movieId === " + movieId);
-        String movieTitle = movieDTO.getTitle();
-        System.out.println("movieTitle === " + movieTitle);
-        String movieOverview = movieDTO.getOverview();
-        String certifications = movieDTO.getCertifications();
-        String movieReleaseDate = movieDTO.getReleaseDate();
-        String posterImage = movieDTO.getPosterPath();
-        String backdropImage = movieDTO.getBackdropPath();
-        String runtime = movieDTO.getRuntime();
-        List<String> stillCut = movieDTO.getStillCutPaths();
-        List<String> genres = movieDTO.getGenres();
-        String video = movieDTO.getVideo();
+        String uploadDir = "C:/uploads/stillCuts/";
+
+        // 디렉터리가 존재하지 않으면 생성합니다.
+        File dir = new File(uploadDir);
+        try {
+            // mkdirs() 메서드를 호출할 때 예외를 처리합니다.
+            boolean created = dir.mkdirs();
+            if (created) {
+                System.out.println("디렉터리 생성 성공: " + uploadDir);
+            } else {
+                System.out.println("디렉터리 생성 실패 또는 이미 존재함: " + uploadDir);
+            }
+        } catch (SecurityException e) {
+            // 권한 문제 등으로 디렉터리를 생성할 수 없는 경우를 처리합니다.
+            System.err.println("디렉터리 생성 중 에러 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+
+        System.out.println("dir 체크 === " + dir);
+
+        List<String> stillCutFiles = new ArrayList<>();
+        try {
+            for (MultipartFile file : registeredStillCut) {
+                String fileName = file.getOriginalFilename();
+                String filePath = uploadDir + fileName;
+
+                // 파일을 C 드라이브의 지정된 디렉터리에 저장합니다.
+                file.transferTo(new File(filePath));
+                stillCutFiles.add(filePath);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            model.addAttribute("message", "파일 저장 중 오류가 발생했습니다.");
+            return "/admin/admin_layout";
+        }
 
         movieService2.saveMovie(
-                movieId, movieTitle, movieOverview,movieReleaseDate, certifications,
-                posterImage, backdropImage, stillCut, genres, video,runtime
+                movieId, movieTitle, movieOverview, movieReleaseDate, certifications,
+                posterImage, backdropImage, stillCutFiles, genres, video, runtime
         );
 
         // 저장 성공 메시지를 모델에 추가
