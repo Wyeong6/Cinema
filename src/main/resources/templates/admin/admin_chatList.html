@@ -66,7 +66,7 @@
             <th>회원 이름</th>
         </tr>
         </thead>
-        <tbody class="table-border-bottom-0">
+        <tbody class="chat-table">
         <!-- 데이터는 자바스크립트로 동적으로 추가됩니다 -->
         </tbody>
     </table>
@@ -92,7 +92,7 @@
                 type: "GET",
                 success: function(response) {
                     var chatList = response.chatRoom;
-                    var $chatListContainer = $(".table-border-bottom-0");
+                    var $chatListContainer = $(".chat-table");
                     $chatListContainer.empty(); // 기존 목록을 비우고
 
                     // 새로운 목록 생성
@@ -124,11 +124,13 @@
                     var $pagination = $("#pagination");
                     $pagination.empty();
 
+                    var paginationHtml = '<div style="text-align: center;">';
                     for (var i = response.startPage; i <= response.endPage; i++) {
-                        $pagination.append(
-                            "<button onclick='loadChatList(" + i + ")'>" + i + "</button>"
-                        );
+                        paginationHtml += '<a href="#" data-page="' + i + '" class="paging-btn">[' + i + ']</a>';
                     }
+                    paginationHtml += '</div>';
+
+                    $pagination.html(paginationHtml);
                 },
                 error: function(error) {
                     console.log("Error: ", error);
@@ -139,7 +141,7 @@
         loadChatList(currentPage);
 
         // 클릭된 페이지에 대한 채팅 목록 로드
-        $(document).on('click', '.page-btn', function() {
+        $(document).on('click', '.paging-btn', function() {
             currentPage = $(this).data('page');
             loadChatList(currentPage);
         });

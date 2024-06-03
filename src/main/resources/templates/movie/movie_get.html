@@ -10,11 +10,18 @@
     <link rel="stylesheet" href="/assets/css/custom.css"/>
     <link rel="stylesheet" href="/assets/css/custom_player.css"/>
     <link rel="stylesheet" href="/assets/css/nav.css"/>
+
+    <meta property="og:title" content="${movie.title}">
+    <meta property="og:description" id="og-description" content="">
+    <meta property="og:url" content="http://localhost:8080/movies/${eventId}">
+    <meta property="og:image" content="https://image.tmdb.org/t/p/original' + ${movie.posterPath}}">
+
+
     <noscript>
         <link rel="stylesheet" href="/assets/css/noscript.css"/>
     </noscript>
     <!--    댓글-->
-
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
     <style>
 
         .fav-icon {
@@ -964,7 +971,20 @@
                 updateButtonState()
             }
 
+                function updateMetaDescription() {
+                    var detailElement = document.querySelector('.movie_detail');
+                    if (detailElement) {
+                        var detailText = detailElement.innerText;
+                        var metaDescription = document.getElementById('og-description');
+                        if (metaDescription) {
+                            metaDescription.setAttribute('content', detailText);
+                        }
+                    }
+                }
+
             document.addEventListener('DOMContentLoaded', function () {
+
+                updateMetaDescription();
                 // Kakao SDK 초기화
                 Kakao.init('3d074cbbda365535b831c90baead22c2'); // 여기에 실제 Kakao 앱 키를 입력하세요.
 
