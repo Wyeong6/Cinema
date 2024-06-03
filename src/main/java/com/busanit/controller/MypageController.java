@@ -166,6 +166,15 @@ public class MypageController {
         return "/mypage/mypage_point";
     }
 
+    @GetMapping("/point/more")
+    @ResponseBody
+    public Slice<PointDTO> getPoints(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = (authentication != null) ? authentication.getName() : null;
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        return pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
+    }
+
     @GetMapping("/review")
     public String mypageReview(Model model) {
         String memberEmail = commentService.getAuthenticatedUserEmail();
