@@ -4,10 +4,14 @@
     <section>
         <header>
             <h4>적립/사용 내역</h4>
-            <div th:if="${not #lists.isEmpty(pointInfo)}">
+            <div th:unless="${pointInfo == null or pointInfo.isEmpty()}">
                 <!-- 첫 번째 요소에 접근하기 위해 getContent() 메서드를 사용하고, 첫 번째 요소 (index 0)를 가져옴 -->
                 <p>잔여 포인트 : <b style="color: #e45649"
                                th:text="${pointInfo.getContent().get(0).currentPoints}+p">2000p</b></p>
+            </div>
+            <div th:if="${pointInfo == null or pointInfo.isEmpty()}">
+                <p>잔여 포인트 : <b style="color: #e45649"
+                               th:text="0p">2000p</b></p>
             </div>
         </header>
         <table class="default">
