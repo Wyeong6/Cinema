@@ -28,10 +28,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,7 +85,15 @@ public class MovieService {
     // (나중에 다른 api 데이터들도 영화id를 기준으로 데이터를가져오기때문에 씀)
     public List<Long> getAllMovieIds() {
         List<Movie> movies = movieRepository.findAll();
-        return movies.stream().map(Movie::getMovieId).collect(Collectors.toList());
+
+        // movieId가 10자리인 id를 필터링하는 이유는
+        // 데이터베이스에 영화를 직접 등록할때 id를 10자리로 등록하기때문이다.
+        // api 링크를 요청할때 직접 등록한 영화의 id로 api 링크를 요청하면 오류가 나기때문에 (api 서버에 등록된 movieId가아니라 어드민이 직접등록한 movieId라서 오류가뜬다)
+        // 그걸 방지하기위해 어드민에게 movieId를 직접 입력받을때 숫자 10자리로 입력받게하고(벨리데이션) api링크 요청함수에서 movieId가 10자리인 movieId를 필터링해줘 오류를 방지한다!
+        return movies.stream()
+                .map(Movie::getMovieId)
+                .filter(movieId -> String.valueOf(movieId).length() != 10)
+                .collect(Collectors.toList());
     }
 
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
@@ -256,19 +267,6 @@ public class MovieService {
 
     public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-
-        if (jsonNode.has("success") && !jsonNode.get("success").asBoolean()) {
-            int statusCode = jsonNode.get("status_code").asInt();
-            String statusMessage = jsonNode.get("status_message").asText();
-
-            System.out.println("responseBody = " + responseBody);
-            System.out.println("리소스를 찾을 수 없습니다. 상태 코드: " + statusCode + ", 상태 메시지: " + statusMessage);
-            return;
-        }
-
-
         MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
         System.out.println("responseBody = " + responseBody);
         System.out.println("movieDetailDTO===" + movieDetailDTO);
@@ -371,6 +369,7 @@ public class MovieService {
             }
         }
     }
+
 
     public void processCertificationResponse(String responseBody, Long movieId) throws IOException {
         MovieDetailDTO.ReleaseDatesDTO releaseDatesDTO = objectMapper.readValue(responseBody, MovieDetailDTO.ReleaseDatesDTO.class);
@@ -572,4 +571,25 @@ public class MovieService {
         movieRepository.save(movie);
     }
 
+    // 영화 스틸컷 등록(저장) (어드민페이지)
+
+    public void saveImage(Movie movie, List<MultipartFile> stillCutFiles) throws IOException {
+
+        List<MovieStillCut> stillCuts = new ArrayList<>();
+
+        for (MultipartFile file : stillCutFiles) {
+            MovieStillCut stillCut = new MovieStillCut();
+            stillCut.setStillCutImage(file.getBytes());
+            // stillCut.setStillCuts(경로); // 필요한 경우 설정
+            stillCuts.add(stillCut);
+        }
+
+        movie.setStillCuts(stillCuts);
+        movieRepository.save(movie);
+
+        for (MovieStillCut stillCut : stillCuts) {
+            stillCut.getMovies().add(movie);
+            movieStillCutRepository.save(stillCut);
+        }
+    }
 }
