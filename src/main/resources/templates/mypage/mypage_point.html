@@ -6,37 +6,84 @@
             <h4>적립/사용 내역</h4>
             <div th:if="${not #lists.isEmpty(pointInfo)}">
                 <!-- 첫 번째 요소에 접근하기 위해 getContent() 메서드를 사용하고, 첫 번째 요소 (index 0)를 가져옴 -->
-                <p>잔여 포인트 : <b style="color: #e45649" th:text="${pointInfo.getContent().get(0).currentPoints}+p">2000p</b></p>
+                <p>잔여 포인트 : <b style="color: #e45649"
+                               th:text="${pointInfo.getContent().get(0).currentPoints}+p">2000p</b></p>
             </div>
         </header>
         <table class="default">
-            <tr th:each="point : ${pointInfo}">
-                <td>
+            <tr th:each="point : ${pointInfo}" th:switch="${point.pointType}">
+                <td th:case="'+'">
                     <div>
-                        <p th:text="${point.content}">시네마캐스트 강남점</p>
-                        <p th:switch="${point.pointType}">
-                            <span th:case="'+'" th:text="'적립'">적립</span>
-                            <span th:case="'-'" th:text="'사용'">사용</span>
+                        <p th:text="${point.content}">신규 가입 적립</p>
+                        <p>
+                            <span th:text="'적립'">적립</span>
                         </p>
                     </div>
                     <div>
-                        <p th:text="${point.pointType}+' '+${point.points}+p" >1000p</p>
+                        <p th:text="${point.pointType}+' '+${point.points}+p">1000p</p>
+                        <p th:text="${#temporals.format(point.getRegDate(), 'yyyy-MM-dd HH:mm:ss')}">2024.5.23 14:31</p>
+                    </div>
+                </td>
+                <td th:case="'-'">
+                    <div>
+                        <p th:text="${point.content}">시네마캐스트 강남점</p>
+                        <p>
+                            <span th:text="'사용'">사용</span>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="price_minus" th:text="${point.pointType}+' '+${point.points}+p">1000p</p>
                         <p th:text="${#temporals.format(point.getRegDate(), 'yyyy-MM-dd HH:mm:ss')}">2024.5.23 14:31</p>
                     </div>
                 </td>
             </tr>
-<!--            <tr>-->
-<!--                <td>-->
-<!--                    <div>-->
-<!--                        <p>시네마캐스트 강남점</p>-->
-<!--                        <p>사용</p>-->
-<!--                    </div>-->
-<!--                    <div>-->
-<!--                        <p class="price_minus">3000p</p>-->
-<!--                        <p>2024.5.23 14:30</p>-->
-<!--                    </div>-->
-<!--                </td>-->
-<!--            </tr>-->
         </table>
+
+        <!-- 더보기 버튼 -->
+        <div id="moreContainer" style="text-align: center; margin-top: 15px;" th:if="${pointInfo.hasNext}">
+            <button id="moreBtn" onclick="loadMore()">더보기</button>
+        </div>
+
+        <script th:inline="javascript">
+            $(document).ready(function() {
+                let currentPage = 0; // 현재 페이지 번호
+
+                window.loadMore = function() {
+                    currentPage++; // 다음 페이지로
+                    $.ajax({
+                        url: '/mypage/point/more?page=' + currentPage + '&size=5', // 페이지 정보 포함
+                        type: 'GET',
+                        success: function(data) {
+                            // 데이터를 페이지에 추가하는 로직
+                            // 'data'는 다음 페이지의 내용
+                            // 테이블의 tbody에 새로운 데이터를 추가
+                            let tbody = $('table tbody');
+                            data.content.forEach(point => {
+                                let row = '<tr>';
+                                if(point.pointType === '+') {
+                                    row += '<td><div><p>' + point.content + '</p><p><span>적립</span></p></div><div><p>' + point.pointType + ' ' + point.points + 'p</p><p>' + new Date(point.regDate).toLocaleString() + '</p></div></td>';
+                                } else {
+                                    row += '<td><div><p>' + point.content + '</p><p><span>사용</span></p></div><div><p class="price_minus">' + point.pointType + ' ' + point.points + 'p</p><p>' + new Date(point.regDate).toLocaleString() + '</p></div></td>';
+                                }
+                                row += '</tr>';
+                                tbody.append(row);
+                            });
+
+                            // 다음 페이지가 없으면 '더보기' 버튼 숨김 이라고 하고 싶었는데 이게 제대로 작동을 안함
+                            // if (!data.hasNext) {
+                            //     $('#moreContainer').hide();
+                            // }
+                            // 그래서 다른 방법으로 더보기 버튼 숨김
+                            if(data.content.length < 5) {
+                                $('#moreContainer').hide();
+                            }
+                        },
+                        error: function(error) {
+                            console.log('Error:', error);
+                        }
+                    });
+                }
+            });
+        </script>
     </section>
 </article>

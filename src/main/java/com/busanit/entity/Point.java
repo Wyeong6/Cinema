@@ -21,13 +21,15 @@ public class Point extends BaseTimeEntity {
 
     private String content;
 
-    private String pointType;
+    private Boolean contentType; // 멤버등급에 필요 - 영화면 true, 나머지 false
 
-    private Integer points;
+    private String pointType; // + or -
 
-    private Integer currentPoints;
+    private Integer points; // 해당 포인트
 
-    private Integer totalPoints;
+    private Integer currentPoints; // 합계
+
+    private Integer totalPoints; // 누적
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -38,6 +40,7 @@ public class Point extends BaseTimeEntity {
         Member member = Member.builder().id(memberId).build();
         return Point.builder()
                 .content("신규 가입 적립")
+                .contentType(false)
                 .pointType("+")
                 .points(3000)
                 .currentPoints(3000)

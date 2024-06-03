@@ -54,6 +54,20 @@ public class MypageController {
             userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
         }
 
+        // 사용자의 등급 확인+저장 (수정예정 은 아니고 추가로 다른 곳에도 넣을 예정 - pay쪽에도 넣어야함)
+        long userGradeCount = pointService.getPointMovieCount(memberService.findUserIdx(userEmail));
+        long userEditGrade;
+        if(userGradeCount >= 10) {
+            userEditGrade = 1;
+        } else if(userGradeCount >= 5) {
+            userEditGrade = 2;
+        } else if(userGradeCount >= 3) {
+            userEditGrade = 3;
+        } else {
+            userEditGrade = 4;
+        }
+        memberService.updateGrade(userEditGrade, userEmail);
+
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
@@ -150,6 +164,15 @@ public class MypageController {
         model.addAttribute("pointInfo", pointDTOList);
 
         return "/mypage/mypage_point";
+    }
+
+    @GetMapping("/point/more")
+    @ResponseBody
+    public Slice<PointDTO> getPoints(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = (authentication != null) ? authentication.getName() : null;
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        return pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
     }
 
     @GetMapping("/review")
