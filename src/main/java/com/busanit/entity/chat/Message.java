@@ -39,8 +39,6 @@ public class Message extends BaseTimeEntity {
 
     private String messageTitle;
 
-    private LocalDateTime timestamp;
-
     @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MessageReadStatus> readStatuses = new ArrayList<>();
 

@@ -1,33 +1,25 @@
 package com.busanit.service;
 
-
 import com.busanit.constant.Role;
-import com.busanit.domain.EventDTO;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.chat.MessageDTO;
-import com.busanit.entity.Event;
 import com.busanit.entity.Member;
 import com.busanit.entity.chat.ChatRoom;
 import com.busanit.entity.chat.Message;
-import com.busanit.entity.chat.QChatRoom;
 import com.busanit.repository.ChatRoomRepository;
 import com.busanit.repository.MemberRepository;
 import com.busanit.repository.MessageRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static com.busanit.domain.chat.ChatRoomDTO.toChatRoomDTO;
-import static com.busanit.domain.chat.MessageDTO.toMessageDTO;
-
 
 @Transactional
 @Service
@@ -50,28 +42,31 @@ public class ChatService {
         messageRepository.save(message);
     }
 
-    // 채팅방 목록 페이징 조회
+    // 채팅방 리스트 페이징 조회
     public Page<ChatRoomDTO> getChatList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<ChatRoom> chatRoomPage = chatRoomRepository.findAll(pageable);
 
         List<ChatRoomDTO> chatRoomList = chatRoomPage.getContent().stream()
                 .map(this::convertToChatRoomDTO)
+                .peek(chatRoomDTO -> { // map 대신 peek을 사용하여 DTO 변환 후 처리
+                    int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), chatRoomDTO.getLastReadTimestamp());
+                    chatRoomDTO.setUnreadMessageCount(unreadMessages);
+                })
                 .collect(Collectors.toList());
-
-//        chatRoomList.forEach(chatRoomDTO -> {
-//            int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), chatRoomDTO.getLastReadTimestamp());
-//            chatRoomDTO.setUnreadMessageCount(unreadMessages);
-//        });
 
         return new PageImpl<>(chatRoomList, pageable, chatRoomPage.getTotalElements());
     }
 
-    // 사용자 이메일로 채팅방 목록 조회
+    // 사용자 이메일로 채팅방 메세지 조회
     public List<ChatRoomDTO> findChatRoomByUserEmail(String userEmail) {
         List<ChatRoom> chatRooms = chatRoomRepository.findByMembersEmail(userEmail);
         return chatRooms.stream()
-                .map(chatRoom -> convertToChatRoomDTOWithMessages(chatRoom, userEmail))
+                .map(chatRoom -> {
+                    // 해당 채팅방의 메시지를 가져오면서 읽은 시간을 업데이트
+                    updateLastReadTimestamp(chatRoom.getId());
+                    return convertToChatRoomDTOWithMessages(chatRoom, userEmail);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -134,9 +129,22 @@ public class ChatService {
     }
 
     // 읽지 않은 메시지 계산
-//    private int calculateUnreadMessages(Long chatRoomId, LocalDateTime lastReadTimestamp) {
-//        return messageRepository.countByChatRoomIdAndRegDateAfter(chatRoomId, lastReadTimestamp);
-//    }
+    private int calculateUnreadMessages(Long chatRoomId, LocalDateTime lastReadTimestamp) {
+        if (lastReadTimestamp == null) {
+            // lastReadTimestamp가 null일 경우, 채팅방의 전체 메시지 수를 반환
+            return messageRepository.countByChatRoomId(chatRoomId);
+        } else {
+            // lastReadTimestamp 이후의 메시지 수를 계산하여 반환
+            return messageRepository.countByChatRoomIdAndRegDateAfter(chatRoomId, lastReadTimestamp);
+        }
+    }
+
+    public void updateLastReadTimestamp(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new EntityNotFoundException("ChatRoom not found with id " + chatRoomId));
+        chatRoom.setLastReadTimestamp(LocalDateTime.now());
+        chatRoomRepository.save(chatRoom);
+    }
 
     // ChatRoomDTO 변환
     private ChatRoomDTO convertToChatRoomDTO(ChatRoom chatRoom) {
@@ -147,14 +155,14 @@ public class ChatService {
         String userEmail = userMemberOpt.map(Member::getEmail).orElse("No user found");
         String userName = userMemberOpt.map(Member::getName).orElse("No user found");
 
-        List<MessageDTO> messages = messageRepository.findByChatRoomId(chatRoom.getId()).stream()
+        List<MessageDTO> messageDTOs = messageRepository.findByChatRoomId(chatRoom.getId()).stream()
                 .map(MessageDTO::toMessageDTO)
                 .collect(Collectors.toList());
 
-        return toChatRoomDTO(chatRoom, userEmail, userName, messages);
+        return toChatRoomDTO(chatRoom, userEmail, userName, messageDTOs);
     }
 
-    // 메시지 포함하여 ChatRoomDTO 변환
+    // 메시지 포함한 ChatRoomDTO 변환
     private ChatRoomDTO convertToChatRoomDTOWithMessages(ChatRoom chatRoom, String userEmail) {
         List<Message> messages = messageRepository.findByChatRoomId(chatRoom.getId());
         List<MessageDTO> messageDTOs = messages.stream()
@@ -165,7 +173,6 @@ public class ChatService {
 
         return toChatRoomDTO(chatRoom, userEmail, userName, messageDTOs);
     }
-
 
     //로그인한 유저 검사
     public boolean isAuthenticated() {
@@ -181,12 +188,4 @@ public class ChatService {
         return null;
     }
 
-    //메세지 확인 여부
-    @Transactional
-    public void markAsRead(Long messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid message ID: " + messageId));
-        message.setRead(true);
-        messageRepository.save(message);
-    }
 }

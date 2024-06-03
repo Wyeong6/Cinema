@@ -13,12 +13,11 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository  extends JpaRepository<Message, Long> {
-    //메세지 확인여부
-    List<Message> findByReceiverIdAndIsReadFalse(Long receiverId);
 
     List<Message> findByChatRoomId(Long chatRoomId);
 
     int countByChatRoomIdAndRegDateAfter(Long chatRoomId, LocalDateTime lastReadTime);
 
-//    Page<Message> findAll(Pageable pageable);
+    int countByChatRoomId(Long chatRoomId);
+
 }

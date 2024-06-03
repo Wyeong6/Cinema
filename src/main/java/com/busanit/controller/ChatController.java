@@ -59,7 +59,6 @@ public class ChatController {
     //유저에게 메세지 보내기
     @MessageMapping("/chat/admin")
     public void sendAdminMessage(@Payload MessageDTO messageDTO) {
-        System.out.println("messageDTO" + messageDTO);
         chatService.saveMessage(messageDTO);
 
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private", messageDTO);
@@ -69,7 +68,7 @@ public class ChatController {
     @GetMapping("/chat/private/{userEmail}")
     @ResponseBody
     public List<ChatRoomDTO> fetchMessages(@PathVariable String userEmail) {
-        System.out.println("피지메세지 컨트롤 발동");
+
         return chatService.findChatRoomByUserEmail(userEmail);
     }
 

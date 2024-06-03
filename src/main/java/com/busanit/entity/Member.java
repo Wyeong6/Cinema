@@ -97,7 +97,7 @@ public class Member extends BaseTimeEntity {
 //            }
 //        }
 //    }
-
+    //보낸메세지 연관관계
     public void addSentMessage(Message message) {
         this.sentMessages.add(message);
         if (message.getSender() != this) {
@@ -118,6 +118,7 @@ public class Member extends BaseTimeEntity {
 //            message.setReceiver(null);
 //        }
 //    }
+    //받은 메세지 연관관계
     public void addReceivedMessage(Message message) {
         this.receivedMessages.add(message);
         if (message.getReceiver() != this) {
@@ -130,9 +131,13 @@ public class Member extends BaseTimeEntity {
         this.chatRooms.add(chatRoom);
         chatRoom.getMembers().add(this);
     }
-
-
-
+    //메세지상태 연관관계
+    public void addReadStatus(MessageReadStatus readStatus) {
+        this.readStatuses.add(readStatus);
+        if (readStatus.getMember() != this) {
+            readStatus.setMember(this);
+        }
+    }
     // 리액션 연관관계 및 그외 메서드 시작
     @Transactional
     public void addReaction(Movie movie, ReactionType reactionType) {

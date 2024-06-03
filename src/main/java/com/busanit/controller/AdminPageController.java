@@ -232,7 +232,6 @@ public String eventList(Model model, @RequestParam(defaultValue = "1") int page,
     int startPage = Math.max(1, page - 5);
     int endPage = Math.min(totalPages, page + 4);
 
-
     model.addAttribute("eventList", eventDTO); //이벤트 게시글
     model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
     model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
@@ -242,9 +241,6 @@ public String eventList(Model model, @RequestParam(defaultValue = "1") int page,
     return "admin/admin_event_list";
 
 }
-
-
-
 
 //이벤트 수정 페이지
 @GetMapping("/update")
@@ -297,8 +293,8 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
         noticeService.incrementViewCount(notice);
 
         model.addAttribute("currentPage", currentPage);
-
         model.addAttribute("notice", notice);
+
         return "cs/noticeDetailAdmin";
     }
 
@@ -377,14 +373,4 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
         return "admin/admin_chatModal";
     }
 
-//    //메세지 확인 여부
-//    @PostMapping("/{messageId}/read")
-//    public void markMessageAsRead(@PathVariable Long messageId) {
-//        chatService.markAsRead(messageId);
-//    }
-//
-//    @GetMapping("/unread/{receiverId}")
-//    public List<Message> getUnreadMessages(@PathVariable Long receiverId) {
-//        return messageRepository.findByReceiverIdAndIsReadFalse(receiverId);
-//    }
 }

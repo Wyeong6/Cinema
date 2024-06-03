@@ -21,8 +21,9 @@ public class ChatRoomDTO {
     private String userEmail;
     private String messageTitle;
     List<MessageDTO> messages;
+    //메세지 조회한 시간
     private LocalDateTime lastReadTimestamp;
-    // 읽지 않은 메세지 수를 저장할 필드
+    //읽지 않은 메세지 갯수
     private int unreadMessageCount;
 
     //채팅룸의 해당 메세지도 반환
@@ -33,17 +34,7 @@ public class ChatRoomDTO {
                 .userName(userName)
                 .messageTitle(chatRoom.getTitle())
                 .messages(messageDTOs)
-                .build();
-    }
-
-    //채팅룸 찾을 때 사용
-    public static ChatRoomDTO toChatRoomDTO(ChatRoom chatRoom, String userEmail, String userName) {
-        return ChatRoomDTO.builder()
-                .id(chatRoom.getId())
-                .userEmail(userEmail)
-                .userName(userName)
-                .messageTitle(chatRoom.getTitle())
-                .messages(new ArrayList<>()) // 메시지 정보를 비워두거나 기본값으로 처리
+                .lastReadTimestamp(chatRoom.getLastReadTimestamp())
                 .build();
     }
 }

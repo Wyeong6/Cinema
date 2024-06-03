@@ -24,7 +24,6 @@ public class EventController {
     public String eventList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
         Page<EventDTO> eventDTO = eventService.getEventList(page -1, size);
 
-
         int startPage = Math.max(1, page - 5);
         int endPage = Math.min(eventDTO.getTotalPages(), page + 5);
 
@@ -43,7 +42,4 @@ public class EventController {
         model.addAttribute("event", event);
         return "event/event_get"; // Thymeleaf를 사용한 이벤트 상세 정보 페이지의 이름
     }
-
-
-
 }

@@ -184,6 +184,9 @@ public class MovieController {
     // 리뷰작성 모달
     @RequestMapping("/review/{movieId}")
     public String reviewPopup(@PathVariable("movieId") String movieId, Model model) {
+        String userEmail = movieService2.getUserEmail();
+
+        model.addAttribute("userEmail", userEmail);
         model.addAttribute("movieId", movieId);
         return "movie/review_modal";
     }
