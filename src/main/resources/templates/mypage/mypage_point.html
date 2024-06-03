@@ -10,13 +10,12 @@
             </div>
         </header>
         <table class="default">
-            <tr th:each="point : ${pointInfo}">
-                <td>
+            <tr th:each="point : ${pointInfo}" th:switch="${point.pointType}">
+                <td th:case="'+'">
                     <div>
-                        <p th:text="${point.content}">시네마캐스트 강남점</p>
-                        <p th:switch="${point.pointType}">
-                            <span th:case="'+'" th:text="'적립'">적립</span>
-                            <span th:case="'-'" th:text="'사용'">사용</span>
+                        <p th:text="${point.content}">신규 가입 적립</p>
+                        <p>
+                            <span th:text="'적립'">적립</span>
                         </p>
                     </div>
                     <div>
@@ -24,19 +23,19 @@
                         <p th:text="${#temporals.format(point.getRegDate(), 'yyyy-MM-dd HH:mm:ss')}">2024.5.23 14:31</p>
                     </div>
                 </td>
+                <td th:case="'-'">
+                    <div>
+                        <p th:text="${point.content}">시네마캐스트 강남점</p>
+                        <p>
+                            <span th:text="'사용'">사용</span>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="price_minus" th:text="${point.pointType}+' '+${point.points}+p" >1000p</p>
+                        <p th:text="${#temporals.format(point.getRegDate(), 'yyyy-MM-dd HH:mm:ss')}">2024.5.23 14:31</p>
+                    </div>
+                </td>
             </tr>
-<!--            <tr>-->
-<!--                <td>-->
-<!--                    <div>-->
-<!--                        <p>시네마캐스트 강남점</p>-->
-<!--                        <p>사용</p>-->
-<!--                    </div>-->
-<!--                    <div>-->
-<!--                        <p class="price_minus">3000p</p>-->
-<!--                        <p>2024.5.23 14:30</p>-->
-<!--                    </div>-->
-<!--                </td>-->
-<!--            </tr>-->
         </table>
     </section>
 </article>
