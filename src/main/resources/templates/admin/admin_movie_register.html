@@ -202,6 +202,8 @@
 
         const id = idInput.value.trim();
 
+        console.log("영화 ID:", id);
+
         if (!/^\d{10}$/.test(id)) {
             alert('영화 ID는 10자리를 입력해주세요');
             // 알람 창이 닫힌 후에 포커스를 설정하기 위해 setTimeout 사용
@@ -325,23 +327,20 @@
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Failed to submit form');
+                    return response.text().then(text => { throw new Error(text); });
                 }
-                return response.json();
+                return response.text();
             })
             .then(data => {
                 console.log('Form submitted successfully:', data);
-                // 폼 제출 성공 시 필요한 처리를 여기에 추가
                 alert('영화가 성공적으로 등록되었습니다.');
             })
             .catch(error => {
                 console.error('Error submitting form:', error);
-                // 폼 제출 실패 시 필요한 처리를 여기에 추가
-                alert('폼 제출 중 오류가 발생했습니다.');
+                alert('폼 제출 중 오류가 발생했습니다: ' + error.message);
             });
 
         return false; // 기본 폼 제출 방지
-
     }
 
     // 파일 input 변경 시 이벤트 처리

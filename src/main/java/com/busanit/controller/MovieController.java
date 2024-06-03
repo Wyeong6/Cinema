@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,8 +130,8 @@ public class MovieController {
     }
 
     // 영화 등록 (어드민페이지에서)
-    @PostMapping("admin/movies/regist")
-    public String registMovie(
+    @PostMapping("/movies/regist")
+    public ResponseEntity<String> registMovie(
             @RequestParam("id") Long movieId,
             @RequestParam("title") String movieTitle,
             @RequestParam("overview") String movieOverview,
@@ -144,6 +145,8 @@ public class MovieController {
             @RequestParam("RegisteredStillCut") List<MultipartFile> registeredStillCut,
             Model model
     ) {
+
+        System.out.println("진입체크");
 
         String uploadDir = "C:/uploads/stillCuts/";
 
@@ -179,7 +182,7 @@ public class MovieController {
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("message", "파일 저장 중 오류가 발생했습니다.");
-            return "/admin/admin_layout";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 중 오류가 발생했습니다.");
         }
 
         movieService2.saveMovie(
@@ -190,7 +193,7 @@ public class MovieController {
         // 저장 성공 메시지를 모델에 추가
         model.addAttribute("message", "영화 정보가 성공적으로 등록되었습니다.");
 
-        return "/admin/admin_layout";
+        return ResponseEntity.ok("영화 정보가 성공적으로 등록되었습니다.");
     }
 
 
