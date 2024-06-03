@@ -1,26 +1,38 @@
 <article id="mypage_order">
-        <!-- 주문내역 -->
+    <!-- 주문내역 -->
     <section>
-            <div class="order history">
-                <header style="margin-bottom: 1em">
-                        <h3>스낵 주문 내역</h3>
-                </header>
-                <hr style="top:0; margin-bottom: 1em">
-                <section>
-                    <article class="history_get">
-                        <header>
-                            <h3>2024-05-22</h3>
-                        </header>
-                        <div class="history_data">
-                            <img src="/images/menu/menu1.png" alt="스낵 이미지">
-                            <div>
-                                <h4>주문번호 : </h4>
-                                <p class="snack_nm">팝콘</p>
-                                <p>36,000원 <small style="font-size: 14px">3개</small></p>
-                            </div>
+        <div class="order history">
+            <header style="margin-bottom: 1em">
+                <h3>스낵 주문 내역</h3>
+            </header>
+            <hr style="top:0; margin-bottom: 1em">
+            <section>
+                <article class="history_get" th:each="snackPayment : ${snackPaymentInfo}"
+                         th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
+                    <header>
+                        <h3 th:text="${#temporals.format(snackPayment.getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
+                    </header>
+                    <div class="history_data">
+                        <img alt="스낵 이미지" src="/images/menu/menu1.png">
+                        <div>
+                            <h4 th:text="'주문번호 : SN'+${#temporals.format(snackPayment.getRegDate(), 'yyyyMMdd')}+${snackPayment.id}">
+                                주문번호 : </h4>
+                            <span class="snack_nm" th:text="${snackPayment.getContent()}+' '">팝콘</span><span><small
+                                style="font-size: 14px" th:text="${snackPayment.getCount()}+개">3개</small> </span>
+                            <p th:text="${snackPayment.getPrice()}+원">36,000원 </p>
                         </div>
-                    </article>
-                </section>
-            </div>
-        </section>
+                    </div>
+                </article>
+                <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
+                    <div class="history_data">
+                        <p class="snack_nm">구매하신 스낵이 없습니다.</p>
+                    </div>
+                </article>
+                <!-- 더보기 버튼 -->
+                <div id="moreContainer" style="text-align: center; margin-top: 15px;">
+                    <button id="moreBtn" onclick="loadMore()">더보기</button>
+                </div>
+            </section>
+        </div>
+    </section>
 </article>

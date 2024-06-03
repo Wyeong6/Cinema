@@ -93,6 +93,10 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     List<Point> pointList;
 
+    // 스낵 구매
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    List<SnackPayment> snackPaymentList;
+
     public void addSentMessage(Message message) {
         this.sentMessages.add(message);
         if (message.getSender() != this) {
