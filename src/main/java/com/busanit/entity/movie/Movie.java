@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,10 +48,7 @@ public class Movie {
     private List<MovieImage> images = new ArrayList<>();
 
     //영화 스틸컷 관계
-    @ManyToMany
-    @JoinTable(name = "stillCuts",
-            joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "movie_still_cut_id"))
+    @ManyToMany(mappedBy = "movies", cascade = CascadeType.ALL)
     private List<MovieStillCut> stillCuts = new ArrayList<>();
 
     //댓글 관계

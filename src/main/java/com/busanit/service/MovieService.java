@@ -6,12 +6,9 @@ import com.busanit.domain.MovieStillCutDTO;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieDetail;
 import com.busanit.entity.movie.MovieStillCut;
-import com.busanit.repository.MovieDetailRepository;
-import com.busanit.repository.MovieRepository;
-import com.busanit.repository.MovieStillCutRepository;
+import com.busanit.repository.*;
 import com.busanit.entity.movie.Genre;
 import com.busanit.entity.movie.MovieImage;
-import com.busanit.repository.GenreRepository;
 import com.busanit.util.GenreUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +46,7 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final MovieDetailRepository movieDetailRepository;
     private final MovieStillCutRepository movieStillCutRepository;
+    private final MovieImageRepository movieImageRepository;
     private final GenreRepository genreRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -530,7 +528,7 @@ public class MovieService {
     //어드민 페이지 영화 등록
     public void saveMovie(
             Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
-            String posterImage, String backdropImage, List<String> stillCut, List<String> genres, String video, String runtime) {
+            String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime) {
 
         Movie movie = new Movie();
         movie.setMovieId(movieId);
@@ -562,16 +560,16 @@ public class MovieService {
             movie.addStillCut(stillCutEntity); // 영화에 스틸컷 추가
         }
 
-        MovieImage posterImageEntity = new MovieImage();
-        posterImageEntity.setPosterPath(posterImage);
-        posterImageEntity.setBackdropPath(backdropImage);
-        movie.addImage(posterImageEntity);
+        // 포스터 이미지와 백드롭 이미지를 저장
+        MovieImage movieImage = new MovieImage();
+        movieImage.setPosterPath(registeredPoster);
+        movieImage.setBackdropPath(registeredPoster);
+        movieImageRepository.save(movieImage);
+        movie.addImage(movieImage);
 
 
         movieRepository.save(movie);
     }
-
-    // 영화 스틸컷 등록(저장) (어드민페이지)
 
 
 }

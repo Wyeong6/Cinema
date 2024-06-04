@@ -36,7 +36,6 @@ public class MovieDTO {
     private List<String> Genres;
     private List<String> stillCutPaths;
 
-    private List<MultipartFile> RegisteredStillCut;
 
     public static MovieDTO convertToDTO(Movie movie){
         MovieDTO movieDTO = new MovieDTO();

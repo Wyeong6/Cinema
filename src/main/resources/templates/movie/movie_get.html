@@ -296,7 +296,12 @@
                              th:class="${iterStat.count > 4} ? 'hide stillCut' : 'stillCut'">
                             <article class="col-4 col-12-mobile special still-cut-article">
                                 <a href="#" class="image featured">
-                                    <img th:src="@{'https://image.tmdb.org/t/p/original/' + ${stillCutPath}}" alt="스틸컷"
+                                    <img th:if="${#strings.length(movie.id) == 10}"
+                                         th:src="@{|/${stillCutPath}|}" alt="스틸컷"
+                                         onclick="openModal(this.getAttribute('src'))"
+                                    />
+                                    <img th:unless="${#strings.length(movie.id) == 10}"
+                                         th:src="@{'https://image.tmdb.org/t/p/original/' + ${stillCutPath}}" alt="스틸컷"
                                          onclick="openModal(this.getAttribute('src'))"
                                     />
                                 </a>

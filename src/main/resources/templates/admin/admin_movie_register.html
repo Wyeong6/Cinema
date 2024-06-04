@@ -81,18 +81,18 @@
                                required type="date"/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="posterPath">포스터 이미지</label>
-                        <input class="form-control" id="posterPath" name="posterPath"
-                               placeholder="포스터 이미지명을 입력해주세요. ex) menu1.png" required type="text"/>
+                        <label class="form-label" for="RegisteredPoster">포스터 이미지</label>
+                        <input class="form-control" id="RegisteredPoster" name="RegisteredPoster"
+                               placeholder="포스터 이미지명을 등록해주세요." required type="file" accept=".png, .jpg, .jpeg" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="backdropPath">배경 이미지</label>
-                        <input class="form-control" id="backdropPath" name="backdropPath" placeholder="배경 이미지를 입력해주세요."
-                               required type="text"/>
+                        <label class="form-label" for="RegisteredBackdrop">배경 이미지</label>
+                        <input class="form-control" id="RegisteredBackdrop" name="RegisteredBackdrop" placeholder="배경 이미지를 등록해주세요."
+                               required type="file" accept=".png, .jpg, .jpeg" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="RegisteredStillCut">스틸컷 이미지</label>
-                        <input class="form-control" id="RegisteredStillCut" name="RegisteredStillCut[]" placeholder="스틸컷 이미지를 입력해주세요."
+                        <input class="form-control" id="RegisteredStillCut" name="RegisteredStillCut[]" placeholder="스틸컷 이미지를 등록해주세요."
                                required type="file" accept=".png, .jpg, .jpeg" multiple />
                     </div>
                     <div class="mb-3">
@@ -281,7 +281,7 @@
 
         const stillCutPaths = stillCutPathsInput.value.trim();
         if (stillCutPaths === '') {
-            alert('스틸컷 이미지를 입력해주세요.');
+            alert('스틸컷 이미지를 등록해주세요.');
             setTimeout(() => {
                 stillCutPathsInput.focus();
             }, 0);
@@ -334,11 +334,25 @@
             .then(data => {
                 console.log('Form submitted successfully:', data);
                 alert('영화가 성공적으로 등록되었습니다.');
+
+                resetForm = true;
             })
             .catch(error => {
                 console.error('Error submitting form:', error);
-                alert('폼 제출 중 오류가 발생했습니다: ' + error.message);
-            });
+                if (error.message.includes('이미 존재하는 영화 ID입니다.')) {
+                    alert('이미 존재하는 영화 ID입니다.');
+                } else {
+                    alert('폼 제출 중 오류가 발생했습니다: ' + error.message);
+                }
+            })
+            .finally(() => {
+            // fetch 요청이 완료된 후 폼을 리셋합니다.
+            if (resetForm) {
+                form.reset();
+                genreCheckboxes.forEach(checkbox => checkbox.checked = false);
+                certificationInputs.forEach(input => input.checked = false);
+            }
+        });
 
         return false; // 기본 폼 제출 방지
     }
