@@ -1,6 +1,7 @@
 package com.busanit.domain;
 
 import com.busanit.entity.SnackPayment;
+import com.busanit.service.SnackService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,19 +21,23 @@ public class SnackPaymentDTO {
     private Long price;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
+    private SnackDTO snack; // 스낵 정보 포함
 
     // Slice<Entity> -> Slice<DTO> 변환
-    public static Slice<SnackPaymentDTO> toDTOList(Slice<SnackPayment> snackPaymentList) {
-        Slice<SnackPaymentDTO> snackPaymentDTOList = snackPaymentList.map(entity -> SnackPaymentDTO.builder()
-                .id(entity.getId())
-                .snack_id(entity.getSnack_id())
-                .content(entity.getContent())
-                .count(entity.getCount())
-                .price(entity.getPrice())
-                .regDate(entity.getRegDate())
-                .updateDate(entity.getUpdateDate())
-                .build());
+    public static Slice<SnackPaymentDTO> toDTOList(Slice<SnackPayment> snackPaymentList, SnackService snackService) {
+        return snackPaymentList.map(entity -> {
+            SnackDTO snackDTO = snackService.findSnackById(entity.getSnack_id());
 
-        return snackPaymentDTOList;
+            return SnackPaymentDTO.builder()
+                    .id(entity.getId())
+                    .snack_id(entity.getSnack_id())
+                    .content(entity.getContent())
+                    .count(entity.getCount())
+                    .price(entity.getPrice())
+                    .regDate(entity.getRegDate())
+                    .updateDate(entity.getUpdateDate())
+                    .snack(snackDTO) // SnackDTO 설정
+                    .build();
+        });
     }
 }

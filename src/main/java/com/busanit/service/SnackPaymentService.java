@@ -13,12 +13,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SnackPaymentService {
+
     private final SnackPaymentRepository snackPaymentRepository;
+    private final SnackService snackService;
 
     // 결제 내역
     public Slice<SnackPaymentDTO> getSnackPaymentInfo(Long member_id, Pageable pageable) {
         Slice<SnackPayment> snackPaymentList = snackPaymentRepository.findByMember_Id(member_id, pageable);
 
-        return SnackPaymentDTO.toDTOList(snackPaymentList);
+        return SnackPaymentDTO.toDTOList(snackPaymentList, snackService);
     }
 }

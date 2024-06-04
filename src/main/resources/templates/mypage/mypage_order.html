@@ -13,7 +13,8 @@
                         <h3 th:text="${#temporals.format(snackPayment.getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
                     </header>
                     <div class="history_data">
-                        <img alt="스낵 이미지" src="/images/menu/menu1.png">
+                        <img th:alt="${snackPayment.getSnack().snack_alt}"
+                             th:src="@{/images/menu/{image}(image=${snackPayment.getSnack().snack_image})}">
                         <div>
                             <h4 th:text="'주문번호 : SN'+${#temporals.format(snackPayment.getRegDate(), 'yyyyMMdd')}+${snackPayment.id}">
                                 주문번호 : </h4>
@@ -29,9 +30,56 @@
                     </div>
                 </article>
                 <!-- 더보기 버튼 -->
-                <div id="moreContainer" style="text-align: center; margin-top: 15px;">
+                <div id="moreContainer" style="text-align: center; margin-top: 15px;"
+                     th:if="${snackPaymentInfo.hasNext}">
                     <button id="moreBtn" onclick="loadMore()">더보기</button>
                 </div>
+
+                <script th:inline="javascript">
+                    $(document).ready(function() {
+                        let currentPage = 0; // 현재 페이지 번호
+
+                        window.loadMore = function() {
+                            currentPage++; // 다음 페이지로
+                            $.ajax({
+                                url: '/mypage/order/more?page=' + currentPage + '&size=5', // 페이지 정보 포함
+                                type: 'GET',
+                                success: function(data) {
+                                    // 데이터를 페이지에 추가하는 로직
+                                    let container = $('.history'); // 주문 내역을 추가할 컨테이너
+                                    data.content.forEach(snackPayment => {
+                                        let formattedDate = new Date(snackPayment.regDate).toISOString().split('T')[0]; // 'yyyy-MM-dd' 포맷으로 날짜 변환
+
+                                        let item = `
+                                            <article class="history_get">
+                                                <header>
+                                                    <h3>${formattedDate}</h3>
+                                                </header>
+                                                <div class="history_data">
+                                                    <img alt="${snackPayment.snack.snack_alt}" src="/images/menu/${snackPayment.snack.snack_image}">
+                                                    <div>
+                                                        <h4>주문번호 : SN${formattedDate.replace(/-/g, '')}${snackPayment.id}</h4>
+                                                        <span class="snack_nm">${snackPayment.content} </span>
+                                                        <span><small style="font-size: 14px">${snackPayment.count}개</small></span>
+                                                        <p>${snackPayment.price}원</p>
+                                                    </div>
+                                                </div>
+                                            </article>`;
+                                        container.append(item);
+                                    });
+
+                                    // 다음 페이지가 없으면 더보기 버튼 숨김
+                                    if(data.content.length < 5) {
+                                        $('#moreContainer').hide();
+                                    }
+                                },
+                                error: function(error) {
+                                    console.log('Error:', error);
+                                }
+                            });
+                        }
+                    });
+                </script>
             </section>
         </div>
     </section>
