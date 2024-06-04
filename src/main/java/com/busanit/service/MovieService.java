@@ -563,7 +563,7 @@ public class MovieService {
         // 포스터 이미지와 백드롭 이미지를 저장
         MovieImage movieImage = new MovieImage();
         movieImage.setPosterPath(registeredPoster);
-        movieImage.setBackdropPath(registeredPoster);
+        movieImage.setBackdropPath(registeredBackdrop);
         movieImageRepository.save(movieImage);
         movie.addImage(movieImage);
 

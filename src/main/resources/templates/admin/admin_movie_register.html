@@ -30,7 +30,7 @@
     <div class="col-xl">
         <div class="card mb-4">
             <div class="card-body">
-                <form id="movieForm" action="/movies/regist"  method="post" >
+                <form id="movieForm" action="/movies/regist"  method="post" enctype="multipart/form-data" >
                     <div class="mb-3">
                         <label class="form-label" for="id">영화 ID</label>
                         <input class="form-control" id="id" name="id" placeholder="ID를 입력해주세요."
@@ -190,8 +190,8 @@
     const runtimeInput = document.getElementById('runtime');
     const certificationInputs = document.querySelectorAll('input[name="certifications"]');
     const releaseDateInput = document.getElementById('releaseDate');
-    const posterPathInput = document.getElementById('posterPath');
-    const backdropPathInput = document.getElementById('backdropPath');
+    const posterPathInput = document.getElementById('RegisteredPoster');
+    const backdropPathInput = document.getElementById('RegisteredBackdrop');
     const stillCutPathsInput = document.getElementById('RegisteredStillCut');
     const videoInput = document.getElementById('video');
 

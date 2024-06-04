@@ -163,6 +163,7 @@ public class MovieController {
 
         // 실제 파일 시스템 경로를 설정합니다.
         String uploadDirectory = resourceLoader.getResource("classpath:/static").getFile().getAbsolutePath();
+
         File stillCutDir = new File(uploadDirectory + "/" + stillCutRelativeUploadDir);
         File backdropDir = new File(uploadDirectory + "/" + backdropRelativeUploadDir);
         File posterDir = new File(uploadDirectory + "/" + posterRelativeUploadDir);
@@ -180,8 +181,8 @@ public class MovieController {
 
 
         List<String> stillCutFiles = new ArrayList<>();
-        String posterFilePath = "";
-        String backdropFilePath = "";
+        String posterRelativeFilePath = "";
+        String backdropRelativeFilePath = "";
 
         try {
             // 스틸컷 이미지를 저장
@@ -196,16 +197,16 @@ public class MovieController {
             }
             // 포스터 이미지를 저장
             String posterFileName = registeredPoster.getOriginalFilename();
-            String posterRelativeFilePath = posterRelativeUploadDir + posterFileName;
-            posterFilePath = uploadDirectory + File.separator + posterRelativeFilePath;
+            posterRelativeFilePath = posterRelativeUploadDir + posterFileName;
+            String posterFilePath = uploadDirectory + File.separator + posterRelativeFilePath;
 
             // 파일을 지정된 경로에 저장합니다.
             registeredPoster.transferTo(new File(posterFilePath));
 
             // 백드롭 이미지를 저장
             String backdropFileName = registeredBackdrop.getOriginalFilename();
-            String backdropRelativeFilePath = backdropRelativeUploadDir + backdropFileName;
-            backdropFilePath = uploadDirectory + File.separator + backdropRelativeFilePath;
+            backdropRelativeFilePath = backdropRelativeUploadDir + backdropFileName;
+            String backdropFilePath = uploadDirectory + File.separator + backdropRelativeFilePath;
 
             // 파일을 지정된 경로에 저장합니다.
             registeredBackdrop.transferTo(new File(backdropFilePath));
@@ -219,7 +220,7 @@ public class MovieController {
         try {
             movieService2.saveMovie(
                     movieId, movieTitle, movieOverview, movieReleaseDate, certifications,
-                    posterFilePath, backdropFilePath, stillCutFiles, genres, video, runtime
+                    posterRelativeFilePath, backdropRelativeFilePath, stillCutFiles, genres, video, runtime
             );
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
