@@ -13,7 +13,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class OAuth2MemberDTO extends User implements OAuth2User {
-    private String id;
+    private String id; // username (idx 아님)
     private String email;
     private String password;
     private String age;
