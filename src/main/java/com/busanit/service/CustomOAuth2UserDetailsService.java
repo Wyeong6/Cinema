@@ -3,6 +3,7 @@ package com.busanit.service;
 import com.busanit.constant.Role;
 import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.entity.Member;
+import com.busanit.entity.Point;
 import com.busanit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,6 +27,8 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MemberService memberService;
+    private final PointService pointService;
 
     // 매서드 재정의로 만듦
     @Override
@@ -89,6 +92,9 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
             // DB에 회원정보 저장(회원가입 처리)
             memberRepository.save(member);
+
+            // 회원가입으로 member 생성 후 해당 멤버 id를 FK로 point란 생성
+            pointService.savePoint(Point.createPoint(memberService.findUserIdx(email)));
 
             OAuth2MemberDTO oAuth2MemberDTO = new OAuth2MemberDTO(
                     email, "1111", email, true, "1",

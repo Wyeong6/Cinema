@@ -1,10 +1,7 @@
 package com.busanit.controller;
 
 import com.busanit.domain.*;
-import com.busanit.service.CommentService;
-import com.busanit.service.FavoriteMovieService;
-import com.busanit.service.MemberService;
-import com.busanit.service.PointService;
+import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +41,7 @@ public class MypageController {
     private final PasswordEncoder passwordEncoder;
     private final FavoriteMovieService favoriteMovieService;
     private final PointService pointService;
+    private final SnackPaymentService snackPaymentService;
     private final ObjectMapper objectMapper;
 
     @GetMapping("/")
@@ -108,6 +106,11 @@ public class MypageController {
         };
         model.addAttribute("myPageGrade", gradeString);
 
+        // 최근 스낵 주문 내역
+        Slice<SnackPaymentDTO> snackPaymentDTOList = null;
+        snackPaymentDTOList = snackPaymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
+        model.addAttribute("snackPaymentInfo", snackPaymentDTOList);
+
         return "/mypage/mypage_main";
     }
 
@@ -118,9 +121,28 @@ public class MypageController {
     }
 
     @GetMapping("/order")
-    public String mypageOrder() {
+    public String mypageOrder(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+
+        // 사용자의 주문내역
+        Slice<SnackPaymentDTO> snackPaymentDTOList = null;
+        snackPaymentDTOList = snackPaymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
+        model.addAttribute("snackPaymentInfo", snackPaymentDTOList);
 
         return "/mypage/mypage_order";
+    }
+
+    @GetMapping("/order/more")
+    @ResponseBody
+    public Slice<SnackPaymentDTO> getOrders(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = (authentication != null) ? authentication.getName() : null;
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        return snackPaymentService.getSnackPaymentInfo(memberRegFormDTO.getId(), pageable);
     }
 
     @GetMapping("/membership")
