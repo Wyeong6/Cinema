@@ -1,8 +1,8 @@
 package com.busanit.service;
 
-import com.busanit.domain.MovieDTO;
-import com.busanit.domain.MovieDetailDTO;
-import com.busanit.domain.MovieStillCutDTO;
+import com.busanit.domain.movie.MovieDTO;
+import com.busanit.domain.movie.MovieDetailDTO;
+import com.busanit.domain.movie.MovieStillCutDTO;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieDetail;
 import com.busanit.entity.movie.MovieStillCut;

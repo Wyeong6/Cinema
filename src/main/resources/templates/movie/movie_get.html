@@ -10,72 +10,55 @@
     <link rel="stylesheet" href="/assets/css/custom.css"/>
     <link rel="stylesheet" href="/assets/css/custom_player.css"/>
     <link rel="stylesheet" href="/assets/css/nav.css"/>
-
     <meta property="og:title" content="${movie.title}">
     <meta property="og:description" id="og-description" content="">
     <meta property="og:url" content="http://localhost:8080/movies/${eventId}">
     <meta property="og:image" content="https://image.tmdb.org/t/p/original' + ${movie.posterPath}}">
-
-
     <noscript>
         <link rel="stylesheet" href="/assets/css/noscript.css"/>
     </noscript>
     <!--    댓글-->
     <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
     <style>
-
         .fav-icon {
             width: 33px !important;
             height: 30px !important;
             cursor: pointer;
             transition: background-color 0.3s; /* 부드러운 색상 전환 효과 */
-
         }
-
-
         .favorite-container {
             display: flex;
             justify-content: center;
         }
-
         .favorited {
             filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-50deg) drop-shadow(0 0 3px rgba(255, 0, 0, 0.5)); /* 빨간색으로 변환 */
         }
-
-
-
         /* 리액션 관련 css 시작 */
         .active {
             width: 50px !important;
             height: 50px !important;
             filter: drop-shadow(0 0 3px #597aff) drop-shadow(0 0 4px #597aff) drop-shadow(0 0 5px #597aff); /* 이미지 부분만 그림자 적용가능하게함 (필터로) */
         }
-
         #likeButton {
             width: 50px !important;
             height: 50px !important;
         }
-
         #dislikeButton {
             width: 50px !important;
             height: 50px !important;
         }
-
         #sadButton {
             width: 50px !important;
             height: 50px !important;
         }
-
         #funnyButton {
             width: 50px !important;
             height: 50px !important;
         }
-
         #scaryButton {
             width: 50px !important;
             height: 50px !important;
         }
-
         .reaction-container {
             display: flex;
             justify-content: space-between;

@@ -68,7 +68,7 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MessageReadStatus> readStatuses = new ArrayList<>();
 
-    //채팅룸
+    //채팅룸 연관관계
     @ManyToMany
     @JoinTable(name = "member_chatroom",
             joinColumns = @JoinColumn(name = "member_id"),
@@ -79,7 +79,7 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteMovie> favoriteMovies = new ArrayList<>();
 
-    //멤버와 댓글 연관관계
+    //댓글 연관관계
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comment = new ArrayList<>();
 
@@ -87,7 +87,19 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MovieReaction> reactions = new ArrayList<>();
 
-//    //회원 삭제시 채팅룸 삭제
+    //공지사황 연관관계
+
+
+    //보낸메세지 연관관계
+    public void addSentMessage(Message message) {
+        this.sentMessages.add(message);
+        if (message.getSender() != this) {
+            message.setSender(this);
+        }
+    }
+
+
+    //    //회원 삭제시 채팅룸 삭제
 //    @PreRemove
 //    private void preRemove() {
 //        for (ChatRoom chatRoom : chatRooms) {
@@ -97,13 +109,6 @@ public class Member extends BaseTimeEntity {
 //            }
 //        }
 //    }
-    //보낸메세지 연관관계
-    public void addSentMessage(Message message) {
-        this.sentMessages.add(message);
-        if (message.getSender() != this) {
-            message.setSender(this);
-        }
-    }
 //
 //    public void removeSentMessage(Message message) {
 //        this.sentMessages.remove(message);

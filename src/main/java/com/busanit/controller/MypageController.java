@@ -1,6 +1,6 @@
 package com.busanit.controller;
 
-import com.busanit.domain.CommentDTO;
+import com.busanit.domain.movie.CommentDTO;
 import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.domain.OAuth2MemberDTO;
@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

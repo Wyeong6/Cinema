@@ -113,7 +113,7 @@
             var eventId = $(this).data('id');
             var pageNumber = $(this).data('page');
             setPageNumber(pageNumber);
-            sendRequest('/admin/update', { eventId: eventId }, function(response) {
+            sendRequest('/admin/eventUpdate', { eventId: eventId }, function(response) {
                 $('.container-xxl').html(response);
             });
         });
@@ -133,7 +133,7 @@
             e.preventDefault();
             var eventId = $(this).data('id');
             var pageNumber = $(this).data('page');
-            sendRequest('/admin/delete/' + eventId + '?pageNumber=' + pageNumber, {}, function(response) {
+            sendRequest('/admin/eventDelete/' + eventId + '?pageNumber=' + pageNumber, {}, function(response) {
                 console.log('Event deleted successfully');
                 $('.container-xxl').html(response);
                 setPageNumber(pageNumber, true);

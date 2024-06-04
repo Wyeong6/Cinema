@@ -1,9 +1,8 @@
 package com.busanit.service;
 
-import com.busanit.domain.CommentDTO;
+import com.busanit.domain.movie.CommentDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.movie.Comment;
-import com.busanit.domain.CommentSummaryDTO;
 import com.busanit.entity.movie.Movie;
 import com.busanit.repository.CommentRepository;
 import com.busanit.repository.MemberRepository;
@@ -15,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

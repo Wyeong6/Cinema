@@ -260,15 +260,16 @@
         $('.event_reg_btn').on('click', function () {
             $('.container-xxl').load('/admin/eventRegister');
         });
-        //이벤트 목록페이지
+        //이벤트 목록
         $('.event_btn').on('click', function () {
             $('.container-xxl').load('/admin/eventList');
         });
-        // 공지사항 관리
+        //공지사항 추가
         $('.notice_reg_btn').on('click', function(e) {
             e.preventDefault()
-            $('.container-xxl').load('/admin/notice/add');
+            $('.container-xxl').load('/admin/noticeRegister');
         });
+        //공지사항 목록
         $('.notice_btn').on('click', function() {
             $('.container-xxl').load('/admin/noticeList');
         });

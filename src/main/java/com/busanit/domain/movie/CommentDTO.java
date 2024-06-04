@@ -1,6 +1,5 @@
-package com.busanit.domain;
+package com.busanit.domain.movie;
 
-import com.busanit.entity.Member;
 import com.busanit.entity.movie.Comment;
 import lombok.Builder;
 import lombok.Getter;
