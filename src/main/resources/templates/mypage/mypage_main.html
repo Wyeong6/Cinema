@@ -27,7 +27,6 @@
             <header style="margin-bottom: 0.5em">
                 <div>
                     <h3>최근 영화 예매 내역</h3>
-                    <p>최근 1개월 간 구매하신 내역 입니다</p>
                 </div>
                 <a>전체 예매 내역 조회 ></a>
             </header>
@@ -55,23 +54,30 @@
             <header style="margin-bottom: 0.5em">
                 <div>
                     <h3>최근 스낵 주문 내역</h3>
-                    <p>최근 1개월 간 구매하신 내역 입니다</p>
                 </div>
-                <a>전체 주문 내역 조회 ></a>
+                <a id="AllOrderInfo">전체 주문 내역 조회 ></a>
             </header>
             <hr style="top:0; margin-bottom: 0.5em">
             <section>
-                <article class="history_get">
+                <article class="history_get" th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
                     <header>
-                        <h3>2024-05-22</h3>
+                        <h3 th:text="${#temporals.format(snackPaymentInfo.getContent().get(0).getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
                     </header>
                     <div class="history_data">
-                        <img alt="스낵 이미지" src="/images/menu/menu1.png">
+                        <img th:alt="${snackPaymentInfo.getContent().get(0).getSnack().snack_alt}"
+                             th:src="@{/images/menu/{image}(image=${snackPaymentInfo.getContent().get(0).getSnack().snack_image})}">
                         <div>
-                            <h4>주문번호 : </h4>
-                            <p class="snack_nm">팝콘</p>
-                            <p>36,000원 <small style="font-size: 14px">3개</small></p>
+                            <h4 th:text="'주문번호 : SN'+${#temporals.format(snackPaymentInfo.getContent().get(0).getRegDate(), 'yyyyMMdd')}+${snackPaymentInfo.getContent().get(0).id}">
+                                주문번호 : </h4>
+                            <span class="snack_nm" th:text="${snackPaymentInfo.getContent().get(0).getContent()}+' '">팝콘</span><span><small
+                                style="font-size: 14px" th:text="${snackPaymentInfo.getContent().get(0).getCount()}+개">3개</small> </span>
+                            <p th:text="${snackPaymentInfo.getContent().get(0).getPrice()}+원">36,000원 </p>
                         </div>
+                    </div>
+                </article>
+                <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
+                    <div class="history_data">
+                        <p class="snack_nm">구매하신 스낵이 없습니다.</p>
                     </div>
                 </article>
             </section>
@@ -93,5 +99,10 @@
                 }
             })
         })
+
+        // 주문내역조회 버튼 클릭 이벤트 설정
+        $('#AllOrderInfo').click(function() {
+            $('#content').load('/mypage/order');
+        });
     });
 </script>
