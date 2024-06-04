@@ -37,6 +37,7 @@ public class AdminPageController {
     private final EventService eventService;
     private final ChatService chatService;
     private final NoticeService noticeService;
+
     @GetMapping("/adminMain")
     public String adminMain() {
         return "admin/admin_layout";
@@ -44,7 +45,7 @@ public class AdminPageController {
 
     /*기존 adminPage 삭제예정*/
     @GetMapping("/adminMain2")
-    public String adminMain2(){
+    public String adminMain2() {
         return "admin/testAdminMain";
     }
 
@@ -54,7 +55,7 @@ public class AdminPageController {
     }
 
     @PostMapping("/member")
-    public String memberManagement(){
+    public String memberManagement() {
         return "admin/adminMemberManagementPage";
     }
 
@@ -89,10 +90,14 @@ public class AdminPageController {
     }
 
     @GetMapping("/scheduleList")
-    public String scheduleList() { return "admin/admin_schedule_list"; }
+    public String scheduleList() {
+        return "admin/admin_schedule_list";
+    }
 
     @GetMapping("/scheduleRegister")
-    public String scheduleRegister() { return "admin/admin_schedule_register"; }
+    public String scheduleRegister() {
+        return "admin/admin_schedule_register";
+    }
 
     @GetMapping("/snackList")
     public String snackList(Model model,
@@ -137,12 +142,12 @@ public class AdminPageController {
     public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult, Model model) {
 
         model.addAttribute("urlLoad", "/admin/snackRegister"); // javascript load function 에 필요함
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "admin/admin_snack_register";
         }
         try {
             snackService.saveSnack(Snack.toEntity(snackDTO));
-        } catch(IllegalStateException e) {
+        } catch (IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }
 
@@ -193,61 +198,73 @@ public class AdminPageController {
 
     //이벤트 등록페이지 이동
     @GetMapping("/eventRegister")
-    public String eventRegPage() { return "admin/admin_event_register"; }
+    public String eventRegPage() {
+        return "admin/admin_event_register";
+    }
+
     //이벤트 등록 기능
     @PostMapping("/eventRegister")
     public String eventRegister(@Valid EventDTO eventDTO, BindingResult bindingResult, Model model) {
 
         model.addAttribute("urlLoad", "/admin/eventRegister");
-        if (bindingResult.hasErrors()) {return "admin/admin_event_register";}
+        if (bindingResult.hasErrors()) {
+            return "admin/admin_event_register";
+        }
+
+        // 중복 체크 로직 추가
+        if (eventService.isDuplicate(eventDTO.getEventDetail(), eventDTO.getEventName())) {
+            return "admin/admin_layout";
+        }
+
         eventService.saveEvent(eventDTO);
 
         return "admin/admin_layout";
     }
 
-@GetMapping("/eventList")
-public String eventList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
-    Page<EventDTO> eventDTO = eventService.getEventList(page -1 , size);
+    @GetMapping("/eventList")
+    public String eventList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+        Page<EventDTO> eventDTO = eventService.getEventList(page - 1, size);
 
-    int totalPages = eventDTO.getTotalPages();
-    int startPage = Math.max(1, page - 5);
-    int endPage = Math.min(totalPages, page + 4);
+        int totalPages = eventDTO.getTotalPages();
+        int startPage = Math.max(1, page - 5);
+        int endPage = Math.min(totalPages, page + 4);
 
-    model.addAttribute("eventList", eventDTO); //이벤트 게시글
-    model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
-    model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
-    model.addAttribute("startPage", startPage);
-    model.addAttribute("endPage", endPage);
+        model.addAttribute("eventList", eventDTO); //이벤트 게시글
+        model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
+        model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
 
-    return "admin/admin_event_list";
+        return "admin/admin_event_list";
 
-}
+    }
 
-//이벤트 수정 페이지
-@GetMapping("/eventUpdate")
-public String editEvent(@RequestParam(name = "eventId") long eventId, Model model) {
+    //이벤트 수정 페이지
+    @GetMapping("/eventUpdate")
+    public String editEvent(@RequestParam(name = "eventId") long eventId, Model model) {
 
-    EventDTO event = eventService.getEvent(eventId);
-    model.addAttribute("event", event);
+        EventDTO event = eventService.getEvent(eventId);
+        model.addAttribute("event", event);
 
-    return "admin/admin_event_update"; // 수정 페이지로 이동
-}
-//이벤트 수정 기능
-@PostMapping("/eventUpdate")
-public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int pageNumber) {
+        return "admin/admin_event_update"; // 수정 페이지로 이동
+    }
 
-    eventService.updateEvent(eventDTO);
+    //이벤트 수정 기능
+    @PostMapping("/eventUpdate")
+    public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int pageNumber) {
 
-    return "redirect:/admin/eventList?page=" + pageNumber;
-}
+        eventService.updateEvent(eventDTO);
 
-//이벤트 삭제기능
-@GetMapping("/eventDelete/{id}")
+        return "redirect:/admin/eventList?page=" + pageNumber;
+    }
+
+    //이벤트 삭제기능
+    @GetMapping("/eventDelete/{id}")
     public String deleteEvent(@PathVariable("id") Long eventId, @RequestParam int pageNumber) {
 
         eventService.delete(eventId);
 
-    return "redirect:/admin/eventList?page=" + pageNumber;
+        return "redirect:/admin/eventList?page=" + pageNumber;
     }
 
     @PostMapping("/help")
@@ -267,14 +284,23 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
     public String noticeRegister(@Valid NoticeDTO noticeDTO, BindingResult bindingResult, Model model) {
 
         model.addAttribute("urlLoad", "/admin/noticeRegister");
-        if (bindingResult.hasErrors()) {return "admin/admin_notice_register";}
+        if (bindingResult.hasErrors()) {
+            return "admin/admin_notice_register";
+        }
+
+        // 중복 체크 로직 추가
+        if (noticeService.isDuplicate(noticeDTO.getNoticeTitle(), noticeDTO.getNoticeContent())) {
+            return "admin/admin_layout";
+        }
+
         noticeService.saveNotice(noticeDTO);
-        return "admin/admin_notice_list";
+        return "admin/admin_layout";
     }
+
     //공지사항 리스트
     @GetMapping("/noticeList")
-    public String noticeList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size){
-        Page<NoticeDTO> noticeDTO = noticeService.getNoticeList(page -1 , size);
+    public String noticeList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+        Page<NoticeDTO> noticeDTO = noticeService.getNoticeList(page - 1, size);
 
         int totalPages = noticeDTO.getTotalPages();
         int startPage = Math.max(1, page - 5);
@@ -287,6 +313,25 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
         model.addAttribute("endPage", endPage);
 
         return "admin/admin_notice_list";
+    }
+
+    //공지사항 수정 페이지
+    @GetMapping("/noticeUpdatePage")
+    public String noticeEdit(@RequestParam(name = "noticeId") long noticeId, Model model) {
+
+        NoticeDTO notice = noticeService.getEvent(noticeId);
+        model.addAttribute("notice", notice);
+
+        return "admin/admin_notice_update"; // 수정 페이지로 이동
+    }
+
+    //공지사항 수정 기능
+    @PostMapping("/noticeUpdate")
+    public String updateEvent(@ModelAttribute NoticeDTO noticeDTO, @RequestParam int pageNumber) {
+
+        noticeService.updateEvent(noticeDTO);
+
+        return "redirect:/admin/noticeList?page=" + pageNumber;
     }
 
 
@@ -361,13 +406,14 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
 
     //채팅리스트
     @GetMapping("/chatList")
-    public String chatList(){
+    public String chatList() {
         return "admin/admin_chatList";
     }
+
     @GetMapping("/api/chatList")
     @ResponseBody
-    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size){
-        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page-1, size);
+    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
+        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size);
 
         int totalPages = chatRoom.getTotalPages();
         int startPage = Math.max(1, page - 5);
@@ -385,7 +431,7 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
 
     //채팅 모달창
     @GetMapping("/chatModal")
-    public String chatModal(){
+    public String chatModal() {
         return "admin/admin_chatModal";
     }
 

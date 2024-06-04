@@ -20,6 +20,7 @@ public class NoticeDTO {
     @NotNull
     private String noticeContent;
     private String memberEmail;
+    private int viewCount;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
 
@@ -30,6 +31,7 @@ public class NoticeDTO {
                 .noticeTitle(notice.getNoticeTitle())
                 .noticeContent(notice.getNoticeContent())
                 .memberEmail(notice.getMemberEmail())
+                .viewCount(notice.getViewCount())
                 .regDate(notice.getRegDate())
                 .updateDate(notice.getUpdateDate())
                 .build();

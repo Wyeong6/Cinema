@@ -13,10 +13,10 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-	<meta property="og:title" content="${event.event_name}">
-	<meta property="og:description" content="${event.event_detail}">
+	<meta property="og:title" content="${event.eventName}">
+	<meta property="og:description" content="${event.eventDetail}">
 	<meta property="og:url" content="http://localhost:8080/event_get/${eventId}">
-	<meta property="og:image" content="http://localhost:8080/images/event/${event.event_image}">
+	<meta property="og:image" content="http://localhost:8080/images/event/${event.eventImage}">
 
 
 	<link href="/assets/css/main.css" rel="stylesheet"/>
@@ -37,12 +37,12 @@
 			<div class="container">
 				<article id="main" class="special">
 					<header>
-						<h2 th:text="${event.event_name}">이벤트 제목</h2>
+						<h2 th:text="${event.eventName}">이벤트 제목</h2>
 						<p th:text="${event.regDate}">이벤트 등록 날짜</p>
 					</header>
 					<section>
-						<img id="input-file" th:src="@{'/images/event/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/>
-						<p class="event-detail" th:text="${event.event_detail}">
+						<img id="input-file" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/>
+						<p class="event-detail" th:text="${event.eventDetail}">
 							이벤트 상세 내용
 						</p>
 						<div class="btn_box">

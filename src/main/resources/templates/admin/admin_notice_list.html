@@ -109,7 +109,7 @@
             var noticeId = $(this).data('id');
             var pageNumber = $(this).data('page');
             setPageNumber(pageNumber);
-            sendRequest('/admin/noticeUpdate', { noticeId: noticeId }, function(response) {
+            sendRequest('/admin/noticeUpdatePage', { noticeId: noticeId }, function(response) {
                 $('.container-xxl').html(response);
             });
         });

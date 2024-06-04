@@ -8,6 +8,7 @@ import com.busanit.entity.Notice;
 import com.busanit.entity.movie.Comment;
 import com.busanit.repository.MemberRepository;
 import com.busanit.repository.NoticeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,7 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository;
 
-
+    //공지사항 저장
     public void saveNotice(NoticeDTO noticeDTO){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -43,7 +45,7 @@ public class NoticeService {
 
         noticeRepository.save(notice);
     }
-
+    //공지사항 리스트
     public Page<NoticeDTO> getNoticeList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("noticeId").ascending());
         Page<Notice> noticePage = noticeRepository.findAll(pageable);
@@ -53,4 +55,28 @@ public class NoticeService {
         return new PageImpl<>(noticeDTOList, pageable, noticePage.getTotalElements());
     }
 
+    //업데이트 할 데이터를 페이지에 표시
+    public NoticeDTO getEvent(Long noticeId){
+        Notice notice = noticeRepository.findById(noticeId).orElseThrow(() -> new NullPointerException("notice null"));
+        notice.setViewCount(notice.getViewCount() + 1);
+        return NoticeDTO.toDTO(notice);
+    }
+    //업데이트기능
+    public void updateEvent(NoticeDTO noticeDTO) {
+        Notice notice = noticeRepository.findById(noticeDTO.getNoticeId())
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + noticeDTO.getNoticeId()));
+
+        notice.update(noticeDTO);
+        noticeRepository.save(notice);
+    }
+    //삭제
+    public void delete(Long noticeId){
+        noticeRepository.deleteById(noticeId);
+
+    }
+
+    // 중복 체크 메서드 추가
+    public boolean isDuplicate(String noticeTitle, String noticeContent) {
+        return noticeRepository.existsByNoticeTitleAndNoticeContent(noticeTitle, noticeContent);
+    }
 }

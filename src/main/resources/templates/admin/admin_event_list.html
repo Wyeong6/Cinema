@@ -62,10 +62,10 @@
                         <tr  th:each="event : ${eventList}">
                             <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.id}"></strong></td>
                             <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.memberEmail}"></strong></td>
-                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.event_name}"></strong></td>
-                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.event_detail}"></strong></td>
-                            <td><img th:src="@{'/images/event/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/></td>
-                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.event_alt}"></strong></td>
+                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.eventName}"></strong></td>
+                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.eventDetail}"></strong></td>
+                            <td><img th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/></td>
+                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${event.eventAlt}"></strong></td>
                             <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${#temporals.format(event.regDate, 'yyyy-MM-dd')}"></strong></td>
                             <td style="text-align: right; width: 50px;">
                             <a class="update-btn" th:data-page="${currentPage}" th:data-id="${event.id}">

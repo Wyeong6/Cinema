@@ -64,7 +64,8 @@ public class EventService {
 
     }
 
-
-
-
+    // 중복 체크 메서드 추가
+    public boolean isDuplicate(String eventDetail, String eventName) {
+        return eventRepository.existsByEventDetailAndEventName(eventDetail, eventName);
+    }
 }

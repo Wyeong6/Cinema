@@ -11,5 +11,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Page<Event> findAll(Pageable pageable);
 
+    boolean existsByEventDetailAndEventName(String eventDetail, String eventName);
 
 }

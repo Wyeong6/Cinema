@@ -1,5 +1,6 @@
 package com.busanit.entity;
 
+import com.busanit.domain.EventDTO;
 import com.busanit.domain.NoticeDTO;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,8 +21,8 @@ public class Notice extends BaseTimeEntity{
     private Long noticeId;
     private String memberEmail;
     private String noticeTitle;
-
     private String noticeContent;
+    private int viewCount;
 
     @ManyToMany
     @JoinTable(
@@ -43,5 +44,12 @@ public class Notice extends BaseTimeEntity{
                .noticeContent(noticeDTO.getNoticeContent())
                .memberEmail(noticeDTO.getMemberEmail())
                .build();
+    }
+
+    public void update(NoticeDTO noticeDTO) {
+        this.memberEmail = noticeDTO.getMemberEmail();
+        this.noticeTitle = noticeDTO.getNoticeTitle();
+        this.noticeContent = noticeDTO.getNoticeContent();
+        this.viewCount = noticeDTO.getViewCount();
     }
 }
