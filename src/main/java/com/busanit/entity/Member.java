@@ -76,7 +76,7 @@ public class Member extends BaseTimeEntity {
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
     // 영화 찜
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<FavoriteMovie> favoriteMovies = new ArrayList<>();
 
     //댓글 연관관계
@@ -87,9 +87,6 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MovieReaction> reactions = new ArrayList<>();
 
-    //공지사황 연관관계
-
-
     //보낸메세지 연관관계
     public void addSentMessage(Message message) {
         this.sentMessages.add(message);
@@ -97,8 +94,6 @@ public class Member extends BaseTimeEntity {
             message.setSender(this);
         }
     }
-
-
     //    //회원 삭제시 채팅룸 삭제
 //    @PreRemove
 //    private void preRemove() {
@@ -123,7 +118,15 @@ public class Member extends BaseTimeEntity {
 //            message.setReceiver(null);
 //        }
 //    }
-    //받은 메세지 연관관계
+
+    // 포인트
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    List<Point> pointList;
+
+    // 스낵 구매
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    List<SnackPayment> snackPaymentList;
+
     public void addReceivedMessage(Message message) {
         this.receivedMessages.add(message);
         if (message.getReceiver() != this) {
@@ -183,8 +186,6 @@ public class Member extends BaseTimeEntity {
         favoriteMovies.remove(favoriteMovie);
         favoriteMovie.setMember(null);
     }
-
-
 
     // 일반 폼 회원 생성
     public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {

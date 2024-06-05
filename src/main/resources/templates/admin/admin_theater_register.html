@@ -18,35 +18,35 @@
     <div class="col-xl">
         <div class="card mb-4">
             <div class="card-body schedule_reg">
-                <form method="post" action="/admin/theaterRegister">
+                <form id="theater-form" method="post" action="/admin/theaterRegister">
                     <div class="mb-3">
                         <label class="form-label" for="theater_name">상영관 지점명</label>
                         <input class="form-control" id="theater_name" name="theaterName" placeholder="상영관 지점명을 입력해주세요." required type="text"/>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label" for="theater_name_eng">상영관 지점명(ENG)</label>
+                        <input class="form-control" id="theater_name_eng" name="theaterNameEng" placeholder="상영관 지점명을 영어로 입력해주세요." required type="text"/>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">지역</label>
                         <div id="button-group">
-                            <button class="button btn" type="button" value="서울">서울</button>
-                            <button class="button btn" type="button" value="인천 / 경기">인천 / 경기</button>
-                            <button class="button btn" type="button" value="강원">강원</button>
-                            <button class="button btn" type="button" value="부산 / 울산 / 경남">부산 / 울산 / 경남</button>
-                            <button class="button btn" type="button" value="대구 / 경북">대구 / 경북</button>
-                            <button class="button btn" type="button" value="광주 / 전라">광주 / 전라</button>
-                            <button class="button btn" type="button" value="대전 / 충청">대전 / 충청</button>
-                            <button class="button btn" type="button" value="제주">제주</button>
-                            <input type="hidden" value="" name="region" id="region_value"/>
+                            <button class="button btn" type="button" value="Seo">서울</button>
+                            <button class="button btn" type="button" value="Inc">인천 / 경기</button>
+                            <button class="button btn" type="button" value="Gan">강원</button>
+                            <button class="button btn" type="button" value="Bus">부산 / 울산 / 경남</button>
+                            <button class="button btn" type="button" value="Dae">대구 / 경북</button>
+                            <button class="button btn" type="button" value="Gwa">광주 / 전라</button>
+                            <button class="button btn" type="button" value="Chu">대전 / 충청</button>
+                            <button class="button btn" type="button" value="Jeju">제주</button>
                         </div>
-
+                        <input type="hidden" value="" name="region" id="region_value" required />
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="theater_cnt">상영관 갯수</label>
                         <div class="select-theater-cnt">
-                            <input class="form-control" id="theater_cnt" name="theaterCount" type="number"
-                                   placeholder="상영관 갯수를 입력해주세요." min="1" style="width: 90%" />
+                            <input class="form-control" id="theater_cnt" name="theaterCount" type="number" placeholder="상영관 갯수를 입력해주세요." min="1" style="width: 90%" required />
                             <button class="button btn" type="button" onclick="createSeatInputs(event)">선택</button>
                         </div>
-                    </div>
-                    <div>
                         <div id="seat-inputs" class="row"></div>
                     </div>
                     <button class="btn btn-primary" type="submit">등록하기</button>
@@ -57,95 +57,86 @@
 </div>
 
 <script>
-    let selectedButton = null;
-
     $(document).ready(function () {
+        let selectedButton = null;
         $('#button-group').on('click', '.button.btn', function () {
-            // 이전에 선택된 버튼에서 active-btn 클래스 제거
             if (selectedButton) {
-                selectedButton.classList.remove('active-btn');
+                selectedButton.removeClass('active-btn');
             }
-            // 현재 클릭된 버튼에 active-btn 클래스 추가
-            this.classList.add('active-btn');
-            // 선택된 버튼의 텍스트 내용을 region_value의 값으로 설정
-            if (this.textContent.trim() !== "") {
-                $('#region_value').val(this.textContent);
-            }
-            // 선택된 버튼 정보 업데이트
-            selectedButton = this;
+            $(this).addClass('active-btn');
+            $('#region_value').val($(this).val());
+            selectedButton = $(this);
         });
 
+        $('#theater-form').submit(function (event) {
+            const theaterName = $('#theater_name').val().trim();
+            const theaterNameEng = $('#theater_name_eng').val().trim();
+            const regionValue = $('#region_value').val();
+
+            if (!regionValue) {
+                event.preventDefault();
+                alert('지역을 선택해주세요.');
+                return;
+            }
+
+            $.ajax({
+                url: '/admin/theaterList',
+                type: 'GET',
+                dataType: 'json',
+                async: false,
+                success: function (response) {
+                    const theaters = response.dto;
+                    const savedTheaterNames = theaters.map(theater => theater.theaterName);
+                    const savedTheaterNamesEng = theaters.map(theater => theater.theaterNameEng);
+
+                    if (savedTheaterNames.includes(theaterName) || savedTheaterNamesEng.includes(theaterNameEng)) {
+                        event.preventDefault();
+                        alert('중복된 상영관 지점명이 있습니다. 다른 이름을 입력해주세요.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error getting DTO:', error);
+                }
+            });
+        });
     });
 
     function createSeatInputs(event) {
-        event.preventDefault(); // 기본 동작 방지
-        console.log('createSeatInputs function called'); // 함수 호출 확인 메시지
-
+        event.preventDefault();
         const theaterCount = parseInt(document.getElementById('theater_cnt').value);
         const seatInputsDiv = document.getElementById('seat-inputs');
-
-        // 기존에 생성된 자식 요소들 삭제
         seatInputsDiv.innerHTML = '';
 
-        // 데이터를 저장할 배열
-        const dataToSend = [];
-
-        // 각 상영관에 대한 입력 생성
         for (let i = 1; i <= theaterCount; i++) {
-            // 각 상영관 별 입력 요소 묶음 생성
             const theaterDiv = document.createElement('div');
-            theaterDiv.classList.add('col-4', 'mb-3'); // col-4와 mb-3 클래스 추가
+            theaterDiv.classList.add('col-4', 'mb-3');
 
-            // 상영관 번호 입력 생성
             const theaterNumberInput = document.createElement('input');
-            theaterNumberInput.setAttribute('type', 'number');
-            theaterNumberInput.setAttribute('name', 'theaterNumber[]');
-            theaterNumberInput.value = i.toString(); // 상영관 번호 설정
-            theaterNumberInput.style.display = 'none'; // 상영관 번호 입력 숨기기
+            theaterNumberInput.setAttribute('type', 'hidden');
+            theaterNumberInput.setAttribute('name', 'theaterNumbers[' + (i - 1) + '].theaterNumber');
+            theaterNumberInput.value = i.toString();
             theaterDiv.appendChild(theaterNumberInput);
 
-            // 상영관 별 좌석 수 입력 생성
             const theaterNameLabel = document.createElement('label');
             theaterNameLabel.textContent = i + '관';
+            theaterDiv.appendChild(theaterNameLabel);
+
             const seatsInput = document.createElement('input');
             seatsInput.classList.add('form-control');
             seatsInput.setAttribute('type', 'number');
-            seatsInput.setAttribute('name', 'seatsPerTheater[]');
+            seatsInput.setAttribute('name', 'theaterNumbers[' + (i - 1) + '].seatsPerTheater');
+            seatsInput.setAttribute('required', 'required');
             seatsInput.setAttribute('placeholder', `${i}관의 좌석 수를 입력하세요.`);
-            theaterDiv.appendChild(theaterNameLabel);
+            seatsInput.setAttribute('min', '50');
             theaterDiv.appendChild(seatsInput);
 
-            // 상영관 별 입력 요소 묶음을 전체 입력 요소에 추가
             seatInputsDiv.appendChild(theaterDiv);
-
-            // 데이터를 배열에 추가
-            const data = {
-                theaterNumber: i,
-                seatsPerTheater: seatsInput.value // 좌석 수 입력 값
-            };
-            dataToSend.push(data);
         }
-
-        // 서버로 데이터 전송 (Ajax) - 상영관 데이터 및 지역 정보 저장
-        $.ajax({
-            url: '/saveTheaterData', // 엔터티에 데이터를 저장할 엔드포인트 URL
-            type: 'POST', // POST 방식으로 전송
-            contentType: 'application/json', // 전송 데이터 타입을 JSON으로 설정
-            data: JSON.stringify({
-                theaters: dataToSend // 상영관 데이터 정보
-            }),
-            success: function (response) {
-                // 서버로부터 응답을 받았을 때 실행할 코드
-                console.log('Data saved successfully:', response);
-            },
-            error: function (xhr, status, error) {
-                // 요청이 실패했을 때 실행할 코드
-                console.error('Error saving data:', error);
-            }
-        });
     }
-
 </script>
 
 <!-- Bootstrap JS (Optional) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+

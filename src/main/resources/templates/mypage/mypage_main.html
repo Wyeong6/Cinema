@@ -1,17 +1,23 @@
 <article id="mypage_main">
     <header id="mypage_main_header">
-        <h2 style="font-size: 2em"><b>user</b>님 반갑습니다.</h2>
+        <h2 style="font-size: 2em"><b th:text="${myPageMemberInfo.name}">user</b>님 반갑습니다.</h2>
         <div class="user_info">
             <div>
-                <img src="/images/grade/green.png" alt="멤버십 등급 이미지">
+                <img alt="멤버십 등급 이미지" th:src="@{/images/grade/{image}.png(image=${myPageGrade})}">
                 <div>
-                    <p>user님의 등급은 <b>green</b> 입니다</p>
-                    <button class="button membership_btn">등급혜택 보기</button>
+                    <p>
+                        <span th:text="${myPageMemberInfo.name}">user</span>님의 등급은 <b th:text="${myPageGrade}">green</b> 입니다.
+                    </p>
+                    <button class="button membership_btn" id="membership_btn">등급혜택 보기</button>
                 </div>
             </div>
             <div class="point">
                 <p>포인트</p>
-                <p style="color: #e45649; font-weight: 600">1400p</p>
+                <!-- 첫 번째 요소에 접근하기 위해 getContent() 메서드를 사용하고, 첫 번째 요소 (index 0)를 가져옴 -->
+                <p style="color: #e45649; font-weight: 600" th:text="${pointInfo.getContent().get(0).currentPoints}+p"
+                   th:unless="${pointInfo == null or pointInfo.isEmpty()}">0p</p>
+                <p style="color: #e45649; font-weight: 600" th:if="${pointInfo == null or pointInfo.isEmpty()}"
+                   th:text="0p">0p</p>
             </div>
         </div>
     </header>
@@ -21,7 +27,6 @@
             <header style="margin-bottom: 0.5em">
                 <div>
                     <h3>최근 영화 예매 내역</h3>
-                    <p>최근 1개월 간 구매하신 내역 입니다</p>
                 </div>
                 <a>전체 예매 내역 조회 ></a>
             </header>
@@ -32,7 +37,7 @@
                         <h3>2024-05-23</h3>
                     </header>
                     <div class="history_data">
-                        <img src="/images/movieposter.webp" alt="영화 포스터">
+                        <img alt="영화 포스터" src="/images/movieposter.webp">
                         <div>
                             <h4>예매번호 : </h4>
                             <p>범죄도시 4</p>
@@ -49,26 +54,55 @@
             <header style="margin-bottom: 0.5em">
                 <div>
                     <h3>최근 스낵 주문 내역</h3>
-                    <p>최근 1개월 간 구매하신 내역 입니다</p>
                 </div>
-                <a>전체 주문 내역 조회 ></a>
+                <a id="AllOrderInfo">전체 주문 내역 조회 ></a>
             </header>
             <hr style="top:0; margin-bottom: 0.5em">
             <section>
-                <article class="history_get">
+                <article class="history_get" th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
                     <header>
-                        <h3>2024-05-22</h3>
+                        <h3 th:text="${#temporals.format(snackPaymentInfo.getContent().get(0).getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
                     </header>
                     <div class="history_data">
-                        <img src="/images/menu/menu1.png" alt="스낵 이미지">
+                        <img th:alt="${snackPaymentInfo.getContent().get(0).getSnack().snack_alt}"
+                             th:src="@{/images/menu/{image}(image=${snackPaymentInfo.getContent().get(0).getSnack().snack_image})}">
                         <div>
-                            <h4>주문번호 : </h4>
-                            <p class="snack_nm">팝콘</p>
-                            <p>36,000원 <small style="font-size: 14px">3개</small></p>
+                            <h4 th:text="'주문번호 : SN'+${#temporals.format(snackPaymentInfo.getContent().get(0).getRegDate(), 'yyyyMMdd')}+${snackPaymentInfo.getContent().get(0).id}">
+                                주문번호 : </h4>
+                            <span class="snack_nm" th:text="${snackPaymentInfo.getContent().get(0).getContent()}+' '">팝콘</span><span><small
+                                style="font-size: 14px" th:text="${snackPaymentInfo.getContent().get(0).getCount()}+개">3개</small> </span>
+                            <p th:text="${snackPaymentInfo.getContent().get(0).getPrice()}+원">36,000원 </p>
                         </div>
+                    </div>
+                </article>
+                <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
+                    <div class="history_data">
+                        <p class="snack_nm">구매하신 스낵이 없습니다.</p>
                     </div>
                 </article>
             </section>
         </div>
     </section>
 </article>
+
+<script th:inline="javascript">
+    $(document).ready(function() {
+        $('#membership_btn').click(function(e) {
+            $.ajax({
+                type: 'GET',
+                url: '/mypage/membership',
+                success: function(response) {
+                    $('#content').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('btn click Error:', error);
+                }
+            })
+        })
+
+        // 주문내역조회 버튼 클릭 이벤트 설정
+        $('#AllOrderInfo').click(function() {
+            $('#content').load('/mypage/order');
+        });
+    });
+</script>

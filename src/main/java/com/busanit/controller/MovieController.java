@@ -1,9 +1,15 @@
 package com.busanit.controller;
 
+
 import com.busanit.domain.movie.MovieDTO;
+import com.busanit.domain.SnackDTO;
 import com.busanit.service.MovieService;
+import com.busanit.service.SnackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -11,33 +17,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 public class MovieController {
 
     private final MovieService movieService2;
+    private final SnackService snackService;
 
     @Transactional
     @GetMapping("/")
-    public String getDetailMovies(Model model) throws IOException {
-
-        // 메인페이지에 상영작 / 상영예정작을 오늘날짜 기준 2개월 전 / 후 로 나눌려고 추가한 날짜 변수들.
-        LocalDate today = LocalDate.now();
-        LocalDate twoMonthsAgo = today.minusMonths(2);
-        LocalDate twoMonthsLater = today.plusMonths(2);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-//        movieService2.fetchAndStoreMoviesNowPlaying();
-//        movieService2.fetchAndStoreMoviesUpcoming();
-//        movieService2.fetchAndStoreMovieRuntimeAndReleaseData();
-//        movieService2.fetchAndStoreMovieStillCuts();
-//        movieService2.fetchAndStoreCertificationData();
+    public String getDetailMovies(Model model, @PageableDefault(size = 8, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
         //비디오가 있는 인기순영화
         List<MovieDTO> videoMovies = movieService2.getCachedVideoMovies();
@@ -46,33 +37,22 @@ public class MovieController {
         //모든 영화
         List<MovieDTO> allMovies = movieService2.getCachedAllMovies();
 
-        //모든 영화에서 개봉일자가 2개월 전 부터 오늘날짜 까지인거만 가져옴 즉 현재 상영작임.
-        List<MovieDTO> filteredMovies = allMovies.stream()
-                .filter(movie -> {
-                    String releaseDateString = movie.getReleaseDate(); // Assuming getReleaseDate() returns String
-                    if (releaseDateString != null && !releaseDateString.isEmpty()) {
-                        LocalDate releaseDate = LocalDate.parse(releaseDateString, formatter);
-                        return !releaseDate.isBefore(twoMonthsAgo) && !releaseDate.isAfter(today);
-                    }
-                    return false;
-                }).collect(Collectors.toList());
+        //모든 영화에서 개봉일자가 4개월 전 부터 오늘날짜 까지인거만 가져옴 즉 현재 상영작임.
+        List<MovieDTO> filteredMovies = movieService2.getFilteredMovies(allMovies,false);
         model.addAttribute("allMovies", filteredMovies);
 
-        //모든 영화에서 개봉일자가 오늘날짜부터 2개월 후 까지인거만 가져옴 즉 상영예정작(개봉예정)임.
-        List<MovieDTO> filteredUpcomingMovies = allMovies.stream()
-                .filter(movie -> {
-                    String releaseDateString = movie.getReleaseDate(); // Assuming getReleaseDate() returns String
-                    if (releaseDateString != null && !releaseDateString.isEmpty()) {
-                        LocalDate releaseDate = LocalDate.parse(releaseDateString, formatter);
-                        return !releaseDate.isBefore(today) && !releaseDate.isAfter(twoMonthsLater);
-                    }
-                    return false;
-                }).collect(Collectors.toList());
+        //모든 영화에서 개봉일자가 오늘날짜부터 4개월 후 까지인거만 가져옴 즉 상영예정작(개봉예정)임.
+        List<MovieDTO> filteredUpcomingMovies = movieService2.getFilteredMovies(allMovies, true);
         model.addAttribute("upcomingMovies", filteredUpcomingMovies);
 
         //인기순
         List<MovieDTO> hotMovies = movieService2.getCachedHotMovies();
         model.addAttribute("hotMovies", hotMovies);
+
+        //스낵스토어
+        Page<SnackDTO> snackDTOList = null;
+        snackDTOList = snackService.getSnackList(pageable);
+        model.addAttribute("snackList", snackDTOList);
 
         return "main";
     }
@@ -83,7 +63,7 @@ public class MovieController {
     public String nowMovies(Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "12") int size) {
-        Page<MovieDTO> moviePage = movieService2.getMoviesPagingAndSorting(page, size);
+        Page<MovieDTO> moviePage = movieService2.getCurrentMoviesPagingAndSorting(page, size);
         model.addAttribute("moviePage", moviePage);
         return "movie/movie_list_now";
     }
@@ -96,17 +76,6 @@ public class MovieController {
         model.addAttribute("moviePage", upcomingMoviesPage);
         return "movie/movie_list_comming";
     }
-
-
-
-//    //개봉예정 페이지
-//    @GetMapping("/comingMoves")
-//    public String hotMove(@RequestParam(value = "page", defaultValue = "1") int page, Model model) throws IOException {
-//        Pageable pageable = PageRequest.of(page - 1, 12); // 1페이지부터 시작하도록 조정
-//        Page<MovieDTO> upcomingMoviesPage = movieService2.getUpcomingMoviesPagingAndSorting(page, size);
-//        model.addAttribute("moviePage", upcomingMoviesPage);
-//        return "movie/movie_list_comming";
-//    }
 
     //디테일페이지
     @GetMapping("/movies/{movieId}")
@@ -133,44 +102,6 @@ public class MovieController {
         return "movie/movie_get";
     }
 
-//    // 업코밍 디테일
-//    @GetMapping("/upcoming/{movieId}")
-//    public String upcomingDetailinfo(@ModelAttribute Movie movie,Model model) throws IOException {
-//        System.out.println("movieId = " + movie.getMovieId());
-//        System.out.println("title = " + movie.getTitle());
-//
-//        String userEmail = movieService2.getUserEmail();
-//
-//        List<MovieDTO> upcomingMovies = movieService2.fetchAndStoreMoviesUpcoming();
-//
-//        System.out.println("업커밍 무비즈 = -----------" + upcomingMovies);
-//
-//        System.out.println("업커밍 디테일 인포 modelAttribute로 받아온 movie = " + movie);
-//
-//        MovieDTO matchingMovie = movieService2.findMovieById((movie.getMovieId()));
-//
-//        System.out.println("matchingMovie ===== " + matchingMovie);
-//
-//        for (MovieDTO movieDTO : upcomingMovies) {
-//            if (movieDTO.getId().equals(movie.getMovieId()) || movieDTO.getTitle().equals(movie.getTitle())) {
-//                matchingMovie = movieDTO;
-//                break;
-//            }
-//        }
-//
-//        // 필터링된 영화 정보를 모델에 추가
-////        if (matchingMovie != null) {
-////            model.addAttribute("movieInfos", matchingMovie);
-////        }
-////        model.addAttribute("movieId", movie.getMovieId());
-//
-//        model.addAttribute("movieInfos", matchingMovie);
-//        model.addAttribute("movieId", movie.getMovieId());
-//        model.addAttribute("userEmail", userEmail);
-//
-//        return "movie/movie_get";
-//    }
-//
 
     @GetMapping("/movies/get")
     public String test(Model model) {
@@ -186,6 +117,15 @@ public class MovieController {
         model.addAttribute("movieId", movieId);
         return "movie/review_modal";
     }
+
+    // 검색 기능
+    @GetMapping("/search")
+    public String searchMovies(@RequestParam("query") String query, Model model) {
+        List<MovieDTO> searchResults = movieService2.searchMovies(query);
+        model.addAttribute("searchResults", searchResults);
+        return "movie/movie_search";
+    }
+
 }
 
 

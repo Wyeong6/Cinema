@@ -92,3 +92,41 @@ div.mb-3 {
     padding: 0.5em 1em;
     margin-top: 0.5em;
 }
+/* 관리자페이지 상영관 삭제 버튼 */
+.delete_form_btn {
+    width: 3em;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: -1.5em -1.5em 0 0;
+}
+.card.mb-4 {
+    margin-top: 1em;
+    margin-right: 1em;
+}
+#item-delete-btn {
+    width: 1em;
+}
+.seats-column-group {
+    display: flex;
+    flex-direction: row;
+}
+/* paging_btn */
+ .paging_btn {
+     display: block;
+     width: 100%;
+     margin-top: 3%;
+ }
+.paging_btn ul {
+    margin: 0 auto;
+    width: 20%;
+    display: flex;
+    justify-content: space-between;
+}
+.paging_btn ul li {
+    /*margin-right: 1%;*/
+    list-style-type: none;
+}
+.theater-list-table th, td {
+    width: 15%;
+}

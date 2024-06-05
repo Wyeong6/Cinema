@@ -2151,7 +2151,7 @@ progress {
   padding-top: calc(0.4375rem + 1px);
   padding-bottom: calc(0.4375rem + 1px);
   margin-bottom: 0;
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.53;
   color: #566a7f;
@@ -6312,6 +6312,11 @@ label.btn {
   background-color: #788393;
   border-color: #788393;
   transform: translateY(-1px);
+}
+.btn-secondary.checked {
+  color: #fff;
+  background-color: #788393;
+  border-color: #788393;
 }
 .btn-check:focus + .btn-secondary, .btn-secondary:focus, .btn-secondary.focus {
   color: #fff;
