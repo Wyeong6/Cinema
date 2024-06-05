@@ -187,10 +187,17 @@
                             <div class="movie_info_background">
                                 <header id="get_info">
                                     <a href="#" class="image featured">
-                                        <img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}"
-                                             alt="영화포스터"
+                                        <img th:if="${#strings.length(movie.id) == 10}"
+                                             th:src="@{|/${movie.posterPath}|}" alt="영화포스터"
+                                             onclick="openModal(this.getAttribute('src'))"
+                                             style="width: 400px; height: 600px;"
+                                        />
+                                        <img th:unless="${#strings.length(movie.id) == 10}"
+                                             th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
                                              th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
-                                             style="width: 400px; height: 600px;"/></a>
+                                             style="width: 400px; height: 600px;"
+                                        />
+                                    </a>
                                     <div class="movie_info">
                                         <header class="info_header">
                                             <h2 th:text="${movie.title}" class="movie_title"></h2>

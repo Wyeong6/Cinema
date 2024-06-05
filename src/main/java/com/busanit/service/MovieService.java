@@ -3,15 +3,12 @@ package com.busanit.service;
 import com.busanit.domain.MovieDTO;
 import com.busanit.domain.MovieDetailDTO;
 import com.busanit.domain.MovieStillCutDTO;
-import com.busanit.entity.movie.Movie;
-import com.busanit.entity.movie.MovieDetail;
-import com.busanit.entity.movie.MovieStillCut;
+import com.busanit.entity.movie.*;
 import com.busanit.repository.*;
-import com.busanit.entity.movie.Genre;
-import com.busanit.entity.movie.MovieImage;
 import com.busanit.util.GenreUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.oauth2.sdk.id.Actor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
@@ -47,6 +44,7 @@ public class MovieService {
     private final MovieDetailRepository movieDetailRepository;
     private final MovieStillCutRepository movieStillCutRepository;
     private final MovieImageRepository movieImageRepository;
+    private final MovieActorRepository movieActorRepository;
     private final GenreRepository genreRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -57,6 +55,7 @@ public class MovieService {
     private List<MovieDTO> cachedVideoMovies = new ArrayList<>();
     private List<MovieDTO> cachedAllMovies = new ArrayList<>();
     private List<MovieDTO> cachedHotMovies = new ArrayList<>();
+    private List<MovieDTO> cachedActors = new ArrayList<>();
     private LocalDate lastFetchDate = LocalDate.now().minusDays(1);
 
     // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
@@ -69,8 +68,10 @@ public class MovieService {
         fetchAndStoreMovieRuntimeAndReleaseData();
         fetchAndStoreMovieStillCuts();
         fetchAndStoreCertificationData();
+//        fetchKoreanActors(); 지우지마세요
 
         // 데이터 캐시 갱신
+//        cachedActors = fetchKoreanActors(); 지우지마세요
         cachedVideoMovies = getVideoMovies();
         cachedAllMovies = getAll();
         cachedHotMovies = getHotMovies();
@@ -356,6 +357,7 @@ public class MovieService {
         }
     }
 
+    // 영화 관람등급 정보
     public void fetchAndStoreCertificationData() throws IOException {
         List<Long> movieIds = getAllMovieIds(); // 모든 movie ID를 가져오는 메서드
         for (Long movieId : movieIds) {
@@ -365,6 +367,52 @@ public class MovieService {
                 String responseBody = response.body().string();
                 processCertificationResponse(responseBody, movieId);
             }
+        }
+    }
+
+    // 영화 배우 가져오기
+    public void fetchKoreanActors() throws IOException {
+        int totalPages = fetchTotalPages();
+        List<MovieActor> koreanActors = new ArrayList<>();
+
+        for (int page = 1; page <= totalPages; page++) {
+            String url = "https://api.themoviedb.org/3/person/popular?language=ko-KR&page=" + page + "&api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                JsonNode results = getResultsFromResponse(responseBody);
+
+                if (results.isArray()) {
+                    for (JsonNode node : results) {
+                        String name = node.get("name").asText();
+                        if (isKoreanName(name)) {
+                            int gender = node.get("gender").asInt();
+                            String profilePath = node.get("profile_path").asText(null);
+                            MovieActor actor = new MovieActor(name, getGender(gender), profilePath);
+                            koreanActors.add(actor);
+                            movieActorRepository.save(actor);  // Save to database
+                        }
+                    }
+                }
+            }
+        }
+
+        koreanActors.forEach(System.out::println);
+    }
+
+    private boolean isKoreanName(String name) {
+        return name.matches(".*[가-힣].*");
+    }
+
+    private static String getGender(int genderCode) {
+        switch (genderCode) {
+            case 1:
+                return "남자";
+            case 2:
+                return "여자";
+            default:
+                return "Not specified";
         }
     }
 
@@ -458,6 +506,13 @@ public class MovieService {
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // 지우지마세요
+//    public List<MovieDTO> getActors() {
+//        List<MovieActor> movieActors = movieActorRepository.findAll();
+//        return movieActors.stream().map(MovieDTO::convertToDTO)
+//                .collect(Collectors.toList());
+//    }
 
     //로그인되어있는 유저 email받아오기
     public String getUserEmail() {
@@ -572,4 +627,7 @@ public class MovieService {
     }
 
 
+    public boolean checkIfMovieIdExists(String id) {
+        return movieRepository.existsById(Long.valueOf(id));
+    }
 }

@@ -36,6 +36,12 @@ public class MovieDTO {
     private List<String> Genres;
     private List<String> stillCutPaths;
 
+    // 영화 배우 관련
+    private String name;
+    private String gender;
+    @JsonProperty("profile_path")
+    private String profilePic;
+
 
     public static MovieDTO convertToDTO(Movie movie){
         MovieDTO movieDTO = new MovieDTO();

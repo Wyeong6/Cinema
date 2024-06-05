@@ -31,7 +31,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -233,6 +235,17 @@ public class MovieController {
         model.addAttribute("message", "영화 정보가 성공적으로 등록되었습니다.");
         return ResponseEntity.ok("영화 정보가 성공적으로 등록되었습니다.");
     }
+
+    // 아이디 중복확인 버튼용
+    @GetMapping("/movies/checkId")
+    @ResponseBody
+    public Map<String, Boolean> checkMovieId(@RequestParam("id") String id) {
+        Map<String, Boolean> response = new HashMap<>();
+        boolean exists = movieService2.checkIfMovieIdExists(id);
+        response.put("exists", exists);
+        return response;
+    }
+
 }
 
 

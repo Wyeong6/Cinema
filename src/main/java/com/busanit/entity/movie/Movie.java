@@ -1,18 +1,11 @@
 package com.busanit.entity.movie;
 
 
-import com.busanit.entity.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -51,6 +44,11 @@ public class Movie {
     @ManyToMany(mappedBy = "movies", cascade = CascadeType.ALL)
     private List<MovieStillCut> stillCuts = new ArrayList<>();
 
+    // 배우 관계
+    @ManyToMany(mappedBy = "movies", cascade= CascadeType.ALL)
+    private List<MovieActor> actors = new ArrayList<>();
+
+
     //댓글 관계
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
@@ -72,6 +70,10 @@ public class Movie {
         favoriteMovie.setMovie(null);
     }
 
+    public void addActor(MovieActor actor) {
+        this.actors.add(actor);
+        actor.getMovies().add(this);
+    }
 
     public void addComment(Comment comment){
         this.comment.add(comment);
