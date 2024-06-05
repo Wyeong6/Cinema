@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Cinemacast</title>
@@ -11,21 +10,22 @@
     <link rel="stylesheet" href="/assets/css/custom.css"/>
     <link rel="stylesheet" href="/assets/css/custom_player.css"/>
     <link rel="stylesheet" href="/assets/css/nav.css"/>
+    <meta property="og:title" content="${movie.title}">
+    <meta property="og:description" id="og-description" content="">
+    <meta property="og:url" content="http://localhost:8080/movies/${eventId}">
+    <meta property="og:image" content="https://image.tmdb.org/t/p/original' + ${movie.posterPath}}">
     <noscript>
         <link rel="stylesheet" href="/assets/css/noscript.css"/>
     </noscript>
     <!--    댓글-->
-
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
     <style>
-
         .fav-icon {
             width: 33px !important;
             height: 30px !important;
             cursor: pointer;
             transition: background-color 0.3s; /* 부드러운 색상 전환 효과 */
-
         }
-
 
         .favorite-container {
             display: flex;
@@ -35,8 +35,6 @@
         .favorited {
             filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-50deg) drop-shadow(0 0 3px rgba(255, 0, 0, 0.5)); /* 빨간색으로 변환 */
         }
-
-
 
         /* 리액션 관련 css 시작 */
         .active {
@@ -202,15 +200,18 @@
                                         <header class="info_header">
                                             <h2 th:text="${movie.title}" class="movie_title"></h2>
                                             <a href="#" class="button" style="height: 3em;">예매하기</a>
-                                            <a id="videoModalBtn" th:data-video-id="${movie.video}" href="#" class="button" style="height: 3em;">트레일러 보기</a>
+                                            <a id="videoModalBtn" th:data-video-id="${movie.video}" href="#"
+                                               class="button" style="height: 3em;">트레일러 보기</a>
                                         </header>
                                         <br>
+                                        <!--<div class="movie_detail">-->
                                         <div>
                                             <span th:text="${movie.releaseDate}">releasedate</span>
                                             <span th:text="${#strings.arrayJoin(movie.genres, ', ')}"></span>
                                             <span th:text="${movie.runtime} + '분'">runtime</span>
                                             <img id="certification-image" src="" alt="영화심의등급 이미지">
-                                            <span id="certification" th:text="${movie.certifications}">certification</span>
+                                            <span id="certification"
+                                                  th:text="${movie.certifications}">certification</span>
                                         </div>
 
 
@@ -221,27 +222,32 @@
 
                                         <div class="reaction-container">
                                             <div class="reaction-item">
-                                                <img id="likeButton" src="/images/like.png" alt="재밌어요" onclick="react('LIKE')">
+                                                <img id="likeButton" src="/images/like.png" alt="재밌어요"
+                                                     onclick="react('LIKE')">
                                                 <p>재미있어요</p>
                                                 <span class="count like-count">0</span>
                                             </div>
                                             <div class="reaction-item">
-                                                <img id="dislikeButton" src="/images/dislike.png" alt="재미없어요" onclick="react('DISLIKE')">
+                                                <img id="dislikeButton" src="/images/dislike.png" alt="재미없어요"
+                                                     onclick="react('DISLIKE')">
                                                 <p>재미없어요</p>
                                                 <span class="count dislike-count">0</span>
                                             </div>
                                             <div class="reaction-item">
-                                                <img id="sadButton" src="/images/sad.png" alt="슬퍼요" onclick="react('SAD')">
+                                                <img id="sadButton" src="/images/sad.png" alt="슬퍼요"
+                                                     onclick="react('SAD')">
                                                 <p>슬퍼요</p>
                                                 <span class="count sad-count">0</span>
                                             </div>
                                             <div class="reaction-item">
-                                                <img id="funnyButton" src="/images/funny.png" alt="웃겨요" onclick="react('FUNNY')">
+                                                <img id="funnyButton" src="/images/funny.png" alt="웃겨요"
+                                                     onclick="react('FUNNY')">
                                                 <p>웃겨요</p>
                                                 <span class="count funny-count">0</span>
                                             </div>
                                             <div class="reaction-item">
-                                                <img id="scaryButton" src="/images/scary.png" alt="무서워요" onclick="react('SCARY')">
+                                                <img id="scaryButton" src="/images/scary.png" alt="무서워요"
+                                                     onclick="react('SCARY')">
                                                 <p>무서워요</p>
                                                 <span class="count scary-count">0</span>
                                             </div>
@@ -265,7 +271,8 @@
                                             <div class="movie_data">
                                                 <h4>찜하기</h4>
                                                 <div class="favorite-container">
-                                                    <img id="favoriteButton" class="fav-icon" src="/images/heart%20icon.png" alt="찜하기(좋아요)">
+                                                    <img id="favoriteButton" class="fav-icon"
+                                                         src="/images/heart%20icon.png" alt="찜하기(좋아요)">
                                                 </div>
                                             </div>
                                         </div>
@@ -334,8 +341,17 @@
                     <span class="close" onclick="closeModal()">&times;</span>
                     <img class="modal-content" id="modalImage">
                 </div>
+                <div class="btn_box">
+                    <a href="javascript:shareMessage()">
+                        <button type="button" class="kakao_btn">
+                            <img src="/img/front/icon/kakao_sh.png" alt="카카오톡 공유">
+                        </button>
+                    </a>
+                    <span>카카오톡 공유</span>
+                </div>
             </div>
         </div>
+
     </div>
 
     <!-- Scripts -->
@@ -381,7 +397,7 @@
                 const certificationValue = certificationElement.textContent;
                 const imgElement = document.getElementById('certification-image');
 
-                switch(certificationValue) {
+                switch (certificationValue) {
                     case '12세 이상 관람가':
                         imgElement.src = '/images/ratings/12.png';
                         break;
@@ -393,7 +409,7 @@
                         imgElement.src = '/images/ratings/18.png';
                         break;
                     default:
-                        imgElement.src ='/images/ratings/all.svg';
+                        imgElement.src = '/images/ratings/all.svg';
                 }
 
                 // 감독 정보 출력 (이미지 포함)
@@ -521,7 +537,7 @@
         /* 유튜브 트레일러 관련 모달 시작 */
 
         // 자바스크립트에서 타임리프를 이용한 변수 가져오기위한 코드 포함
-            document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             var openModalButton = document.getElementById('videoModalBtn');
             if (openModalButton) {
                 openModalButton.addEventListener('click', function () {
@@ -600,7 +616,7 @@
                 url: `/movies/hasCommented/${movieId}`,
                 method: 'GET',
                 dataType: 'json',
-                success: function(hasCommented, textStatus, xhr) {
+                success: function (hasCommented, textStatus, xhr) {
                     console.log("hasCommented 값:", hasCommented);
 
                     if (hasCommented) {
@@ -615,16 +631,17 @@
                         }, 500); // 0.5초마다 상태 확인
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     if (xhr.status === 401) {
                         alert("로그인해주세요.");
-                        }else {
+                    } else {
                         console.error("댓글 작성 여부를 확인하는 중 오류가 발생했습니다:", error);
 
                     }
                 }
             });
         }
+
         //            댓글리스트    --------------------------------------------------
         const loadComments = () => {
             const emojiMap = {
@@ -633,59 +650,59 @@
                 3: '😐',
                 4: '😊',
                 5: '😍'
-                };
-
-                $.ajax({
-                    url: `/movies/` + movieId,
-                    method: 'GET',
-                    dataType: 'json',
-                    success: (data) => {
-                        console.log(data)
-                        //평점
-                        const movieDataSection = $('.movie_data_averageRating');
-                        movieDataSection.html(`<h4>평점</h4><p>${data.averageRating !== null ? data.averageRating : 0}</p>`);
-                        //댓글정보
-                        const reviewsSection = $('#reviews-table');
-                        reviewsSection.empty();
-                        data.comments.forEach((comment) => {
-                            appendReviewRow(reviewsSection, comment, emojiMap);
-                        });
-                    },
-                    error: (xhr, status, error) => {
-                        console.error("댓글을 불러오지 못했습니다:", error);
-                        $('#comments').append(`<div class="error"><p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p></div>`);
-                    }
-                });
-
             };
 
-            loadComments();
-
-            //이메일 처리
-            function maskEmail(email) {
-                const atIndex = email.indexOf('@');
-                let emailName = email.slice(0, atIndex);
-                const emailDomain = email.slice(atIndex + 1);
-
-                if (emailName.length > 3) {
-                    emailName = `${emailName.slice(0, -3)}***`;
-                } else {
-                    emailName = '***';
+            $.ajax({
+                url: `/movies/` + movieId,
+                method: 'GET',
+                dataType: 'json',
+                success: (data) => {
+                    console.log(data)
+                    //평점
+                    const movieDataSection = $('.movie_data_averageRating');
+                    movieDataSection.html(`<h4>평점</h4><p>${data.averageRating !== null ? data.averageRating : 0}</p>`);
+                    //댓글정보
+                    const reviewsSection = $('#reviews-table');
+                    reviewsSection.empty();
+                    data.comments.forEach((comment) => {
+                        appendReviewRow(reviewsSection, comment, emojiMap);
+                    });
+                },
+                error: (xhr, status, error) => {
+                    console.error("댓글을 불러오지 못했습니다:", error);
+                    $('#comments').append(`<div class="error"><p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p></div>`);
                 }
+            });
 
-                return `${emailName}@${emailDomain}`;
+        };
+
+        loadComments();
+
+        //이메일 처리
+        function maskEmail(email) {
+            const atIndex = email.indexOf('@');
+            let emailName = email.slice(0, atIndex);
+            const emailDomain = email.slice(atIndex + 1);
+
+            if (emailName.length > 3) {
+                emailName = `${emailName.slice(0, -3)}***`;
+            } else {
+                emailName = '***';
             }
+
+            return `${emailName}@${emailDomain}`;
+        }
 
         function generateStars(grade) {
             return '★'.repeat(grade);
         }
+
         //댓글 수만큼 반복생성
         function appendReviewRow(reviewsSection, comment, emojiMap) {
             const maskedEmail = maskEmail(comment.memberEmail);
             const stars = generateStars(comment.grade);
             const emoji = emojiMap[comment.grade] || '';
-            const member = JSON.parse(sessionStorage.getItem("userInfo"));
-            const isOwner = member && member.email === comment.memberEmail;
+            const isOwner = userEmail === comment.memberEmail;
             const reviewRow = `
 
         <tr>
@@ -702,42 +719,42 @@
             </td>
         </tr>
     `;
-                reviewsSection.append(reviewRow);
-            }
+            reviewsSection.append(reviewRow);
+        }
 
         // 찜하기 관련 함수 시작 //
 
 
-        $(document).ready(function (){
+        $(document).ready(function () {
 
             var isFavorited = false; // 현재 사용자의 찜하기(좋아요) 상태를 저장할 변수임
 
 
-                // 현재 찜하기 상태를 가져오기 위해 API 호출
-                $.ajax({
-                    url: '/favorites/check/' + userEmail + '/' + movieId,
-                    type: 'GET',
-                    data: {
-                        userEmail: userEmail,
-                        movieId: movieId
-                    },
-                    success: function (response) {
-                        // 응답에서 현재 리액션 상태를 받아와 버튼 상태를 업데이트
-                        isFavorited = response.isFavorited;
-                        console.log("현재 리액션 상태 가져오기 성공! 현재상태 = " + isFavorited)
-                        updateFavoriteButton(isFavorited)
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error fetching current reaction:', status, error);
-                    }
-                });
+            // 현재 찜하기 상태를 가져오기 위해 API 호출
+            $.ajax({
+                url: '/favorites/check/' + userEmail + '/' + movieId,
+                type: 'GET',
+                data: {
+                    userEmail: userEmail,
+                    movieId: movieId
+                },
+                success: function (response) {
+                    // 응답에서 현재 리액션 상태를 받아와 버튼 상태를 업데이트
+                    isFavorited = response.isFavorited;
+                    console.log("현재 리액션 상태 가져오기 성공! 현재상태 = " + isFavorited)
+                    updateFavoriteButton(isFavorited)
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching current reaction:', status, error);
+                }
+            });
 
 
-            $("#favoriteButton").click(function (){
+            $("#favoriteButton").click(function () {
 
                 checkAnonymousUser();
 
-                if(isFavorited === false) {
+                if (isFavorited === false) {
                     // 좋아요 요청 (POST 요청)
                     $.ajax({
                         url: '/favorites/' + userEmail + '/' + movieId,
@@ -782,234 +799,249 @@
         });
 
 
+        /* 좋아요 싫어요 슬퍼요 등등 리액션 관련 함수 시작 */
 
-            /* 좋아요 싫어요 슬퍼요 등등 리액션 관련 함수 시작 */
+        var currentReactions = {}; // 사용자의 현재 리액션 선택을 추적하는 객체
 
-            var currentReactions = {}; // 사용자의 현재 리액션 선택을 추적하는 객체
+        var userEmail = [[${userEmail}]];
 
-            var userEmail = [[${userEmail}]];
+        var isRequestPending = false; // 비동기 요청 상태를 추적하는 플래그
 
-            var isRequestPending = false; // 비동기 요청 상태를 추적하는 플래그
+        var userCurrentReaction = null; // 현재 사용자의 리액션 상태를 저장할 변수
 
-            var userCurrentReaction = null; // 현재 사용자의 리액션 상태를 저장할 변수
+        // 비회원 체크
+        function checkAnonymousUser() {
+            if (!userEmail || userEmail === 'anonymousUser') {
+                alert('로그인이 필요합니다.');
+                return true;
+            }
+            return false;
+        }
+
+        async function addReaction(userEmail, movieId, reactionType) {
+
+            if (isRequestPending) {
+                return; // 비동기 요청 중이면 클릭을 무시
+            }
+            isRequestPending = true; // 비동기 요청 시작
+
+            try {
+                if (!(movieId in currentReactions)) {
+                    currentReactions[movieId] = {};
+                }
+                var currentMemberReaction = currentReactions[movieId][userEmail];
+
+                if (currentMemberReaction === reactionType) {
+                    await removeReaction(userEmail, movieId, reactionType);
+                    delete currentReactions[movieId][userEmail];
+                } else {
+                    if (currentMemberReaction) {
+                        await removeReaction(userEmail, movieId, currentMemberReaction);
+                    }
+                    await sendReaction(userEmail, movieId, reactionType);
+                    currentReactions[movieId][userEmail] = reactionType;
+                }
+            } catch (error) {
+                console.error('Error processing reaction:', error);
+            } finally {
+                isRequestPending = false;
+            }
+        }
+
+        function sendReaction(userEmail, movieId, reactionType) {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '/add',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        userEmail: userEmail,
+                        movieId: movieId,
+                        reactionType: reactionType
+                    }),
+                    success: function (response) {
+                        console.log('Response:', response);
+                        updateReactionCount(movieId);
+                        resolve(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error adding reaction:', status, error);
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        function updateReactionCount(movieId) {
+            $.ajax({
+                url: '/movie/' + movieId,
+                type: 'GET',
+                success: function (response) {
+                    $('#likeCount_' + movieId).text(response.likeCount);
+                    $('#dislikeCount_' + movieId).text(response.dislikeCount);
+                    $('#sadCount_' + movieId).text(response.sadCount);
+                    $('#funnyCount_' + movieId).text(response.funnyCount);
+                    $('#scaryCount_' + movieId).text(response.scaryCount);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error updating reaction count", error);
+                }
+            });
+        }
+
+        // 리액션 삭제
+        function removeReaction(userEmail, movieId, reactionType) {
+            var data = {
+                userEmail: userEmail,
+                movieId: movieId,
+                reactionType: reactionType
+            };
+
+            // movieId(영화식별정보)가 없거나 userEmail(회원정보,로그인정보)가 없으면 return
+            // 버튼연타시 ajax 요청 꼬이는거 방지할려고 추가함
+            if (!userEmail || !movieId) {
+                console.error('Error removing reaction: userEmail or movieId is missing');
+                return;
+            }
+
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '/remove',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        console.log('Response:', response);
+                        updateReactionCount(movieId);
+                        if (currentReactions[movieId]) {
+                            delete currentReactions[movieId][userEmail];
+                            if (Object.keys(currentReactions[movieId]).length === 0) {
+                                delete currentReactions[movieId];
+                            }
+                        }
+                        resolve(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error removing reaction:', status, error);
+                        console.log('XHR Object:', xhr);
+                        console.log('Response Text:', xhr.responseText);
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        // 사용자의 현재 리액션 상태를 가져오는 함수
+        // 페이지 로드시 바로 발동되게 해놓음
+        // 현재 리액션상태를 가져와서 새로고침하면 중복으로 누를수있던부분 해결
+        function initializeReactions() {
+            // 현재 사용자와 영화 ID를 설정합니다. 이 부분은 사용자에 맞게 변경해야 합니다.
+            // 현재 리액션 상태를 가져오기 위해 API 호출
+            $.ajax({
+                url: '/getCurrentReaction',
+                type: 'GET',
+                data: {
+                    userEmail: userEmail,
+                    movieId: movieId
+                },
+                success: function (response) {
+                    // 응답에서 현재 리액션 상태를 받아와 버튼 상태를 업데이트
+                    userCurrentReaction = response.reactionType;
+                    updateButtonState()
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching current reaction:', status, error);
+                }
+            });
+        }
+
+        // 버튼 상태 업데이트 함수 추가
+        function updateButtonState() { // 새로 추가된 함수
+            // 모든 버튼에서 active 클래스를 제거
+            $('#likeButton, #dislikeButton, #sadButton, #funnyButton, #scaryButton').removeClass('active');
+
+            // 현재 리액션에 해당하는 버튼에 active 클래스 추가
+            // active 클래스 활용해서 선택한버튼에만 css를 추가해 꾸밀수있음
+            if (userCurrentReaction === 'LIKE') {
+                $('#likeButton').addClass('active');
+            } else if (userCurrentReaction === 'DISLIKE') {
+                $('#dislikeButton').addClass('active');
+            } else if (userCurrentReaction === 'SAD') {
+                $('#sadButton').addClass('active');
+            } else if (userCurrentReaction === 'FUNNY') {
+                $('#funnyButton').addClass('active');
+            } else if (userCurrentReaction === 'SCARY') {
+                $('#scaryButton').addClass('active');
+            }
+        }
+
+        function react(reactionType) {
 
             // 비회원 체크
-            function checkAnonymousUser() {
-                if (!userEmail || userEmail === 'anonymousUser') {
-                    alert('로그인이 필요합니다.');
-                    return true;
-                }
-                return false;
+            if (checkAnonymousUser()) {
+                return;
             }
-
-            async function addReaction(userEmail, movieId, reactionType) {
-
-                if (isRequestPending) {
-                    return; // 비동기 요청 중이면 클릭을 무시
-                }
-                isRequestPending = true; // 비동기 요청 시작
-
-                try {
-                    if (!(movieId in currentReactions)) {
-                        currentReactions[movieId] = {};
-                    }
-                    var currentMemberReaction = currentReactions[movieId][userEmail];
-
-                    if (currentMemberReaction === reactionType) {
-                        await removeReaction(userEmail, movieId, reactionType);
-                        delete currentReactions[movieId][userEmail];
-                    } else {
-                        if (currentMemberReaction) {
-                            await removeReaction(userEmail, movieId, currentMemberReaction);
-                        }
-                        await sendReaction(userEmail, movieId, reactionType);
-                        currentReactions[movieId][userEmail] = reactionType;
-                    }
-                } catch (error) {
-                    console.error('Error processing reaction:', error);
-                } finally {
-                    isRequestPending = false;
-                }
-            }
-
-            function sendReaction(userEmail, movieId, reactionType) {
-                return new Promise((resolve, reject) => {
-                    $.ajax({
-                        url: '/add',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            userEmail: userEmail,
-                            movieId: movieId,
-                            reactionType: reactionType
-                        }),
-                        success: function (response) {
-                            console.log('Response:', response);
-                            updateReactionCount(movieId);
-                            resolve(response);
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error adding reaction:', status, error);
-                            reject(error);
-                        }
-                    });
-                });
-            }
-
-            function updateReactionCount(movieId) {
-                $.ajax({
-                    url: '/movie/' + movieId,
-                    type: 'GET',
-                    success: function (response) {
-                        $('#likeCount_' + movieId).text(response.likeCount);
-                        $('#dislikeCount_' + movieId).text(response.dislikeCount);
-                        $('#sadCount_' + movieId).text(response.sadCount);
-                        $('#funnyCount_' + movieId).text(response.funnyCount);
-                        $('#scaryCount_' + movieId).text(response.scaryCount);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error updating reaction count", error);
-                    }
-                });
-            }
-
-            // 리액션 삭제
-            function removeReaction(userEmail, movieId, reactionType) {
-                var data = {
-                    userEmail: userEmail,
-                    movieId: movieId,
-                    reactionType: reactionType
-                };
-
-                // movieId(영화식별정보)가 없거나 userEmail(회원정보,로그인정보)가 없으면 return
-                // 버튼연타시 ajax 요청 꼬이는거 방지할려고 추가함
-                if (!userEmail || !movieId) {
-                    console.error('Error removing reaction: userEmail or movieId is missing');
-                    return;
-                }
-
-                return new Promise((resolve, reject) => {
-                    $.ajax({
-                        url: '/remove',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(data),
-                        success: function (response) {
-                            console.log('Response:', response);
-                            updateReactionCount(movieId);
-                            if (currentReactions[movieId]) {
-                                delete currentReactions[movieId][userEmail];
-                                if (Object.keys(currentReactions[movieId]).length === 0) {
-                                    delete currentReactions[movieId];
-                                }
-                            }
-                            resolve(response);
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error removing reaction:', status, error);
-                            console.log('XHR Object:', xhr);
-                            console.log('Response Text:', xhr.responseText);
-                            reject(error);
-                        }
-                    });
-                });
-            }
-
-            // 사용자의 현재 리액션 상태를 가져오는 함수
-            // 페이지 로드시 바로 발동되게 해놓음
-            // 현재 리액션상태를 가져와서 새로고침하면 중복으로 누를수있던부분 해결
-            function initializeReactions() {
-                // 현재 사용자와 영화 ID를 설정합니다. 이 부분은 사용자에 맞게 변경해야 합니다.
-                // 현재 리액션 상태를 가져오기 위해 API 호출
-                $.ajax({
-                    url: '/getCurrentReaction',
-                    type: 'GET',
-                    data: {
-                        userEmail: userEmail,
-                        movieId: movieId
-                    },
-                    success: function (response) {
-                        // 응답에서 현재 리액션 상태를 받아와 버튼 상태를 업데이트
-                        userCurrentReaction = response.reactionType;
-                        updateButtonState()
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error fetching current reaction:', status, error);
-                    }
-                });
-            }
-
-            // 버튼 상태 업데이트 함수 추가
-            function updateButtonState() { // 새로 추가된 함수
-                // 모든 버튼에서 active 클래스를 제거
-                $('#likeButton, #dislikeButton, #sadButton, #funnyButton, #scaryButton').removeClass('active');
-
-                // 현재 리액션에 해당하는 버튼에 active 클래스 추가
-                // active 클래스 활용해서 선택한버튼에만 css를 추가해 꾸밀수있음
-                if (userCurrentReaction === 'LIKE') {
-                    $('#likeButton').addClass('active');
-                } else if (userCurrentReaction === 'DISLIKE') {
-                    $('#dislikeButton').addClass('active');
-                } else if (userCurrentReaction === 'SAD') {
-                    $('#sadButton').addClass('active');
-                } else if (userCurrentReaction === 'FUNNY') {
-                    $('#funnyButton').addClass('active');
-                } else if (userCurrentReaction === 'SCARY') {
-                    $('#scaryButton').addClass('active');
-                }
-            }
-
-            function react(reactionType) {
-
-                // 비회원 체크
-                if (checkAnonymousUser()) {
-                    return;
-                }
-                // 이전에 선택한 리액션을 서버에서 삭제
-                if (userCurrentReaction === reactionType) {
-                    removeReaction(userEmail, movieId, reactionType)
-                    userCurrentReaction = null;// 이전 리액션 상태를 초기화
-                    updateButtonState()
-                    return;
-                } else if (userCurrentReaction) {
-                    removeReaction(userEmail, movieId, reactionType);
-                    updateButtonState()
-                }
-                // 새로운 리액션을 추가하고 클라이언트 측의 리액션 상태 업데이트
-                addReaction(userEmail, movieId, reactionType)
-                userCurrentReaction = reactionType; // 새로운 리액션 상태 설정
+            // 이전에 선택한 리액션을 서버에서 삭제
+            if (userCurrentReaction === reactionType) {
+                removeReaction(userEmail, movieId, reactionType)
+                userCurrentReaction = null;// 이전 리액션 상태를 초기화
+                updateButtonState()
+                return;
+            } else if (userCurrentReaction) {
+                removeReaction(userEmail, movieId, reactionType);
                 updateButtonState()
             }
+            // 새로운 리액션을 추가하고 클라이언트 측의 리액션 상태 업데이트
+            addReaction(userEmail, movieId, reactionType)
+            userCurrentReaction = reactionType; // 새로운 리액션 상태 설정
+            updateButtonState()
+        }
 
-            document.addEventListener('DOMContentLoaded', function () {
-                console.log("movieId = " + movieId);
+        function updateMetaDescription() {
+            var detailElement = document.querySelector('.movie_detail');
+            if (detailElement) {
+                var detailText = detailElement.innerText;
+                var metaDescription = document.getElementById('og-description');
+                if (metaDescription) {
+                    metaDescription.setAttribute('content', detailText);
+                }
+            }
+        }
 
-                var likeCountSpans = document.querySelectorAll('.like-count');
-                var dislikeCountSpans = document.querySelectorAll('.dislike-count');
-                var sadCountSpans = document.querySelectorAll('.sad-count');
-                var funnyCountSpans = document.querySelectorAll('.funny-count');
-                var scaryCountSpans = document.querySelectorAll('.scary-count');
+        document.addEventListener('DOMContentLoaded', function () {
 
-                likeCountSpans.forEach(span => {
-                    span.id = 'likeCount_' + movieId;
-                });
-                dislikeCountSpans.forEach(span => {
-                    span.id = 'dislikeCount_' + movieId;
-                });
-                sadCountSpans.forEach(span => {
-                    span.id = 'sadCount_' + movieId;
-                });
-                funnyCountSpans.forEach(span => {
-                    span.id = 'funnyCount_' + movieId;
-                });
-                scaryCountSpans.forEach(span => {
-                    span.id = 'scaryCount_' + movieId;
-                });
-                updateReactionCount(movieId);
-                initializeReactions();
+            updateMetaDescription();
+            // Kakao SDK 초기화
+            Kakao.init('3d074cbbda365535b831c90baead22c2'); // 여기에 실제 Kakao 앱 키를 입력하세요.
+
+            console.log("movieId = " + movieId);
+
+            var likeCountSpans = document.querySelectorAll('.like-count');
+            var dislikeCountSpans = document.querySelectorAll('.dislike-count');
+            var sadCountSpans = document.querySelectorAll('.sad-count');
+            var funnyCountSpans = document.querySelectorAll('.funny-count');
+            var scaryCountSpans = document.querySelectorAll('.scary-count');
+
+            likeCountSpans.forEach(span => {
+                span.id = 'likeCount_' + movieId;
             });
+            dislikeCountSpans.forEach(span => {
+                span.id = 'dislikeCount_' + movieId;
+            });
+            sadCountSpans.forEach(span => {
+                span.id = 'sadCount_' + movieId;
+            });
+            funnyCountSpans.forEach(span => {
+                span.id = 'funnyCount_' + movieId;
+            });
+            scaryCountSpans.forEach(span => {
+                span.id = 'scaryCount_' + movieId;
+            });
+            updateReactionCount(movieId);
+            initializeReactions();
+        });
 
-        $(document).on('click', '.delete-btn', function() {
+        $(document).on('click', '.delete-btn', function () {
 
             const cno = $(this).data('comment-id');
             console.log(cno);
@@ -1020,15 +1052,47 @@
             $.ajax({
                 url: `/movies/delete/${cno}`,
                 method: 'DELETE',
-                success: function(response) {
+                success: function (response) {
                     alert("댓글이 삭제되었습니다.");
                     loadComments(); // 댓글 목록 다시 로드
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error("댓글 삭제 중 오류가 발생했습니다:", error);
                     alert("댓글을 삭제하는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
                 }
             });
+        }
+
+        // Kakao 공유 함수
+        function shareMessage() {
+            var currentUrl = window.location.href;
+            var urlSegments = currentUrl.split('/');
+            var movieId = urlSegments[urlSegments.length - 1];
+
+            var titleElement = document.querySelector('.movie_title');
+            var detailElement = document.querySelector('.movie_detail');
+            var imageElement = document.querySelector('.featured img');
+
+            if (titleElement && detailElement && imageElement) {
+                var title = titleElement.innerText;
+                var detail = detailElement.innerText;
+                var imageUrl = imageElement.src;
+
+                Kakao.Link.sendDefault({
+                    objectType: 'feed',
+                    content: {
+                        title: title, // 이벤트 제목
+                        description: detail, // 이벤트 상세 내용
+                        imageUrl: imageUrl, // 이벤트 이미지 URL
+                        link: {
+                            mobileWebUrl: `http://localhost:8080/movies/${movieId}`, // 동적 이벤트 ID를 포함한 URL
+                            webUrl: `http://localhost:8080/movies/${movieId}`
+                        }
+                    }
+                });
+            } else {
+                console.error('필요한 요소를 찾을 수 없습니다.');
+            }
         }
     </script>
 </th:block>

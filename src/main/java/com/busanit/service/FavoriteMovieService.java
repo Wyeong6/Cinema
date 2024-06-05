@@ -1,6 +1,6 @@
 package com.busanit.service;
 
-import com.busanit.domain.FavoriteMovieDTO;
+import com.busanit.domain.movie.FavoriteMovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.movie.FavoriteMovie;
 import com.busanit.entity.movie.Movie;

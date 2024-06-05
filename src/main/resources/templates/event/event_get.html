@@ -13,10 +13,10 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-	<meta property="og:title" content="${event.event_name}">
-	<meta property="og:description" content="${event.event_detail}">
+	<meta property="og:title" content="${event.eventName}">
+	<meta property="og:description" content="${event.eventDetail}">
 	<meta property="og:url" content="http://localhost:8080/event_get/${eventId}">
-	<meta property="og:image" content="http://localhost:8080/images/event/${event.event_image}">
+	<meta property="og:image" content="http://localhost:8080/images/event/${event.eventImage}">
 
 
 	<link href="/assets/css/main.css" rel="stylesheet"/>
@@ -37,12 +37,12 @@
 			<div class="container">
 				<article id="main" class="special">
 					<header>
-						<h2 th:text="${event.event_name}">이벤트 제목</h2>
+						<h2 th:text="${event.eventName}">이벤트 제목</h2>
 						<p th:text="${event.regDate}">이벤트 등록 날짜</p>
 					</header>
 					<section>
-						<img id="input-file" th:src="@{'/images/event/' + ${event.event_image}}" alt="이벤트 이미지" style="width: 100px; height: auto;"/>
-						<p class="event-detail" th:text="${event.event_detail}">
+						<img id="input-file" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="width: 500px; height: auto;"/>
+						<p class="event-detail" th:text="${event.eventDetail}">
 							이벤트 상세 내용
 						</p>
 						<div class="btn_box">
@@ -54,7 +54,26 @@
 							<span>카카오톡 공유</span>
 						</div>
 					</section>
+					<table class="default">
+						<tr>
+							<td>다음글</td>
+							<td th:if="${nextEvent != null}">
+								<a th:href="@{/event_get/{id}(id=${nextEvent.id})}" th:text="${nextEvent.eventName}"></a>
+							</td>
+							<td th:if="${nextEvent == null}">다음글이 없습니다.</td>
+						</tr>
+						<tr>
+							<td>이전글</td>
+							<td th:if="${previousEvent != null}">
+								<a th:href="@{/event_get/{id}(id=${previousEvent.id})}" th:text="${previousEvent.eventName}"></a>
+							</td>
+							<td th:if="${previousEvent == null}">이전글이 없습니다.</td>
+						</tr>
+					</table>
+					<button class="button" onclick="window.location.href='/event/eventList'">목록</button>
 				</article>
+				</article>
+
 			</div>
 		</div>
 
@@ -100,13 +119,9 @@
 			var urlSegments = currentUrl.split('/');
 			var eventId = urlSegments[urlSegments.length - 1];
 
-
-
 			var titleElement = document.querySelector('h2');
 			var detailElement = document.querySelector('.event-detail');
 			var imageElement = document.querySelector('img');
-
-
 
 			if (titleElement && detailElement && imageElement) {
 				var title = titleElement.innerText;

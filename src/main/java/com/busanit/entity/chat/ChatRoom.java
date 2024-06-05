@@ -4,6 +4,7 @@ import com.busanit.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,8 @@ public class ChatRoom {
     private Long id;
 
     private String title;
+
+    private LocalDateTime lastReadTimestamp;
 
     @ManyToMany(mappedBy = "chatRooms")
     private List<Member> members = new ArrayList<>();
@@ -38,4 +41,5 @@ public class ChatRoom {
             newMembers.forEach(member -> member.addChatRoom(this));
         }
     }
+
 }

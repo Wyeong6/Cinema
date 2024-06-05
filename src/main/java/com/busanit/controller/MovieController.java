@@ -1,40 +1,30 @@
 package com.busanit.controller;
 
-import com.busanit.domain.MovieDTO;
-import com.busanit.entity.movie.Genre;
-import com.busanit.entity.movie.Movie;
-import com.busanit.entity.movie.MovieStillCut;
+import com.busanit.domain.movie.MovieDTO;
+import com.busanit.domain.SnackDTO;
 import com.busanit.service.MovieService;
+import com.busanit.service.SnackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,13 +32,14 @@ public class MovieController {
 
     private final MovieService movieService2;
     private final ResourceLoader resourceLoader;
+    private final SnackService snackService;
 
     @Value("${upload.path}")
     private String uploadPath;
 
     @Transactional
     @GetMapping("/")
-    public String getDetailMovies(Model model) {
+    public String getDetailMovies(Model model, @PageableDefault(size = 8, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
         //비디오가 있는 인기순영화
         List<MovieDTO> videoMovies = movieService2.getCachedVideoMovies();
@@ -68,6 +59,11 @@ public class MovieController {
         //인기순
         List<MovieDTO> hotMovies = movieService2.getCachedHotMovies();
         model.addAttribute("hotMovies", hotMovies);
+
+        //스낵스토어
+        Page<SnackDTO> snackDTOList = null;
+        snackDTOList = snackService.getSnackList(pageable);
+        model.addAttribute("snackList", snackDTOList);
 
         return "main";
     }
@@ -129,6 +125,9 @@ public class MovieController {
     // 리뷰작성 모달
     @RequestMapping("/review/{movieId}")
     public String reviewPopup(@PathVariable("movieId") String movieId, Model model) {
+        String userEmail = movieService2.getUserEmail();
+
+        model.addAttribute("userEmail", userEmail);
         model.addAttribute("movieId", movieId);
         return "movie/review_modal";
     }

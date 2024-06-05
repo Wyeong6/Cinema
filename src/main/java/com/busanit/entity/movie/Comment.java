@@ -1,12 +1,10 @@
 package com.busanit.entity.movie;
 
-import com.busanit.domain.CommentDTO;
-import com.busanit.entity.BaseEntity;
+import com.busanit.domain.movie.CommentDTO;
 import com.busanit.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 

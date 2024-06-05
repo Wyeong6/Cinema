@@ -1,8 +1,8 @@
 package com.busanit.service;
 
-import com.busanit.domain.MovieDTO;
-import com.busanit.domain.MovieDetailDTO;
-import com.busanit.domain.MovieStillCutDTO;
+import com.busanit.domain.movie.MovieDTO;
+import com.busanit.domain.movie.MovieDetailDTO;
+import com.busanit.domain.movie.MovieStillCutDTO;
 import com.busanit.entity.movie.*;
 import com.busanit.repository.GenreRepository;
 import com.busanit.repository.MovieDetailRepository;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

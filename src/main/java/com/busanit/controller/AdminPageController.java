@@ -1,33 +1,36 @@
 package com.busanit.controller;
 
-import com.busanit.customerService.Notice.*;
 import com.busanit.domain.EventDTO;
-import com.busanit.customerService.Notice.NoticeDTO;
-import com.busanit.customerService.Notice.NoticeService;
-import com.busanit.domain.MovieDTO;
 import com.busanit.domain.SnackDTO;
 import com.busanit.domain.chat.ChatRoomDTO;
+import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
-import com.busanit.entity.chat.Message;
-import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MessageRepository;
 import com.busanit.service.*;
+import com.busanit.domain.NoticeDTO;
+import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.TheaterDTO;
 import com.busanit.entity.Theater;
+import com.busanit.service.ChatService;
+import com.busanit.service.EventService;
+import com.busanit.service.SnackService;
+import com.busanit.service.TheaterService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 
@@ -42,11 +45,14 @@ public class AdminPageController {
     private final TheaterService theaterService;
     private final SnackService snackService;
     private final EventService eventService;
-    private final NoticeService noticeService;
     private final ChatService chatService;
     private final MessageRepository messageRepository;
     private final MemberService memberService;
     private final MovieService movieService;
+    private final NoticeService noticeService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @GetMapping("/adminMain")
     public String adminMain() {
@@ -55,7 +61,7 @@ public class AdminPageController {
 
     /*기존 adminPage 삭제예정*/
     @GetMapping("/adminMain2")
-    public String adminMain2(){
+    public String adminMain2() {
         return "admin/testAdminMain";
     }
 
@@ -79,6 +85,12 @@ public class AdminPageController {
         model.addAttribute("totalPages", totalPages);
 
         return "admin/admin_movie_list";
+
+    }
+
+    @PostMapping("/member")
+    public String memberManagement() {
+        return "admin/adminMemberManagementPage";
     }
 
     @PostMapping("/movieRegister")
@@ -86,10 +98,19 @@ public class AdminPageController {
         return "admin/admin_movie_register";
     }
 
-
-
     @GetMapping("/theaterList")
-    public String theaterList() {
+    public String theaterList(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
+                              @PageableDefault(size = 15, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<TheaterDTO> theaterDTOList = null;
+
+        theaterDTOList = theaterService.getTheaterAll(pageable);
+        model.addAttribute("theaterDTOList", theaterDTOList);
+
+        int startPage= Math.max(1, theaterDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(theaterDTOList.getTotalPages(), theaterDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "admin/admin_theater_list";
     }
 
@@ -106,23 +127,50 @@ public class AdminPageController {
         }
 
         try {
-            if (theaterDTO.getSeatsPerTheater() == null) {
-                throw new IllegalArgumentException("상영관 좌석 정보가 제공되지 않았습니다.");
-            } else {
-                theaterService.save(Theater.toEntity(theaterDTO));
-            }
-        } catch (IllegalStateException e) {
-            model.addAttribute("error", e.getMessage());
+            theaterService.save(Theater.toEntity(theaterDTO));
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("message", e.getMessage());
         }
 
         return "admin/admin_layout";
     }
 
+    @GetMapping("/theaterGet")
+    public String theaterGet(@RequestParam(name = "theaterId") long theaterId, Model model) {
+        TheaterDTO theaterDTO = theaterService.getTheaterById(theaterId);
+        List<TheaterNumberDTO> theaterNumberDTOs = theaterService.getTheaterNumbersByTheaterId(theaterId);
+
+        model.addAttribute("theaterDTO", theaterDTO);
+        model.addAttribute("theaterNumberDTOs", theaterNumberDTOs);
+
+        return "admin/admin_theater_edit";
+    }
+
+    @PostMapping("/theaterDelete")
+    public String theaterDelete(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "theaterId") long theaterId,
+                                Model model, @PageableDefault(size = 15) Pageable pageable, TheaterDTO theaterDTO) {
+        theaterService.deleteTheaterById(theaterId);
+
+        Page<TheaterDTO> theaterDTOList = theaterService.getTheaterAll(pageable);
+        model.addAttribute("theaterDTOList", theaterDTOList);
+
+        int startPage = Math.max(1, theaterDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(theaterDTOList.getTotalPages(), theaterDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_theater_list";
+    }
+
     @GetMapping("/scheduleList")
-    public String scheduleList() { return "admin/admin_schedule_list"; }
+    public String scheduleList() {
+        return "admin/admin_schedule_list";
+    }
 
     @GetMapping("/scheduleRegister")
-    public String scheduleRegister() { return "admin/admin_schedule_register"; }
+    public String scheduleRegister() {
+        return "admin/admin_schedule_register";
+    }
 
     @GetMapping("/snackList")
     public String snackList(Model model,
@@ -167,12 +215,12 @@ public class AdminPageController {
     public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult, Model model) {
 
         model.addAttribute("urlLoad", "/admin/snackRegister"); // javascript load function 에 필요함
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "admin/admin_snack_register";
         }
         try {
             snackService.saveSnack(Snack.toEntity(snackDTO));
-        } catch(IllegalStateException e) {
+        } catch (IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }
 
@@ -223,72 +271,73 @@ public class AdminPageController {
 
     //이벤트 등록페이지 이동
     @GetMapping("/eventRegister")
-    public String eventRegister() { return "admin/admin_event_register"; }
+    public String eventRegPage() {
+        return "admin/admin_event_register";
+    }
+
     //이벤트 등록 기능
     @PostMapping("/eventRegister")
     public String eventRegister(@Valid EventDTO eventDTO, BindingResult bindingResult, Model model) {
 
-
-        model.addAttribute("urlLoad", "/admin/eventRegister"); // javascript load function 에 필요함
-        if(bindingResult.hasErrors()) {
+        model.addAttribute("urlLoad", "/admin/eventRegister");
+        if (bindingResult.hasErrors()) {
             return "admin/admin_event_register";
         }
-        try {
-            System.out.println("eventDTO: " + eventDTO.toString());
-            eventService.saveEvent(eventDTO);
-        } catch(IllegalStateException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+
+        // 중복 체크 로직 추가
+        if (eventService.isDuplicate(eventDTO.getEventDetail(), eventDTO.getEventName())) {
+            return "admin/admin_layout";
         }
+
+        eventService.saveEvent(eventDTO);
+
         return "admin/admin_layout";
     }
 
-@GetMapping("/eventList")
-public String eventList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
-    Page<EventDTO> eventDTO = eventService.getEventList(page -1 , size);
+    @GetMapping("/eventList")
+    public String eventList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+        Page<EventDTO> eventDTO = eventService.getEventList(page - 1, size);
 
-    int totalPages = eventDTO.getTotalPages();
-    int startPage = Math.max(1, page - 5);
-    int endPage = Math.min(totalPages, page + 4);
+        int totalPages = eventDTO.getTotalPages();
+        int startPage = Math.max(1, page - 5);
+        int endPage = Math.min(totalPages, page + 4);
 
+        model.addAttribute("eventList", eventDTO); //이벤트 게시글
+        model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
+        model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
 
-    model.addAttribute("eventList", eventDTO); //이벤트 게시글
-    model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
-    model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
-    model.addAttribute("startPage", startPage);
-    model.addAttribute("endPage", endPage);
+        return "admin/admin_event_list";
 
-    return "admin/admin_event_list";
+    }
 
-}
+    //이벤트 수정 페이지
+    @GetMapping("/eventUpdate")
+    public String editEvent(@RequestParam(name = "eventId") long eventId, Model model) {
 
+        EventDTO event = eventService.getEvent(eventId);
+        model.addAttribute("event", event);
 
+        return "admin/admin_event_update"; // 수정 페이지로 이동
+    }
 
+    //이벤트 수정 기능
+    @PostMapping("/eventUpdate")
+    public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int pageNumber) {
 
-//이벤트 수정 페이지
-@GetMapping("/update")
-public String editEvent(@RequestParam(name = "eventId") long eventId, Model model) {
+        eventService.updateEvent(eventDTO);
 
-    EventDTO event = eventService.getEvent(eventId);
-    model.addAttribute("event", event);
+        return "redirect:/admin/eventList?page=" + pageNumber;
+    }
 
-    return "admin/admin_event_update"; // 수정 페이지로 이동
-}
-//이벤트 수정 기능
-@PostMapping("/update")
-public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int pageNumber) {
-
-    eventService.updateEvent(eventDTO);
-
-    return "redirect:/admin/eventList?page=" + pageNumber;
-}
-
-//이벤트 삭제기능
-@GetMapping("/delete/{id}")
+    //이벤트 삭제기능
+    @GetMapping("/eventDelete/{id}")
     public String deleteEvent(@PathVariable("id") Long eventId, @RequestParam int pageNumber) {
 
         eventService.delete(eventId);
 
-    return "redirect:/admin/eventList?page=" + pageNumber;
+        return "redirect:/admin/eventList?page=" + pageNumber;
     }
 
     @PostMapping("/help")
@@ -296,107 +345,178 @@ public String updateEvent(@ModelAttribute EventDTO eventDTO, @RequestParam int p
         return "admin/adminHelpPage";
     }
 
-    @GetMapping("/notice")
-    public String showNoticeList(Model model,
-                                 @RequestParam(defaultValue = "1") int page,
-                                 @RequestParam(defaultValue = "10") int size) {
-        noticeService.prepareNoticeList(model, page, size);
-        return "/cs/noticeAdmin";
+    //공지사항 등록페이지 이동
+    @GetMapping("/noticeRegister")
+    public String noticeRegPage() {
+
+        return "admin/admin_notice_register";
     }
 
-    @GetMapping("/notice/{id}")
-    public String showNoticeDetails(Model model,
-                                    @PathVariable Long id,
-                                    @RequestParam(value = "currentPage", required = false) Integer currentPage) {
-        Notice notice = noticeService.getNoticeById(id);
-        if (notice == null) {
-            return "redirect:/admin/notice";
-        }
-        noticeService.incrementViewCount(notice);
+    //공지사항 등록기능
+    @PostMapping("/noticeRegister")
+    public String noticeRegister(@Valid NoticeDTO noticeDTO, BindingResult bindingResult, Model model) {
 
-        model.addAttribute("currentPage", currentPage);
-
-        model.addAttribute("notice", notice);
-        return "cs/noticeDetailAdmin";
-    }
-
-    @DeleteMapping("/notice/{id}")
-    public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
-        return noticeService.deleteNoticeById(id)
-                ? ResponseEntity.ok("삭제 완료")
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제 실패");
-    }
-
-    @GetMapping("/notice/add")
-    public String addNotice() {
-        return "/cs/noticeAddAdmin";
-    }
-
-    @PostMapping("/notice/add")
-    public String addNotice(Model model,
-                            @RequestParam(value = "currentPage", required = false) Integer currentPage,
-                            NoticeDTO noticeDTO, BindingResult result) {
-        Long id = noticeDTO.getId();
-        if (id == null) {
-            noticeService.NoticeSave(noticeDTO);
-            model.addAttribute("urlLoad", "/admin/notice");
-        } else {
-            noticeService.NoticeMod(id, noticeDTO);
-            model.addAttribute("urlLoad", "/admin/notice/" + id + "?page=" + currentPage);
-            model.addAttribute("currentPage", currentPage);
-            System.out.println("수정 완료해서 보낼 때: " + currentPage);
+        model.addAttribute("urlLoad", "/admin/noticeRegister");
+        if (bindingResult.hasErrors()) {
+            return "admin/admin_notice_register";
         }
 
+        // 중복 체크 로직 추가
+        if (noticeService.isDuplicate(noticeDTO.getNoticeTitle(), noticeDTO.getNoticeContent())) {
+            return "admin/admin_layout";
+        }
+
+        noticeService.saveNotice(noticeDTO);
         return "admin/admin_layout";
     }
 
-    @GetMapping("/notice/mod/{id}")
-    public String modNotice(@PathVariable Long id, Model model,
-                            @RequestParam(value = "currentPage", required = false) Integer currentPage ) {
-        NoticeDTO noticeDTO = noticeService.findById(id);
+    //공지사항 리스트
+    @GetMapping("/noticeList")
+    public String noticeList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+        Page<NoticeDTO> noticeDTO = noticeService.getNoticeList(page - 1, size);
 
-        model.addAttribute("id", id);
-        model.addAttribute("title", noticeDTO.getTitle());
-        model.addAttribute("content", noticeDTO.getContent());
-        model.addAttribute("pinned", noticeDTO.isPinned());
-        model.addAttribute("currentPage", currentPage);
-        System.out.println("수정 페이지로 들어갔을 때 " + currentPage);
-
-        return "cs/noticeAddAdmin";
-    }
-
-    //채팅리스트
-    @GetMapping("/chatList")
-    public String chatList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size){
-        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page-1, size);
-
-        int totalPages = chatRoom.getTotalPages();
+        int totalPages = noticeDTO.getTotalPages();
         int startPage = Math.max(1, page - 5);
         int endPage = Math.min(totalPages, page + 4);
 
-
-        model.addAttribute("eventList", chatRoom); //이벤트 게시글
+        model.addAttribute("noticeList", noticeDTO); //이벤트 게시글
         model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
         model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
 
+        return "admin/admin_notice_list";
+    }
+
+    //공지사항 수정 페이지
+    @GetMapping("/noticeUpdatePage")
+    public String noticeEdit(@RequestParam(name = "noticeId") long noticeId, Model model) {
+
+        NoticeDTO notice = noticeService.getNotice(noticeId);
+        model.addAttribute("notice", notice);
+
+        return "admin/admin_notice_update"; // 수정 페이지로 이동
+    }
+
+    //공지사항 수정 기능
+    @PostMapping("/noticeUpdate")
+    public String updateNotice(@ModelAttribute NoticeDTO noticeDTO, @RequestParam int pageNumber) {
+
+        noticeService.updateNotice(noticeDTO);
+
+        return "redirect:/admin/noticeList?page=" + pageNumber;
+    }
+
+    //공지사항 삭제기능
+    @GetMapping("/noticeDelete/{noticeId}")
+    public String deleteNotice(@PathVariable("noticeId") Long noticeId, @RequestParam int pageNumber) {
+
+        noticeService.delete(noticeId);
+
+        return "redirect:/admin/noticeList?page=" + pageNumber;
+    }
+
+    //채팅리스트 페이지 이동
+    @GetMapping("/chatList")
+    public String chatList() {
         return "admin/admin_chatList";
     }
+
+    //채팅리스트
+    @GetMapping("/api/chatList")
+    @ResponseBody
+    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
+        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size);
+
+        int totalPages = chatRoom.getTotalPages();
+        int startPage = Math.max(1, page - 5);
+        int endPage = Math.min(totalPages, page + 4);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("chatRoom", chatRoom.getContent());
+        response.put("currentPage", page);
+        response.put("totalPages", totalPages);
+        response.put("startPage", startPage);
+        response.put("endPage", endPage);
+
+        return response;
+    }
+
     //채팅 모달창
     @GetMapping("/chatModal")
-    public String chatModal(){
+    public String chatModal() {
         return "admin/admin_chatModal";
     }
 
-    //메세지 확인 여부
-    @PostMapping("/{messageId}/read")
-    public void markMessageAsRead(@PathVariable Long messageId) {
-        chatService.markAsRead(messageId);
-    }
+//    @GetMapping("/noticeList")
+//    public String showNoticeList(Model model,
+//                                 @RequestParam(defaultValue = "1") int page,
+//                                 @RequestParam(defaultValue = "10") int size) {
+//        noticeService.prepareNoticeList(model, page, size);
+//        return "/cs/noticeAdmin";
+//    }
+//
+//    @GetMapping("/notice/{id}")
+//    public String showNoticeDetails(Model model,
+//                                    @PathVariable Long id,
+//                                    @RequestParam(value = "currentPage", required = false) Integer currentPage) {
+//        Notice notice = noticeService.getNoticeById(id);
+//        if (notice == null) {
+//            return "redirect:/admin/notice";
+//        }
+//        noticeService.incrementViewCount(notice);
+//
+//        model.addAttribute("currentPage", currentPage);
+//        model.addAttribute("notice", notice);
+//
+//        return "cs/noticeDetailAdmin";
+//    }
+//
+//    @DeleteMapping("/notice/{id}")
+//    public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
+//        return noticeService.deleteNoticeById(id)
+//                ? ResponseEntity.ok("삭제 완료")
+//                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제 실패");
+//    }
+//
+//    @GetMapping("/notice/add")
+//    public String addNotice() {
+//        return "/cs/noticeAddAdmin";
+//    }
+//
+//    @PostMapping("/notice/add")
+//    public String addNotice(Model model,
+//                            @RequestParam(value = "currentPage", required = false) Integer currentPage,
+//                            NoticeDTO noticeDTO, BindingResult result) {
+//        Long id = noticeDTO.getId();
+//        if (id == null) {
+//            noticeService.NoticeSave(noticeDTO);
+//            model.addAttribute("urlLoad", "/admin/notice");
+//        } else {
+//            noticeService.NoticeMod(id, noticeDTO);
+//            model.addAttribute("urlLoad", "/admin/notice/" + id + "?page=" + currentPage);
+//            model.addAttribute("currentPage", currentPage);
+//            System.out.println("수정 완료해서 보낼 때: " + currentPage);
+//        }
+//
+//        return "admin/admin_layout";
+//    }
+//
+//    @GetMapping("/notice/mod/{id}")
+//    public String modNotice(@PathVariable Long id, Model model,
+//                            @RequestParam(value = "currentPage", required = false) Integer currentPage ) {
+//        NoticeDTO noticeDTO = noticeService.findById(id);
+//
+//        model.addAttribute("id", id);
+//        model.addAttribute("title", noticeDTO.getTitle());
+//        model.addAttribute("content", noticeDTO.getContent());
+//        model.addAttribute("pinned", noticeDTO.isPinned());
+//        model.addAttribute("currentPage", currentPage);
+//        System.out.println("수정 페이지로 들어갔을 때 " + currentPage);
+//
+//        return "cs/noticeAddAdmin";
+//    }
 
-    @GetMapping("/unread/{receiverId}")
-    public List<Message> getUnreadMessages(@PathVariable Long receiverId) {
-        return messageRepository.findByReceiverIdAndIsReadFalse(receiverId);
-    }
+
+
 }

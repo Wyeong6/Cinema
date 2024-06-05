@@ -16,25 +16,25 @@ public class EventDTO {
 
     private Long id;
     @NotNull
-    private String event_name;
+    private String eventName;
     private String memberEmail;
     @NotNull
-    private String event_image;
+    private String eventImage;
     @NotNull
-    private String event_alt;
+    private String eventAlt;
     @NotNull
-    private String event_detail;
+    private String eventDetail;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
 
     public static EventDTO toDTO(Event event) {
         return EventDTO.builder()
                 .id(event.getId())
-                .event_name(event.getEvent_name())
+                .eventName(event.getEventName())
                 .memberEmail(event.getMemberEmail())
-                .event_image(event.getEvent_image())
-                .event_alt(event.getEvent_alt())
-                .event_detail(event.getEvent_detail()) // 소문자로 수정
+                .eventImage(event.getEventImage())
+                .eventAlt(event.getEventAlt())
+                .eventDetail(event.getEventDetail()) // 소문자로 수정
                 .regDate(event.getRegDate())
                 .updateDate(event.getUpdateDate())
                 .build();

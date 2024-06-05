@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항 등록</title>
+    <!-- 필요한 CSS 파일 및 기타 헤더 내용 -->
+</head>
+<body>
+<h4 class="fw-bold py-3 mb-4">공지사항 등록</h4>
+<!-- Basic Layout -->
+
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="/admin/noticeRegister" method="post">
+                    <div class="mb-3">
+                        <label class="form-label" for="noticeTitle">공지사항 제목</label>
+                        <input class="form-control" id="noticeTitle" name="noticeTitle" placeholder="공지사항 제목을 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="noticeContent">공지사항 상세 설명</label>
+                        <input class="form-control" id="noticeContent" name="noticeContent"
+                               placeholder="공지사항 상세 설명을 입력해주세요." required type="text" />
+                    </div>
+                    <button class="btn btn-primary" type="submit">등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

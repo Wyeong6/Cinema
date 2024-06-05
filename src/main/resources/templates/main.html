@@ -40,7 +40,7 @@
     <!-- Header -->
     <div id="header">
         <div class="overlay"></div>
-        <h1 class="logo" style="font-size: 2em;">CINEMACAST</h1>
+        <h1 class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
         <!-- Inner -->
         <div class="inner">
             <header>
@@ -99,7 +99,7 @@
                 </li>
                 <li><a href="/snack/snackList">스낵 스토어</a></li>
                 <li><a href="/event/eventList">이벤트</a></li>
-                <li><a href="/cs/notice">공지사항</a></li>
+                <li><a href="/notice/noticeList">공지사항</a></li>
             </ul>
         </nav>
 
@@ -195,63 +195,24 @@
                 <h2>스낵 스토어</h2>
                 <p>달콤한 맛과 바삭한 식감이 어우러진 팝콘 한 컵, 영화의 재미를 더 높여줄 거예요.<br />
                     지금 바로 팝콘을 주문하고, 당신의 영화관 체험을 더욱 완벽하게 즐겨보세요!</p>
-                <p class="more_btn"><a href="#">more</a></p>
+                <p class="more_btn"><a href="/snack/snackList">more</a></p>
             </header>
             <div class="row">
-                <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/images/pic07.jpg" alt="" /></a>
+                <article class="col-3 col-12-mobile special" th:each="snack : ${snackList}"
+                         th:if="${snackList.totalElements > 0}">
+                    <a class="image featured" th:href="@{/snack/detail(id=${snack.id})}">
+                        <!-- locahost:8080/snack/detail?id=1 -->
+                        <img th:alt="${snack.snack_alt}"
+                             th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
+                    </a>
                     <header>
-                        <h3><a href="#">Gravida aliquam penatibus</a></h3>
+                        <h3><a th:href="@{/snack/detail(id=${snack.id})}" th:text="${snack.snack_nm}"></a></h3>
                     </header>
-                    <p>
-                        8,000원
-                    </p>
+                    <p th:text="${snack.snack_price} + '원'"></p>
                 </article>
-                <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/images/pic08.jpg" alt="" /></a>
-                    <header>
-                        <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                    </header>
-                    <p>
-                        4,000원
-                    </p>
-                </article>
-                <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/images/pic09.jpg" alt="" /></a>
-                    <header>
-                        <h3><a href="#">Magna laoreet et aliquam</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
-                <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/images/pic07.jpg" alt="" /></a>
-                    <header>
-                        <h3><a href="#">Gravida aliquam penatibus</a></h3>
-                    </header>
-                    <p>
-                        8,000원
-                    </p>
-                </article>
-                <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/images/pic08.jpg" alt="" /></a>
-                    <header>
-                        <h3><a href="#">Sed quis rhoncus placerat</a></h3>
-                    </header>
-                    <p>
-                        4,000원
-                    </p>
-                </article>
-                <article class="col-4 col-12-mobile special">
-                    <a href="#" class="image featured"><img src="/images/pic09.jpg" alt="" /></a>
-                    <header>
-                        <h3><a href="#">Magna laoreet et aliquam</a></h3>
-                    </header>
-                    <p>
-                        10,000원
-                    </p>
-                </article>
+            </div>
+            <div style="text-align: center" th:unless="${snackList.totalElements > 0}">
+                <h3>상품을 준비중 입니다.</h3>
             </div>
         </section>
     </div>

@@ -46,4 +46,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m.name FROM Member m WHERE m.email = :email")
     Optional<String> findNameByEmail(@Param("email") String email);
+
+    // 멤버십 등급 수정
+    @Modifying
+    @Transactional
+    @Query("UPDATE Member m SET m.grade_code = :userEditGrade WHERE m.email = :email")
+    void updateGrade(long userEditGrade, String email);
 }

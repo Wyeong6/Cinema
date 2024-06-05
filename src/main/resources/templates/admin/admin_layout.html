@@ -18,8 +18,6 @@
 
     <meta name="description" content="" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/assets/css/images/favicon.ico" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,6 +32,8 @@
     <link rel="stylesheet" href="/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="/assets/css/demo.css" />
     <link rel="stylesheet" href="/assets/css/custom_player.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
 
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
@@ -175,7 +175,7 @@
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link chat_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form interface">chat List</div>
+                        <div data-i18n="Form interface">1:1문의</div>
                     </a>
                 </li>
 
@@ -271,18 +271,20 @@
         $('.event_reg_btn').on('click', function () {
             $('.container-xxl').load('/admin/eventRegister');
         });
-        //이벤트 목록페이지
+        //이벤트 목록
         $('.event_btn').on('click', function () {
             $('.container-xxl').load('/admin/eventList');
         });
-        // 공지사항 관리
+        //공지사항 추가
         $('.notice_reg_btn').on('click', function(e) {
             e.preventDefault()
-            $('.container-xxl').load('/admin/notice/add');
+            $('.container-xxl').load('/admin/noticeRegister');
         });
+        //공지사항 목록
         $('.notice_btn').on('click', function() {
-            $('.container-xxl').load('/admin/notice');
+            $('.container-xxl').load('/admin/noticeList');
         });
+        //채팅 관리
         $('.chat_btn').on('click', function() {
             $('.container-xxl').load('/admin/chatList');
         });
@@ -292,14 +294,14 @@
         $('.container-xxl').load('/admin/notice?page=' + page + '&size=' + size);
     }
 
-        /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
-        $(document).ready(function () {
-            var urlLoad = [[${urlLoad}]];
-            if (urlLoad != null) {
-                // 페이지가 로드될 때 실행되는 코드
-                $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
-            }
-        });
+    /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
+    $(document).ready(function() {
+        var urlLoad = [[${urlLoad}]];
+        if(urlLoad != null) {
+            // 페이지가 로드될 때 실행되는 코드
+            $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
+        }
+    });
 </script>
 
 

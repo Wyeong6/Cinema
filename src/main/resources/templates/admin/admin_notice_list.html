@@ -1,3 +1,7 @@
+<!-- event_list.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <!-- Navbar -->
 
 <nav
@@ -24,110 +28,136 @@
 
 <!-- / Navbar -->
 
-                <!-- Content -->
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event List</title>
+    <style>
+        td {
+            padding: 15px; /* 좌우 간격을 조절할 값 */
+        }
 
-                    <!-- Hoverable Table rows -->
-                    <div class="card">
-                        <h5 class="card-header">Notice List</h5>
-                        <div class="table-responsive text-nowrap">
-                            <table class="table table-hover">
-                                <thead>
-                                <tr>
-                                    <th>공지사항 번호</th>
-                                    <th>제목</th>
-                                    <th>등록일자</th>
-                                    <th>수정일자</th>
-                                </tr>
-                                </thead>
-                                <tbody class="table-border-bottom-0">
-                                <tr>
-                                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>102030</strong></td>
-                                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>이병훈</strong></td>
-                                    <td>gpfud9109@gmail.com</td>
-                                    <td><span class="badge bg-label-primary me-1">Vip</span></td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                <i class="bx bx-dots-vertical-rounded"></i>
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
-                                                >
-                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                ><i class="bx bx-trash me-1"></i> Delete</a
-                                                >
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>102031</strong></td>
-                                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>조혜령</strong></td>
-                                    <td>gpfud9109@gmail.com</td>
-                                    <td><span class="badge bg-label-success me-1">Gold</span></td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                <i class="bx bx-dots-vertical-rounded"></i>
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
-                                                >
-                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                ><i class="bx bx-trash me-1"></i> Delete</a
-                                                >
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>102032</strong></td>
-                                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>김소연</strong></td>
-                                    <td>gpfud9109@gmail.com</td>
-                                    <td><span class="badge bg-label-warning me-1">Vvip</span></td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                <i class="bx bx-dots-vertical-rounded"></i>
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
-                                                >
-                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                ><i class="bx bx-trash me-1"></i> Delete</a
-                                                >
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>102033</strong></td>
-                                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>김우영</strong></td>
-                                    <td>gpfud9109@gmail.com</td>
-                                    <td><span class="badge bg-label-info me-1">Silver</span></td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                <i class="bx bx-dots-vertical-rounded"></i>
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
-                                                >
-                                                <a class="dropdown-item" href="javascript:void(0);"
-                                                ><i class="bx bx-trash me-1"></i> Delete</a
-                                                >
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!--/ Hoverable Table rows -->
+        th {
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+<h5 class="card-header">Event List</h5>
+<div class="table-responsive text-nowrap">
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>공지사항 번호</th>
+        <th>작성자 이메일</th>
+        <th>공지사항 제목</th>
+        <th>공지사항 상세글</th>
+        <th>일자</th>
+    </tr>
+    </thead>
+    <tbody class="table-border-bottom-0">
+    <tr th:if="${#lists.isEmpty(noticeList.content)}">
+        <td colspan="5" style="text-align: center;">공지사항이 없습니다.</td>
+    </tr>
+    <tr class="truncate-row" th:each="notice : ${noticeList.content}">
+        <td><strong th:text="${notice.noticeId}"></strong></td>
+        <td><strong th:text="${notice.memberEmail}"></strong></td>
+        <td><strong th:text="${notice.noticeTitle}"></strong></td>
+        <td><strong th:text="${notice.noticeContent}"></strong></td>
+        <td><strong th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}"></strong></td>
+        <td style="text-align: right; width: 50px;">
+            <a class="update-btn" th:data-page="${currentPage}" th:data-id="${notice.noticeId}">
+                <img alt="공지사항 수정 버튼" src="/images/edit.png" style="width: 24px; height: auto; margin-right: 20px;"/>
+            </a>
+            <a th:data-page="${currentPage}" th:data-id="${notice.noticeId}" class="delete-btn">
+                <img alt="공지사항 삭제 버튼" src="/images/delete.png" style="width: 24px; height: auto; margin-right: 15px;"/>
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div style="text-align: center;" th:if="${!#lists.isEmpty(noticeList.content)}">
+    <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}" th:text="'[' + ${i} + ']'"
+       class="paging-btn"></a>
+</div>
+</div>
+<script>
+    $(document).ready(function () {
+        // AJAX 요청을 보내는 공통 함수
+        function sendRequest(url, data, onSuccess, onError) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: data,
+                success: onSuccess,
+                error: function (xhr, status, error) {
+                    console.error('Error occurred: ', error);
+                    if (onError) onError(xhr, status, error);
+                }
+            });
+        }
 
+        // 페이지 번호를 세션 스토리지에 저장하거나 제거하는 함수
+        function setPageNumber(pageNumber, shouldRemove = false) {
+            if (shouldRemove) {
+                sessionStorage.removeItem('pageNumber');
+            } else {
+                sessionStorage.setItem('pageNumber', pageNumber);
+            }
+        }
 
+        // 업데이트 버튼 클릭 이벤트 핸들러
+        $('.update-btn').click(function () {
+            var noticeId = $(this).data('id');
+            var pageNumber = $(this).data('page');
+            setPageNumber(pageNumber);
+            sendRequest('/admin/noticeUpdatePage', {noticeId: noticeId}, function (response) {
+                $('.container-xxl').html(response);
+            });
+        });
+
+        // 페이징 버튼 클릭 이벤트 핸들러
+        $('.paging-btn').click(function (e) {
+            e.preventDefault();
+            var pageNumber = $(this).data('page');
+            sendRequest('/admin/noticeList?page=' + pageNumber, {}, function (response) {
+                $('.container-xxl').html(response);
+                setPageNumber(pageNumber);
+            });
+        });
+
+        // 삭제 버튼 클릭 이벤트 핸들러
+        $('.delete-btn').click(function (e) {
+            e.preventDefault();
+            var noticeId = $(this).data('id');
+            var pageNumber = $(this).data('page');
+            sendRequest('/admin/noticeDelete/' + noticeId + '?pageNumber=' + pageNumber, {}, function (response) {
+                console.log('Event deleted successfully');
+                $('.container-xxl').html(response);
+                setPageNumber(pageNumber, true);
+            });
+        });
+
+        // 텍스트를 10자로 자르고 "..."을 추가하는 함수
+        function truncateText(text, length) {
+            if (text.length > length) {
+                return text.substring(0, length) + '...';
+            }
+            return text;
+        }
+
+        //.truncate-text 요소에 대해 텍스트를 변환
+        $('.truncate-row').each(function () {
+            $(this).find('td').each(function () {
+                if (!$(this).html().match(/<a|<img/)) {
+                    var originalText = $(this).text();
+                    var truncatedText = truncateText(originalText, 10);
+                    $(this).text(truncatedText);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

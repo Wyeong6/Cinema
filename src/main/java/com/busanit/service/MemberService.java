@@ -151,4 +151,9 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         return memberRepository.findAll();
     }
 
+    // 멤버십 등급 수정
+    public void updateGrade(long userEditGrade, String email) {
+        memberRepository.updateGrade(userEditGrade, email);
+    }
+
 }

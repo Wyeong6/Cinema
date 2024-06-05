@@ -53,41 +53,17 @@
                          style="width: 24px; height: auto; margin-right: 20px;"
                          th:onclick="'editItem(' + ${snack.id} + ', ' + ${snackList.pageable.pageNumber} + ')'"/>
                     <img alt="상품 삭제 버튼" src="/images/delete.png"
-                         style="width: 24px; height: auto; margin-right: 15px;"
+                         id="item-delete-btn"
                          th:onclick="'removeItem(' + ${snack.id} + ', ' + ${snackList.pageable.pageNumber} + ')'"/>
                 </td>
             </tr>
             <tr style="text-align: center" th:unless="${snackList.totalElements > 0}">
-                <td></td>
-                <td>상품이 없습니다. 상품을 추가해주세요.</td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td colspan="5" style="padding: 2em 0 1em">상품이 없습니다. 상품을 추가해주세요.</td>
             </tr>
             </tbody>
         </table>
     </div>
     <div class="paging_btn">
-        <style>
-            /* paging_btn */
-            .paging_btn {
-                display: block;
-                width: 100%;
-                margin-top: 3%;
-            }
-
-            .paging_btn ul {
-                margin: 0 auto;
-                width: 20%;
-                display: flex;
-                justify-content: space-between;
-            }
-
-            .paging_btn ul li {
-                /*margin-right: 1%;*/
-                list-style-type: none;
-            }
-        </style>
         <ul style="text-align: center" th:if="${snackList.totalElements > 0}">
             <li th:classappend="${snackList.first} ? 'disabled'">
                 <a href="javascript:void(0);" onclick="saveUrl(0)">First</a>

@@ -18,6 +18,72 @@
     <noscript>
         <link href="/assets/css/noscript.css" rel="stylesheet"/>
     </noscript>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
+            padding: 20px;
+        }
+        .container {
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+        }
+        .special header h2 {
+            font-size: 36px; /* 제목 글자 크기 크게 */
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center; /* 제목 중앙 정렬 */
+        }
+        .special header p {
+            font-size: 14px;
+            color: #999;
+            text-align: right; /* 작성자, 조회수, 등록일 오른쪽 정렬 */
+        }
+        .special p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #555;
+            text-align: center; /* content 중앙 정렬 */
+        }
+        table.default {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            font-size: 12px; /* 테이블 글자 크기 작게 */
+        }
+        table.default td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        table.default a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        table.default a:hover {
+            text-decoration: underline;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px; /* 버튼 글자 크기 작게 */
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
@@ -27,46 +93,43 @@
 
         <!-- Main -->
         <div class="wrapper style1">
-
             <div class="container notice_get">
                 <article class="special" id="main">
                     <header>
-                        <h2><a href="#">Notice Title</a></h2>
+                        <h2><a href="#">[[${notice.noticeTitle}]]</a></h2>
                         <p>
-                            Notice Sub Title
+                            <span>작성자: [[${notice.memberEmail}]]</span> | <span>조회수: [[${notice.viewCount}]]</span> | <span>등록일: [[${#temporals.format(notice.regDate, 'yyyy-MM-dd HH:mm:ss')}]]</span>
                         </p>
                     </header>
                     <p>
-                        Commodo id natoque malesuada sollicitudin elit suscipit. Curae suspendisse mauris posuere
-                        accumsan massa
-                        posuere lacus convallis tellus interdum. Amet nullam fringilla nibh nulla convallis ut venenatis
-                        purus
-                        lobortis. Auctor etiam porttitor phasellus tempus cubilia ultrices tempor sagittis. Nisl
-                        fermentum
-                        consequat integer interdum integer purus sapien. Nibh eleifend nulla nascetur pharetra commodo
-                        mi augue
-                        interdum tellus. Ornare cursus augue feugiat sodales velit lorem. Semper elementum ullamcorper
-                        lacinia
-                        natoque aenean scelerisque vel lacinia mollis quam sodales congue.
+                        [[${notice.noticeContent}]]
                     </p>
                 </article>
                 <table class="default">
                     <tr>
                         <td>다음글</td>
-                        <td><a href="notice_list.html">notice title</a></td>
+                        <td th:if="${nextNotice != null}">
+                            <a th:href="@{/notice_get/{id}(id=${nextNotice.noticeId})}" th:text="${nextNotice.noticeTitle}"></a>
+                        </td>
+                        <td th:if="${nextNotice == null}">다음글이 없습니다.</td>
                     </tr>
                     <tr>
                         <td>이전글</td>
-                        <td><a href="notice_list.html">notice title</a></td>
+                        <td th:if="${previousNotice != null}">
+                            <a th:href="@{/notice_get/{id}(id=${previousNotice.noticeId})}" th:text="${previousNotice.noticeTitle}"></a>
+                        </td>
+                        <td th:if="${previousNotice == null}">이전글이 없습니다.</td>
                     </tr>
                 </table>
-                <button class="button" onclick="location.href='notice_list.html'">목록으로 가기</button>
+                <button class="button" onclick="window.location.href='/notice/noticeList'">목록</button>
             </div>
         </div>
 
+        <footer data-include-path="footer.html"></footer>
     </div>
+</th:block>
 
-    <footer data-include-path="footer.html"></footer>
+
 
     <!-- Scripts -->
     <script src="/assets/js/jquery.min.js"></script>

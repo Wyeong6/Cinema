@@ -8,16 +8,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface MessageRepository  extends JpaRepository<Message, Long> {
-    //메세지 확인여부
-    List<Message> findByReceiverIdAndIsReadFalse(Long receiverId);
 
     List<Message> findByChatRoomId(Long chatRoomId);
 
+    int countByChatRoomIdAndRegDateAfter(Long chatRoomId, LocalDateTime lastReadTime);
 
+    int countByChatRoomId(Long chatRoomId);
 
-//    Page<Message> findAll(Pageable pageable);
 }
