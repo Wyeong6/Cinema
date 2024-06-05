@@ -37,7 +37,7 @@ public class Message extends BaseTimeEntity {
 
     private String content;
 
-    private String messageTitle;
+//    private String messageTitle;
 
     @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MessageReadStatus> readStatuses = new ArrayList<>();

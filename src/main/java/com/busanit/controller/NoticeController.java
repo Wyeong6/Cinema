@@ -41,9 +41,13 @@ public class NoticeController {
     @GetMapping("/notice_get/{noticeId}")
     public String eventGet(@PathVariable("noticeId") Long noticeId, Model model) {
         // 서비스 레이어를 통해 특정 ID의 이벤트 상세 정보를 조회합니다.
-        NoticeDTO notice = noticeService.getEvent(noticeId);
+        NoticeDTO currentNotice  = noticeService.getNotice(noticeId);
+        Notice previousNotice = noticeService.getPreviousNotice(noticeId);
+        Notice nextNotice = noticeService.getNextNotice(noticeId);
         // 모델에 이벤트 정보를 추가하여 뷰에 전달합니다.
-        model.addAttribute("notice", notice);
+        model.addAttribute("notice", currentNotice );
+        model.addAttribute("previousNotice", previousNotice);
+        model.addAttribute("nextNotice", nextNotice);
         return "notice/notice_get"; // Thymeleaf를 사용한 이벤트 상세 정보 페이지의 이름
     }
 }

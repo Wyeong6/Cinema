@@ -70,6 +70,18 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
+    // 사용자 이메일로 채팅방 타이틀 조회
+    public String findChatTitleByMemberEmail(String userEmail) {
+        List<ChatRoom> chatRooms = chatRoomRepository.findByMembersEmail(userEmail);
+        if (!chatRooms.isEmpty()) {
+            // 채팅방 리스트가 비어있지 않다면, 첫 번째 채팅방의 타이틀을 반환합니다.
+            return chatRooms.get(0).getTitle();
+        } else {
+            // 채팅방이 없을 경우, 빈 문자열이나 null을 반환할 수 있습니다.
+            return ""; // 또는 return null;
+        }
+    }
+
     // 채팅방 생성 또는 조회
     public ChatRoom getOrCreateChatRoom(String messageTitle, String senderEmail, String recipientEmail) {
         if ("admin@admin.com".equals(senderEmail)) {
@@ -116,7 +128,6 @@ public class ChatService {
         message.setSender(sender);
         message.setReceiver(receiver);
         message.setContent(messageDTO.getContent());
-        message.setMessageTitle(messageDTO.getMessageTitle());
         message.setChatRoom(chatRoom);
         return message;
     }
@@ -138,6 +149,11 @@ public class ChatService {
             return messageRepository.countByChatRoomIdAndRegDateAfter(chatRoomId, lastReadTimestamp);
         }
     }
+    public String findMessageTitleByUserEmail(String userEmail) {
+        return null;
+//       return messageRepository.findMessageTitleByUserEmail(userEmail);
+    }
+
 
     public void updateLastReadTimestamp(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)

@@ -24,7 +24,7 @@ public class MessageDTO {
                 .sender(message.getSender().getEmail())
                 .recipient(message.getReceiver().getEmail())
                 .content(message.getContent())
-                .messageTitle(message.getMessageTitle())
+                .messageTitle(message.getChatRoom().getTitle())
                 .build();
     }
 

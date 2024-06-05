@@ -3,6 +3,7 @@ package com.busanit.controller;
 import com.busanit.domain.EventDTO;
 import com.busanit.domain.SnackDTO;
 import com.busanit.entity.Event;
+import com.busanit.entity.Notice;
 import com.busanit.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,8 +39,12 @@ public class EventController {
     public String eventGet(@PathVariable("id") Long id, Model model) {
         // 서비스 레이어를 통해 특정 ID의 이벤트 상세 정보를 조회합니다.
         EventDTO event = eventService.getEvent(id);
+        Event previousEvent = eventService.getPreviousEvent(id);
+        Event nextEvent = eventService.getNextEvent(id);
         // 모델에 이벤트 정보를 추가하여 뷰에 전달합니다.
         model.addAttribute("event", event);
+        model.addAttribute("previousEvent", previousEvent);
+        model.addAttribute("nextEvent", nextEvent);
         return "event/event_get"; // Thymeleaf를 사용한 이벤트 상세 정보 페이지의 이름
     }
 }

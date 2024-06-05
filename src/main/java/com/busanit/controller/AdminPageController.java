@@ -319,7 +319,7 @@ public class AdminPageController {
     @GetMapping("/noticeUpdatePage")
     public String noticeEdit(@RequestParam(name = "noticeId") long noticeId, Model model) {
 
-        NoticeDTO notice = noticeService.getEvent(noticeId);
+        NoticeDTO notice = noticeService.getNotice(noticeId);
         model.addAttribute("notice", notice);
 
         return "admin/admin_notice_update"; // 수정 페이지로 이동
@@ -327,13 +327,53 @@ public class AdminPageController {
 
     //공지사항 수정 기능
     @PostMapping("/noticeUpdate")
-    public String updateEvent(@ModelAttribute NoticeDTO noticeDTO, @RequestParam int pageNumber) {
+    public String updateNotice(@ModelAttribute NoticeDTO noticeDTO, @RequestParam int pageNumber) {
 
-        noticeService.updateEvent(noticeDTO);
+        noticeService.updateNotice(noticeDTO);
 
         return "redirect:/admin/noticeList?page=" + pageNumber;
     }
 
+    //공지사항 삭제기능
+    @GetMapping("/noticeDelete/{noticeId}")
+    public String deleteNotice(@PathVariable("noticeId") Long noticeId, @RequestParam int pageNumber) {
+
+        noticeService.delete(noticeId);
+
+        return "redirect:/admin/noticeList?page=" + pageNumber;
+    }
+
+    //채팅리스트 페이지 이동
+    @GetMapping("/chatList")
+    public String chatList() {
+        return "admin/admin_chatList";
+    }
+
+    //채팅리스트
+    @GetMapping("/api/chatList")
+    @ResponseBody
+    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
+        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size);
+
+        int totalPages = chatRoom.getTotalPages();
+        int startPage = Math.max(1, page - 5);
+        int endPage = Math.min(totalPages, page + 4);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("chatRoom", chatRoom.getContent());
+        response.put("currentPage", page);
+        response.put("totalPages", totalPages);
+        response.put("startPage", startPage);
+        response.put("endPage", endPage);
+
+        return response;
+    }
+
+    //채팅 모달창
+    @GetMapping("/chatModal")
+    public String chatModal() {
+        return "admin/admin_chatModal";
+    }
 
 //    @GetMapping("/noticeList")
 //    public String showNoticeList(Model model,
@@ -404,35 +444,6 @@ public class AdminPageController {
 //        return "cs/noticeAddAdmin";
 //    }
 
-    //채팅리스트
-    @GetMapping("/chatList")
-    public String chatList() {
-        return "admin/admin_chatList";
-    }
 
-    @GetMapping("/api/chatList")
-    @ResponseBody
-    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
-        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size);
-
-        int totalPages = chatRoom.getTotalPages();
-        int startPage = Math.max(1, page - 5);
-        int endPage = Math.min(totalPages, page + 4);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("chatRoom", chatRoom.getContent());
-        response.put("currentPage", page);
-        response.put("totalPages", totalPages);
-        response.put("startPage", startPage);
-        response.put("endPage", endPage);
-
-        return response;
-    }
-
-    //채팅 모달창
-    @GetMapping("/chatModal")
-    public String chatModal() {
-        return "admin/admin_chatModal";
-    }
 
 }

@@ -108,14 +108,20 @@
                 <table class="default">
                     <tr>
                         <td>다음글</td>
-                        <td><a href="[[${nextNoticeUrl}]]">[[${nextNoticeTitle}]]</a></td>
+                        <td th:if="${nextNotice != null}">
+                            <a th:href="@{/notice_get/{id}(id=${nextNotice.noticeId})}" th:text="${nextNotice.noticeTitle}"></a>
+                        </td>
+                        <td th:if="${nextNotice == null}">다음글이 없습니다.</td>
                     </tr>
                     <tr>
                         <td>이전글</td>
-                        <td><a href="[[${prevNoticeUrl}]]">[[${prevNoticeTitle}]]</a></td>
+                        <td th:if="${previousNotice != null}">
+                            <a th:href="@{/notice_get/{id}(id=${previousNotice.noticeId})}" th:text="${previousNotice.noticeTitle}"></a>
+                        </td>
+                        <td th:if="${previousNotice == null}">이전글이 없습니다.</td>
                     </tr>
                 </table>
-                <button class="button" onclick="location.href='notice_list.html'">목록</button>
+                <button class="button" onclick="window.location.href='/notice/noticeList'">목록</button>
             </div>
         </div>
 

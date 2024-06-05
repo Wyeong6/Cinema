@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -40,13 +41,13 @@ public class ChatController {
         }
     }
     //관리자에게 메세지 보내기
-    @MessageMapping("/chat/private")
-    public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
-        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" +messageDTO.getSender() , messageDTO);
+        @MessageMapping("/chat/private")
+        public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
+            messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" +messageDTO.getSender() , messageDTO);
 
-        chatService.saveMessage(messageDTO);
+            chatService.saveMessage(messageDTO);
 
-    }
+        }
     //관리자 챗메세지
     @GetMapping("/chatAdmin")
     public String chatAdmin(Model model) {
@@ -70,6 +71,13 @@ public class ChatController {
     public List<ChatRoomDTO> fetchMessages(@PathVariable String userEmail) {
 
         return chatService.findChatRoomByUserEmail(userEmail);
+    }
+    //선택한 메세지타이틀
+    @GetMapping("/getChatTitle/{userEmail}")
+    @ResponseBody
+    public Map<String, String> getMessageTitle(@PathVariable String userEmail) {
+        String chatTitle = chatService.findChatTitleByMemberEmail(userEmail);
+        return Map.of("chatTitle", chatTitle != null ? chatTitle : "");
     }
 
 }

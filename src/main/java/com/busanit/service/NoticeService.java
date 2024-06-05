@@ -56,13 +56,21 @@ public class NoticeService {
     }
 
     //업데이트 할 데이터를 페이지에 표시
-    public NoticeDTO getEvent(Long noticeId){
+    public NoticeDTO getNotice(Long noticeId){
         Notice notice = noticeRepository.findById(noticeId).orElseThrow(() -> new NullPointerException("notice null"));
         notice.setViewCount(notice.getViewCount() + 1);
         return NoticeDTO.toDTO(notice);
     }
+
+    public Notice getPreviousNotice(Long noticeId) {
+        return noticeRepository.findPreviousNotice(noticeId);
+    }
+
+    public Notice getNextNotice(Long noticeId) {
+        return noticeRepository.findNextNotice(noticeId);
+    }
     //업데이트기능
-    public void updateEvent(NoticeDTO noticeDTO) {
+    public void updateNotice(NoticeDTO noticeDTO) {
         Notice notice = noticeRepository.findById(noticeDTO.getNoticeId())
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + noticeDTO.getNoticeId()));
 
