@@ -74,10 +74,10 @@ public class MovieService {
         fetchAndStoreMovieRuntimeAndReleaseData();
         fetchAndStoreMovieStillCuts();
         fetchAndStoreCertificationData();
-//        fetchKoreanActors(); 지우지마세요
+        fetchKoreanActors();
 
         // 데이터 캐시 갱신
-//        cachedActors = fetchKoreanActors(); 지우지마세요
+        cachedActors = getActors();
         cachedVideoMovies = getVideoMovies();
         cachedAllMovies = getAll();
         cachedHotMovies = getHotMovies();
@@ -378,10 +378,9 @@ public class MovieService {
 
     // 영화 배우 가져오기
     public void fetchKoreanActors() throws IOException {
-        int totalPages = fetchTotalPages();
         List<MovieActor> koreanActors = new ArrayList<>();
 
-        for (int page = 1; page <= totalPages; page++) {
+        for (int page = 1; page <= 50; page++) {
             String url = "https://api.themoviedb.org/3/person/popular?language=ko-KR&page=" + page + "&api_key=" + apiKey;
             Request request = new Request.Builder().url(url).build();
 
@@ -414,9 +413,9 @@ public class MovieService {
     private static String getGender(int genderCode) {
         switch (genderCode) {
             case 1:
-                return "남자";
-            case 2:
                 return "여자";
+            case 2:
+                return "남자";
             default:
                 return "Not specified";
         }
@@ -514,11 +513,11 @@ public class MovieService {
     }
 
     // 지우지마세요
-//    public List<MovieDTO> getActors() {
-//        List<MovieActor> movieActors = movieActorRepository.findAll();
-//        return movieActors.stream().map(MovieDTO::convertToDTO)
-//                .collect(Collectors.toList());
-//    }
+    public List<MovieDTO> getActors() {
+        List<MovieActor> movieActors = movieActorRepository.findAll();
+        return movieActors.stream().map(MovieDTO::convertActorToDTO)
+                .collect(Collectors.toList());
+    }
 
     //로그인되어있는 유저 email받아오기
     public String getUserEmail() {
