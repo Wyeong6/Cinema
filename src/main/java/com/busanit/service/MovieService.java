@@ -79,7 +79,7 @@ public class MovieService {
         fetchAndStoreCertificationData();
         fetchKoreanActors();
 
-        // 데이터 캐시 갱신
+        // 데이터 로컬 캐시 전략
         cachedActors = getActors();
         cachedVideoMovies = getVideoMovies();
         cachedAllMovies = getAll();
@@ -397,9 +397,13 @@ public class MovieService {
                         if (isKoreanName(name)) {
                             int gender = node.get("gender").asInt();
                             String profilePath = node.get("profile_path").asText(null);
-                            MovieActor actor = new MovieActor(name, getGender(gender), profilePath);
-                            koreanActors.add(actor);
-                            movieActorRepository.save(actor);  // Save to database
+                            // 중복 체크
+                            if (!isActorExists(name)) {
+                                // 데이터베이스에 존재하지 않는 경우에만 추가
+                                MovieActor actor = new MovieActor(name, getGender(gender), profilePath);
+                                koreanActors.add(actor);
+                                movieActorRepository.save(actor);  // Save to database
+                            }
                         }
                     }
                 }
@@ -411,6 +415,10 @@ public class MovieService {
 
     private boolean isKoreanName(String name) {
         return name.matches(".*[가-힣].*");
+    }
+    private boolean isActorExists(String name) {
+        // 배우 이름으로 데이터베이스에서 검색하여 존재 여부 확인
+        return movieActorRepository.existsByActorName(name);
     }
 
     private static String getGender(int genderCode) {

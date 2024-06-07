@@ -13,4 +13,6 @@ public interface MovieActorRepository extends JpaRepository<MovieActor, Long> {
 
     @Query("SELECT a.actorId FROM MovieActor a JOIN a.movies m WHERE m.movieId = :movieId")
     List<Long> findActorIdsByMovieId(String movieId);
+
+    boolean existsByActorName(String name);
 }
