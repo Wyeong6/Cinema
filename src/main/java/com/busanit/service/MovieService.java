@@ -1,5 +1,6 @@
 package com.busanit.service;
 
+import com.busanit.domain.movie.ActorDTO;
 import com.busanit.entity.movie.*;
 import com.busanit.repository.*;
 import com.busanit.domain.movie.MovieDTO;
@@ -38,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.busanit.domain.movie.ActorDTO.convertToDto;
 
 @Service
 @RequiredArgsConstructor
@@ -588,12 +591,13 @@ public class MovieService {
     //어드민 페이지 영화 등록
     public void saveMovie(
             Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
-            String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime) {
+            String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime, List<Long> actors) {
 
         Movie movie = new Movie();
         movie.setMovieId(movieId);
         movie.setTitle(movieTitle);
         movie.setOverview(movieOverview);
+
 
 
         MovieDetail movieDetail = new MovieDetail();
@@ -602,6 +606,15 @@ public class MovieService {
         movieDetail.setVideo(video);
         movieDetail.setRuntime(runtime);
         movie.setMovieDetail(movieDetail);
+
+        // 배우 추가
+
+        for (Long actorId : actors) {
+            MovieActor actor = movieActorRepository.findById(actorId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid actor ID: " + actorId));
+            movie.addActor(actor);
+        }
+
 
 
         // 장르 추가
@@ -628,11 +641,33 @@ public class MovieService {
         movie.addImage(movieImage);
 
 
+
+
         movieRepository.save(movie);
     }
 
 
     public boolean checkIfMovieIdExists(String id) {
         return movieRepository.existsById(Long.valueOf(id));
+    }
+
+    public List<MovieActor> findByActorNameContaining(String query) {
+        return movieActorRepository.findByActorNameContaining(query);
+    }
+
+
+    public List<Long> getActorIdsByMovieId(String movieId) {
+        // Movie ID를 기반으로 해당 영화에 출연한 배우들의 ID 목록을 데이터베이스에서 조회하여 반환
+        return movieActorRepository.findActorIdsByMovieId(movieId);
+    }
+
+    public ActorDTO getActorById(Long actorId) {
+        Optional<MovieActor> optionalMovieActor = movieActorRepository.findById(actorId);
+        if (optionalMovieActor.isPresent()) {
+            MovieActor movieActor = optionalMovieActor.get();
+            return convertToDto(movieActor);
+        } else {
+            throw new IllegalArgumentException("Actor with ID " + actorId + " not found");
+        }
     }
 }
