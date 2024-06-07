@@ -4,6 +4,7 @@ import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.entity.chat.ChatRoom;
 import com.busanit.entity.chat.Message;
+import com.busanit.entity.chat.MessageReadStatus;
 import com.busanit.entity.movie.Comment;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieReaction;
@@ -14,6 +15,7 @@ import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -54,12 +56,19 @@ public class Member extends BaseTimeEntity {
 
     private Boolean checkedTermsS;
 
-    @OneToMany(mappedBy = "sender")
+    //보낸 메세지
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     private List<Message> sentMessages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver")
+    //받은 메세지
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
     private List<Message> receivedMessages = new ArrayList<>();
 
+    //멤버별 메세지 읽음 상태를 관리
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MessageReadStatus> readStatuses = new ArrayList<>();
+
+    //채팅룸 연관관계
     @ManyToMany
     @JoinTable(name = "member_chatroom",
             joinColumns = @JoinColumn(name = "member_id"),
@@ -70,7 +79,7 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<FavoriteMovie> favoriteMovies = new ArrayList<>();
 
-    //멤버와 댓글 연관관계
+    //댓글 연관관계
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comment = new ArrayList<>();
 
@@ -78,7 +87,14 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MovieReaction> reactions = new ArrayList<>();
 
-//    //회원 삭제시 채팅룸 삭제
+    //보낸메세지 연관관계
+    public void addSentMessage(Message message) {
+        this.sentMessages.add(message);
+        if (message.getSender() != this) {
+            message.setSender(this);
+        }
+    }
+    //    //회원 삭제시 채팅룸 삭제
 //    @PreRemove
 //    private void preRemove() {
 //        for (ChatRoom chatRoom : chatRooms) {
@@ -88,31 +104,29 @@ public class Member extends BaseTimeEntity {
 //            }
 //        }
 //    }
+//
+//    public void removeSentMessage(Message message) {
+//        this.sentMessages.remove(message);
+//        if (message.getSender() == this) {
+//            message.setSender(null);
+//        }
+//    }
+//
+//    public void removeReceivedMessage(Message message) {
+//        this.receivedMessages.remove(message);
+//        if (message.getReceiver() == this) {
+//            message.setReceiver(null);
+//        }
+//    }
 
     // 포인트
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     List<Point> pointList;
 
-    public void addSentMessage(Message message) {
-        this.sentMessages.add(message);
-        if (message.getSender() != this) {
-            message.setSender(this);
-        }
-    }
+    // 스낵 구매
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    List<SnackPayment> snackPaymentList;
 
-    public void removeSentMessage(Message message) {
-        this.sentMessages.remove(message);
-        if (message.getSender() == this) {
-            message.setSender(null);
-        }
-    }
-
-    public void removeReceivedMessage(Message message) {
-        this.receivedMessages.remove(message);
-        if (message.getReceiver() == this) {
-            message.setReceiver(null);
-        }
-    }
     public void addReceivedMessage(Message message) {
         this.receivedMessages.add(message);
         if (message.getReceiver() != this) {
@@ -125,9 +139,13 @@ public class Member extends BaseTimeEntity {
         this.chatRooms.add(chatRoom);
         chatRoom.getMembers().add(this);
     }
-
-
-
+    //메세지상태 연관관계
+    public void addReadStatus(MessageReadStatus readStatus) {
+        this.readStatuses.add(readStatus);
+        if (readStatus.getMember() != this) {
+            readStatus.setMember(this);
+        }
+    }
     // 리액션 연관관계 및 그외 메서드 시작
     @Transactional
     public void addReaction(Movie movie, ReactionType reactionType) {

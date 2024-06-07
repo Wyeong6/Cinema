@@ -3,9 +3,11 @@ package com.busanit.service;
 import com.busanit.constant.Role;
 import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.entity.Member;
+import com.busanit.entity.Point;
 import com.busanit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -26,6 +28,8 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MemberService memberService;
+    private final PointService pointService;
 
     // 매서드 재정의로 만듦
     @Override
@@ -70,13 +74,14 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
     private OAuth2MemberDTO generateDTO(String email, Map<String, Object> paramMap){
         Optional<Member> result = memberRepository.findByEmail(email);
+        String temporaryName = "USER-"+RandomStringUtils.randomAlphanumeric(10);
 
         // DB에 해당 이메일과 사용자가 없다면 자동으로 회원 가입 처리
         if(result.isEmpty()){
             // 회원 추가
             // id = 이메일 주소 / 패스워드는 1111
             Member member = Member.builder()
-                    .name(email)
+                    .name(temporaryName)
                     .email(email)
                     .password(passwordEncoder.encode("1111"))
                     .age("1")
@@ -90,8 +95,11 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
             // DB에 회원정보 저장(회원가입 처리)
             memberRepository.save(member);
 
+            // 회원가입으로 member 생성 후 해당 멤버 id를 FK로 point란 생성
+            pointService.savePoint(Point.createPoint(memberService.findUserIdx(email)));
+
             OAuth2MemberDTO oAuth2MemberDTO = new OAuth2MemberDTO(
-                    email, "1111", email, true, "1",
+                    temporaryName, "1111", email, true, "1",
                     Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")), true, false);
             oAuth2MemberDTO.setAttr(paramMap);
 

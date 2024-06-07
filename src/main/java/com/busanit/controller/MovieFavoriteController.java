@@ -1,6 +1,6 @@
 package com.busanit.controller;
 
-import com.busanit.domain.FavoriteMovieDTO;
+import com.busanit.domain.movie.FavoriteMovieDTO;
 import com.busanit.service.FavoriteMovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

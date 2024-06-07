@@ -22,15 +22,15 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String event_name;
+    private String eventName;
 
     private String memberEmail;
 
-    private String event_image;
+    private String eventImage;
 
-    private String event_alt;
+    private String eventAlt;
 
-    private String event_detail;
+    private String eventDetail;
     @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime regDate;
@@ -54,19 +54,19 @@ public class Event {
 
     public static Event toEntity(EventDTO eventDTO) {
         return Event.builder()
-                .event_name(eventDTO.getEvent_name())
+                .eventName(eventDTO.getEventName())
                 .memberEmail(eventDTO.getMemberEmail())
-                .event_image(eventDTO.getEvent_image())
-                .event_alt(eventDTO.getEvent_alt())
-                .event_detail(eventDTO.getEvent_detail())
+                .eventImage(eventDTO.getEventImage())
+                .eventAlt(eventDTO.getEventAlt())
+                .eventDetail(eventDTO.getEventDetail())
                 .build();
     }
 
     public void update(EventDTO eventDTO) {
-        this.event_name = eventDTO.getEvent_name();
+        this.eventName = eventDTO.getEventName();
         this.memberEmail = eventDTO.getMemberEmail();
-        this.event_image = eventDTO.getEvent_image();
-        this.event_alt = eventDTO.getEvent_alt();
-        this.event_detail = eventDTO.getEvent_detail();
+        this.eventImage = eventDTO.getEventImage();
+        this.eventAlt = eventDTO.getEventAlt();
+        this.eventDetail = eventDTO.getEventDetail();
     }
 }

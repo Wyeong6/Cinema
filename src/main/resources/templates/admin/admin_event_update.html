@@ -15,28 +15,30 @@
     <div class="col-xl">
         <div class="card mb-4">
             <div class="card-body">
-                <form action="/admin/update" method="post">
+                <form action="/admin/eventUpdate" method="post">
                     <input type="hidden" name="pageNumber" id="pageNumber">
+                    <input type="hidden" name="memberEmail" id="memberEmail" th:value="${event.memberEmail}">
                     <input type="hidden" name="id" id="id" th:value="${event.id}">
+
                     <div class="mb-3">
-                        <label class="form-label" for="event_name">이벤트 제목</label>
-                        <input class="form-control" id="event_name" name="event_name" placeholder="이벤트 제목을 입력해주세요."
-                               required type="text" th:value="${event.event_name}"/>
+                        <label class="form-label" for="eventName">이벤트 제목</label>
+                        <input class="form-control" id="eventName" name="eventName" placeholder="이벤트 제목을 입력해주세요."
+                               required type="text" th:value="${event.eventName}"/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="event_detail">이벤트 상세 설명</label>
-                        <input class="form-control" id="event_detail" name="event_detail"
-                               placeholder="이벤트 상세 설명을 입력해주세요." required type="text" th:value="${event.event_detail}"/>
+                        <label class="form-label" for="eventDetail">이벤트 상세 설명</label>
+                        <input class="form-control" id="eventDetail" name="eventDetail"
+                               placeholder="이벤트 상세 설명을 입력해주세요." required type="text" th:value="${event.eventDetail}"/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="event_image">이미지 이름</label>
-                        <input class="form-control" id="event_image" name="event_image"
-                               placeholder="이미지 파일명을 입력해주세요. ex) event01.png" required type="text" th:value="${event.event_image}"/>
+                        <label class="form-label" for="eventImage">이미지 이름</label>
+                        <input class="form-control" id="eventImage" name="eventImage"
+                               placeholder="이미지 파일명을 입력해주세요. ex) event01.png" required type="text" th:value="${event.eventImage}"/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="event_alt">이미지 alt 설명</label>
-                        <input class="form-control" id="event_alt" name="event_alt" placeholder="이미지 alt 설명을 입력해주세요."
-                               required type="text" th:value="${event.event_alt}"/>
+                        <label class="form-label" for="eventAlt">이미지 alt 설명</label>
+                        <input class="form-control" id="eventAlt" name="eventAlt" placeholder="이미지 alt 설명을 입력해주세요."
+                               required type="text" th:value="${event.eventAlt}"/>
                     </div>
                     <button class="updatePageBt" type="submit">수정하기</button>
                 </form>
@@ -55,7 +57,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "/admin/update",
+                url: "/admin/eventUpdate",
                 data: formData,
                 success: function(response) {
                     $('.container-xxl').html(response);

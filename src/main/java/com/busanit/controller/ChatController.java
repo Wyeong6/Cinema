@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -40,24 +41,16 @@ public class ChatController {
         }
     }
     //관리자에게 메세지 보내기
-    @MessageMapping("/chat/private")
-    public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
+        @MessageMapping("/chat/private")
+        public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
+            messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" +messageDTO.getSender() , messageDTO);
 
-        System.out.println("sendPrivateMessage() 메서드 호출됨");
-        // 데이터가 잘 들어오는지 확인하기 위해 시스템 아웃 추가
-        System.out.println("Received messageDTO: " + messageDTO);
+            chatService.saveMessage(messageDTO);
 
-        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private", messageDTO);
-
-        // 메시지를 저장하기 전에 데이터 확인
-        System.out.println("Saving message: " + messageDTO);
-        chatService.saveMessage(messageDTO);
-
-    }
+        }
     //관리자 챗메세지
     @GetMapping("/chatAdmin")
     public String chatAdmin(Model model) {
-
             String adminEmail = chatService.getAuthenticatedUserEmail();
             model.addAttribute("adminEmail", adminEmail);
 
@@ -67,7 +60,6 @@ public class ChatController {
     //유저에게 메세지 보내기
     @MessageMapping("/chat/admin")
     public void sendAdminMessage(@Payload MessageDTO messageDTO) {
-
         chatService.saveMessage(messageDTO);
 
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private", messageDTO);
@@ -77,15 +69,15 @@ public class ChatController {
     @GetMapping("/chat/private/{userEmail}")
     @ResponseBody
     public List<ChatRoomDTO> fetchMessages(@PathVariable String userEmail) {
+
         return chatService.findChatRoomByUserEmail(userEmail);
     }
-
-        //모든 구독자에게 메세지전송
-//    @MessageMapping("/chat/admin")
-//    @SendTo("/topic/messages") //브로드캐스트기능 , /topic/messages를 구독한 모든 사용자에게 메세지를 전송
-//    public MessageDTO broadcastMessage(@Payload MessageDTO messageDTO) {
-//        return messageDTO;
-//    }
-
+    //선택한 메세지타이틀
+    @GetMapping("/getChatTitle/{userEmail}")
+    @ResponseBody
+    public Map<String, String> getMessageTitle(@PathVariable String userEmail) {
+        String chatTitle = chatService.findChatTitleByMemberEmail(userEmail);
+        return Map.of("chatTitle", chatTitle != null ? chatTitle : "");
+    }
 
 }

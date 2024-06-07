@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이벤트 등록</title>
+    <!-- 필요한 CSS 파일 및 기타 헤더 내용 -->
+</head>
+<body>
+<h4 class="fw-bold py-3 mb-4">이벤트 수정</h4>
+<!-- Basic Layout -->
+
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="/admin/noticeUpdate" method="post">
+                    <input type="hidden" name="pageNumber" id="pageNumber">
+                    <input type="hidden" name="memberEmail" id="memberEmail" th:value="${notice.memberEmail}">
+                    <input type="hidden" name="noticeId" id="noticeId" th:value="${notice.noticeId}">
+                    <div class="mb-3">
+                        <label class="form-label" for="noticeTitle">공지사항 제목</label>
+                        <input class="form-control" id="noticeTitle" name="noticeTitle" placeholder="이벤트 제목을 입력해주세요."
+                               required type="text" th:value="${notice.noticeTitle}"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="noticeContent">이벤트 상세 설명</label>
+                        <input class="form-control" id="noticeContent" name="noticeContent"
+                               placeholder="공지사항 상세 설명을 입력해주세요." required type="text" th:value="${notice.noticeContent}"/>
+                    </div>
+                    <button class="updatePageBt" type="submit">수정하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('form').on('submit', function(e) {
+            e.preventDefault();
+
+            var pageNumber = sessionStorage.getItem('pageNumber');
+            $('#pageNumber').val(pageNumber);
+            var formData = $(this).serialize(); // 폼 데이터 직렬화
+
+            $.ajax({
+                type: "POST",
+                url: "/admin/noticeUpdate",
+                data: formData,
+                success: function(response) {
+                    $('.container-xxl').html(response);
+                    sessionStorage.removeItem('pageNumber');
+                },
+                error: function(error) {
+                    console.log('폼 제출 실패', error);
+                }
+            });
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const message = document.getElementById("message").value;
+        if (message) {
+            alert(message);
+        }
+    });
+</script>
+</body>
+</html>

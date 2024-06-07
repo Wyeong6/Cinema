@@ -1,15 +1,19 @@
 package com.busanit.controller;
 
-import com.busanit.domain.*;
+
+import com.busanit.domain.movie.CommentDTO;
+import com.busanit.domain.FormMemberDTO;
+import com.busanit.domain.MemberRegFormDTO;
+import com.busanit.domain.OAuth2MemberDTO;
+import com.busanit.domain.movie.FavoriteMovieDTO;
 import com.busanit.service.CommentService;
-import com.busanit.service.FavoriteMovieService;
 import com.busanit.service.MemberService;
-import com.busanit.service.PointService;
+import com.busanit.domain.*;
+import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -26,12 +30,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/mypage")
@@ -44,6 +45,7 @@ public class MypageController {
     private final PasswordEncoder passwordEncoder;
     private final FavoriteMovieService favoriteMovieService;
     private final PointService pointService;
+    private final SnackPaymentService snackPaymentService;
     private final ObjectMapper objectMapper;
 
     @GetMapping("/")
@@ -53,6 +55,20 @@ public class MypageController {
         if (authentication != null) {
             userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
         }
+
+        // 사용자의 등급 확인+저장 (수정예정 은 아니고 추가로 다른 곳에도 넣을 예정 - pay쪽에도 넣어야함)
+        long userGradeCount = pointService.getPointMovieCount(memberService.findUserIdx(userEmail));
+        long userEditGrade;
+        if(userGradeCount >= 10) {
+            userEditGrade = 1;
+        } else if(userGradeCount >= 5) {
+            userEditGrade = 2;
+        } else if(userGradeCount >= 3) {
+            userEditGrade = 3;
+        } else {
+            userEditGrade = 4;
+        }
+        memberService.updateGrade(userEditGrade, userEmail);
 
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
         if(principal instanceof OAuth2MemberDTO) {
@@ -94,6 +110,11 @@ public class MypageController {
         };
         model.addAttribute("myPageGrade", gradeString);
 
+        // 최근 스낵 주문 내역
+        Slice<SnackPaymentDTO> snackPaymentDTOList = null;
+        snackPaymentDTOList = snackPaymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
+        model.addAttribute("snackPaymentInfo", snackPaymentDTOList);
+
         return "/mypage/mypage_main";
     }
 
@@ -104,9 +125,28 @@ public class MypageController {
     }
 
     @GetMapping("/order")
-    public String mypageOrder() {
+    public String mypageOrder(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+
+        // 사용자의 주문내역
+        Slice<SnackPaymentDTO> snackPaymentDTOList = null;
+        snackPaymentDTOList = snackPaymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
+        model.addAttribute("snackPaymentInfo", snackPaymentDTOList);
 
         return "/mypage/mypage_order";
+    }
+
+    @GetMapping("/order/more")
+    @ResponseBody
+    public Slice<SnackPaymentDTO> getOrders(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = (authentication != null) ? authentication.getName() : null;
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        return snackPaymentService.getSnackPaymentInfo(memberRegFormDTO.getId(), pageable);
     }
 
     @GetMapping("/membership")
@@ -150,6 +190,15 @@ public class MypageController {
         model.addAttribute("pointInfo", pointDTOList);
 
         return "/mypage/mypage_point";
+    }
+
+    @GetMapping("/point/more")
+    @ResponseBody
+    public Slice<PointDTO> getPoints(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = (authentication != null) ? authentication.getName() : null;
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        return pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
     }
 
     @GetMapping("/review")

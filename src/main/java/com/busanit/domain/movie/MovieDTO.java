@@ -1,4 +1,4 @@
-package com.busanit.domain;
+package com.busanit.domain.movie;
 
 import com.busanit.entity.movie.Genre;
 import com.busanit.entity.movie.Movie;
@@ -6,6 +6,7 @@ import com.busanit.entity.movie.MovieStillCut;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,13 @@ public class MovieDTO {
     private List<Integer> genreIds;
     private List<String> Genres;
     private List<String> stillCutPaths;
+
+    // 영화 배우 관련
+    private String name;
+    private String gender;
+    @JsonProperty("profile_path")
+    private String profilePic;
+
 
     public static MovieDTO convertToDTO(Movie movie){
         MovieDTO movieDTO = new MovieDTO();

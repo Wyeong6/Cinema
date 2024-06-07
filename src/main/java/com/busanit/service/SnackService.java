@@ -58,18 +58,37 @@ public class SnackService {
         return SnackDTO.toDTO(snack);
     }
 
+    // 마이페이지 주문내역조회 리스트 불러오기
+    public SnackDTO findSnackById(Long snackId) {
+        Snack snack = snackRepository.findById(snackId)
+                .orElseThrow(() -> new RuntimeException("Snack not found"));
+
+        return SnackDTO.builder()
+                .id(snack.getId())
+                .snack_nm(snack.getSnack_nm())
+                .snack_image(snack.getSnack_image())
+                .snack_alt(snack.getSnack_alt())
+                .snack_price(snack.getSnack_price())
+                .snack_stock(snack.getSnack_stock())
+                .snack_set(snack.getSnack_set())
+                .snack_detail(snack.getSnack_detail())
+                .regDate(snack.getRegDate())
+                .updateDate(snack.getUpdateDate())
+                .build();
+    }
+
     // 스낵 저장(관리자 페이지)
     public void saveSnack(Snack snack) {
         snackRepository.save(snack);
     }
 
     // 스낵 수정(관리자 페이지)
-    public void editSnack(SnackDTO snackDTO){
+    public void editSnack(SnackDTO snackDTO) {
         snackRepository.save(Snack.toEntity(snackDTO));
     }
 
     // 스낵 삭제(관리자 페이지)
-    public void deleteSnack(long snackItemId){
+    public void deleteSnack(long snackItemId) {
         snackRepository.deleteById(snackItemId);
     }
 }

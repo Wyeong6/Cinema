@@ -1,0 +1,541 @@
+<!-- Navbar -->
+
+<style>
+
+    /* 모달 스타일 */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.9);
+    }
+
+    .modal-content {
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        z-index: 99999;
+        width: 80%;
+        max-width: 600px;
+        background-color: #fefefe;
+        position: relative;
+    }
+
+    .close {
+        color: #aaa;
+        position: absolute;
+        z-index: 999999;
+        top: 10px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+    }
+
+    /* 비디오 컨테이너 스타일 */
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+    }
+
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .form-check-wrapper {
+        max-width: 800px;
+    }
+
+    .form-control {
+        max-width: 800px; /* 입력 필드의 최대 너비를 조정 */
+    }
+
+    .form-check-wrapper {
+        display: grid;
+        grid-template-columns: repeat(4, auto);
+        gap: 5px 20px;
+    }
+
+    .form-check {
+        display: inline-block;
+    }
+</style>
+
+<nav
+        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+        id="layout-navbar" style="margin-bottom: 10px;"
+>
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <input
+                        aria-label="Search..."
+                        class="form-control border-0 shadow-none"
+                        placeholder="Search..."
+                        type="text"
+                />
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+
+<!-- / Navbar -->
+
+<h4 class="fw-bold py-3 mb-4">영화 등록</h4>
+<!-- Basic Layout -->
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form id="movieForm" action="/movies/regist"  method="post" enctype="multipart/form-data" >
+                    <div class="mb-3">
+                        <label class="form-label" for="id">영화 ID</label>
+                        <div class="input-group">
+                        <input class="form-control" id="id" name="id" placeholder="ID를 입력해주세요."
+                               required type="text"/>
+                        <button class="btn btn-outline-secondary" type="button" id="check-id-button" onclick="duplicateCheck()">중복 확인</button>
+                        </div>
+                        <span id="id-error" class="error-message"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="title">영화 제목</label>
+                        <input class="form-control" id="title" name="title" placeholder="상품 제목을 입력해주세요."
+                               required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="overview">영화 줄거리</label>
+                        <textarea
+                                class="form-control"
+                                id="overview"
+                                name="overview"
+                                placeholder="영화 줄거리를 입력해주세요." required
+                        ></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="runtime">상영시간</label>
+                        <input class="form-control" id="runtime" name="runtime"
+                               placeholder="상영시간을 입력해주세요" type="number"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="cert-all" style="margin-right: 15px">관람 등급</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="certifications" id="cert-all" value="전체이용가">
+                            <label class="form-check-label" for="cert-all">전체 관람가</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="certifications" id="cert-12" value="12세 이상 관람가">
+                            <label class="form-check-label" for="cert-12">12세 이상 관람가</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="certifications" id="cert-15" value="15세 이상 관람가">
+                            <label class="form-check-label" for="cert-15">15세 이상 관람가</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="certifications" id="cert-18" value="18세 이상 관람가">
+                            <label class="form-check-label" for="cert-18">18세 이상 관람가</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="releaseDate">개봉 일자</label>
+                        <input class="form-control" id="releaseDate" name="releaseDate" placeholder="개봉 일자를 입력해주세요. ex) 2024-05-05"
+                               required type="date"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="RegisteredPoster">포스터 이미지</label>
+                        <input class="form-control" id="RegisteredPoster" name="RegisteredPoster"
+                               placeholder="포스터 이미지명을 등록해주세요." required type="file" accept=".png, .jpg, .jpeg" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="RegisteredBackdrop">배경 이미지</label>
+                        <input class="form-control" id="RegisteredBackdrop" name="RegisteredBackdrop" placeholder="배경 이미지를 등록해주세요."
+                               required type="file" accept=".png, .jpg, .jpeg" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="RegisteredStillCut">스틸컷 이미지</label>
+                        <input class="form-control" id="RegisteredStillCut" name="RegisteredStillCut[]" placeholder="스틸컷 이미지를 등록해주세요."
+                               required type="file" accept=".png, .jpg, .jpeg" multiple />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="video">트레일러</label>
+                        <div class="input-group">
+                            <input class="form-control" id="video" name="video" placeholder="유튜브 키 를 입력해주세요 (ex. LU7ujHmsc-s)"
+                                   required type="text"/>
+                            <button class="btn btn-outline-secondary" type="button" id="check-trailer-btn" onclick="previewTrailer()">미리보기</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="genre-action">장르</label>
+                        <div class="form-check-wrapper">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-sf" value="SF">
+                            <label class="form-check-label" for="genre-sf">SF</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-adventure" value="액션">
+                            <label class="form-check-label" for="genre-adventure">모험</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-action" value="액션">
+                            <label class="form-check-label" for="genre-action">액션</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-comedy" value="코미디">
+                            <label class="form-check-label" for="genre-comedy">코미디</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-anime" value="애니메이션">
+                            <label class="form-check-label" for="genre-anime">애니메이션</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-family" value="패밀리">
+                            <label class="form-check-label" for="genre-family">패밀리</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-romance" value="로맨스">
+                            <label class="form-check-label" for="genre-romance">로맨스</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-drama" value="드라마">
+                            <label class="form-check-label" for="genre-drama">애니메이션</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-horror" value="호러">
+                            <label class="form-check-label" for="genre-horror">공포</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-thriller" value="스릴러">
+                            <label class="form-check-label" for="genre-thriller">스릴러</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-fantasy" value="판타지">
+                            <label class="form-check-label" for="genre-fantasy">판타지</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-history" value="역사">
+                            <label class="form-check-label" for="genre-thriller">역사</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-crime" value="범죄">
+                            <label class="form-check-label" for="genre-crime">범죄</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-mystery" value="미스터리">
+                            <label class="form-check-label" for="genre-mystery">미스터리</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-documentary" value="다큐멘터리">
+                            <label class="form-check-label" for="genre-documentary">스릴러</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-war" value="전쟁">
+                            <label class="form-check-label" for="genre-war">전쟁</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-music" value="음악">
+                            <label class="form-check-label" for="genre-music">음악</label>
+                        </div>
+                        </div>
+                        <!-- 추가로 필요한 장르 체크박스 추가 -->
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="actor-search">배우 검색</label>
+                        <input type="text" class="form-control" id="actor-search" placeholder="배우 이름을 입력하세요" oninput="searchActors()">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="actors">배우 목록</label>
+                        <select class="form-control" id="actors" name="actors[]" multiple>
+                            <!-- 배우 목록을 서버에서 받아와서 렌더링 -->
+                        </select>
+                    </div>
+
+
+                    <button class="btn btn-primary" type="button" id="formSubmit" onclick="validateForm()">등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="trailerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="video-container">
+            <iframe id="trailerIframe" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // 폼 벨리데이션
+    const form = document.querySelector('form');
+    const idInput = document.getElementById('id');
+    const titleInput = document.getElementById('title');
+    const overviewInput = document.getElementById('overview');
+    const runtimeInput = document.getElementById('runtime');
+    const certificationInputs = document.querySelectorAll('input[name="certifications"]');
+    const releaseDateInput = document.getElementById('releaseDate');
+    const posterPathInput = document.getElementById('RegisteredPoster');
+    const backdropPathInput = document.getElementById('RegisteredBackdrop');
+    const stillCutPathsInput = document.getElementById('RegisteredStillCut');
+    const videoInput = document.getElementById('video');
+    // ID 중복체크
+    const idError = document.getElementById('id-error');
+
+
+
+    console.log(idInput)
+    // 아이디 중복 미리 체크
+
+    function duplicateCheck() {
+
+        const id = idInput.value.trim();
+
+        if(!/^\d{10}$/.test(id)) {
+            idError.textContent = '영화 ID는 10자리를 입력해주세요.';
+            idError.style.color = 'red';
+            return;
+        }
+        fetch(`/movies/checkId?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    idError.textContent = '이미 존재하는 영화 ID 입니다.';
+                    idError.style.color = 'red';
+                } else {
+                    idError.textContent = '사용 가능한 영화 ID 입니다.';
+                    idError.style.color = 'green';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking movie ID:', error);
+                idError.textContent = 'ID 확인 중 오류가 발생했습니다.';
+                idError.style.color = 'red';
+            });
+
+    }
+
+
+    // 폼 제출 및 벨리데이션
+    function validateForm() {
+
+        const id = idInput.value.trim();
+
+        console.log("영화 ID:", id);
+
+        if (!/^\d{10}$/.test(id)) {
+            alert('영화 ID는 10자리를 입력해주세요');
+            // 알람 창이 닫힌 후에 포커스를 설정하기 위해 setTimeout 사용
+            setTimeout(() => {
+                idInput.focus(); // 입력란에 포커스를 맞추는 부분입니다.
+            }, 0);
+            return false;
+        }
+
+        if (titleInput.value.trim() === '') {
+            alert('영화 제목을 입력해주세요.');
+            setTimeout(() => {
+                titleInput.focus();
+            }, 0);
+            return false;
+        }
+
+        if (overviewInput.value.trim() === '') {
+            alert('영화 줄거리를 입력해주세요.');
+            setTimeout(() => {
+                overviewInput.focus();
+            }, 0);
+            return false;
+        }
+
+        const runtime = runtimeInput.value.trim();
+        if (runtime === '') {
+            alert('상영시간을 입력해주세요.');
+            setTimeout(() => {
+                runtimeInput.focus();
+            }, 0);
+            return false;
+        } else if (isNaN(runtime)) {
+            alert('상영시간을 숫자로 입력해주세요.')
+            setTimeout(() => {
+                runtimeInput.focus();
+            }, 0);
+            return false
+        }
+
+        const selectedCertification = Array.from(certificationInputs).find(input => input.checked);
+        if (!selectedCertification) {
+            alert('관람 등급을 선택해주세요.');
+            certificationInputs[0].focus();
+            return false;
+        }
+
+
+        const releaseDate = releaseDateInput.value;
+        if (releaseDate === '') {
+            alert('개봉 일자를 입력해주세요.');
+            setTimeout(() => {
+                releaseDateInput.focus();
+            }, 0);
+            return false;
+        }
+
+        const posterPath = posterPathInput.value.trim();
+        if (posterPath === '') {
+            alert('포스터 이미지명을 입력해주세요.');
+            setTimeout(() => {
+                posterPathInput.focus();
+            }, 0);
+            return false;
+        }
+
+        const backdropPath = backdropPathInput.value.trim();
+        if (backdropPath === '') {
+            alert('배경 이미지를 입력해주세요.');
+            setTimeout(() => {
+                backdropPathInput.focus();
+            }, 0);
+            return false;
+        }
+
+        const stillCutPaths = stillCutPathsInput.value.trim();
+        if (stillCutPaths === '') {
+            alert('스틸컷 이미지를 등록해주세요.');
+            setTimeout(() => {
+                stillCutPathsInput.focus();
+            }, 0);
+            return false;
+        }
+
+        const video = videoInput.value.trim();
+        if (video === '') {
+            alert('트레일러 키를 입력해주세요.');
+            setTimeout(() => {
+                videoInput.focus();
+            }, 0);
+            return false;
+        }
+
+        const genreCheckboxes = document.querySelectorAll('input[name="genres[]"]');
+        let isGenreSelected = false;
+        genreCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                isGenreSelected = true;
+                return;
+            }
+        });
+
+        if (!isGenreSelected) {
+            alert('장르를 선택해 주세요.');
+            return false;
+        }
+
+
+        // 모든 유효성 검사 통과 시 폼 제출
+        const formData = new FormData(form);
+
+        // 스틸컷 이미지를 FormData에 추가
+        const stillCutFiles = stillCutPathsInput.files;
+
+        for (let i = 0; i < stillCutFiles.length; i++) {
+            formData.append('RegisteredStillCut', stillCutFiles[i]);
+        }
+        fetch('/movies/regist', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Form submitted successfully:', data);
+                alert('영화가 성공적으로 등록되었습니다.');
+
+                resetForm = true;
+            })
+            .catch(error => {
+                console.error('Error submitting form:', error);
+                if (error.message.includes('이미 존재하는 영화 ID입니다.')) {
+                    alert('이미 존재하는 영화 ID입니다.');
+                } else {
+                    alert('폼 제출 중 오류가 발생했습니다: ' + error.message);
+                }
+            })
+            .finally(() => {
+                // fetch 요청이 완료된 후 폼을 리셋합니다.
+                if (resetForm) {
+                    form.reset();
+                    genreCheckboxes.forEach(checkbox => checkbox.checked = false);
+                    certificationInputs.forEach(input => input.checked = false);
+                    idError.textContent = '';
+                }
+            });
+
+        return false; // 기본 폼 제출 방지
+    }
+
+    // 파일 input 변경 시 이벤트 처리
+    document.getElementById('RegisteredStillCut').addEventListener('change', function(event) {
+        const files = event.target.files;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            console.log('Selected file:', file);
+        }
+    });
+
+    // 유튜브 트레일러 키 미리보기
+
+    // 모달 열기 함수
+    function openModal() {
+        document.getElementById('trailerModal').style.display = 'block';
+    }
+
+    // 모달 닫기 함수
+    function closeModal() {
+        document.getElementById('trailerModal').style.display = 'none';
+        // 비디오 멈추기
+        document.getElementById('trailerIframe').src = '';
+    }
+
+    // 미리보기 버튼 클릭 시 호출되는 함수
+    function previewTrailer() {
+        const videoKey = document.getElementById('video').value.trim();
+        const videoUrl = `https://www.youtube.com/embed/${videoKey}?autoplay=1`; // autoplay=1을 추가하여 자동 재생
+
+        // 모달 내부의 iframe에 YouTube 비디오 URL 설정
+        document.getElementById('trailerIframe').src = videoUrl;
+
+        // 모달 열기
+        openModal();
+    }
+
+
+
+
+</script>

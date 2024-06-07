@@ -1,8 +1,9 @@
-package com.busanit.domain;
+package com.busanit.domain.movie;
 
 
 import com.busanit.entity.movie.Movie;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.busanit.domain;
+package com.busanit.domain.movie;
 
 import lombok.Getter;
 import lombok.Setter;

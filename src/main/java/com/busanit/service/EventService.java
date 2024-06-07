@@ -3,6 +3,7 @@ package com.busanit.service;
 import com.busanit.domain.EventDTO;
 import com.busanit.entity.Event;
 import com.busanit.entity.Member;
+import com.busanit.entity.Notice;
 import com.busanit.repository.EventRepository;
 import com.busanit.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -49,7 +50,15 @@ public class EventService {
         return EventDTO.toDTO(event);
     }
 
-    //수정해야할 것         event.update(eventDTO);
+    public Event getPreviousEvent(Long id) {
+        return eventRepository.findPreviousEvent(id);
+    }
+
+    public Event getNextEvent(Long id) {
+        return eventRepository.findNextEvent(id);
+    }
+
+    //수정기능
     public void updateEvent(EventDTO eventDTO) {
         Event event = eventRepository.findById(eventDTO.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + eventDTO.getId()));
@@ -61,10 +70,10 @@ public class EventService {
     //삭제
     public void delete(Long eventId){
         eventRepository.deleteById(eventId);
-
     }
 
-
-
-
+    // 중복 체크 메서드 추가
+    public boolean isDuplicate(String eventDetail, String eventName) {
+        return eventRepository.existsByEventDetailAndEventName(eventDetail, eventName);
+    }
 }

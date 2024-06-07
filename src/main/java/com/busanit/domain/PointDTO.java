@@ -15,6 +15,7 @@ public class PointDTO {
     private Long id;
     private Long member_id;
     private String content;
+    private Boolean contentType;
     private String pointType;
     private Integer points;
     private Integer currentPoints;
@@ -27,6 +28,7 @@ public class PointDTO {
         Slice<PointDTO> pointDTOList = pointList.map(entity -> PointDTO.builder()
                 .id(entity.getId())
                 .content(entity.getContent())
+                .contentType(entity.getContentType())
                 .pointType(entity.getPointType())
                 .points(entity.getPoints())
                 .currentPoints(entity.getCurrentPoints())

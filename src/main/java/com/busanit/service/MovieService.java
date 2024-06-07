@@ -1,8 +1,10 @@
 package com.busanit.service;
 
-import com.busanit.domain.MovieDTO;
-import com.busanit.domain.MovieDetailDTO;
-import com.busanit.domain.MovieStillCutDTO;
+import com.busanit.entity.movie.*;
+import com.busanit.repository.*;
+import com.busanit.domain.movie.MovieDTO;
+import com.busanit.domain.movie.MovieDetailDTO;
+import com.busanit.domain.movie.MovieStillCutDTO;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieDetail;
 import com.busanit.entity.movie.MovieStillCut;
@@ -28,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -46,6 +49,8 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final MovieDetailRepository movieDetailRepository;
     private final MovieStillCutRepository movieStillCutRepository;
+    private final MovieImageRepository movieImageRepository;
+    private final MovieActorRepository movieActorRepository;
     private final GenreRepository genreRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -56,6 +61,7 @@ public class MovieService {
     private List<MovieDTO> cachedVideoMovies = new ArrayList<>();
     private List<MovieDTO> cachedAllMovies = new ArrayList<>();
     private List<MovieDTO> cachedHotMovies = new ArrayList<>();
+    private List<MovieDTO> cachedActors = new ArrayList<>();
     private LocalDate lastFetchDate = LocalDate.now().minusDays(1);
 
     // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
@@ -68,8 +74,10 @@ public class MovieService {
         fetchAndStoreMovieRuntimeAndReleaseData();
         fetchAndStoreMovieStillCuts();
         fetchAndStoreCertificationData();
+//        fetchKoreanActors(); 지우지마세요
 
         // 데이터 캐시 갱신
+//        cachedActors = fetchKoreanActors(); 지우지마세요
         cachedVideoMovies = getVideoMovies();
         cachedAllMovies = getAll();
         cachedHotMovies = getHotMovies();
@@ -82,7 +90,15 @@ public class MovieService {
     // (나중에 다른 api 데이터들도 영화id를 기준으로 데이터를가져오기때문에 씀)
     public List<Long> getAllMovieIds() {
         List<Movie> movies = movieRepository.findAll();
-        return movies.stream().map(Movie::getMovieId).collect(Collectors.toList());
+
+        // movieId가 10자리인 id를 필터링하는 이유는
+        // 데이터베이스에 영화를 직접 등록할때 id를 10자리로 등록하기때문이다.
+        // api 링크를 요청할때 직접 등록한 영화의 id로 api 링크를 요청하면 오류가 나기때문에 (api 서버에 등록된 movieId가아니라 어드민이 직접등록한 movieId라서 오류가뜬다)
+        // 그걸 방지하기위해 어드민에게 movieId를 직접 입력받을때 숫자 10자리로 입력받게하고(벨리데이션) api링크 요청함수에서 movieId가 10자리인 movieId를 필터링해줘 오류를 방지한다!
+        return movies.stream()
+                .map(Movie::getMovieId)
+                .filter(movieId -> String.valueOf(movieId).length() != 10)
+                .collect(Collectors.toList());
     }
 
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
@@ -255,8 +271,12 @@ public class MovieService {
 
 
     public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
+
         MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
         System.out.println("responseBody = " + responseBody);
+        System.out.println("movieDetailDTO===" + movieDetailDTO);
+        System.out.println("널체크 == " + movieRepository.findById(movieDetailDTO.getId()));
+
         Movie movie = movieRepository.findById(movieDetailDTO.getId()).orElse(new Movie());
         MovieDetail movieDetail = getOrCreateMovieDetail(movie);
         movieDetail.setReleaseDate(movieDetailDTO.getRelease_date());
@@ -343,6 +363,7 @@ public class MovieService {
         }
     }
 
+    // 영화 관람등급 정보
     public void fetchAndStoreCertificationData() throws IOException {
         List<Long> movieIds = getAllMovieIds(); // 모든 movie ID를 가져오는 메서드
         for (Long movieId : movieIds) {
@@ -354,6 +375,53 @@ public class MovieService {
             }
         }
     }
+
+    // 영화 배우 가져오기
+    public void fetchKoreanActors() throws IOException {
+        int totalPages = fetchTotalPages();
+        List<MovieActor> koreanActors = new ArrayList<>();
+
+        for (int page = 1; page <= totalPages; page++) {
+            String url = "https://api.themoviedb.org/3/person/popular?language=ko-KR&page=" + page + "&api_key=" + apiKey;
+            Request request = new Request.Builder().url(url).build();
+
+            try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body().string();
+                JsonNode results = getResultsFromResponse(responseBody);
+
+                if (results.isArray()) {
+                    for (JsonNode node : results) {
+                        String name = node.get("name").asText();
+                        if (isKoreanName(name)) {
+                            int gender = node.get("gender").asInt();
+                            String profilePath = node.get("profile_path").asText(null);
+                            MovieActor actor = new MovieActor(name, getGender(gender), profilePath);
+                            koreanActors.add(actor);
+                            movieActorRepository.save(actor);  // Save to database
+                        }
+                    }
+                }
+            }
+        }
+
+        koreanActors.forEach(System.out::println);
+    }
+
+    private boolean isKoreanName(String name) {
+        return name.matches(".*[가-힣].*");
+    }
+
+    private static String getGender(int genderCode) {
+        switch (genderCode) {
+            case 1:
+                return "남자";
+            case 2:
+                return "여자";
+            default:
+                return "Not specified";
+        }
+    }
+
 
     public void processCertificationResponse(String responseBody, Long movieId) throws IOException {
         MovieDetailDTO.ReleaseDatesDTO releaseDatesDTO = objectMapper.readValue(responseBody, MovieDetailDTO.ReleaseDatesDTO.class);
@@ -445,6 +513,13 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
+    // 지우지마세요
+//    public List<MovieDTO> getActors() {
+//        List<MovieActor> movieActors = movieActorRepository.findAll();
+//        return movieActors.stream().map(MovieDTO::convertToDTO)
+//                .collect(Collectors.toList());
+//    }
+
     //로그인되어있는 유저 email받아오기
     public String getUserEmail() {
         String userEmail = null;
@@ -491,4 +566,74 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
+    // 페이징된  !!!모든영화!!!  무비리스트
+    public List<MovieDTO> getMoviesWithPaging(int page, int pageSize) {
+        // JPA 페이징 처리를 위한 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, pageSize);
+
+        // 페이징 처리된 Movie 데이터 조회
+        Page<Movie> moviePage = movieRepository.findAll(pageable);
+
+        List<MovieDTO> movieList = moviePage.getContent().stream().map(MovieDTO::convertToDTO)
+                .collect(Collectors.toList());
+
+        // 페이징 처리된 Movie 데이터를 List로 반환
+        return movieList;
+    }
+
+    public long getTotalMovies() {
+        // 전체 영화 개수 조회
+        return movieRepository.count();
+    }
+
+    //어드민 페이지 영화 등록
+    public void saveMovie(
+            Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
+            String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime) {
+
+        Movie movie = new Movie();
+        movie.setMovieId(movieId);
+        movie.setTitle(movieTitle);
+        movie.setOverview(movieOverview);
+
+
+        MovieDetail movieDetail = new MovieDetail();
+        movieDetail.setCertification(certifications);
+        movieDetail.setReleaseDate(movieReleaseDate);
+        movieDetail.setVideo(video);
+        movieDetail.setRuntime(runtime);
+        movie.setMovieDetail(movieDetail);
+
+
+        // 장르 추가
+        for (String genreStr : genres) {
+            Genre genre = new Genre(); // 새로운 장르 엔티티 생성
+            genre.setGenreName(genreStr); // 장르 이름 설정
+            genreRepository.save(genre);
+            movie.addGenre(genre); // 영화에 장르 추가
+        }
+
+        // 스틸컷 추가
+        for (String stillCutPath : stillCut) {
+            MovieStillCut stillCutEntity = new MovieStillCut(); // 새로운 스틸컷 엔티티 생성
+            stillCutEntity.setStillCuts(stillCutPath); // 스틸컷 경로 설정
+            movieStillCutRepository.save(stillCutEntity);
+            movie.addStillCut(stillCutEntity); // 영화에 스틸컷 추가
+        }
+
+        // 포스터 이미지와 백드롭 이미지를 저장
+        MovieImage movieImage = new MovieImage();
+        movieImage.setPosterPath(registeredPoster);
+        movieImage.setBackdropPath(registeredBackdrop);
+        movieImageRepository.save(movieImage);
+        movie.addImage(movieImage);
+
+
+        movieRepository.save(movie);
+    }
+
+
+    public boolean checkIfMovieIdExists(String id) {
+        return movieRepository.existsById(Long.valueOf(id));
+    }
 }

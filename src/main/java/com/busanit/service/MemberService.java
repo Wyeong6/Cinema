@@ -145,4 +145,15 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
                 })
                 .collect(Collectors.toList());
     }
+
+    // 모든 회원정보 가져오기 ( admin 페이지에서 뿌려주기위함 )
+    public List<Member> getAllMembers() {
+        return memberRepository.findAll();
+    }
+
+    // 멤버십 등급 수정
+    public void updateGrade(long userEditGrade, String email) {
+        memberRepository.updateGrade(userEditGrade, email);
+    }
+
 }

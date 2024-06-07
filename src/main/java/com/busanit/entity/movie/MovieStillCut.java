@@ -22,6 +22,10 @@ public class MovieStillCut {
     @Column(length = 1024)
     private String stillCuts;
 
-    @ManyToMany(mappedBy = "stillCuts",fetch = FetchType.LAZY)
+
+    @ManyToMany
+    @JoinTable(name = "stillCuts",
+            joinColumns = @JoinColumn(name = "movie_still_cut_id"),
+            inverseJoinColumns = @JoinColumn(name = "movie_id"))
     private List<Movie> movies = new ArrayList<>();
 }
