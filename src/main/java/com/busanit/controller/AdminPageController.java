@@ -1,20 +1,15 @@
 package com.busanit.controller;
 
-import com.busanit.customerService.Notice.*;
 import com.busanit.domain.EventDTO;
-import com.busanit.customerService.Notice.NoticeDTO;
-import com.busanit.customerService.Notice.NoticeService;
 import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.SnackDTO;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
-import com.busanit.entity.chat.Message;
 import com.busanit.repository.MessageRepository;
 import com.busanit.service.*;
 import com.busanit.domain.NoticeDTO;
-import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.TheaterDTO;
 import com.busanit.entity.Theater;
 import com.busanit.service.ChatService;
@@ -60,7 +55,6 @@ public class AdminPageController {
     private final MessageRepository messageRepository;
     private final MemberService memberService;
     private final MovieService movieService;
-    private final NoticeService noticeService;
 
     @Autowired
     private ObjectMapper objectMapper;
