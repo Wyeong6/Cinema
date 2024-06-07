@@ -14,7 +14,6 @@ public class SeatDTO {
     private String seatColumn;
     private boolean reserved;
     private boolean available;
-    private String unavailableReason;
 
     public static SeatDTO toDTO(Seat seat) {
         return SeatDTO.builder()
@@ -23,7 +22,6 @@ public class SeatDTO {
                 .seatColumn(seat.getSeatColumn())
                 .reserved(seat.isReserved())
                 .available(seat.isAvailable())
-                .unavailableReason(seat.getUnavailableReason())
                 .build();
     }
 }

@@ -17,7 +17,6 @@ public class Seat {
     private String seatColumn;
     private boolean isReserved;
     private boolean isAvailable;
-    private String unavailableReason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theaterNumber_id")
@@ -32,7 +31,6 @@ public class Seat {
         this.seatColumn = seatColumn;
         this.isReserved = false;
         this.isAvailable = true;
-        this.unavailableReason = "";
     }
 
     public void reserveSeat() {
@@ -41,14 +39,12 @@ public class Seat {
         }
     }
 
-    public void setUnavailable(String reason) {
+    public void setUnavailable() {
         isAvailable = false;
-        unavailableReason = reason;
     }
 
     public void setAvailable() {
         isAvailable = true;
-        unavailableReason = "";
     }
 
 }

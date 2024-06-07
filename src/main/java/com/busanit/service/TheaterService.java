@@ -1,5 +1,6 @@
 package com.busanit.service;
 
+import com.busanit.domain.SeatDTO;
 import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.TheaterDTO;
 import com.busanit.entity.Theater;
@@ -81,6 +82,39 @@ public class TheaterService {
                 .collect(Collectors.toList());
     }
 
+    // 해당 지역과 상영관에 대한 좌석 정보를 포함하는 TheaterDTO를 반환하는 메서드
+    public TheaterDTO getTheaterDTOWithSeats(String region, String theaterName) {
+        Theater theater = theaterRepository.findByRegionAndTheaterName(region, theaterName)
+                .orElseThrow(() -> new IllegalArgumentException("상영관을 찾을 수 없습니다: " + theaterName));
+
+        TheaterDTO theaterDTO = TheaterDTO.toDTO(theater);
+
+        // TheaterDTO에 좌석 정보 추가
+        List<TheaterNumberDTO> theaterNumbersWithSeats = theater.getTheaterNumbers().stream()
+                .map(theaterNumber -> {
+                    TheaterNumberDTO theaterNumberDTO = TheaterNumberDTO.toDTO(theaterNumber);
+                    List<SeatDTO> seats = theaterNumber.getSeats().stream()
+                            .map(SeatDTO::toDTO)
+                            .collect(Collectors.toList());
+                    theaterNumberDTO.setSeats(seats);
+                    return theaterNumberDTO;
+                })
+                .collect(Collectors.toList());
+
+        theaterDTO.setTheaterNumbers(theaterNumbersWithSeats);
+
+        return theaterDTO;
+    }
+
+    public List<TheaterNumberDTO> getTheaterNumbersByTheaterName(String theaterName) {
+        Theater theater = theaterRepository.findByTheaterName(theaterName)
+                .orElseThrow(() -> new IllegalArgumentException("상영관을 찾을 수 없습니다: " + theaterName));
+
+        return theater.getTheaterNumbers().stream()
+                .map(TheaterNumberDTO::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public void deleteTheaterById(Long id) {
         theaterRepository.deleteById(id);
     }
@@ -95,5 +129,9 @@ public class TheaterService {
         return theaters.stream()
                 .map(TheaterDTO::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Optional<Theater> findByTheaterName(String theaterName) {
+        return theaterRepository.findByTheaterName(theaterName);
     }
 }

@@ -97,8 +97,14 @@ div.mb-3 {
     margin-top: 0.5em;
 }
 .theater-seat-cnt {
+    height: 100%;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+}
+.theater-seat-cnt input {
+    text-align: right;
+    padding: 0;
 }
 .label-text {
     width: 20em;

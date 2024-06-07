@@ -1,21 +1,13 @@
 package com.busanit.controller;
 
-import com.busanit.customerService.Notice.*;
-import com.busanit.domain.EventDTO;
-import com.busanit.customerService.Notice.NoticeDTO;
-import com.busanit.customerService.Notice.NoticeService;
-import com.busanit.domain.TheaterNumberDTO;
-import com.busanit.domain.SnackDTO;
+import com.busanit.domain.*;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
+import com.busanit.entity.Seat;
 import com.busanit.entity.Snack;
-import com.busanit.entity.chat.Message;
 import com.busanit.repository.MessageRepository;
 import com.busanit.service.*;
-import com.busanit.domain.NoticeDTO;
-import com.busanit.domain.TheaterNumberDTO;
-import com.busanit.domain.TheaterDTO;
 import com.busanit.entity.Theater;
 import com.busanit.service.ChatService;
 import com.busanit.service.EventService;
@@ -37,9 +29,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import java.util.Map;
 
 
@@ -60,7 +50,6 @@ public class AdminPageController {
     private final MessageRepository messageRepository;
     private final MemberService memberService;
     private final MovieService movieService;
-    private final NoticeService noticeService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -165,23 +154,33 @@ public class AdminPageController {
     }
 
     @GetMapping("/seatRegister")
-    public String showSeatRegisterFormSelect(@RequestParam(required = false) String region, @RequestParam(required = false) String theaterName, Model model) {
-        if(region == null) {
-            region = ""; // 빈 값일 때 처리
+    public String showSeatRegisterFormSelect(@RequestParam(required = false) String region,
+                                             @RequestParam(required = false) String theaterName,
+                                             Model model) {
+        TheaterDTO theaterDTO = new TheaterDTO();
+        List<TheaterNumberDTO> theaterNumberDTOs = null;
+
+        theaterDTO.setRegion(region != null ? region : "");
+        theaterDTO.setTheaterName(theaterName != null ? theaterName : "");
+        theaterDTO.setTheaterNumbers(new ArrayList<>());
+
+        if(theaterDTO.getRegion() != null && !theaterDTO.getRegion().isEmpty()
+                && theaterDTO.getTheaterName() != null && !theaterDTO.getTheaterName().isEmpty()) {
+            // theaterService.getTheaterDTOWithSeats()로 seatForm 객체 업데이트
+            theaterDTO = theaterService.getTheaterDTOWithSeats(region, theaterName);
+            theaterNumberDTOs = theaterService.getTheaterNumbersByTheaterName(theaterName);
         }
 
-        if(theaterName == null) {
-            theaterName = ""; // 빈 값일 때 처리
-        }
-        TheaterDTO seatForm = new TheaterDTO();
-        seatForm.setRegion(region);
-        seatForm.setTheaterName(theaterName);
-
-        model.addAttribute("seatForm", seatForm);
+        model.addAttribute("theaterDTO", theaterDTO);
+        model.addAttribute("theaterNumberDTOs", theaterNumberDTOs);
 
         return "admin/admin_seat_register";
     }
 
+    @PostMapping("/seatRegister")
+    public String seatRegister(@Valid SeatDTO seatDTO, BindingResult bindingResult, Model model) {
+        return "redirect:/admin/adminMain";
+    }
 
     @GetMapping("/getTheatersByRegion")
     @ResponseBody
