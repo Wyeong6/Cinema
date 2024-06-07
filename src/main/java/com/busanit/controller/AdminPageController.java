@@ -1,13 +1,16 @@
 package com.busanit.controller;
 
-import com.busanit.domain.*;
+import com.busanit.domain.EventDTO;
+import com.busanit.domain.TheaterNumberDTO;
+import com.busanit.domain.SnackDTO;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
-import com.busanit.entity.Seat;
 import com.busanit.entity.Snack;
 import com.busanit.repository.MessageRepository;
 import com.busanit.service.*;
+import com.busanit.domain.NoticeDTO;
+import com.busanit.domain.TheaterDTO;
 import com.busanit.entity.Theater;
 import com.busanit.service.ChatService;
 import com.busanit.service.EventService;
@@ -158,28 +161,18 @@ public class AdminPageController {
                                              @RequestParam(required = false) String theaterName,
                                              Model model) {
         TheaterDTO theaterDTO = new TheaterDTO();
-        List<TheaterNumberDTO> theaterNumberDTOs = null;
 
         theaterDTO.setRegion(region != null ? region : "");
         theaterDTO.setTheaterName(theaterName != null ? theaterName : "");
-        theaterDTO.setTheaterNumbers(new ArrayList<>());
 
-        if(theaterDTO.getRegion() != null && !theaterDTO.getRegion().isEmpty()
-                && theaterDTO.getTheaterName() != null && !theaterDTO.getTheaterName().isEmpty()) {
+        if (theaterDTO.getRegion() != null && theaterDTO.getTheaterName() != null
+                && !theaterDTO.getRegion().isEmpty() && !theaterDTO.getTheaterName().isEmpty()) {
             // theaterService.getTheaterDTOWithSeats()로 seatForm 객체 업데이트
             theaterDTO = theaterService.getTheaterDTOWithSeats(region, theaterName);
-            theaterNumberDTOs = theaterService.getTheaterNumbersByTheaterName(theaterName);
         }
-
         model.addAttribute("theaterDTO", theaterDTO);
-        model.addAttribute("theaterNumberDTOs", theaterNumberDTOs);
 
         return "admin/admin_seat_register";
-    }
-
-    @PostMapping("/seatRegister")
-    public String seatRegister(@Valid SeatDTO seatDTO, BindingResult bindingResult, Model model) {
-        return "redirect:/admin/adminMain";
     }
 
     @GetMapping("/getTheatersByRegion")

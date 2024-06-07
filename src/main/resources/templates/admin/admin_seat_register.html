@@ -39,9 +39,9 @@
                         <div class="input-group">
                             <label class="input-group-text label-text" for="theater-names-select">지점명 선택</label>
                             <select class="form-select" id="theater-names-select" th:field="*{theaterName}">
-                                <option th:selected="${theaterDTO.theaterName == null || theaterDTO.theaterName == ''}" value=''>극장을 선택해주세요.</option>
-                                <option th:value="${theaterDTO.theaterName}" th:selected="${theaterDTO.theaterName}"
-                                        th:text="${theaterDTO.theaterName}" th:if="${theaterDTO.theaterName != ''}"></option>
+                                <option th:selected="${theaterDTO?.theaterName == null || theaterDTO?.theaterName == ''}" value=''>극장을 선택해주세요.</option>
+                                <option th:value="${theaterDTO?.theaterName}" th:selected="${theaterDTO?.theaterName}"
+                                        th:text="${theaterDTO?.theaterName}" th:if="${theaterDTO?.theaterName != ''}"></option>
                             </select>
                             <input type="hidden" id="theater-name-input" th:value="${theaterDTO?.theaterName}">
                         </div>

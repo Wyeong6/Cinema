@@ -87,6 +87,10 @@ public class TheaterService {
         Theater theater = theaterRepository.findByRegionAndTheaterName(region, theaterName)
                 .orElseThrow(() -> new IllegalArgumentException("상영관을 찾을 수 없습니다: " + theaterName));
 
+        if (theater == null) {
+            throw new IllegalArgumentException("상영관을 찾을 수 없습니다: " + theaterName);
+        }
+
         TheaterDTO theaterDTO = TheaterDTO.toDTO(theater);
 
         // TheaterDTO에 좌석 정보 추가

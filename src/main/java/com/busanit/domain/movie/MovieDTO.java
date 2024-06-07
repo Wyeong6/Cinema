@@ -2,6 +2,7 @@ package com.busanit.domain.movie;
 
 import com.busanit.entity.movie.Genre;
 import com.busanit.entity.movie.Movie;
+import com.busanit.entity.movie.MovieActor;
 import com.busanit.entity.movie.MovieStillCut;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -41,6 +42,16 @@ public class MovieDTO {
     private String gender;
     @JsonProperty("profile_path")
     private String profilePic;
+
+    public static MovieDTO convertActorToDTO(MovieActor movieActor) {
+        MovieDTO movieDTO = new MovieDTO();
+
+        movieDTO.setName(movieActor.getActorName());
+        movieDTO.setGender(movieActor.getActorGender());
+        movieDTO.setProfilePic(movieActor.getActorProfilePic());
+
+        return movieDTO;
+    }
 
 
     public static MovieDTO convertToDTO(Movie movie){
