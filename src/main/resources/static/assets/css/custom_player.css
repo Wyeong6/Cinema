@@ -60,6 +60,10 @@
 }
 
 /* 관리자 페이지 - 상영관관리 */
+.container-xxl h4 {
+    margin-top: 0.7em;
+    margin-left: 1.8em;
+}
 div.card-body {
     padding: 3em;
 }
@@ -92,17 +96,15 @@ div.mb-3 {
     padding: 0.5em 1em;
     margin-top: 0.5em;
 }
-/* 관리자페이지 상영관 삭제 버튼 */
-.delete_form_btn {
-    width: 3em;
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: -1.5em -1.5em 0 0;
+.theater-seat-cnt {
+    display: flex;
+    justify-content: flex-end;
+}
+.label-text {
+    width: 20em;
 }
 .card.mb-4 {
     margin-top: 1em;
-    margin-right: 1em;
 }
 #item-delete-btn {
     width: 1em;
@@ -110,6 +112,10 @@ div.mb-3 {
 .seats-column-group {
     display: flex;
     flex-direction: row;
+}
+.add-column-btn {
+    min-height: calc(1.53em + 1.5rem + 2px);
+    padding: 0.75rem 1.25rem;
 }
 /* paging_btn */
  .paging_btn {

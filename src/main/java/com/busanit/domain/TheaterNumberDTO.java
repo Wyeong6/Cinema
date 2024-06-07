@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class TheaterNumberDTO {
+    private Long id;
     private String theaterIdx;
     private Long theaterNumber; // 지점내 상영관 고유 번호
     private Long seatsPerTheater; // 상영관 별 좌석 수
@@ -19,6 +20,7 @@ public class TheaterNumberDTO {
 
     public static TheaterNumberDTO toDTO(TheaterNumber theaterNumber) {
         return TheaterNumberDTO.builder()
+                .id(theaterNumber.getId())
                 .theaterIdx(theaterNumber.getTheaterIdx())
                 .theaterNumber(theaterNumber.getTheaterNumber())
                 .seatsPerTheater(theaterNumber.getSeatsPerTheater())
