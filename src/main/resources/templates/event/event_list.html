@@ -44,7 +44,6 @@
                         <a th:href="@{'/event_get/' + ${event.id}}" class="image featured">
                             <img th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지"
                                  style="width: 100px; height: auto;"/>
-
                         </a>
                         <header>
                             <h3>
@@ -57,10 +56,10 @@
                     </article>
                 </div>
                 <div style="text-align: center" th:unless="${eventList.totalElements > 0}">
-                    <h3>상품을 준비중 입니다.</h3>
+                    <h3>준비중 입니다.</h3>
                 </div>
             </div>
-            <div style="text-align: center;">
+            <div style="text-align: center;" th:if="${!#lists.isEmpty(eventList.content)}">
                 <a th:href="@{'/event/eventList?page=' + ${i}}" th:each="i : ${#numbers.sequence(startPage, endPage)}"
                    class="paging-btn" th:text="'[' + ${i} + ']'"></a>
             </div>

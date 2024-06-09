@@ -2,16 +2,12 @@ package com.busanit.controller;
 
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.chat.MessageDTO;
-import com.busanit.entity.chat.ChatRoom;
-import com.busanit.entity.chat.Message;
+import com.busanit.domain.chat.TypingIndicator;
 import com.busanit.service.ChatService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Map;
-
 
 @Controller
 @RequiredArgsConstructor
@@ -40,21 +34,14 @@ public class ChatController {
             return "redirect:/login"; // 로그인 페이지로 리다이렉트
         }
     }
+
     //관리자에게 메세지 보내기
-        @MessageMapping("/chat/private")
-        public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
-            messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" +messageDTO.getSender() , messageDTO);
+    @MessageMapping("/chat/private")
+    public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
+        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getSender(), messageDTO);
 
-            chatService.saveMessage(messageDTO);
+        chatService.saveMessage(messageDTO);
 
-        }
-    //관리자 챗메세지
-    @GetMapping("/chatAdmin")
-    public String chatAdmin(Model model) {
-            String adminEmail = chatService.getAuthenticatedUserEmail();
-            model.addAttribute("adminEmail", adminEmail);
-
-            return "service";
     }
 
     //유저에게 메세지 보내기
@@ -66,18 +53,23 @@ public class ChatController {
     }
 
     //이전 메세지 내용가져오기
-    @GetMapping("/chat/private/{userEmail}")
+    @GetMapping("/chat/private/{recipient}")
     @ResponseBody
-    public List<ChatRoomDTO> fetchMessages(@PathVariable String userEmail) {
-
-        return chatService.findChatRoomByUserEmail(userEmail);
-    }
-    //선택한 메세지타이틀
-    @GetMapping("/getChatTitle/{userEmail}")
-    @ResponseBody
-    public Map<String, String> getMessageTitle(@PathVariable String userEmail) {
-        String chatTitle = chatService.findChatTitleByMemberEmail(userEmail);
-        return Map.of("chatTitle", chatTitle != null ? chatTitle : "");
+    public List<ChatRoomDTO> fetchMessages(@PathVariable String recipient) {
+        System.out.println("이전메세지가져ㅑ옴");
+        return chatService.findChatRoomByUserEmail(recipient);
     }
 
+    @GetMapping("/chat/getRecipientEmail")
+    @ResponseBody
+    public List<String> getRecipient() {
+        return chatService.findCHatRoomByRecipient();
+    }
+    // 클라이언트로부터 전송된 타이핑 인디케이터 처리
+    @MessageMapping("/chat/typing")
+    public void handleTypingIndicator(TypingIndicator typingIndicator) {
+
+
+        messagingTemplate.convertAndSendToUser(typingIndicator.getRecipient(), "/queue/private", "{\"typing\": \"상대방이 채팅 중입니다.\"}");
+    }
 }

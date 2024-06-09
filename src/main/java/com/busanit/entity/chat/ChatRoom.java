@@ -22,13 +22,20 @@ public class ChatRoom {
 
     private String title;
 
-    private LocalDateTime lastReadTimestamp;
+    private String type;
 
-    @ManyToMany(mappedBy = "chatRooms")
+
+    @ManyToMany
+    @JoinTable(name = "member_chatroom",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "chatroom_id"))
     private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoomReadStatus> readStatuses = new ArrayList<>();
 
     public void addMessage(Message message) {
         this.messages.add(message);
@@ -39,6 +46,14 @@ public class ChatRoom {
         if (newMembers != null) {
             this.members.addAll(newMembers);
             newMembers.forEach(member -> member.addChatRoom(this));
+        }
+    }
+        public void addReadStatus(ChatRoomReadStatus chatRoomReadStatus) {
+        // 현재 메시지에 읽음 상태를 추가
+        this.readStatuses.add(chatRoomReadStatus);
+        // messageReadStatus의 message 참조가 현재 메시지가 아니라면 업데이트
+        if (chatRoomReadStatus.getChatRoom() != this) {
+            chatRoomReadStatus.setChatRoom(this);
         }
     }
 

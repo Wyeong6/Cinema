@@ -16,15 +16,14 @@ public class MessageDTO {
     private String content;
     private String sender;
     private String recipient;
-    private String messageTitle;
-
+    private String chatRoomTitle;
     public static MessageDTO toMessageDTO(Message message) {
         return MessageDTO.builder()
                 .id(message.getId())
                 .sender(message.getSender().getEmail())
                 .recipient(message.getReceiver().getEmail())
                 .content(message.getContent())
-                .messageTitle(message.getChatRoom().getTitle())
+                .chatRoomTitle(message.getChatRoom().getTitle())
                 .build();
     }
 

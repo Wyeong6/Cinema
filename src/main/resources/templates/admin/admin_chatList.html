@@ -53,7 +53,7 @@
 </head>
 <body>
 <!-- Navbar 생략 -->
-
+<div class="card">
 <h5 class="card-header">Event List</h5>
 <div class="table-responsive text-nowrap">
     <table class="table table-hover">
@@ -73,7 +73,7 @@
     <!-- 페이지네이션 -->
     <div id="pagination"></div>
 </div>
-
+</div>
 <!-- 모달 -->
 
 <script>
@@ -91,6 +91,7 @@
                 },
                 type: "GET",
                 success: function(response) {
+                    memberEmail  = response.memberEmail;
                     var chatList = response.chatRoom;
                     var $chatListContainer = $(".chat-table");
                     $chatListContainer.empty(); // 기존 목록을 비우고
@@ -110,7 +111,7 @@
                         var chatRoomRow =
                             "<tr data-room-id='" + chatRoom.id + "' onclick='openChatModal(this)'>" +
                             "<td>" + chatRoom.id + "</td>" +
-                            "<td>" + chatRoom.messageTitle + "</td>" +
+                            "<td>" + chatRoom.chatRoomTitle + "</td>" +
                             "<td>" + lastMessageContent + " (" + chatRoom.unreadMessageCount + "개 메시지)" + "</td>" +
                             "<td>" + chatRoom.userEmail + "</td>" +
                             "<td>" + chatRoom.userName + "</td>" +
@@ -152,11 +153,12 @@
         }, 3000);
 
     });
-
+    var memberEmail = '';
     var currentRecipient = ''; // 전역 변수로 선언
-    var messageTitle = '';
+    var chatRoomTitle = '';
     var isConnected = false;
     var stompClient = null;
+    var typingTimeout = null;
 
     // DOM 요소를 가져오는 함수
     function getElement(id) {
@@ -175,13 +177,15 @@
     // Stomp 연결 함수
     function connect() {
         if (isConnected) return;
-        console.log("currentMessageTitle" + currentRecipient);
+        console.log("currentchatRoomTitle" + currentRecipient);
 
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function(frame) {
             console.log('Connected: ' + frame);
             subscribeToRecipient();
+            // 타이핑 이벤트를 감지하여 서버로 전송
+            getElement('message').addEventListener('input', sendTypingIndicator);
         });
         isConnected = true;
     }
@@ -193,9 +197,15 @@
             var parsedMessage = JSON.parse(message.body);
             showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
 
-            messageTitle = parsedMessage.messageTitle;
-            console.log("messageTitle" + messageTitle);
+            chatRoomTitle = parsedMessage.chatRoomTitle;
+
+            console.log("chatRoomTitle" + chatRoomTitle);
             currentRecipient = parsedMessage.sender;
+
+            if (parsedMessage.typing){
+                // 상대방이 타이핑 중임을 표시하는 UI 업데이트 등을 수행
+                showTypingIndicator();
+            }
         });
     }
 
@@ -212,17 +222,51 @@
         var messageContent = getElement('message').value;
         if (messageContent && currentRecipient) {
             var message = {
-                sender: 'admin@admin.com',
+                sender: memberEmail,
                 recipient: currentRecipient,
-                content: messageContent,
-                // messageTitle: messageTitle
-
+                content: messageContent
             };
             console.log("Sending message:", message);
             stompClient.send("/app/chat/admin", {}, JSON.stringify(message));
             showMessage('관리자: ' + messageContent);
             getElement('message').value = '';
         }
+    }
+
+    // 타이핑 인디케이터 전송 함수
+    function sendTypingIndicator() {
+        var isTyping = getElement('message').value.length > 0;
+        var typingIndicator = {
+            sender: memberEmail,
+            recipient: currentRecipient,
+            typing: isTyping
+        };
+        stompClient.send("/app/chat/typing", {}, JSON.stringify(typingIndicator));
+    }
+
+    // 종료 메시지 전송 함수
+    function sendEndChatMessage() {
+        var endUserChatMessage = {
+            sender: memberEmail,
+            recipient: currentRecipient,
+            content: '대화가 종료되었습니다.다른 문의가 있으면 카테고리를 선택해주세요.',
+            chatRoomTitle: "endChat"
+        };
+
+        console.log("Sending end chat message:", endUserChatMessage);
+        stompClient.send("/app/chat/admin", {}, JSON.stringify(endUserChatMessage));
+
+        // 추가 문구 전송
+        var adminMessage = {
+            sender: memberEmail,
+            recipient: currentRecipient,
+            content: '상담이 완료되었습니다.'
+        };
+        console.log("Sending follow-up message:", adminMessage);
+        // stompClient.send("/app/chat/admin", {}, JSON.stringify(adminMessage));
+
+        // 관리자 측 채팅창에도 메시지 표시
+        showMessage(adminMessage.content);
     }
 
     // 메시지 가져오기 함수
@@ -238,14 +282,33 @@
                 data.forEach(item => {
                     if (Array.isArray(item.messages)) {
                         item.messages.forEach(message => {
-                            let displayMessage = message.sender  === currentRecipient ? `${message.sender}: ${message.content}` : `관리자 : ${message.content}`;
+                            // chatRoomTitle이 "endChat"이 아닌 메시지만 화면에 표시
+                            if (message.chatRoomTitle !== "endChat") {
+                                let displayMessage = message.recipient === currentRecipient ? `${message.sender}: ${message.content}` : `관리자 : ${message.content}`;
 
-                            showMessage(displayMessage);
+                                showMessage(displayMessage);
+                            }
                         });
                     }
                 });
             })
             .catch(error => console.error('Error fetching messages:', error));
+    }
+
+    // 타이핑 인디케이터를 보여주는 함수
+    function showTypingIndicator() {
+        document.getElementById('typingIndicator').style.display = 'block'; // 타이핑 인디케이터 표시
+
+        // 이전 타이머 초기화 후 3초 후에 숨김
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(function() {
+            hideTypingIndicator();
+        }, 3000);
+    }
+
+    // 타이핑 인디케이터를 숨기는 함수
+    function hideTypingIndicator() {
+        document.getElementById('typingIndicator').style.display = 'none'; // 타이핑 인디케이터 숨김
     }
 
     // 채팅 모달 열기 함수
@@ -278,8 +341,10 @@
         <div id="userEmail"></div> <!-- 유저 이메일 표시 부분 추가 -->
         <div id="messages"></div>
         <div>
+            <div id="typingIndicator" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
             <input type="text" id="message" placeholder="Type a message..."/>
             <button onclick="sendMessage()">Send</button>
+            <button onclick="sendEndChatMessage()">대화 종료</button>
         </div>
     </div>
 </div>

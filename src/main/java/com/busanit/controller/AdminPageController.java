@@ -46,7 +46,6 @@ public class AdminPageController {
     private final SnackService snackService;
     private final EventService eventService;
     private final ChatService chatService;
-    private final MessageRepository messageRepository;
     private final MemberService memberService;
     private final MovieService movieService;
     private final NoticeService noticeService;
@@ -426,7 +425,8 @@ public class AdminPageController {
     @GetMapping("/api/chatList")
     @ResponseBody
     public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
-        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size);
+        String memberEmail = movieService.getUserEmail();
+        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
 
         int totalPages = chatRoom.getTotalPages();
         int startPage = Math.max(1, page - 5);
@@ -438,6 +438,7 @@ public class AdminPageController {
         response.put("totalPages", totalPages);
         response.put("startPage", startPage);
         response.put("endPage", endPage);
+        response.put("memberEmail", memberEmail);
 
         return response;
     }
