@@ -64,56 +64,63 @@
                     </div>
                     <div class="mb-3 row">
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="A" class="form-label">A열</label>
+                            <label for="A-input" class="form-label">A열</label>
                             <input
-                                    id="A"
+                                    id="A-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    max="20"
                                     placeholder="A열 좌석 수를 입력하세요."
+                                    required
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="B" class="form-label">B열</label>
+                            <label for="B-input" class="form-label">B열</label>
                             <input
-                                    id="B"
+                                    id="B-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    max="20"
                                     placeholder="B열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="C" class="form-label">C열</label>
+                            <label for="C-input" class="form-label">C열</label>
                             <input
-                                    id="C"
+                                    id="C-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    max="20"
                                     placeholder="C열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="D" class="form-label">D열</label>
+                            <label for="D-input" class="form-label">D열</label>
                             <input
-                                    id="D"
+                                    id="D-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    max="20"
                                     placeholder="D열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="E" class="form-label">E열</label>
+                            <label for="E-input" class="form-label">E열</label>
                             <input
-                                    id="E"
+                                    id="E-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    max="20"
                                     placeholder="E열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="F" class="form-label">F열</label>
+                            <label for="F-input" class="form-label">F열</label>
                             <input
-                                    id="F"
+                                    id="F-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    max="20"
                                     placeholder="F열 좌석 수를 입력하세요."
                             />
                         </div>
@@ -121,28 +128,60 @@
                             <button type="button" class="btn btn-gray add-column-btn">+</button>
                         </div>
                     </div>
-                    <button class="btn btn-gray" type="button">좌석 배치도 결과보기</button>
+                    <button class="btn btn-gray arrangement-show"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exLargeModal">좌석 배치도 결과보기</button>
                     <button class="btn btn-primary" type="submit">등록하기</button>
                 </form>
+                <div class="row gy-3">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="modal fade" id="exLargeModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-xl seats-arrangement" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="exampleModalLabel4">Modal title</h4>
+                                        <button
+                                                type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal"
+                                                aria-label="Close"
+                                        ></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="d-flex justify-content-center">
+                                            <div class="screen"></div>
+                                        </div>
+                                        <div class="seating-area"></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-info" data-bs-dismiss="modal">
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap JS (Optional) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 
 <script th:inline="javascript">
     $(document).ready(function () {
-        let columnCount = 1;
-        const alphabet = 'FGHIJKLMN';
-
         const theaterNumbersSelect = $("#theater-numbers-select");
         const theaterNamesSelect = $("#theater-names-select");
+        let theaterNumberSelected = $('theater-numbers-input');
         const regionSelect = $('#region-select');
+
+        let columnCount = 1;
+        const alphabet = 'FGHIJKLMN';
 
         $('.add-column-btn').on('click', function (e) {
             e.preventDefault();
@@ -151,8 +190,8 @@
                 columnCount++;
                 const newColumn = `
                 <div class="mt-2 mb-3 col-sm-3">
-                    <label for="${letter}" class="form-label">${letter}열</label>
-                    <input id="${letter}" class="form-control form-control-lg" type="number" placeholder="${letter}열 좌석 수를 입력하세요." />
+                    <label for="${letter} + '-input'" class="form-label">${letter}열</label>
+                    <input id="${letter} + '-input'" class="form-control form-control-lg" type="number" max="20" placeholder="${letter}열 좌석 수를 입력하세요." />
                 </div>
             `;
                 $(newColumn).insertBefore('.add-column:first');
@@ -201,6 +240,7 @@
         theaterNamesSelect.change(function(event) {
             event.preventDefault();
             const selectedValue = $(this).val();
+            const selectedText = $(this).find('option:selected').text();
             $.ajax({
                 type: "GET",
                 url: "/reservation/getTheaterByTheaterName",
@@ -223,6 +263,8 @@
                             const seatsPerTheater = selectedTheaterNumber.seatsPerTheater;
                             displaySeatsPerTheater(seatsPerTheater);
                         });
+                        $('#theater-name-input').val(selectedValue);
+                        $('.modal-title').text(selectedText);
                     } else {
                         const $option = $("<option></option>").val("").text("해당 영화관에 상영관이 없습니다.");
                         theaterNumbersSelect.append($option);
@@ -237,10 +279,17 @@
         theaterNumbersSelect.change(function (event) {
             event.preventDefault();
             const selectedOption = $(this).find('option:selected');
+            const selectedText = $(this).find('option:selected').text();
+            const selectedValue = $(this).val();
+            theaterNumberSelected.val(selectedValue);
             const seatsPerTheater = selectedOption.data('seats-per-theater');
             if (seatsPerTheater !== undefined) {
                 displaySeatsPerTheater(seatsPerTheater);
             }
+            const modalTitle = $('.modal-title');
+            const oldText = modalTitle.text();
+            const newText = oldText + ' ' + selectedText;
+            modalTitle.text(newText);
         });
 
         function displaySeatsPerTheater(seatsPerTheater) {
@@ -263,5 +312,50 @@
 
             seatsInfoContainer.append(label, input, span);
         }
+
+        $('.arrangement-show').on('click', function() {
+            $('.seating-area').empty();
+
+            for (let i = 0; i < 14; i++) {
+                let column = String.fromCharCode(65 + i);
+                let inputId = column + "-input";
+                let seatCount = $('#' + inputId).val();
+                console.log(column + '열의 좌석 수: ' + seatCount);
+
+                let columnDiv = $('<div></div>').addClass('d-flex justify-content-center seat-' + column);
+                columnDiv.css({
+                    display: 'flex',
+                    justifyContent: 'row',
+                    height: 'auto'
+                });
+                $('.seating-area').append(columnDiv);
+                if (seatCount == null || seatCount === '') {
+                    console.log(column + seatCount + '가 null입니다.');
+                } else {
+                    for (let j = 1; j <= 22; j++) {
+                        let newDiv = $('<div></div>').addClass('seat');
+                        columnDiv.append(newDiv);
+                    }
+
+                    columnDiv.find('.seat:nth-child(5)').addClass('remove');
+                    columnDiv.find('.seat:nth-last-child(5)').addClass('remove');
+
+                    let seatsToRemove = Math.max((20 - seatCount) / 2, 0); // 음수인 경우 0으로 설정
+                    for (let k = 1; k <= seatsToRemove; k++) {
+                        columnDiv.find('.seat:nth-child(' + k + ')').addClass('remove');
+                        columnDiv.find('.seat:nth-last-child(' + k + ')').addClass('remove');
+                    }
+
+                    if (seatCount < 11) {
+                        columnDiv.children('.seat:not(.remove)').first().addClass('remove');
+                        columnDiv.children('.seat:not(.remove)').last().addClass('remove');
+                    }
+
+                    if (seatCount % 2 !== 0) {
+                        columnDiv.children('.seat:not(.remove)').last().addClass('remove');
+                    }
+                }
+            }
+        });
     });
 </script>

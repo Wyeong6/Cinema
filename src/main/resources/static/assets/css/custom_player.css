@@ -1,62 +1,20 @@
 /* 상세 페이지 css 조정 */
+.still-cut-article {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
 
-        .still-cut-article {
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin: 10px;
-        }
-
-
-        .hide {
-            display: none;
-        }
-
-        .still-cut-article img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-
-        /* 이미지클릭시 띄우는 모달 */
-.modal {
+.hide {
     display: none;
-    position: fixed;
-    z-index: 1000;
-    padding-top: 60px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.9);
 }
 
-.modal-content {
-    margin: auto;
-    display: block;
-    width: 100%;
-    max-width: 1200px;
-}
-
-.close {
-    position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #fff;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.close:hover,
-.close:focus {
-    color: #bbb;
-    text-decoration: none;
-    cursor: pointer;
+.still-cut-article img {
+    max-width: 100%;
+    max-height: 100%;
 }
 
 /* 관리자 페이지 - 상영관관리 */
@@ -122,6 +80,42 @@ div.mb-3 {
 .add-column-btn {
     min-height: calc(1.53em + 1.5rem + 2px);
     padding: 0.75rem 1.25rem;
+}
+/* 좌석 배치표 모달 */
+.seats-arrangement > div {
+     background: black;
+ }
+.modal-body {
+    padding: 10%;
+}
+.screen {
+    margin-bottom: 3em;
+    width: 60%;
+    height: 2em;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.7);
+}
+.seating-area {
+    display: block;
+}
+.seat {
+    margin: 0.5em;
+    width: 2em;
+    height: 2em;
+    border-radius: 50% 50% 0 0; /* 위쪽만 둥글게 */
+    background-color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+}
+.seat.remove {
+    margin: 0.5em;
+    width: 2em;
+    height: 2em;
+    background: #000;
+    cursor: default;
+}
+.seat:hover {
+    cursor: pointer;
+    transform: scale(1.2);
 }
 /* paging_btn */
  .paging_btn {
