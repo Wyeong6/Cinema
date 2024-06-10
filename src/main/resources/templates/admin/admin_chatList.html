@@ -118,6 +118,8 @@
                             "</tr>";
                         $chatListContainer.append(chatRoomRow);
                     });
+                    // 마지막 메시지를 구독하여 새로운 메시지가 도착할 때마다 해당 행 업데이트
+
 
                     // 페이징 정보 업데이트
                     var $pagination = $("#pagination");
@@ -150,14 +152,16 @@
         setInterval(function () {
             loadChatList(currentPage);
         }, 3000);
-    });
 
+    });
     var memberEmail = '';
-    var currentRecipient = '';
+    var currentRecipient = ''; // 전역 변수로 선언
     var chatRoomTitle = '';
     var isConnected = false;
-    var stompClient = null;
+    var stompClient = null; // STOMP 클라이언트 변수 선언
     var typingTimeout = null;
+    var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
+    var typingIndicatorSent = false;  // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
 
     // DOM 요소를 가져오는 함수
     function getElement(id) {
@@ -171,6 +175,7 @@
         messageElement.className = 'message-style'; // 메시지 스타일 클래스 추가
         messageElement.textContent = message;
         messages.appendChild(messageElement);
+        document.getElementById('typingIndicatorDTO').style.display = 'none';
     }
 
     // Stomp 연결 함수
@@ -183,29 +188,32 @@
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             subscribeToRecipient();
-
+            // 타이핑 이벤트를 감지하여 서버로 전송
+            document.getElementById('message').addEventListener('input', handleTypingEvent);
+            ;
         });
         isConnected = true;
     }
 
     // 수신자 구독
     function subscribeToRecipient() {
-        // 타이핑 이벤트를 감지하여 서버로 전송
-        document.getElementById('message').addEventListener('input', sendTypingIndicator);
         stompClient.subscribe('/user/queue/private/' + currentRecipient, function (message) {
             console.log("Private Message: " + message.body);
             var parsedMessage = JSON.parse(message.body);
-            showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
+
 
             chatRoomTitle = parsedMessage.chatRoomTitle;
 
             console.log("chatRoomTitle" + chatRoomTitle);
             currentRecipient = parsedMessage.sender;
-            console.log("parsedMessage.typing" +parsedMessage.typing)
 
-            if (parsedMessage.typing) {
+            if (parsedMessage.typing === "typing") {
                 // 상대방이 타이핑 중임을 표시하는 UI 업데이트 등을 수행
                 showTypingIndicator();
+            } else if (parsedMessage.typing === "not_typing") {
+                hideTypingIndicator();
+            } else {
+                showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
             }
         });
     }
@@ -228,25 +236,38 @@
                 content: messageContent
             };
             console.log("Sending message:", message);
-            stompClient.send("/app/chat/admin", {}, JSON.stringify(message));
+            stompClient.send("/app/chat/private", {}, JSON.stringify(message));
             showMessage('관리자: ' + messageContent);
             getElement('message').value = '';
         }
     }
 
-    // 타이핑 인디케이터 전송 함수
-    function sendTypingIndicator() {
-        var isTyping = getElement('message').value.length > 0;
+    // 타이핑 이벤트를 처리하는 함수
+    function handleTypingEvent() {
+        if (!typingIndicatorSent) {
+            const type = "typing";
+            sendTypingIndicator(type); // 처음 입력 시 타이핑 상태 전송
+            typingIndicatorSent = true;
+        }
 
-        console.log("isTyping"+isTyping)
-        console.log("memberEmail"+memberEmail)
-        console.log("currentRecipient"+currentRecipient)
-        var typingIndicator = {
+        clearTimeout(typingTimeout); // 기존 타이머 제거
+
+        typingTimeout = setTimeout(function () {
+
+            const type = "not_typing";
+            sendTypingIndicator(type); // 사용자가 일정 시간 입력을 멈추면 타이핑 상태 전송
+            typingIndicatorSent = false; // 타이핑 상태 초기화
+        }, TYPING_DELAY);
+    }
+
+    // 타이핑 인디케이터 전송 함수
+    function sendTypingIndicator(type) {
+        var typingIndicatorDTO = {
             sender: memberEmail,
             recipient: currentRecipient,
-            typing: isTyping
+            typing: type
         };
-        stompClient.send("/app/chat/typing", {}, JSON.stringify(typingIndicator));
+        stompClient.send("/app/chat/typing", {}, JSON.stringify(typingIndicatorDTO));
     }
 
     // 종료 메시지 전송 함수
@@ -259,7 +280,7 @@
         };
 
         console.log("Sending end chat message:", endUserChatMessage);
-        stompClient.send("/app/chat/admin", {}, JSON.stringify(endUserChatMessage));
+        stompClient.send("/app/chat/private", {}, JSON.stringify(endUserChatMessage));
 
         // 추가 문구 전송
         var adminMessage = {
@@ -268,6 +289,7 @@
             content: '상담이 완료되었습니다.'
         };
         console.log("Sending follow-up message:", adminMessage);
+        // stompClient.send("/app/chat/admin", {}, JSON.stringify(adminMessage));
 
         // 관리자 측 채팅창에도 메시지 표시
         showMessage(adminMessage.content);
@@ -301,19 +323,14 @@
 
     // 타이핑 인디케이터를 보여주는 함수
     function showTypingIndicator() {
-        console.log("나왓어")
-        document.getElementById('typingIndicator').style.display = 'block'; // 타이핑 인디케이터 표시
+        document.getElementById('typingIndicatorDTO').style.display = 'block'; // 타이핑 인디케이터 표시
 
-        // 이전 타이머 초기화 후 3초 후에 숨김
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(function () {
-            hideTypingIndicator();
-        }, 3000);
+
     }
 
     // 타이핑 인디케이터를 숨기는 함수
     function hideTypingIndicator() {
-        document.getElementById('typingIndicator').style.display = 'none'; // 타이핑 인디케이터 숨김
+        document.getElementById('typingIndicatorDTO').style.display = 'none'; // 타이핑 인디케이터 숨김
     }
 
     // 채팅 모달 열기 함수
@@ -349,7 +366,7 @@
             <input type="text" id="message" placeholder="Type a message..."/>
             <button onclick="sendMessage()">Send</button>
             <button onclick="sendEndChatMessage()">대화 종료</button>
-            <div id="typingIndicator" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
+            <div id="typingIndicatorDTO" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
         </div>
     </div>
 </div>

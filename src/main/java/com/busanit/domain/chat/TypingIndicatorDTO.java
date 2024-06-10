@@ -7,9 +7,9 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TypingIndicator {
+public class TypingIndicatorDTO {
 
     private String sender;
     private String recipient;
-    private boolean typing;
+    private String typing;
 }

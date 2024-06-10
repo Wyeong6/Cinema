@@ -2,7 +2,7 @@ package com.busanit.controller;
 
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.chat.MessageDTO;
-import com.busanit.domain.chat.TypingIndicator;
+import com.busanit.domain.chat.TypingIndicatorDTO;
 import com.busanit.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -44,13 +44,13 @@ public class ChatController {
 
     }
 
-    //유저에게 메세지 보내기
-    @MessageMapping("/chat/admin")
-    public void sendAdminMessage(@Payload MessageDTO messageDTO) {
-        chatService.saveMessage(messageDTO);
-
-        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private", messageDTO);
-    }
+//    //유저에게 메세지 보내기
+//    @MessageMapping("/chat/admin")
+//    public void sendAdminMessage(@Payload MessageDTO messageDTO) {
+//        chatService.saveMessage(messageDTO);
+//
+//        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private", messageDTO);
+//    }
 
     //이전 메세지 내용가져오기
     @GetMapping("/chat/private/{recipient}")
@@ -67,9 +67,8 @@ public class ChatController {
     }
     // 클라이언트로부터 전송된 타이핑 인디케이터 처리
     @MessageMapping("/chat/typing")
-    public void handleTypingIndicator(TypingIndicator typingIndicator) {
-        System.out.println("typingIndicator.getRecipient()"+ typingIndicator.getRecipient());
-        System.out.println("typingIndicator.getSender()"+ typingIndicator.getSender());
-        messagingTemplate.convertAndSendToUser(typingIndicator.getRecipient(), "/queue/private", "{\"typing\": \"상대방이 채팅 중입니다.\"}");
+    public void handleTypingIndicator(@Payload TypingIndicatorDTO typingIndicatorDTO) {
+
+        messagingTemplate.convertAndSendToUser(typingIndicatorDTO.getRecipient(), "/queue/private/" + typingIndicatorDTO.getSender(), typingIndicatorDTO);
     }
 }
