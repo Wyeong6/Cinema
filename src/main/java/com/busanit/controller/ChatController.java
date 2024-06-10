@@ -68,8 +68,8 @@ public class ChatController {
     // 클라이언트로부터 전송된 타이핑 인디케이터 처리
     @MessageMapping("/chat/typing")
     public void handleTypingIndicator(TypingIndicator typingIndicator) {
-
-
+        System.out.println("typingIndicator.getRecipient()"+ typingIndicator.getRecipient());
+        System.out.println("typingIndicator.getSender()"+ typingIndicator.getSender());
         messagingTemplate.convertAndSendToUser(typingIndicator.getRecipient(), "/queue/private", "{\"typing\": \"상대방이 채팅 중입니다.\"}");
     }
 }

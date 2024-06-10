@@ -17,7 +17,7 @@
             top: 0;
             width: 100%;
             height: 100vh; /* 모달 창의 높이를 화면 전체로 설정 */
-            background-color: rgba(0,0,0,0.4); /* 반투명 배경 */
+            background-color: rgba(0, 0, 0, 0.4); /* 반투명 배경 */
             padding-top: 60px;
         }
 
@@ -54,31 +54,31 @@
 <body>
 <!-- Navbar 생략 -->
 <div class="card">
-<h5 class="card-header">Event List</h5>
-<div class="table-responsive text-nowrap">
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>방 번호</th>
-            <th>카테고리</th>
-            <th>메세지</th>
-            <th>회원 이메일</th>
-            <th>회원 이름</th>
-        </tr>
-        </thead>
-        <tbody class="chat-table">
-        <!-- 데이터는 자바스크립트로 동적으로 추가됩니다 -->
-        </tbody>
-    </table>
-    <!-- 페이지네이션 -->
-    <div id="pagination"></div>
-</div>
+    <h5 class="card-header">Event List</h5>
+    <div class="table-responsive text-nowrap">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>방 번호</th>
+                <th>카테고리</th>
+                <th>메세지</th>
+                <th>회원 이메일</th>
+                <th>회원 이름</th>
+            </tr>
+            </thead>
+            <tbody class="chat-table">
+            <!-- 데이터는 자바스크립트로 동적으로 추가됩니다 -->
+            </tbody>
+        </table>
+        <!-- 페이지네이션 -->
+        <div id="pagination"></div>
+    </div>
 </div>
 <!-- 모달 -->
 
 <script>
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         var currentPage = 1;
 
         function loadChatList(page) {
@@ -90,14 +90,14 @@
                     size: 8
                 },
                 type: "GET",
-                success: function(response) {
-                    memberEmail  = response.memberEmail;
+                success: function (response) {
+                    memberEmail = response.memberEmail;
                     var chatList = response.chatRoom;
                     var $chatListContainer = $(".chat-table");
                     $chatListContainer.empty(); // 기존 목록을 비우고
 
                     // 새로운 목록 생성
-                    chatList.forEach(function(chatRoom) {
+                    chatList.forEach(function (chatRoom) {
                         var lastMessageContent = "";
 
                         // 메시지가 존재하는지 확인
@@ -118,8 +118,6 @@
                             "</tr>";
                         $chatListContainer.append(chatRoomRow);
                     });
-                    // 마지막 메시지를 구독하여 새로운 메시지가 도착할 때마다 해당 행 업데이트
-
 
                     // 페이징 정보 업데이트
                     var $pagination = $("#pagination");
@@ -133,28 +131,29 @@
 
                     $pagination.html(paginationHtml);
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log("Error: ", error);
                 }
             });
         }
+
         // 최초 페이지 로드 시 데이터 로드
         loadChatList(currentPage);
 
         // 클릭된 페이지에 대한 채팅 목록 로드
-        $(document).on('click', '.paging-btn', function() {
+        $(document).on('click', '.paging-btn', function () {
             currentPage = $(this).data('page');
             loadChatList(currentPage);
         });
 
         // 3초마다 현재 페이지 데이터 자동 새로고침
-        setInterval(function() {
+        setInterval(function () {
             loadChatList(currentPage);
         }, 3000);
-
     });
+
     var memberEmail = '';
-    var currentRecipient = ''; // 전역 변수로 선언
+    var currentRecipient = '';
     var chatRoomTitle = '';
     var isConnected = false;
     var stompClient = null;
@@ -181,18 +180,19 @@
 
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
-        stompClient.connect({}, function(frame) {
+        stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             subscribeToRecipient();
-            // 타이핑 이벤트를 감지하여 서버로 전송
-            getElement('message').addEventListener('input', sendTypingIndicator);
+
         });
         isConnected = true;
     }
 
     // 수신자 구독
     function subscribeToRecipient() {
-        stompClient.subscribe('/user/queue/private/' + currentRecipient, function(message){
+        // 타이핑 이벤트를 감지하여 서버로 전송
+        document.getElementById('message').addEventListener('input', sendTypingIndicator);
+        stompClient.subscribe('/user/queue/private/' + currentRecipient, function (message) {
             console.log("Private Message: " + message.body);
             var parsedMessage = JSON.parse(message.body);
             showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
@@ -201,8 +201,9 @@
 
             console.log("chatRoomTitle" + chatRoomTitle);
             currentRecipient = parsedMessage.sender;
+            console.log("parsedMessage.typing" +parsedMessage.typing)
 
-            if (parsedMessage.typing){
+            if (parsedMessage.typing) {
                 // 상대방이 타이핑 중임을 표시하는 UI 업데이트 등을 수행
                 showTypingIndicator();
             }
@@ -236,6 +237,10 @@
     // 타이핑 인디케이터 전송 함수
     function sendTypingIndicator() {
         var isTyping = getElement('message').value.length > 0;
+
+        console.log("isTyping"+isTyping)
+        console.log("memberEmail"+memberEmail)
+        console.log("currentRecipient"+currentRecipient)
         var typingIndicator = {
             sender: memberEmail,
             recipient: currentRecipient,
@@ -263,7 +268,6 @@
             content: '상담이 완료되었습니다.'
         };
         console.log("Sending follow-up message:", adminMessage);
-        // stompClient.send("/app/chat/admin", {}, JSON.stringify(adminMessage));
 
         // 관리자 측 채팅창에도 메시지 표시
         showMessage(adminMessage.content);
@@ -297,11 +301,12 @@
 
     // 타이핑 인디케이터를 보여주는 함수
     function showTypingIndicator() {
+        console.log("나왓어")
         document.getElementById('typingIndicator').style.display = 'block'; // 타이핑 인디케이터 표시
 
         // 이전 타이머 초기화 후 3초 후에 숨김
         clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(function() {
+        typingTimeout = setTimeout(function () {
             hideTypingIndicator();
         }, 3000);
     }
@@ -341,10 +346,10 @@
         <div id="userEmail"></div> <!-- 유저 이메일 표시 부분 추가 -->
         <div id="messages"></div>
         <div>
-            <div id="typingIndicator" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
             <input type="text" id="message" placeholder="Type a message..."/>
             <button onclick="sendMessage()">Send</button>
             <button onclick="sendEndChatMessage()">대화 종료</button>
+            <div id="typingIndicator" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
         </div>
     </div>
 </div>
