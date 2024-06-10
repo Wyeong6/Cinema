@@ -30,7 +30,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -512,7 +514,7 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    // 지우지마세요
+
     public List<MovieDTO> getActors() {
         List<MovieActor> movieActors = movieActorRepository.findAll();
         return movieActors.stream().map(MovieDTO::convertActorToDTO)
@@ -629,6 +631,48 @@ public class MovieService {
 
 
         movieRepository.save(movie);
+    }
+
+    // 영화 등록 관련 로직
+
+    public List<String> saveStillCutImages(List<MultipartFile> registeredStillCut, String uploadDirectory, String stillCutRelativeUploadDir) throws IOException {
+        List<String> stillCutFiles = new ArrayList<>();
+        for (MultipartFile file : registeredStillCut) {
+            String fileName = file.getOriginalFilename();
+            String relativeFilePath = stillCutRelativeUploadDir + fileName;
+            String filePath = uploadDirectory + File.separator + relativeFilePath;
+
+            // 파일을 지정된 경로에 저장합니다.
+            file.transferTo(new File(filePath));
+            stillCutFiles.add(relativeFilePath);
+        }
+        return stillCutFiles;
+    }
+
+    public String saveImage(MultipartFile image, String uploadDirectory, String relativeUploadDir) throws IOException {
+        String fileName = image.getOriginalFilename();
+        String relativeFilePath = relativeUploadDir + fileName;
+        String filePath = uploadDirectory + File.separator + relativeFilePath;
+
+        // 파일을 지정된 경로에 저장합니다.
+        image.transferTo(new File(filePath));
+        return relativeFilePath;
+    }
+
+    public void createDirectories(String uploadDirectory, String stillCutRelativeUploadDir, String backdropRelativeUploadDir, String posterRelativeUploadDir) {
+        File stillCutDir = new File(uploadDirectory + "/" + stillCutRelativeUploadDir);
+        File backdropDir = new File(uploadDirectory + "/" + backdropRelativeUploadDir);
+        File posterDir = new File(uploadDirectory + "/" + posterRelativeUploadDir);
+        // 디렉터리가 존재하지 않으면 생성합니다.
+        if (!stillCutDir.exists()) {
+            stillCutDir.mkdirs();
+        }
+        if (!backdropDir.exists()) {
+            backdropDir.mkdirs();
+        }
+        if (!posterDir.exists()) {
+            posterDir.mkdirs();
+        }
     }
 
 

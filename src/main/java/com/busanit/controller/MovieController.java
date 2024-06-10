@@ -165,58 +165,22 @@ public class MovieController {
         // 실제 파일 시스템 경로를 설정합니다.
         String uploadDirectory = resourceLoader.getResource("classpath:/static").getFile().getAbsolutePath();
 
-        File stillCutDir = new File(uploadDirectory + "/" + stillCutRelativeUploadDir);
-        File backdropDir = new File(uploadDirectory + "/" + backdropRelativeUploadDir);
-        File posterDir = new File(uploadDirectory + "/" + posterRelativeUploadDir);
-        // 디렉터리가 존재하지 않으면 생성합니다.
-        if (!stillCutDir.exists()) {
-            stillCutDir.mkdirs();
-        }
-        if (!backdropDir.exists()) {
-            backdropDir.mkdirs();
-        }
-        if (!posterDir.exists()) {
-            posterDir.mkdirs();
-        }
+        movieService2.createDirectories(uploadDirectory, stillCutRelativeUploadDir, backdropRelativeUploadDir, posterRelativeUploadDir);
 
-
-
-        List<String> stillCutFiles = new ArrayList<>();
-        String posterRelativeFilePath = "";
-        String backdropRelativeFilePath = "";
+        List<String> stillCutFiles;
+        String posterRelativeFilePath;
+        String backdropRelativeFilePath;
 
         try {
-            // 스틸컷 이미지를 저장
-            for (MultipartFile file : registeredStillCut) {
-                String fileName = file.getOriginalFilename();
-                String relativeFilePath = stillCutRelativeUploadDir + fileName;
-                String filePath = uploadDirectory + File.separator + stillCutRelativeUploadDir + fileName;
-
-                // 파일을 지정된 경로에 저장합니다.
-                file.transferTo(new File(filePath));
-                stillCutFiles.add(relativeFilePath);
-            }
-            // 포스터 이미지를 저장
-            String posterFileName = registeredPoster.getOriginalFilename();
-            posterRelativeFilePath = posterRelativeUploadDir + posterFileName;
-            String posterFilePath = uploadDirectory + File.separator + posterRelativeFilePath;
-
-            // 파일을 지정된 경로에 저장합니다.
-            registeredPoster.transferTo(new File(posterFilePath));
-
-            // 백드롭 이미지를 저장
-            String backdropFileName = registeredBackdrop.getOriginalFilename();
-            backdropRelativeFilePath = backdropRelativeUploadDir + backdropFileName;
-            String backdropFilePath = uploadDirectory + File.separator + backdropRelativeFilePath;
-
-            // 파일을 지정된 경로에 저장합니다.
-            registeredBackdrop.transferTo(new File(backdropFilePath));
-
+            stillCutFiles = movieService2.saveStillCutImages(registeredStillCut, uploadDirectory, stillCutRelativeUploadDir);
+            posterRelativeFilePath = movieService2.saveImage(registeredPoster, uploadDirectory, posterRelativeUploadDir);
+            backdropRelativeFilePath = movieService2.saveImage(registeredBackdrop, uploadDirectory, backdropRelativeUploadDir);
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("message", "파일 저장 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 중 오류가 발생했습니다.");
         }
+
 
         try {
             movieService2.saveMovie(
