@@ -204,6 +204,14 @@ public class MovieController {
         return ResponseEntity.ok("영화 정보가 성공적으로 등록되었습니다.");
     }
 
+    // 영화 삭제 (어드민 페이지에서)
+    @PostMapping("/movies/delete/{id}")
+    public String deleteMovie(@PathVariable("id") Long movieId) {
+        movieService2.deleteMovie(movieId);
+        return "admin/admin_layout"; // 영화 목록 페이지로 리다이렉트
+    }
+
+
     // 아이디 중복확인 버튼용
     @GetMapping("/movies/checkId")
     @ResponseBody

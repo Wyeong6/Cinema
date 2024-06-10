@@ -72,7 +72,9 @@ public class MovieService {
     // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
+//    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
+
+    @Scheduled(fixedRate = 120000)
     public void fetchAndStoreMovies() throws IOException {
         fetchAndStoreMoviesNowPlaying();
         fetchAndStoreMoviesUpcoming();
@@ -696,6 +698,11 @@ public class MovieService {
         if (!posterDir.exists()) {
             posterDir.mkdirs();
         }
+    }
+
+    // 영화 삭제 (어드민 페이지)
+    public void deleteMovie(Long movieId) {
+        movieRepository.deleteById(movieId);
     }
 
 
