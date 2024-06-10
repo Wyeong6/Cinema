@@ -1,7 +1,10 @@
 package com.busanit.controller;
 
+import com.busanit.domain.movie.ActorDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.domain.SnackDTO;
+import com.busanit.entity.movie.MovieActor;
+import com.busanit.repository.MovieActorRepository;
 import com.busanit.service.MovieService;
 import com.busanit.service.SnackService;
 import lombok.RequiredArgsConstructor;
@@ -154,8 +157,11 @@ public class MovieController {
             @RequestParam("video") String video,
             @RequestParam("genres") List<String> genres,
             @RequestParam("RegisteredStillCut") List<MultipartFile> registeredStillCut,
+            @RequestParam("actors") List<Long> actors,
             Model model
     ) throws IOException {
+
+        System.out.println("actors 체크 === " + actors);
 
 
         String stillCutRelativeUploadDir = "uploads/stillCuts/";
@@ -181,11 +187,10 @@ public class MovieController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 중 오류가 발생했습니다.");
         }
 
-
         try {
             movieService2.saveMovie(
                     movieId, movieTitle, movieOverview, movieReleaseDate, certifications,
-                    posterRelativeFilePath, backdropRelativeFilePath, stillCutFiles, genres, video, runtime
+                    posterRelativeFilePath, backdropRelativeFilePath, stillCutFiles, genres, video, runtime, actors
             );
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
@@ -207,6 +212,37 @@ public class MovieController {
         boolean exists = movieService2.checkIfMovieIdExists(id);
         response.put("exists", exists);
         return response;
+    }
+
+    // 영화등록시 배우 검색
+    @GetMapping("/actors/search")
+    @ResponseBody
+    public ResponseEntity<List<MovieActor>> searchActors(@RequestParam String query) {
+
+        List<MovieActor> actors = movieService2.findByActorNameContaining(query);
+
+
+        return ResponseEntity.ok(actors);
+    }
+
+    // 직접등록한 영화 상세보기에 배우정보 가져오기
+
+    @GetMapping("/actors/{movieId}")
+    @ResponseBody
+    public List<Long> getActorIdsByMovieId(@PathVariable("movieId") String movieId) {
+        // movieId를 기반으로 해당 영화에 출연한 배우들의 ID 목록을 가져오는 서비스 메서드 호출
+        return movieService2.getActorIdsByMovieId(movieId);
+    }
+
+    @GetMapping("/actor/{actorId}")
+    @ResponseBody
+    public ResponseEntity<ActorDTO> getActorById(@PathVariable Long actorId) {
+        ActorDTO actorDto = movieService2.getActorById(actorId);
+        if (actorDto != null) {
+            return ResponseEntity.ok(actorDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

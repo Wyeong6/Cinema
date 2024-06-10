@@ -1,6 +1,7 @@
 package com.busanit.controller;
 
 import com.busanit.domain.EventDTO;
+import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.SnackDTO;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.movie.MovieDTO;
@@ -9,7 +10,6 @@ import com.busanit.entity.Snack;
 import com.busanit.repository.MessageRepository;
 import com.busanit.service.*;
 import com.busanit.domain.NoticeDTO;
-import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.TheaterDTO;
 import com.busanit.entity.Theater;
 import com.busanit.service.ChatService;
@@ -25,13 +25,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -43,13 +47,14 @@ public class AdminPageController {
     // 병합시점에서 log 사용자가 없고 @Slf4j 와 log 가 중복된거라 log 부분을 주석처리 했습니다.
 //    private static final Logger log = LoggerFactory.getLogger(AdminPageController.class);
     private final TheaterService theaterService;
+    private final TheaterNumberService theaterNumberService;
     private final SnackService snackService;
     private final EventService eventService;
+    private final NoticeService noticeService;
     private final ChatService chatService;
     private final MessageRepository messageRepository;
     private final MemberService memberService;
     private final MovieService movieService;
-    private final NoticeService noticeService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -89,7 +94,7 @@ public class AdminPageController {
     }
 
     @PostMapping("/member")
-    public String memberManagement() {
+    public String memberManagement(){
         return "admin/adminMemberManagementPage";
     }
 
@@ -122,17 +127,61 @@ public class AdminPageController {
     @PostMapping("/theaterRegister")
     public String theaterRegister(@Valid TheaterDTO theaterDTO, BindingResult bindingResult, Model model) {
         model.addAttribute("urlLoad", "/admin/theaterRegister");
+
         if (bindingResult.hasErrors()) {
+            model.addAttribute("errors", bindingResult.getAllErrors());
             return "admin/admin_theater_register";
         }
 
         try {
             theaterService.save(Theater.toEntity(theaterDTO));
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("message", e.getMessage());
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
         }
 
-        return "admin/admin_layout";
+        return "redirect:/admin/adminMain";
+    }
+
+    @PostMapping("/checkTheaterName")
+    public ResponseEntity<Map<String, Boolean>> checkDuplicateTheaterName(@RequestParam String theaterName) {
+        boolean isDuplicate = theaterService.isTheaterNameDuplicate(theaterName);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("duplicate", isDuplicate);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/checkTheaterNameEng")
+    public ResponseEntity<Map<String, Boolean>> checkDuplicateTheaterNameEng(@RequestParam String theaterNameEng) {
+        boolean isDuplicate = theaterService.isTheaterNameEngDuplicate(theaterNameEng);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("duplicate", isDuplicate);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/seatRegister")
+    public String showSeatRegisterFormSelect(@RequestParam(required = false) String region, @RequestParam(required = false) String theaterName, Model model) {
+        if(region == null) {
+            region = ""; // 빈 값일 때 처리
+        }
+
+        if(theaterName == null) {
+            theaterName = ""; // 빈 값일 때 처리
+        }
+        TheaterDTO seatForm = new TheaterDTO();
+        seatForm.setRegion(region);
+        seatForm.setTheaterName(theaterName);
+
+        model.addAttribute("seatForm", seatForm);
+
+        return "admin/admin_seat_register";
+    }
+
+
+    @GetMapping("/getTheatersByRegion")
+    @ResponseBody
+    public List<TheaterDTO> getTheatersByRegion(@RequestParam String region) {
+        System.out.println("Region: " + region);
+        return theaterService.findTheatersByRegion(region);
     }
 
     @GetMapping("/theaterGet")
@@ -162,15 +211,27 @@ public class AdminPageController {
         return "admin/admin_theater_list";
     }
 
-    @GetMapping("/scheduleList")
-    public String scheduleList() {
-        return "admin/admin_schedule_list";
+    @PostMapping("/theaterNumberDelete")
+    public ResponseEntity<TheaterDTO> theaterNumberDelete(@RequestParam(name = "theaterNumberId") long theaterNumberId) {
+        try {
+            long theaterId = theaterNumberService.getTheaterIdByTheaterNumberId(theaterNumberId); // theaterId 가져오기
+            theaterNumberService.deleteTheaterNumberById(theaterNumberId);
+            theaterService.decreaseTheaterCountById(theaterId);
+
+            // 삭제 후 업데이트된 TheaterDTO를 반환
+            TheaterDTO updatedTheaterDTO = theaterService.getTheaterById(theaterId);
+            return ResponseEntity.ok(updatedTheaterDTO);
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 정보를 로깅하거나 콘솔에 출력합니다.
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
+    @GetMapping("/scheduleList")
+    public String scheduleList() { return "admin/admin_schedule_list"; }
+
     @GetMapping("/scheduleRegister")
-    public String scheduleRegister() {
-        return "admin/admin_schedule_register";
-    }
+    public String scheduleRegister() { return "admin/admin_schedule_register"; }
 
     @GetMapping("/snackList")
     public String snackList(Model model,
@@ -215,12 +276,12 @@ public class AdminPageController {
     public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult, Model model) {
 
         model.addAttribute("urlLoad", "/admin/snackRegister"); // javascript load function 에 필요함
-        if (bindingResult.hasErrors()) {
+        if(bindingResult.hasErrors()) {
             return "admin/admin_snack_register";
         }
         try {
             snackService.saveSnack(Snack.toEntity(snackDTO));
-        } catch (IllegalStateException e) {
+        } catch(IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }
 
