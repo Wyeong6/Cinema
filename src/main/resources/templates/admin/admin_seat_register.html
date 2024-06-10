@@ -152,7 +152,9 @@
                                         <div class="d-flex justify-content-center">
                                             <div class="screen"></div>
                                         </div>
-                                        <div class="seating-area"></div>
+                                        <div>
+                                            <div class="seating-area"></div>
+                                        </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-info" data-bs-dismiss="modal">
@@ -190,8 +192,8 @@
                 columnCount++;
                 const newColumn = `
                 <div class="mt-2 mb-3 col-sm-3">
-                    <label for="${letter} + '-input'" class="form-label">${letter}열</label>
-                    <input id="${letter} + '-input'" class="form-control form-control-lg" type="number" max="20" placeholder="${letter}열 좌석 수를 입력하세요." />
+                    <label for="${letter}-input" class="form-label">${letter}열</label>
+                    <input id="${letter}-input" class="form-control form-control-lg" type="number" max="20" placeholder="${letter}열 좌석 수를 입력하세요." />
                 </div>
             `;
                 $(newColumn).insertBefore('.add-column:first');
@@ -332,18 +334,22 @@
                 if (seatCount == null || seatCount === '') {
                     console.log(column + seatCount + '가 null입니다.');
                 } else {
+                    let columnTextDiv = $('<div></div>').addClass('column').text(column);
+                    columnDiv.append(columnTextDiv);
                     for (let j = 1; j <= 22; j++) {
                         let newDiv = $('<div></div>').addClass('seat');
                         columnDiv.append(newDiv);
                     }
 
-                    columnDiv.find('.seat:nth-child(5)').addClass('remove');
+                    columnDiv.find('.seat:nth-child(6)').addClass('remove');
                     columnDiv.find('.seat:nth-last-child(5)').addClass('remove');
 
-                    let seatsToRemove = Math.max((20 - seatCount) / 2, 0); // 음수인 경우 0으로 설정
-                    for (let k = 1; k <= seatsToRemove; k++) {
-                        columnDiv.find('.seat:nth-child(' + k + ')').addClass('remove');
-                        columnDiv.find('.seat:nth-last-child(' + k + ')').addClass('remove');
+                    let seatsToRemove = Math.max(Math.floor((20 - seatCount) / 2), 0);
+                    console.log(seatsToRemove);
+
+                    for (let k = 0; k < seatsToRemove; k++) {
+                        columnDiv.find('.seat:nth-child(' + (k + 2) + ')').addClass('remove'); // columnTextDiv로 인해 인덱스가 1씩 증가
+                        columnDiv.find('.seat:nth-last-child(' + (k + 1) + ')').addClass('remove');
                     }
 
                     if (seatCount < 11) {

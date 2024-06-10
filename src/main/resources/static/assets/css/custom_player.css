@@ -98,6 +98,12 @@ div.mb-3 {
 .seating-area {
     display: block;
 }
+.column {
+    background: #000;
+    width: 2em;
+    height: 2em;
+    line-height: 2em;
+}
 .seat {
     margin: 0.5em;
     width: 2em;
