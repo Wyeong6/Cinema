@@ -3,6 +3,7 @@ package com.busanit.controller;
 import com.busanit.domain.movie.ActorDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.domain.SnackDTO;
+import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieActor;
 import com.busanit.repository.MovieActorRepository;
 import com.busanit.service.MovieService;
@@ -206,9 +207,18 @@ public class MovieController {
 
     // 영화 삭제 (어드민 페이지에서)
     @PostMapping("/movies/delete/{id}")
-    public String deleteMovie(@PathVariable("id") Long movieId) {
+    public String deleteMovieAndAddToBlacklist(@PathVariable("id") Long movieId) {
         movieService2.deleteMovie(movieId);
-        return "admin/admin_layout"; // 영화 목록 페이지로 리다이렉트
+        movieService2.addToBlacklist(movieId);
+        return "admin/admin_layout"; // 영화 목록 페이지로
+    }
+
+    // 영화 수정 (어드민 페이지에서)
+    @GetMapping("/movies/edit/{id}")
+    public String showEditMovieForm(@PathVariable("id") Long movieId, Model model) {
+        Movie movie = movieService2.getMovieById(movieId);
+        model.addAttribute("movie", movie);
+        return "/admin/admin_movie_register";
     }
 
 

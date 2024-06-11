@@ -57,6 +57,7 @@ public class MovieService {
     private final MovieImageRepository movieImageRepository;
     private final MovieActorRepository movieActorRepository;
     private final GenreRepository genreRepository;
+    private final MovieBlacklistRepository movieBlacklistRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${TMDB.apiKey}")
@@ -72,9 +73,7 @@ public class MovieService {
     // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-//    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
-
-    @Scheduled(fixedRate = 120000)
+    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
     public void fetchAndStoreMovies() throws IOException {
         fetchAndStoreMoviesNowPlaying();
         fetchAndStoreMoviesUpcoming();
@@ -90,6 +89,17 @@ public class MovieService {
         cachedHotMovies = getHotMovies();
         lastFetchDate = LocalDate.now();
     }
+
+    // 어드민페이지에서 영화를 삭제했을때 만약 API에서 주기적으로 받아와 서버에 저장하고있는 영화라면
+    //
+    private List<Long> getBlacklistedMovieIds() {
+        return movieBlacklistRepository.findAll()
+                .stream()
+                .map(MovieBlacklist::getMovieId)
+                .collect(Collectors.toList());
+    }
+
+
 
     /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
 
@@ -109,13 +119,16 @@ public class MovieService {
     }
 
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
+
+        List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
+
         int totalPages = fetchTotalPages();
         for (int page = 1; page <= totalPages; page++) {
             String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody);
+                processResponse(responseBody, blacklistedMovieIds);
             }
         }
     }
@@ -123,12 +136,15 @@ public class MovieService {
     // 상영예정작 DB에 넣기
     @Async
     public void fetchAndStoreMoviesUpcoming() throws IOException {
+
+        List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
+
         for (int page = 1; page <= 8; page++) {
             String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody);
+                processResponse(responseBody, blacklistedMovieIds);
             }
         }
     }
@@ -177,12 +193,15 @@ public class MovieService {
         return null;
     }
 
-    private void processResponse(String responseBody) throws IOException {
+    private void processResponse(String responseBody, List<Long> blacklistedMovieIds) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
             for (JsonNode node : results) {
-                processMovieData(node);
+                Long movieId = node.get("id").asLong();
+                if (!blacklistedMovieIds.contains(movieId)) {
+                    processMovieData(node);
+                }
             }
         }
     }
@@ -703,6 +722,17 @@ public class MovieService {
     // 영화 삭제 (어드민 페이지)
     public void deleteMovie(Long movieId) {
         movieRepository.deleteById(movieId);
+    }
+
+    //영화 수정 (어드민 페이지)
+    public Movie getMovieById(Long movieId) {
+        return movieRepository.findById(movieId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid movie Id:" + movieId));
+    }
+
+
+    public void addToBlacklist(Long movieId) {
+        movieBlacklistRepository.save(new MovieBlacklist(movieId));
     }
 
 
