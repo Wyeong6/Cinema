@@ -16,7 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -41,30 +43,41 @@ public class ChatController {
     @MessageMapping("/chat/private")
     public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
 
-        if ("endChat".equals(messageDTO.getChatRoomTitle())) { // 채팅 종료 메시지인 경우
-
+        if ("inactive".equals(messageDTO.getStatus())) { // 채팅 종료할 경우
+            chatService.updateChatRoomStatus(messageDTO.getChatRoomId(), "inactive");
+        }else if("active".equals(messageDTO.getStatus())){
+            chatService.saveMessage(messageDTO);
         }
-        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getSender(), messageDTO);
+        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
+    }
 
+    @PostMapping("/chat/createChatRoom")
+    @ResponseBody
+    public ResponseEntity<Map<String, Long>> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
 
-        chatService.saveMessage(messageDTO);
+        ChatRoom createChatRoom = chatService.getOrCreateChatRoom(chatRoomDTO.getChatRoomTitle(), chatRoomDTO.getUserEmail(), chatRoomDTO.getAdminEmail());
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("chatRoomId", createChatRoom.getId());
+
+        return ResponseEntity.ok().body(response);
 
     }
 
-//    @PostMapping("/chat/createChatRoom")
-//    @ResponseBody
-//    public ResponseEntity<String> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
-//
-//        ChatRoom createdRoom = chatService.createChatRoom(chatRoomDTO.getChatRoomTitle(), chatRoomDTO.getUserEmail(), chatRoomDTO.getAdminEmail());
-//
-//        return ResponseEntity.ok().body("{\"message\": \"Chat room created successfully.\"}");    }
-
-    //이전 메세지 내용가져오기
-    @GetMapping("/chat/private/{recipient}")
+    //채팅중인 메세지 가져오기
+    @GetMapping("/chat/active/{recipient}")
     @ResponseBody
-    public List<ChatRoomDTO> fetchMessages(@PathVariable String recipient) {
+    public List<ChatRoomDTO> getActiveChat(@PathVariable String recipient) {
         System.out.println("이전메세지가져옴");
         return chatService.findChatRoomByUserEmail(recipient);
+    }
+
+    //클릭한 채팅룸 메세지 가져오기
+    @GetMapping("/chat/clickChat/{chatRoomId}")
+    @ResponseBody
+    public List<ChatRoomDTO> getClickChat(@PathVariable String chatRoomId) {
+        System.out.println("이전메세지가져옴");
+        return chatService.findChatRoomByChatRoomId(chatRoomId);
     }
 
     @GetMapping("/chat/getRecipientEmail")

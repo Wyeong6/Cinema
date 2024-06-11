@@ -40,15 +40,15 @@ public class ChatService {
     public void saveMessage(MessageDTO messageDTO) {
         Member sender = findMemberByEmail(messageDTO.getSender());
         Member receiver = findMemberByEmail(messageDTO.getRecipient());
-        ChatRoom chatRoom = getOrCreateChatRoom(messageDTO.getChatRoomTitle(), messageDTO.getSender(), messageDTO.getRecipient());
-
+//      ChatRoom chatRoom = getOrCreateChatRoom(messageDTO.getChatRoomTitle(), messageDTO.getSender(), messageDTO.getRecipient());
+        ChatRoom chatRoom = chatRoomRepository.findById(messageDTO.getChatRoomId()).orElseThrow(()-> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
         //메세지 생성
         Message message = Message.createMessage(sender, receiver, messageDTO, chatRoom);
         //연관메서드
         updateEntitiesWithNewMessage(sender, receiver, chatRoom, message);
         //메세지 저장
         messageRepository.save(message);
-        //메세지 상태추가
+//        //메세지 상태추가
         createReadStatus(chatRoom, sender, receiver);
     }
 
@@ -110,6 +110,7 @@ public class ChatService {
     public List<ChatRoomDTO> findChatRoomByUserEmail(String recipient) {
         //로그인 한 사람
         String readEmail = getAuthenticatedUserEmail();
+        //유저들이 있는 채팅방의 상태가 active인 것
         List<ChatRoom> chatRooms = chatRoomRepository.findByRecipientAndSender(recipient, readEmail);
         System.out.println("Found chat rooms: " + chatRooms.size());
 
@@ -131,16 +132,14 @@ public class ChatService {
 
     }
 
-//    public void createChatRoom(String title, String recipientEmail, String senderEmail){
-//        Member sender = findMemberByEmail(senderEmail);
-//        Member receiver = findMemberByEmail(recipientEmail);
-//
-//        // sender와 receiver가 동일한 채팅방을 가지고 있는지 확인
-//        sender.getChatRooms().stream()
-//                .filter(chatRoom -> chatRoom.getMembers().contains(receiver))
-//                .findFirst()
-//                .orElseGet(() -> createNewChatRoom(title, sender, receiver));
-//    }
+    public List<ChatRoomDTO> findChatRoomByChatRoomId(String chatRoomId) {
+
+        List<ChatRoom> chatRooms = chatRoomRepository.findByChatRoomId(Long.valueOf(chatRoomId));
+
+        return chatRooms.stream()
+                .map(this::convertToChatRoomDTO)
+                .collect(Collectors.toList());
+    }
 
     // 이메일로 회원 조회
     private Member findMemberByEmail(String email) {
@@ -161,22 +160,21 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
-
     // 사용자 메시지 처리
     private ChatRoom handleUserMessage(String chatRoomTitle, String senderEmail, String recipientEmail) {
         Member sender = findMemberByEmail(senderEmail);
         Member receiver = findMemberByEmail(recipientEmail);
 
-        // sender와 receiver가 동일한 채팅방을 가지고 있는지 확인
+        // sender와 receiver가 동일한 채팅방이 active인 지 확인 없으면 생성
         return sender.getChatRooms().stream()
-                .filter(chatRoom -> chatRoom.getMembers().contains(receiver))
+                .filter(chatRoom -> chatRoom.getMembers().contains(receiver) && chatRoom.getType().equals("active") )
                 .findFirst()
                 .orElseGet(() -> createNewChatRoom(chatRoomTitle, sender, receiver));
     }
 
     // 새 채팅방 생성
     private ChatRoom createNewChatRoom(String title, Member sender, Member receiver) {
-
+        System.out.println("새채팅방생성 title" + title);
         List<Member> members = Arrays.asList(sender, receiver);
 
         ChatRoom newChatRoom = ChatRoom.builder()
@@ -195,6 +193,18 @@ public class ChatService {
         sender.addSentMessage(message);
         receiver.addReceivedMessage(message);
         chatRoom.addMessage(message);
+    }
+    //상태 업데이트
+    public void updateChatRoomStatus(Long chatRoomId, String status) {
+        Optional<ChatRoom> optionalChatRoom = chatRoomRepository.findById(chatRoomId);
+        if (optionalChatRoom.isPresent()) {
+            ChatRoom chatRoom = optionalChatRoom.get();
+            chatRoom.setType(status);
+            chatRoomRepository.save(chatRoom);
+        } else {
+            // 채팅 방이 없는 경우 예외 처리
+            throw new IllegalArgumentException("Chat room not found with ID: " + chatRoomId);
+        }
     }
 
     // 읽지 않은 메시지 수를 계산하는 메서드

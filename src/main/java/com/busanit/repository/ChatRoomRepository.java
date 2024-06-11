@@ -21,7 +21,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m WHERE m.email = :memberEmail")
     Page<ChatRoom> findByMemberEmail(@Param("memberEmail") String memberEmail, Pageable pageable);
 
-    @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m1 JOIN cr.members m2 WHERE m1.email = :recipient AND m2.email = :readEmail")
+    @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m1 JOIN cr.members m2 WHERE m1.email = :recipient AND m2.email = :readEmail AND cr.type = 'active'")
     List<ChatRoom> findByRecipientAndSender(@Param("recipient") String recipient, @Param("readEmail") String readEmail);
 
     @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m WHERE m.email = :loginUser AND cr.type = 'active'")
@@ -29,4 +29,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m WHERE m.id = :memberId")
     List<ChatRoom> findByMembersId(@Param("memberId") Long memberId);
+
+    @Query("SELECT cr FROM ChatRoom cr WHERE cr.id = :chatRoomId")
+    List<ChatRoom> findByChatRoomId(@Param("chatRoomId") Long chatRoomId);
 }

@@ -91,8 +91,10 @@
                 },
                 type: "GET",
                 success: function (response) {
+                    console.log("응답 데이터:", response);
                     memberEmail = response.memberEmail;
                     var chatList = response.chatRoom;
+
                     var $chatListContainer = $(".chat-table");
                     $chatListContainer.empty(); // 기존 목록을 비우고
 
@@ -111,7 +113,7 @@
                         var chatRoomRow =
                             "<tr data-room-id='" + chatRoom.id + "' onclick='openChatModal(this)'>" +
                             "<td>" + chatRoom.id + "</td>" +
-                            "<td>" + chatRoom.chatRoomTitle + "</td>" +
+                            "<td>" + chatRoom.chatRoomTitle + "(" +chatRoom.type + ")" + "</td>" +
                             "<td>" + lastMessageContent + " (" + chatRoom.unreadMessageCount + "개 메시지)" + "</td>" +
                             "<td>" + chatRoom.userEmail + "</td>" +
                             "<td>" + chatRoom.userName + "</td>" +
@@ -198,7 +200,7 @@
 
     // 수신자 구독
     function subscribeToRecipient() {
-        stompClient.subscribe('/user/queue/private/' + currentRecipient, function (message) {
+        stompClient.subscribe('/user/queue/private/' + chatRoomId, function (message) {
             console.log("Private Message: " + message.body);
 
             document.getElementById('message').disabled = false;
@@ -277,12 +279,13 @@
 
     // 종료 메시지 전송 함수
     function sendEndChatMessage() {
+        console.log("메세지종료 chatRoomId" + chatRoomId)
         var endUserChatMessage = {
             chatRoomId: chatRoomId,
             sender: memberEmail,
             recipient: currentRecipient,
             content: '상담이 완료되었습니다.',
-            chatRoomTitle: "endChat"
+            status: "inactive"
         };
 
         console.log("Sending end chat message:", endUserChatMessage);
@@ -304,17 +307,16 @@
     }
 
     // 메시지 가져오기 함수
-    function fetchMessages() {
-        console.log("currentRecipient 연결 " + currentRecipient);
-        fetch(`/chat/private/${currentRecipient}`)
+    function fetchMessages(chatRoomId) {
+
+        console.log("chatRoomId 클릭한 " + chatRoomId);
+        fetch(`/chat/clickChat/${chatRoomId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok ' + response.statusText);
                 return response.json();
             })
             .then(data => {
                 console.log('Data:', data);
-                console.log('chatRoomId:', data[0].id);
-                chatRoomId = data[0].id;
                 data.forEach(item => {
                     if (Array.isArray(item.messages)) {
                         item.messages.forEach(message => {
@@ -345,6 +347,8 @@
 
     // 채팅 모달 열기 함수
     function openChatModal(row) {
+
+        chatRoomId = row.getAttribute('data-room-id');
         currentRecipient = row.querySelector('td:nth-child(4)').innerText; // 현재 수신자 업데이트
         getElement('messages').innerHTML = ''; // 메시지 요소 초기화
 
@@ -352,7 +356,7 @@
             disconnect(); // 이미 연결된 경우, 연결 해제
         }
 
-        fetchMessages();
+        fetchMessages(chatRoomId);
         connect();
         const modal = getElement('myModal');
         getElement('userEmail').innerText = currentRecipient;

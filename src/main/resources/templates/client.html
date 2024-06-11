@@ -22,7 +22,7 @@
         var typingTimeout = null;
         var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
         var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수var roomId = null;
-        var ChatRoomId = null;
+        var status = null;
 
         // WebSocket 연결 함수
         function connect() {
@@ -36,12 +36,12 @@
                 console.log('Connected: ' + frame); // 연결 성공 시 콘솔에 로그 출력
 
                 // 특정 사용자 큐에 구독 (개인 메시지 수신)
-                stompClient.subscribe('/user/queue/private/' + recipient, function (message) {
+                stompClient.subscribe('/user/queue/private/' + chatRoomId, function (message) {
 
                     var parsedMessage = JSON.parse(message.body);
                     console.log("Message type:", typeof parsedMessage.type);
                     // 메시지 타입에 따른 처리
-                    if (parsedMessage.chatRoomTitle === 'endChat') {
+                    if (parsedMessage.status === 'inactive') {
                         console.log("대화종료메세지오기전에")
                         // 대화 종료 메시지 처리
                         showMessage(parsedMessage.content);
@@ -103,9 +103,10 @@
                     recipient: recipient, // 수신자 이메일
                     content: messageContent, // 메시지 내용
                     chatRoomTitle: chatRoomTitle, // 메시지 제목 (카테고리)
+                    status: "active"
                 };
                 console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
-                stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
+                stompClient.send("/app/chat/private" , {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
                 showMessage('나: ' + messageContent); // 전송한 메시지를 화면에 표시
                 document.getElementById('message').value = ''; // 입력 필드를 비움
 
@@ -123,6 +124,7 @@
 
         //카테고리를 선택한 후
         function selectCategory(category) {
+            console.log("선택한 category" + category)
             chatRoomTitle = category;
             showMessage('문의사항을 남겨주시면 신속히 답변해드리겠습니다.');
 
@@ -146,12 +148,12 @@
                 default:
                     recipient = 'admin@admin.com';
             }
-
+            console.log("선택한 category의 아이디 " + recipient)
             if (recipient) {
                 connect();
             }
 
-            // createChatRoomAndConnect(recipient,category);
+            createChatRoomAndConnect(recipient,category);
         }
         function createChatRoomAndConnect(recipient, category) {
             console.log("userEmail" + userEmail);
@@ -170,7 +172,7 @@
                     return response.json(); // 서버 응답을 JSON 형식으로 파싱
                 })
                 .then(data => {
-                     chatRoomId = data.roomId; // 서버 응답에서 채팅방 ID 추출
+                     chatRoomId = data.chatRoomId; // 서버 응답에서 채팅방 ID 추출
                     console.log("Created chat room ID:", chatRoomId);
                     // 채팅방 생성 후 연결
                     connect();
@@ -204,9 +206,9 @@
         async function fetchRecipientEmail() {
             try {
                 const response = await fetch('/chat/getRecipientEmail');
-                console.log("받는 이메일" + response)
-                const data = await response.json();
-                console.log("받는 이메일data" + data)
+                console.log("받는 이메일", response); // Response 객체를 그대로 로깅하지 않음
+                const data = await response.json(); // JSON 형식으로 응답을 파싱
+                console.log("받는 이메일 data", data); // 파싱된 JSON 데이터 로깅
                 return Array.isArray(data) ? data[0] : data || '이메일을 찾을 수 없습니다.';
             } catch (error) {
                 console.error('오류:', error);
@@ -216,7 +218,7 @@
 
         function fetchMessages(recipient) {
             console.log("fetchMessages의 recipient" + recipient)
-            fetch(`/chat/private/${recipient}`)
+            fetch(`/chat/active/${recipient}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
