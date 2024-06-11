@@ -31,10 +31,10 @@ public class ChatRoom {
             inverseJoinColumns = @JoinColumn(name = "chatroom_id"))
     private List<Member> members = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<Message> messages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<ChatRoomReadStatus> readStatuses = new ArrayList<>();
 
     public void addMessage(Message message) {

@@ -17,6 +17,7 @@ public class MessageDTO {
     private String sender;
     private String recipient;
     private String chatRoomTitle;
+    private String chatRoomId;
     public static MessageDTO toMessageDTO(Message message) {
         return MessageDTO.builder()
                 .id(message.getId())

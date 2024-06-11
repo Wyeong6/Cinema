@@ -21,8 +21,8 @@
         var stompClient = null; // STOMP 클라이언트 변수 선언
         var typingTimeout = null;
         var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
-        var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
-
+        var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수var roomId = null;
+        var ChatRoomId = null;
 
         // WebSocket 연결 함수
         function connect() {
@@ -46,6 +46,7 @@
                         // 대화 종료 메시지 처리
                         showMessage(parsedMessage.content);
                         // 추가적인 처리 (예: 대화 종료 후 UI 업데이트 등)
+                        showMessage('다른 문의가 있으면 카테고리를 선택해주세요.');
                         document.getElementById('categoryButtons').style.display = 'block';
                     } else if (parsedMessage.typing === "typing") {
                         console.log("상대방이 타이핑 중입니다.");
@@ -93,9 +94,11 @@
         // 메시지 전송 함수
         function sendMessage() {
             var messageContent = document.getElementById('message').value; // 입력된 메시지 내용 가져오기
+            console.log("메세지전송의 ChatRoomId" + chatRoomId)
             console.log("메세지전송의 recipient" + recipient)
             if (messageContent) { // 메시지 내용과 제목이 있을 때만 전송
                 var message = {
+                    chatRoomId: chatRoomId, //챗룸번호
                     sender: userEmail, // 발신자 이메일
                     recipient: recipient, // 수신자 이메일
                     content: messageContent, // 메시지 내용
@@ -143,26 +146,60 @@
                 default:
                     recipient = 'admin@admin.com';
             }
+
+            if (recipient) {
+                connect();
+            }
+
+            // createChatRoomAndConnect(recipient,category);
+        }
+        function createChatRoomAndConnect(recipient, category) {
+            console.log("userEmail" + userEmail);
+            // 채팅방 생성 및 연결 요청
+            fetch('/chat/createChatRoom', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ adminEmail: recipient, userEmail: userEmail, chatRoomTitle: category })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json(); // 서버 응답을 JSON 형식으로 파싱
+                })
+                .then(data => {
+                     chatRoomId = data.roomId; // 서버 응답에서 채팅방 ID 추출
+                    console.log("Created chat room ID:", chatRoomId);
+                    // 채팅방 생성 후 연결
+                    connect();
+                })
+                .catch(error => console.error('Error creating chat room:', error));
         }
 
         // 타이핑 인디케이터를 보여주는 함수
         function showTypingIndicator() {
-            document.getElementById('typingIndicatorDTO').style.display = 'block'; // 타이핑 인디케이터 표시
+            document.getElementById('typingIndicatorDTO').style.display = 'block';
 
         }
 
         // 타이핑 인디케이터를 숨기는 함수
         function hideTypingIndicator() {
-            document.getElementById('typingIndicatorDTO').style.display = 'none'; // 타이핑 인디케이터 숨김
+            document.getElementById('typingIndicatorDTO').style.display = 'none';
         }
 
         window.onload = async function () {
 
-            connect();
             recipient = await fetchRecipientEmail();
             console.log("로드된 recipient" + recipient)
             fetchMessages(recipient);
+            if (recipient) {
+                connect(); // recipient가 있는 경우에만 커넥션 설정
+            }
         };
+
+
 
         async function fetchRecipientEmail() {
             try {
@@ -208,8 +245,10 @@
                             }
                         });
                         // 메시지가 없을 경우에만 카테고리 메시지를 표시합니다.
-                        if (!messageExist) {
+                        if (!messageExist ) {
                             showMessage('안녕하세요 고객님 카테고리를 선택해주세요');
+                        }else if(chatRoomTitle === '상담이 완료되었습니다.'){
+                            document.getElementById('categoryButtons').style.display = 'block';
                         }
                     } catch (error) {
                         console.error('Error parsing JSON:', error);

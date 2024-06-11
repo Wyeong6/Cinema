@@ -21,6 +21,7 @@ public class ChatRoomDTO {
     private Long id;
     private String userName;
     private String userEmail;
+    private String adminEmail;
     private String chatRoomTitle;
     List<MessageDTO> messages;
     //메세지 조회한 시간

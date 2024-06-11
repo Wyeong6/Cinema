@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.busanit.domain.chat.ChatRoomDTO.toChatRoomDTO;
+import static com.busanit.entity.chat.QChatRoom.chatRoom;
 
 @Transactional
 @Service
@@ -129,6 +130,17 @@ public class ChatService {
         return handleUserMessage(chatRoomTitle, senderEmail, recipientEmail);
 
     }
+
+//    public void createChatRoom(String title, String recipientEmail, String senderEmail){
+//        Member sender = findMemberByEmail(senderEmail);
+//        Member receiver = findMemberByEmail(recipientEmail);
+//
+//        // sender와 receiver가 동일한 채팅방을 가지고 있는지 확인
+//        sender.getChatRooms().stream()
+//                .filter(chatRoom -> chatRoom.getMembers().contains(receiver))
+//                .findFirst()
+//                .orElseGet(() -> createNewChatRoom(title, sender, receiver));
+//    }
 
     // 이메일로 회원 조회
     private Member findMemberByEmail(String email) {

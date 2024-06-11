@@ -157,6 +157,7 @@
     var memberEmail = '';
     var currentRecipient = ''; // 전역 변수로 선언
     var chatRoomTitle = '';
+    var chatRoomId = '';
     var isConnected = false;
     var stompClient = null; // STOMP 클라이언트 변수 선언
     var typingTimeout = null;
@@ -190,7 +191,7 @@
             subscribeToRecipient();
             // 타이핑 이벤트를 감지하여 서버로 전송
             document.getElementById('message').addEventListener('input', handleTypingEvent);
-            ;
+
         });
         isConnected = true;
     }
@@ -199,10 +200,14 @@
     function subscribeToRecipient() {
         stompClient.subscribe('/user/queue/private/' + currentRecipient, function (message) {
             console.log("Private Message: " + message.body);
+
+            document.getElementById('message').disabled = false;
             var parsedMessage = JSON.parse(message.body);
 
 
             chatRoomTitle = parsedMessage.chatRoomTitle;
+            // chatRoomId = parsedMessage.chatRoomId;
+            // console.log("chatRoomId" + chatRoomId)
 
             console.log("chatRoomTitle" + chatRoomTitle);
             currentRecipient = parsedMessage.sender;
@@ -231,6 +236,7 @@
         var messageContent = getElement('message').value;
         if (messageContent && currentRecipient) {
             var message = {
+                chatRoomId: chatRoomId,
                 sender: memberEmail,
                 recipient: currentRecipient,
                 content: messageContent
@@ -241,7 +247,6 @@
             getElement('message').value = '';
         }
     }
-
     // 타이핑 이벤트를 처리하는 함수
     function handleTypingEvent() {
         if (!typingIndicatorSent) {
@@ -273,26 +278,29 @@
     // 종료 메시지 전송 함수
     function sendEndChatMessage() {
         var endUserChatMessage = {
+            chatRoomId: chatRoomId,
             sender: memberEmail,
             recipient: currentRecipient,
-            content: '대화가 종료되었습니다.다른 문의가 있으면 카테고리를 선택해주세요.',
+            content: '상담이 완료되었습니다.',
             chatRoomTitle: "endChat"
         };
 
         console.log("Sending end chat message:", endUserChatMessage);
         stompClient.send("/app/chat/private", {}, JSON.stringify(endUserChatMessage));
 
-        // 추가 문구 전송
-        var adminMessage = {
-            sender: memberEmail,
-            recipient: currentRecipient,
-            content: '상담이 완료되었습니다.'
-        };
-        console.log("Sending follow-up message:", adminMessage);
+        // // // 추가 문구 전송
+        // var adminMessage = {
+        //     sender: memberEmail,
+        //     recipient: currentRecipient,
+        //     content: '상담이 완료되었습니다.'
+        // };
+        // console.log("Sending follow-up message:", adminMessage);
         // stompClient.send("/app/chat/admin", {}, JSON.stringify(adminMessage));
 
         // 관리자 측 채팅창에도 메시지 표시
-        showMessage(adminMessage.content);
+        showMessage(endUserChatMessage.content);
+        //입력필드 비활성화
+        document.getElementById('message').disabled = true;
     }
 
     // 메시지 가져오기 함수
@@ -305,6 +313,8 @@
             })
             .then(data => {
                 console.log('Data:', data);
+                console.log('chatRoomId:', data[0].id);
+                chatRoomId = data[0].id;
                 data.forEach(item => {
                     if (Array.isArray(item.messages)) {
                         item.messages.forEach(message => {
@@ -342,9 +352,8 @@
             disconnect(); // 이미 연결된 경우, 연결 해제
         }
 
-        connect();
         fetchMessages();
-
+        connect();
         const modal = getElement('myModal');
         getElement('userEmail').innerText = currentRecipient;
         modal.style.display = 'block';

@@ -3,16 +3,18 @@ package com.busanit.controller;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.chat.MessageDTO;
 import com.busanit.domain.chat.TypingIndicatorDTO;
+import com.busanit.entity.Member;
+import com.busanit.entity.chat.ChatRoom;
 import com.busanit.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,25 +40,30 @@ public class ChatController {
     //관리자에게 메세지 보내기
     @MessageMapping("/chat/private")
     public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
+
+        if ("endChat".equals(messageDTO.getChatRoomTitle())) { // 채팅 종료 메시지인 경우
+
+        }
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getSender(), messageDTO);
+
 
         chatService.saveMessage(messageDTO);
 
     }
 
-//    //유저에게 메세지 보내기
-//    @MessageMapping("/chat/admin")
-//    public void sendAdminMessage(@Payload MessageDTO messageDTO) {
-//        chatService.saveMessage(messageDTO);
+//    @PostMapping("/chat/createChatRoom")
+//    @ResponseBody
+//    public ResponseEntity<String> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
 //
-//        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private", messageDTO);
-//    }
+//        ChatRoom createdRoom = chatService.createChatRoom(chatRoomDTO.getChatRoomTitle(), chatRoomDTO.getUserEmail(), chatRoomDTO.getAdminEmail());
+//
+//        return ResponseEntity.ok().body("{\"message\": \"Chat room created successfully.\"}");    }
 
     //이전 메세지 내용가져오기
     @GetMapping("/chat/private/{recipient}")
     @ResponseBody
     public List<ChatRoomDTO> fetchMessages(@PathVariable String recipient) {
-        System.out.println("이전메세지가져ㅑ옴");
+        System.out.println("이전메세지가져옴");
         return chatService.findChatRoomByUserEmail(recipient);
     }
 
