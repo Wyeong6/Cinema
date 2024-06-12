@@ -195,13 +195,12 @@
 
             recipient = await fetchRecipientEmail();
             console.log("로드된 recipient" + recipient)
+            console.log("로드시 로그인된 이메일" + userEmail)
             fetchMessages(recipient);
             if (recipient) {
                 connect(); // recipient가 있는 경우에만 커넥션 설정
             }
         };
-
-
 
         async function fetchRecipientEmail() {
             try {

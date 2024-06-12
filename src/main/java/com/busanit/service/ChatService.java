@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.busanit.domain.chat.ChatRoomDTO.toChatRoomDTO;
-import static com.busanit.entity.chat.QChatRoom.chatRoom;
 
 @Transactional
 @Service
@@ -41,14 +40,14 @@ public class ChatService {
         Member sender = findMemberByEmail(messageDTO.getSender());
         Member receiver = findMemberByEmail(messageDTO.getRecipient());
 //      ChatRoom chatRoom = getOrCreateChatRoom(messageDTO.getChatRoomTitle(), messageDTO.getSender(), messageDTO.getRecipient());
-        ChatRoom chatRoom = chatRoomRepository.findById(messageDTO.getChatRoomId()).orElseThrow(()-> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(messageDTO.getChatRoomId());
         //메세지 생성
         Message message = Message.createMessage(sender, receiver, messageDTO, chatRoom);
         //연관메서드
         updateEntitiesWithNewMessage(sender, receiver, chatRoom, message);
         //메세지 저장
         messageRepository.save(message);
-//        //메세지 상태추가
+//       //메세지 상태추가
         createReadStatus(chatRoom, sender, receiver);
     }
 
@@ -67,8 +66,9 @@ public class ChatService {
         }
 
         // 변경사항을 데이터베이스에 저장
-        chatRoomReadStatusRepository.save(senderReadStatus);
-        chatRoomReadStatusRepository.save(receiverReadStatus);
+        chatRoom.addReadStatus(senderReadStatus);
+        chatRoom.addReadStatus(receiverReadStatus);
+
     }
 
     // 채팅방과 멤버에 대한 읽음 상태를 찾거나, 없으면 새로 생성하는 메서드
@@ -121,7 +121,7 @@ public class ChatService {
                     // 해당 채팅방의 메시지를 가져오면서 읽은 시간을 업데이트
                     updateLastReadTimestamp(chatRoom.getId());
                     System.out.println("updateLastReadTimestamp 가져오고나서  ");
-                    return convertToChatRoomDTOWithMessages(chatRoom, recipient);
+                    return convertToChatRoomDTOWithMessages(chatRoom, readEmail);
                 })
                 .collect(Collectors.toList());
     }
@@ -132,13 +132,19 @@ public class ChatService {
 
     }
 
-    public List<ChatRoomDTO> findChatRoomByChatRoomId(String chatRoomId) {
+    public List<ChatRoomDTO> findChatRoomByChatRoomId(Long chatRoomId) {
 
-        List<ChatRoom> chatRooms = chatRoomRepository.findByChatRoomId(Long.valueOf(chatRoomId));
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId);
 
-        return chatRooms.stream()
-                .map(this::convertToChatRoomDTO)
-                .collect(Collectors.toList());
+        Optional<Message> firstMessageOptional = chatRoom.getMessages().stream().findFirst();
+        Member sender = firstMessageOptional.map(Message::getSender).orElse(null);
+        Member receiver = firstMessageOptional.map(Message::getReceiver).orElse(null);
+
+        //메세지 상태추가
+//        createReadStatus(chatRoom, sender, receiver);
+        updateLastReadTimestamp(chatRoomId);
+
+        return Collections.singletonList(convertToChatRoomDTO(chatRoom));
     }
 
     // 이메일로 회원 조회
@@ -152,6 +158,7 @@ public class ChatService {
         String loginUser = getAuthenticatedUserEmail();
         List<ChatRoom> activeChatRooms = chatRoomRepository.findActiveChatRoomsByMemberEmail(loginUser);
         List<Member> recipients = messageRepository.findReceiversByChatRooms(activeChatRooms);
+
 
         // 로그인된 사용자의 이메일을 제외한 이메일 목록을 반환
         return recipients.stream()

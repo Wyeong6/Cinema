@@ -69,12 +69,6 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<ChatRoomReadStatus> readStatuses = new ArrayList<>();
 
-    //채팅룸 연관관계
-//    @ManyToMany
-//    @JoinTable(name = "member_chatroom",
-//            joinColumns = @JoinColumn(name = "member_id"),
-//            inverseJoinColumns = @JoinColumn(name = "chatroom_id"))
-
     @ManyToMany(mappedBy = "members", cascade = CascadeType.ALL)
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
@@ -98,20 +92,6 @@ public class Member extends BaseTimeEntity {
         }
     }
 
-//    public void removeSentMessage(Message message) {
-//        this.sentMessages.remove(message);
-//        if (message.getSender() == this) {
-//            message.setSender(null);
-//        }
-//    }
-//
-//    public void removeReceivedMessage(Message message) {
-//        this.receivedMessages.remove(message);
-//        if (message.getReceiver() == this) {
-//            message.setReceiver(null);
-//        }
-//    }
-
     // 포인트
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     List<Point> pointList;
@@ -127,11 +107,14 @@ public class Member extends BaseTimeEntity {
         }
     }
 
-    //채팅룸 연관관계
-    public void addChatRoom(ChatRoom chatRoom) {
-        this.chatRooms.add(chatRoom);
-        chatRoom.getMembers().add(this);
-    }
+//    //채팅룸 연관관계
+//    public void addChatRoom(ChatRoom chatRoom) {
+//        this.chatRooms.add(chatRoom);
+//        chatRoom.getMembers().add(this);
+//    }
+public void addChatRoom(ChatRoom chatRoom) {
+    this.chatRooms.add(chatRoom);
+}
     //메세지상태 연관관계
     public void addReadStatus(ChatRoomReadStatus chatRoomReadStatus) {
         this.readStatuses.add(chatRoomReadStatus);

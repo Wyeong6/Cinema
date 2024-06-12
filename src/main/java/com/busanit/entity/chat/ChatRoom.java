@@ -24,7 +24,6 @@ public class ChatRoom {
 
     private String type;
 
-
     @ManyToMany
     @JoinTable(name = "member_chatroom",
             joinColumns = @JoinColumn(name = "member_id"),
@@ -42,12 +41,21 @@ public class ChatRoom {
           message.setChatRoom(this);
     }
 
+//    public void addMembers(List<Member> newMembers) {
+//        if (newMembers != null) {
+//            this.members.addAll(newMembers);
+//            newMembers.forEach(member -> member.addChatRoom(this));
+//        }
+//    }
+
     public void addMembers(List<Member> newMembers) {
         if (newMembers != null) {
             this.members.addAll(newMembers);
-            newMembers.forEach(member -> member.addChatRoom(this));
         }
     }
+
+
+
         public void addReadStatus(ChatRoomReadStatus chatRoomReadStatus) {
         // 현재 메시지에 읽음 상태를 추가
         this.readStatuses.add(chatRoomReadStatus);

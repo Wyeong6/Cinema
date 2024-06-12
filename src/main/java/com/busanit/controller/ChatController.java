@@ -50,7 +50,7 @@ public class ChatController {
         }
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
     }
-
+    //카테고리 선택 시 채팅룸 생성
     @PostMapping("/chat/createChatRoom")
     @ResponseBody
     public ResponseEntity<Map<String, Long>> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
@@ -75,8 +75,8 @@ public class ChatController {
     //클릭한 채팅룸 메세지 가져오기
     @GetMapping("/chat/clickChat/{chatRoomId}")
     @ResponseBody
-    public List<ChatRoomDTO> getClickChat(@PathVariable String chatRoomId) {
-        System.out.println("이전메세지가져옴");
+    public List<ChatRoomDTO> getClickChat(@PathVariable Long chatRoomId) {
+        System.out.println("클릭한이전메세지가져옴");
         return chatService.findChatRoomByChatRoomId(chatRoomId);
     }
 
@@ -85,7 +85,7 @@ public class ChatController {
     public List<String> getRecipient() {
         return chatService.findCHatRoomByRecipient();
     }
-    // 클라이언트로부터 전송된 타이핑 인디케이터 처리
+    //타이핑 인디케이터 처리
     @MessageMapping("/chat/typing")
     public void handleTypingIndicator(@Payload TypingIndicatorDTO typingIndicatorDTO) {
 

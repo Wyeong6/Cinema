@@ -165,6 +165,7 @@
     var typingTimeout = null;
     var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
     var typingIndicatorSent = false;  // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
+    var status = null;
 
     // DOM 요소를 가져오는 함수
     function getElement(id) {
@@ -241,7 +242,8 @@
                 chatRoomId: chatRoomId,
                 sender: memberEmail,
                 recipient: currentRecipient,
-                content: messageContent
+                content: messageContent,
+                status: "active"
             };
             console.log("Sending message:", message);
             stompClient.send("/app/chat/private", {}, JSON.stringify(message));
@@ -336,7 +338,6 @@
     // 타이핑 인디케이터를 보여주는 함수
     function showTypingIndicator() {
         document.getElementById('typingIndicatorDTO').style.display = 'block'; // 타이핑 인디케이터 표시
-
 
     }
 
