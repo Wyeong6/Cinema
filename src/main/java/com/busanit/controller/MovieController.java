@@ -213,13 +213,49 @@ public class MovieController {
         return "admin/admin_layout"; // 영화 목록 페이지로
     }
 
-    // 영화 수정 (어드민 페이지에서)
+    // 영화 수정 폼을 불러오는 핸들러 (어드민 페이지에서)
     @GetMapping("/movies/edit/{id}")
     public String showEditMovieForm(@PathVariable("id") Long movieId, Model model) {
         Movie movie = movieService2.getMovieById(movieId);
-        model.addAttribute("movie", movie);
-        return "/admin/admin_movie_register";
+        model.addAttribute("movie", movie); // 수정할 영화 객체를 모델에 추가
+        return "admin/admin_movie_register"; // 등록 폼을 재활용
     }
+
+
+
+//    public ResponseEntity<String> registMovie(
+//            @RequestParam("id") Long movieId,
+//            @RequestParam("title") String movieTitle,
+//            @RequestParam("overview") String movieOverview,
+//            @RequestParam("certifications") String certifications,
+//            @RequestParam("releaseDate") String movieReleaseDate,
+//            @RequestParam("RegisteredPoster") MultipartFile registeredPoster,
+//            @RequestParam("RegisteredBackdrop") MultipartFile registeredBackdrop,
+//            @RequestParam("runtime") String runtime,
+//            @RequestParam("video") String video,
+//            @RequestParam("genres") List<String> genres,
+//            @RequestParam("RegisteredStillCut") List<MultipartFile> registeredStillCut,
+//            @RequestParam("actors") List<Long> actors,
+    // 영화 저장 핸들러 (수정 후 저장)
+//    @PostMapping("/movies/save")
+//    public String saveMovie(
+//                            @RequestParam("id") Long movieId,
+//                            @RequestParam("title") String movieTitle,
+//                            @RequestParam("overview") String movieOverview,
+//                            @RequestParam("certifications") String certifications,
+//                            @RequestParam("releaseDate") String movieReleaseDate,
+//                            @RequestParam("RegisteredPoster") String registeredPoster,
+//                            @RequestParam("RegisteredBackdrop") String registeredBackdrop,
+//                            @RequestParam("runtime") String runtime,
+//                            @RequestParam("video") String video,
+//                            @RequestParam("genres") List<String> genres,
+//                            @RequestParam("RegisteredStillCut") List<MultipartFile> registeredStillCut,
+//
+//                            @RequestParam("actors") List<Long> actors) {
+//        movieService2.saveMovie(movieId, movieTitle, movieOverview, movieReleaseDate, certifications, registeredPoster, registeredBackdrop, registeredStillCut, genres, video, runtime, actors);
+//        return "redirect:/admin/movieList"; // 수정 후 영화 목록으로 리다이렉트
+//    }
+
 
 
     // 아이디 중복확인 버튼용

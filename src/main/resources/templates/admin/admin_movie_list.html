@@ -47,7 +47,7 @@
                                     <td><i class="fab fa-angular fa-lg text-danger me-3"></i><a th:href="@{/movies/{id}(id=${movie.id})}"><strong th:text="${movie.title}">영화제목</strong></a></td>
                                     <td th:text="${movie.runtime}">영화런타임</td>
                                     <td th:text="${movie.releaseDate}">영화개봉일자</td>
-                                    <td><a th:href="@{/movies/edit/{id}(id=${movie.id})}" class="btn btn-primary btn-sm">수정</a></td>
+                                    <td><a href="#" class="btn btn-primary btn-sm edit-movie-btn" th:data-movie-id="${movie.id}">수정</a></td>
                                     <td>
                                         <form th:action="@{/movies/delete/{id}(id=${movie.id})}" method="post" style="display:inline;">
                                             <button type="submit" class="btn btn-danger btn-sm">삭제</button>
@@ -75,12 +75,29 @@
                             </ul>
                         </nav>
                     </div>
-</div>
+            </div>
                     <!--/ Hoverable Table rows -->
+
+<!-- 영화 수정 폼을 표시할 컨테이너 -->
+<div id="edit-movie-container" style="display: none;"></div>
 
 
 <script>
-        // 영화 목록 로드 함수
+
+
+    $(document).ready(function () {
+        // 영화 수정 버튼 클릭 시
+        $('.edit-movie-btn').on('click', function () {
+            var movieId = $(this).data('movie-id');
+            $('#edit-movie-container').load('/movies/edit/' + movieId, function () {
+                $('#edit-movie-container').show();
+            });
+        });
+    });
+
+
+
+    // 영화 목록 로드 함수
         function loadMovieList(page) {
             $.ajax({
                 url: '/admin/movieList',
