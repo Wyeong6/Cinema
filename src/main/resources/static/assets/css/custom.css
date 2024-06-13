@@ -861,6 +861,60 @@ article#pay > button {
     list-style-type: disc;
 }
 /* 상영시간표 */
+.table-div {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    align-items: stretch;
+    height: 40em; /* 부모 요소에 고정 높이 설정 */
+}
+tbody {
+    width: 100%;
+}
+#schedule-table {
+    width: 100%;
+    height: 100%; /* 테이블에 부모 요소와 같은 높이 설정 */
+    border-collapse: collapse; /* 테이블 셀 사이의 공간 제거 */
+}
+#schedule-table th:nth-child(1) {
+    width: 25%;
+}
+#schedule-table th:nth-child(2) {
+    width: 30%;
+}
+#schedule-table th:nth-child(3) {
+    width: 45%;
+}
+#schedule-table td {
+    box-sizing: border-box;
+    overflow: hidden;
+    vertical-align: top;
+}
+#schedule-table td:nth-child(1),
+#schedule-table td:nth-child(2) {
+    width: 12.5%;
+}
+#schedule-table td:nth-child(4) ul {
+    padding: 0;
+}
+#schedule-table td:nth-child(4) {
+    width: 10%;
+}
+#schedule-table td:nth-child(5) {
+    width: 35%;
+}
+.scrollable-content {
+    height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
+}
+.region-btn,
+.theater-name,
+.movie-item,
+.date-btn,
+.schedule-item {
+    cursor: pointer;
+}
 #select-theater-group {
     padding: 0;
 }
@@ -878,18 +932,68 @@ article#pay > button {
     text-align: left;
     padding: 0.5em 1em;
 }
-#select-theater-group ul > li.clicked {
-    background: #3B353C;
+td.theater-name {
+    cursor: pointer;
+}
+#select-theater-group ul > li.clicked, td.theater-name.clicked {
+    background: #79657B;
     color:#fff;
 }
-#theaterList {
+#theater-list {
     padding: 0;
 }
-#theaterList td {
+#theater-list td {
     text-align: left;
     padding: 0.5em 1em;
 }
-#theaterList td.clicked {
-    background: #3B353C;
-    color:#fff;
+#theater-list tbody tr {
+    border-top: 0;
+}
+.movie-item {
+    padding: 0.5em;
+    display: flex;
+    flex-direction: row;
+}
+.movie-item.clicked {
+    border: 3px solid #79657B;
+}
+.movie-item > .certification-img {
+    width: 1.5em;
+    height: 1.5em;
+    margin-right: 1em;
+}
+.movie-item > p {
+    text-align: left;
+    margin: 0;
+}
+.date-btn {
+    margin: 0.25em 0.5em;
+    padding: 0.25em 0.5em;
+    color: #3B353C;
+}
+.date-btn.clicked {
+    border-radius: 10px;
+    background: #FFFFFF;
+}
+.theaterNumber-group {
+    padding: 0.5em;
+}
+.theaterNumber-group ul {
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+}
+.theaterNumber-group h4 {
+    text-align: left;
+}
+.schedule-item {
+    padding: 0.5em 1em;
+    background: #FFFFFF;
+    border-radius: 10px;
+}
+.schedule-item.clicked {
+    background: mediumpurple;
+}
+.schedule-item.clicked h5, .schedule-item.clicked h6 {
+    color: #FFFFFF;
 }

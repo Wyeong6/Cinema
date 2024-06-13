@@ -1,8 +1,12 @@
 package com.busanit.entity;
 
+import com.busanit.domain.SeatDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -13,7 +17,6 @@ public class Seat {
     private String id;
 
     private Long seatRow;
-
     private String seatColumn;
     private boolean isReserved;
     private boolean isAvailable;
@@ -25,12 +28,25 @@ public class Seat {
     public Seat() {
     }
 
-    public Seat(String id, Long seatRow, String seatColumn) {
-        this.id = id;
-        this.seatRow = seatRow;
-        this.seatColumn = seatColumn;
-        this.isReserved = false;
-        this.isAvailable = true;
+    @PrePersist
+    public void prePersist() {
+        this.id = generateId(this.seatColumn, this.seatRow, this.theaterNumber.getId());
+    }
+
+    public static String generateId(String seatColumn, Long seatRow, Long theaterNumberId) {
+        return theaterNumberId + seatColumn + seatRow;
+    }
+
+    @Override
+    public String toString() {
+        return "Seat{" +
+                "id='" + id + '\'' +
+                ", seatRow=" + seatRow +
+                ", seatColumn='" + seatColumn + '\'' +
+                ", isReserved=" + isReserved +
+                ", isAvailable=" + isAvailable +
+                ", theaterNumber=" + theaterNumber +
+                '}';
     }
 
     public void reserveSeat() {
@@ -47,4 +63,21 @@ public class Seat {
         isAvailable = true;
     }
 
+    public static List<Seat> toEntity(SeatDTO seatDTO, TheaterNumber theaterNumber) {
+        List<Seat> seats = new ArrayList<>();
+
+        // 여러 좌석을 생성하여 리스트에 추가
+        for (int i = 1; i <= seatDTO.getSeatRow(); i++) {
+            Seat seat = new Seat();
+            seat.setSeatRow((long) i);
+            seat.setSeatColumn(seatDTO.getSeatColumn());
+            seat.setReserved(seatDTO.isReserved());
+            seat.setTheaterNumber(theaterNumber);
+            seat.setId(generateId(seat.getSeatColumn(), seat.getSeatRow(), theaterNumber.getId()));
+
+            seats.add(seat);
+        }
+
+        return seats;
+    }
 }

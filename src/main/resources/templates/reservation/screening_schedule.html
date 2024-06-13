@@ -25,16 +25,16 @@
                         <h2>상영시간표</h2>
                     </header>
                     <hr />
-                    <div class="row">
-                        <table id="theaterTable" class="default">
+                    <div class="row table-div">
+                        <table id="schedule-table" class="default">
                             <thead>
                             <tr>
                                 <th id="select-theater-th" colspan="2">영화관 선택</th>
                                 <th id="select-movie-th">영화 선택</th>
-                                <th id="select-time-th">시간 선택</th>
+                                <th id="select-time-th" colspan="2">시간 선택</th>
                             </tr>
                             </thead>
-                            <tbody id="theaterGroup">
+                            <tbody id="schedule-group">
                             <tr>
                                 <td id="select-theater-group">
                                     <div id="select-region">
@@ -74,10 +74,43 @@
                                         </ul>
                                     </div>
                                 </td>
-                                <td id="theaterList">
+                                <td id="theater-list">
+                                    <div class="scrollable-content" style="padding: 0">
                                     <table>
                                         <tbody></tbody>
                                     </table>
+                                    </div>
+                                </td>
+                                <td id="select-movie-group">
+                                    <div class="scrollable-content">
+                                        <ul>
+                                            <li class="movie-item" th:each="movie : ${movies}">
+                                                <input type="hidden" th:value="${movie.id}" />
+                                                <img src="" alt="관람가 연령" class="certification-img" th:data-certification="${movie.certifications}" />
+                                                <p th:text="${movie.title}"></p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td id="select-date-group">
+<!--                                    <button type="button" class="btn backward-btn"></button>-->
+                                    <ul>
+
+                                    </ul>
+<!--                                    <button type="button" class="btn forward-btn"></button>-->
+                                </td>
+                                <td id="select-time-group">
+                                    <div class="scrollable-content">
+                                        <div class="theaterNumber-group">
+                                            <h4>3관</h4>
+                                            <ul>
+                                                <li class="schedule-item">
+                                                    <h5>10:00</h5>
+                                                    <h6>125석</h6>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             </tbody>
@@ -106,14 +139,21 @@
                         region: regionValue
                     },
                     success: function(data) {
-                        const $tbody = $("#theaterList tbody");
+                        const $tbody = $("#theater-list tbody");
                         $tbody.empty();
                         if(data.length > 0) {
                             $.each(data, function(index, theater) {
                                 const $tr = $("<tr class='theater-row'></tr>");
                                 const $td = $("<td></td>").text(theater.theaterName);
+                                $td.addClass('theater-name');
                                 $tr.append($td);
                                 $tbody.append($tr);
+                            });
+
+                            $('.theater-name').on('click', function (event) {
+                                event.preventDefault();
+                                $(".theater-name.clicked").removeClass("clicked");
+                                $(this).addClass('clicked');
                             });
                         } else {
                             const $tr = $("<tr class='theater-row'></tr>");
@@ -123,9 +163,63 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error("AJAX 요청 실패:", error); // 오류 메시지 출력
+                        console.error("AJAX 요청 실패:", error);
                     }
                 });
+            });
+
+            $('.certification-img').each(function() {
+                let certification = $(this).data('certification'); // 관람 등급 데이터 가져오기
+
+                switch (certification) {
+                    case '12세 이상 관람가':
+                        $(this).attr('src', '/images/ratings/12.png');
+                        break;
+                    case '15세 이상 관람가':
+                        $(this).attr('src', '/images/ratings/15.png');
+                        break;
+                    case 19:
+                    case '18세 이상 관람가':
+                        $(this).attr('src', '/images/ratings/18.png');
+                        break;
+                    default:
+                        $(this).attr('src', '/images/ratings/all.svg');
+                }
+            });
+
+            $('.movie-item').on('click', function (e) {
+                e.preventDefault();
+                $('.movie-item').removeClass('clicked');
+                $(this).addClass('clicked');
+            });
+
+            const dateGroup = $('#select-date-group ul');
+
+            const today = new Date();
+            const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+
+            for (let i = 0; i < 12; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+
+                const paragraph = document.createElement("li");
+                paragraph.classList.add("date-btn");
+                paragraph.innerHTML = "<h5>" + (date.getMonth() + 1) + "/" + date.getDate() + "</h5>" +
+                    "<h6>" + weekdays[(date.getDay()) % 7] + "</h6>";
+
+                dateGroup.append(paragraph);
+            }
+
+            $('.date-btn').on('click', function (e) {
+                e.preventDefault();
+                $('.date-btn').removeClass('clicked');
+                $(this).addClass('clicked');
+            });
+
+            $('.schedule-item').on('click', function (e) {
+                e.preventDefault();
+                $('.schedule-item').removeClass('clicked');
+                $(this).addClass('clicked');
             });
         });
     </script>

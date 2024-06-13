@@ -123,6 +123,11 @@ div.mb-3 {
     cursor: pointer;
     transform: scale(1.2);
 }
+/* 상영 스케줄 등록하기 */
+#schedule-form input {
+    padding: 0.7em 2em;
+    font-size: 0.9375rem;
+}
 /* paging_btn */
  .paging_btn {
      display: block;
@@ -138,7 +143,4 @@ div.mb-3 {
 .paging_btn ul li {
     /*margin-right: 1%;*/
     list-style-type: none;
-}
-.theater-list-table th, td {
-    width: 15%;
 }

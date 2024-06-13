@@ -17,7 +17,7 @@
     <div class="col-xl">
         <div class="card mb-4">
             <div class="card-body schedule_reg">
-                <form id="theater-form" method="post" th:action="@{/admin/seatRegister}" th:object="${theaterDTO}">
+                <form id="seat-form" method="post" th:action="@{/admin/seatRegister}" th:object="${theaterDTO}">
                     <div class="mb-3">
                         <div class="input-group">
                             <label class="input-group-text label-text" for="region-select">지역 선택</label>
@@ -32,7 +32,7 @@
                                 <option value="Gwa" th:selected="${theaterDTO?.region == 'Gwa'}" th:text="'광주 / 전라'"></option>
                                 <option value="Jeju" th:selected="${theaterDTO?.region == 'Jeju'}" th:text="'제주'"></option>
                             </select>
-                            <input type="hidden" id="region-input" th:value="${theaterDTO?.region}">
+                            <input type="hidden" id="region-input" th:value="${theaterDTO?.region}" name="region"/>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -43,7 +43,7 @@
                                 <option th:value="${theaterDTO?.theaterName}" th:selected="${theaterDTO?.theaterName}"
                                         th:text="${theaterDTO?.theaterName}" th:if="${theaterDTO?.theaterName != ''}"></option>
                             </select>
-                            <input type="hidden" id="theater-name-input" th:value="${theaterDTO?.theaterName}">
+                            <input type="hidden" id="theater-name-input" th:value="${theaterDTO?.theaterName}" name="theaterName">
                         </div>
                     </div>
                     <div class="mb-3">
@@ -52,74 +52,80 @@
                                 <select class="form-select" id="theater-numbers-select" th:field="*{theaterNumbers}" >
                                     <option value="" selected>상영관을 선택해주세요.</option>
                                     <option th:each="theaterNumber : ${theaterDTO?.theaterNumbers}"
-                                            th:value="${theaterNumber.theaterNumber}"
+                                            th:value="${theaterNumber.id}"
                                             th:data-seats-per-theater="${theaterNumber.seatsPerTheater}"
                                             th:text="${theaterNumber.theaterNumber + '관'}"></option>
                                 </select>
                             <input type="hidden" id="theater-number-selected" />
-                            <input type="hidden" id="theater-number-id" />
+                            <input type="hidden" id="theaterNumberId" name="theaterNumberId">
                         </div>
                     </div>
                     <div class="mb-3 theater-seat-cnt">
                     </div>
                     <div class="mb-3 row">
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="A-input" class="form-label">A열</label>
+                            <label for="A-input" class="form-label" name="seatColumn" value="A">A열</label>
                             <input
                                     id="A-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
                                     max="20"
                                     placeholder="A열 좌석 수를 입력하세요."
                                     required
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="B-input" class="form-label">B열</label>
+                            <label for="B-input" class="form-label" name="seatColumn" value="B">B열</label>
                             <input
                                     id="B-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
                                     max="20"
                                     placeholder="B열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="C-input" class="form-label">C열</label>
+                            <label for="C-input" class="form-label" name="seatColumn" value="C">C열</label>
                             <input
                                     id="C-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
                                     max="20"
                                     placeholder="C열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="D-input" class="form-label">D열</label>
+                            <label for="D-input" class="form-label" name="seatColumn" value="D">D열</label>
                             <input
                                     id="D-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
                                     max="20"
                                     placeholder="D열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="E-input" class="form-label">E열</label>
+                            <label for="E-input" class="form-label" name="seatColumn" value="E">E열</label>
                             <input
                                     id="E-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
                                     max="20"
                                     placeholder="E열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="F-input" class="form-label">F열</label>
+                            <label for="F-input" class="form-label" name="seatColumn" value="F">F열</label>
                             <input
                                     id="F-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
                                     max="20"
                                     placeholder="F열 좌석 수를 입력하세요."
                             />
@@ -132,6 +138,7 @@
                             type="button"
                             data-bs-toggle="modal"
                             data-bs-target="#exLargeModal">좌석 배치도 결과보기</button>
+                    <input type="hidden" id="seatData" name="seatData">
                     <button class="btn btn-primary" type="submit">등록하기</button>
                 </form>
                 <div class="row gy-3">
@@ -141,12 +148,6 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h4 class="modal-title" id="exampleModalLabel4">Modal title</h4>
-                                        <button
-                                                type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal"
-                                                aria-label="Close"
-                                        ></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="d-flex justify-content-center">
@@ -157,8 +158,8 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-info" data-bs-dismiss="modal">
-                                            Close
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                                            닫기
                                         </button>
                                     </div>
                                 </div>
@@ -192,8 +193,9 @@
                 columnCount++;
                 const newColumn = `
                 <div class="mt-2 mb-3 col-sm-3">
-                    <label for="${letter}-input" class="form-label">${letter}열</label>
-                    <input id="${letter}-input" class="form-control form-control-lg" type="number" max="20" placeholder="${letter}열 좌석 수를 입력하세요." />
+                    <label for="${letter}-input" class="form-label" name="seatColumn" value="${letter}">${letter}열</label>
+                    <input id="${letter}-input" class="form-control form-control-lg" name="seatRow"
+                    type="number" max="20" placeholder="${letter}열 좌석 수를 입력하세요." />
                 </div>
             `;
                 $(newColumn).insertBefore('.add-column:first');
@@ -322,7 +324,11 @@
                 let column = String.fromCharCode(65 + i);
                 let inputId = column + "-input";
                 let seatCount = $('#' + inputId).val();
-                console.log(column + '열의 좌석 수: ' + seatCount);
+
+                if (seatCount === null || seatCount === '' || seatCount === undefined) {
+                    console.log(column + '의 입력 값이 null이거나 비어 있습니다.');
+                    continue;
+                }
 
                 let columnDiv = $('<div></div>').addClass('d-flex justify-content-center seat-' + column);
                 columnDiv.css({
@@ -362,6 +368,50 @@
                     }
                 }
             }
+        });
+
+        $('#seat-form').on('submit', function (e) {
+            e.preventDefault();
+
+            const selectedTheaterId = $('#theater-numbers-select').val();
+            $('#theaterNumberId').val(selectedTheaterId);
+
+            const seatsPerTheater = $('#seats-count').val();
+
+            let totalSeats = 0;
+            const seatDTOList = [];
+            $('.form-control-lg').each(function() {
+                const seatCount = parseInt($(this).val(), 10);
+                const seatColumn = $(this).siblings('label').attr('value');
+
+                totalSeats += seatCount;
+
+                for (let i = 1; i <= seatCount; i++) {
+                    const dto = {
+                        seatRow: i,
+                        seatColumn: seatColumn,
+                        theaterNumberId: selectedTheaterId // 추가된 theaterNumberId
+                    };
+                    seatDTOList.push(dto);
+                }
+            });
+
+            if (totalSeats != seatsPerTheater) {
+                Swal.fire({
+                    title: '총 좌석 수는 ' + seatsPerTheater + '석 입니다.',
+                    text: '확인 후 다시 시도해주세요.',
+                    icon: 'error'
+                });
+                console.log(totalSeats);
+                console.log(seatsPerTheater);
+                return false;
+            }
+
+            const seatDataJson = JSON.stringify(seatDTOList);
+            document.getElementById('seatData').value = seatDataJson;
+
+            // 폼을 제출
+            this.submit();
         });
     });
 </script>

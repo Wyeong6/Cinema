@@ -27,9 +27,6 @@ public class TheaterService {
     @Autowired
     private TheaterRepository theaterRepository;
 
-    @Autowired
-    private TheaterNumberRepository theaterNumberRepository;
-
     public void save(Theater theater) {
         if (theater.getTheaterNumbers() == null) {
             throw new IllegalArgumentException("상영관 좌석 정보가 제공되지 않았습니다.");
