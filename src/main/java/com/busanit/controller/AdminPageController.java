@@ -475,6 +475,7 @@ public class AdminPageController {
     @ResponseBody
     public Map<String, Object> pagingChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
         String memberEmail =  movieService.getUserEmail();
+
         Page<ChatRoomDTO> chatRooms = chatService.getChatList(page - 1, size, memberEmail);
 
         int totalPages = chatRooms.getTotalPages();

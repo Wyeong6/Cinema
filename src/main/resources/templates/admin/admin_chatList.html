@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js" async></script>
+
+    <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" async></script>
 
     <title>Event List</title>
     <style>
@@ -79,37 +82,40 @@
 <script>
 
     $(document).ready(function () {
-        var stompClient = null;
+        var stompClient = null; // 전역 변수로 선언
 
+        // 웹소켓 연결 설정
         function connectWebSocket() {
-            console.log("Connecting to 리스틈ㄴ아ㅓㅜㅁ너ㅏ우")
-            var socket = new SockJS('/ws2');
+            console.log("Connecting to WebSocket server...");
+            var socket = new SockJS('/ws');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
-                console.log('Connected: ㅁㄴㅇㅁㄴㅇ ' + frame);
+                console.log('Connected to WebSocket: ' + frame);
 
-                // 채팅 목록 업데이트를 구독
+                // '/queue/chatList'를 구독하여 새로운 메시지 받기
                 stompClient.subscribe('/queue/chatList', function (message) {
-                    console.log("Received message:", message.body);
                     var response = JSON.parse(message.body);
+                    console.log("Received message:", response);
                     displayChatList(response); // 받은 데이터를 화면에 표시하는 함수 호출
                 });
+                // 최초 페이지 로드 시 데이터 로드
+                loadChatList(1, 8);
             });
         }
 
+        // 서버에서 채팅 목록 로드
         function loadChatList(page, size) {
             $.ajax({
                 url: "/admin/getChatList",
                 data: {
                     page: page,
-                    size: size
+                    size: size,
                 },
                 type: "POST",
                 contentType: "application/json",
                 success: function (response) {
                     console.log("응답 데이터:", response);
-                    memberEmail = response.memberEmail;
-                    displayChatList(response);
+                    displayChatList(response); // 받은 데이터를 화면에 표시하는 함수 호출
                 },
                 error: function (error) {
                     console.log("Error: ", error);
@@ -117,17 +123,17 @@
             });
         }
 
+        // 채팅 목록 업데이트 함수
         function displayChatList(response) {
             var chatList = response.chatRoom;
-
             var $chatListContainer = $(".chat-table");
-            $chatListContainer.empty(); // 기존 목록을 비우고
 
-            // 새로운 목록 생성
+            // 기존 목록을 비우고 새로운 목록 생성
+            $chatListContainer.empty();
+
             chatList.forEach(function (chatRoom) {
                 var lastMessageContent = "";
 
-                // 메시지가 존재하는지 확인
                 if (chatRoom.messages && chatRoom.messages.length > 0) {
                     var lastMessage = chatRoom.messages[chatRoom.messages.length - 1];
                     if (lastMessage) {
@@ -159,8 +165,7 @@
             $pagination.html(paginationHtml);
         }
 
-        // 최초 페이지 로드 시 데이터 로드
-        loadChatList(1, 8);
+
 
         // 클릭된 페이지에 대한 채팅 목록 로드
         $(document).on('click', '.paging-btn', function () {
@@ -171,7 +176,7 @@
         // 웹소켓 연결
         connectWebSocket();
 
-        // 웹소켓 연결 해제
+        // 페이지를 떠날 때 웹소켓 연결 해제
         $(window).on('beforeunload', function () {
             if (stompClient !== null) {
                 stompClient.disconnect();

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,9 +100,11 @@ public class ChatController {
 
     @MessageMapping("/chat/chatList") // 클라이언트에서 메시지 보낼 때 사용할 주제
     @SendTo("/queue/chatList") // 클라이언트가 구독할 주제
-    public Map<String, Object> updateChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+    public Map<String, Object> updateChatList(@Payload Map<String, Object> request, Principal principal) {
+        int page = (int) request.getOrDefault("page", 1);
+        int size = (int) request.getOrDefault("size", 8);
         System.out.println("리스트업데이트시작");
-        String memberEmail = movieService.getUserEmail();
+        String memberEmail = principal.getName();
         Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
 
         int totalPages = chatRoom.getTotalPages();
@@ -119,7 +122,7 @@ public class ChatController {
         // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
 //        messagingTemplate.convertAndSend("/queue/chatList", response);
 
-        System.out.println("리스트업데이트돼라얍");
+        System.out.println("response" + response);
         return response;
     }
 

@@ -13,7 +13,7 @@
     <!-- JavaScript 코드를 인라인으로 작성 (Thymeleaf 사용) -->
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var userEmail = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
+        var sender = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
         /*]]>*/
         var chatRoomId = null;
         var chatRoomTitle = null;
@@ -87,7 +87,7 @@
         function sendTypingIndicator(type) {
             var typingIndicatorDTO = {
                 chatRoomId: chatRoomId,
-                sender: userEmail,
+                sender: sender,
                 recipient: recipient,
                 typing: type
             };
@@ -102,7 +102,7 @@
             if (messageContent) { // 메시지 내용과 제목이 있을 때만 전송
                 var message = {
                     chatRoomId: chatRoomId, //챗룸번호
-                    sender: userEmail, // 발신자 이메일
+                    sender: sender, // 발신자 이메일
                     recipient: recipient, // 수신자 이메일
                     content: messageContent, // 메시지 내용
                     chatRoomTitle: chatRoomTitle, // 메시지 제목 (카테고리)
@@ -110,7 +110,7 @@
                 };
                 console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
                 stompClient.send("/app/chat/private" , {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
-                stompClient.send("/app/updateChatList", {}, JSON.stringify({ page: 1, size: 8 }));
+                stompClient.send("/app/chat/chatList", {}, JSON.stringify({ page: 1, size: 8, sender: sender, recipient: recipient}));
                 showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
                 document.getElementById('message').value = ''; // 입력 필드를 비움
 
@@ -160,14 +160,14 @@
             createChatRoomAndConnect(recipient,category);
         }
         function createChatRoomAndConnect(recipient, category) {
-            console.log("userEmail" + userEmail);
+            console.log("sender" + sender);
             // 채팅방 생성 및 연결 요청
             fetch('/chat/createChatRoom', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ adminEmail: recipient, userEmail: userEmail, chatRoomTitle: category })
+                body: JSON.stringify({ adminEmail: recipient, sender: sender, chatRoomTitle: category })
             })
                 .then(response => {
                     if (!response.ok) {
@@ -199,7 +199,7 @@
 
             recipient = await fetchRecipientEmail();
             console.log("로드된 recipient" + recipient)
-            console.log("로드시 로그인된 이메일" + userEmail)
+            console.log("로드시 로그인된 이메일" + sender)
             fetchMessages(recipient);
             if (recipient) {
                 connect(); // recipient가 있는 경우에만 커넥션 설정
@@ -246,7 +246,7 @@
                                     recipient = message.sender;
                                     chatRoomTitle = message.chatRoomTitle;
                                     document.getElementById('categoryButtons').style.display = 'none';
-                                    let displayMessage = message.sender === userEmail ? `나 : ${message.content}` : `관리자 : ${message.content}`;
+                                    let displayMessage = message.sender === sender ? `나 : ${message.content}` : `관리자 : ${message.content}`;
                                     showMessage(displayMessage);
                                 });
                             }

@@ -50,4 +50,8 @@ public class ChatRoomDTO {
                 .type(chatRoom.getType())
                 .build();
     }
+
+
+
+
 }

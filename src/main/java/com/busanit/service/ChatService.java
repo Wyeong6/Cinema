@@ -95,7 +95,13 @@ public class ChatService {
                 .map(this::convertToChatRoomDTO)
                 .peek(chatRoomDTO -> { // map 대신 peek을 사용하여 DTO 변환 후 처리
                     System.out.println("Before calculateUnreadMessages - chatRoomDTO: " + chatRoomDTO); // convertToChatRoomDTO 결과 확인
-                    int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), memberEmail);
+
+                    // 마지막 메시지의 받는 사람 가져오기
+                    String lastMessageRecipient = getLastMessageRecipient(chatRoomDTO);
+                    System.out.println("Before calculateUnreadMessages - getRecipient(): " + lastMessageRecipient);
+
+                    // 읽지 않은 메시지 수 계산
+                    int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), lastMessageRecipient);
                     chatRoomDTO.setUnreadMessageCount(unreadMessages);
                     System.out.println("After calculateUnreadMessages - unreadMessages: " + unreadMessages); // unreadMessages 값 확인
                 })
@@ -104,6 +110,16 @@ public class ChatService {
         System.out.println("chatRoomList: " + chatRoomList); // 최종 chatRoomList 상태 확인
 
         return new PageImpl<>(chatRoomList, pageable, chatRoomPage.getTotalElements());
+    }
+
+    // ChatRoomDTO에서 마지막 메시지의 받는 사람 가져오기
+    private String getLastMessageRecipient(ChatRoomDTO chatRoomDTO) {
+        List<MessageDTO> messages = chatRoomDTO.getMessages();
+        if (messages != null && !messages.isEmpty()) {
+            MessageDTO lastMessage = messages.get(messages.size() - 1);
+            return lastMessage.getRecipient();
+        }
+        return null; // 만약 메시지가 없을 경우 null 반환 혹은 예외처리 추가
     }
 
     // 사용자 이메일로 채팅방 메세지 조회
@@ -296,10 +312,11 @@ public class ChatService {
     //로그인한 유저의 이메일을 리턴
     public String getAuthenticatedUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication: " + authentication);
         if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getName())) {
+            System.out.println("Authenticated user email: " + authentication.getName());
             return authentication.getName();
         }
         return null;
     }
-
 }
