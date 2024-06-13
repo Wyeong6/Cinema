@@ -172,7 +172,7 @@ public class ChatService {
         Member sender = findMemberByEmail(senderEmail);
         Member receiver = findMemberByEmail(recipientEmail);
 
-        // sender와 receiver가 동일한 채팅방이 active인 지 확인 없으면 생성
+        // sender와 receiver가 동일한 채팅방이 active인 지 확인 후 없으면 생성
         return sender.getChatRooms().stream()
                 .filter(chatRoom -> chatRoom.getMembers().contains(receiver) && chatRoom.getType().equals("active") )
                 .findFirst()

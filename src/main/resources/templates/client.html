@@ -54,10 +54,12 @@
                         // 상대방이 타이핑 중임을 표시하는 UI 업데이트 등을 수행
                         showTypingIndicator(parsedMessage.typing === "not_typing");
                     } else if (parsedMessage.typing === "not_typing") {
+                        console.log("채팅안함");
                         hideTypingIndicator();
                     } else {
+                        console.log("일반메세지.");
                         // 일반 메시지 처리
-                        showMessage(parsedMessage.content);
+                        showMessage('관리자 : '+parsedMessage.content);
                     }
                 });
             });
@@ -84,6 +86,7 @@
         // 타이핑 인디케이터를 서버로 전송하는 함수
         function sendTypingIndicator(type) {
             var typingIndicatorDTO = {
+                chatRoomId: chatRoomId,
                 sender: userEmail,
                 recipient: recipient,
                 typing: type
@@ -107,7 +110,8 @@
                 };
                 console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
                 stompClient.send("/app/chat/private" , {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
-                showMessage('나: ' + messageContent); // 전송한 메시지를 화면에 표시
+                stompClient.send("/app/updateChatList", {}, JSON.stringify({ page: 1, size: 8 }));
+                showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
                 document.getElementById('message').value = ''; // 입력 필드를 비움
 
             }
@@ -230,13 +234,15 @@
                         const data = JSON.parse(text);
                         console.log('Data:', data);
                         let messageExist = false;
+                        console.log('Dataid:', data[0].id);
+                        chatRoomId = data[0].id;
                         // 각 메시지 객체를 순회합니다.
                         data.forEach(item => {
                             // 여기서 'messages' 필드가 실제 메시지 배열을 가지고 있음
                             if (Array.isArray(item.messages) && item.messages.length > 0) {
                                 messageExist = true; // 메시지가 존재함을 표시
                                 item.messages.forEach(message => {
-                                    chatRoomId = message.id;
+
                                     recipient = message.sender;
                                     chatRoomTitle = message.chatRoomTitle;
                                     document.getElementById('categoryButtons').style.display = 'none';

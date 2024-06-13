@@ -26,8 +26,8 @@ public class ChatRoom {
 
     @ManyToMany
     @JoinTable(name = "member_chatroom",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "chatroom_id"))
+            joinColumns = @JoinColumn(name = "chatroom_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_id"))
     private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
@@ -47,14 +47,24 @@ public class ChatRoom {
 //            newMembers.forEach(member -> member.addChatRoom(this));
 //        }
 //    }
+//
+//    public void addMembers(List<Member> newMembers) {
+//        if (newMembers != null) {
+//            this.members.addAll(newMembers);
+//        }
+//    }
+//
 
     public void addMembers(List<Member> newMembers) {
         if (newMembers != null) {
-            this.members.addAll(newMembers);
+            newMembers.forEach(member -> {
+                if (!this.members.contains(member)) {
+                    this.members.add(member); // 기존 채팅방에 새로운 멤버 추가
+                    member.getChatRooms().add(this); // 새로운 멤버의 채팅방 목록에 현재 채팅방 추가
+                }
+            });
         }
     }
-
-
 
         public void addReadStatus(ChatRoomReadStatus chatRoomReadStatus) {
         // 현재 메시지에 읽음 상태를 추가

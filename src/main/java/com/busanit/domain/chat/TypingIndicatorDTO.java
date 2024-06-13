@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TypingIndicatorDTO {
-
+    private String chatRoomId;
     private String sender;
     private String recipient;
     private String typing;
