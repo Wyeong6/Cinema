@@ -3,6 +3,8 @@ package com.busanit.controller;
 import com.busanit.domain.*;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.movie.MovieDTO;
+import com.busanit.entity.Member;
+import com.busanit.entity.Snack;
 import com.busanit.entity.*;
 import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MessageRepository;
@@ -35,7 +37,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -109,7 +110,15 @@ public class AdminPageController {
     }
 
     @PostMapping("/movieRegister")
-    public String movieRegister(Model model) {
+    public String movieRegister() {
+        return "admin/admin_movie_register";
+    }
+
+    @PostMapping("/movieUpdate")
+    public String movieUpdate(@RequestParam(name = "movieId") Long movieId, Model model) {
+
+        model.addAttribute("movieId", movieId);
+
         return "admin/admin_movie_register";
     }
 

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Cinemacast</title>
@@ -13,25 +12,21 @@
     <link rel="stylesheet" href="/assets/css/nav.css" />
     <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 </head>
-<body class="right-sidebar is-preload">
+<body class="right-sidebar is-preload bg-black-wrapper">
 <th:block layout:fragment="content">
-    <div id="page-wrapper">
+    <div id="page-wrapper" class="bg-black-wrapper">
 
         <!-- 메인 -->
-        <div class="wrapper style1 screening-schedule">
+        <div class="wrapper style1 screening-schedule bg-black-wrapper">
             <div class="container">
                 <article id="main" class="special">
-                    <header>
-                        <h2>상영시간표</h2>
-                    </header>
-                    <hr />
                     <div class="row table-div">
                         <table id="schedule-table" class="default">
                             <thead>
                             <tr>
                                 <th id="select-theater-th" colspan="2">영화관 선택</th>
                                 <th id="select-movie-th">영화 선택</th>
-                                <th id="select-time-th" colspan="2">시간 선택</th>
+                                <th id="select-time-th">시간 선택</th>
                             </tr>
                             </thead>
                             <tbody id="schedule-group">
@@ -85,30 +80,23 @@
                                     <div class="scrollable-content">
                                         <ul>
                                             <li class="movie-item" th:each="movie : ${movies}">
-                                                <input type="hidden" th:value="${movie.id}" />
+                                                <input type="hidden" th:value="${movie.id}" th:data-poster="${movie.posterPath}" />
                                                 <img src="" alt="관람가 연령" class="certification-img" th:data-certification="${movie.certifications}" />
                                                 <p th:text="${movie.title}"></p>
                                             </li>
                                         </ul>
                                     </div>
                                 </td>
-                                <td id="select-date-group">
-<!--                                    <button type="button" class="btn backward-btn"></button>-->
-                                    <ul>
+                                <td id="schedule">
+                                    <div id="select-date-group">
+                                        <ul>
+                                        </ul>
+                                    </div>
+                                    <div id="select-time-group">
+                                        <div class="scrollable-content">
+                                            <div class="theaterNumber-group">
 
-                                    </ul>
-<!--                                    <button type="button" class="btn forward-btn"></button>-->
-                                </td>
-                                <td id="select-time-group">
-                                    <div class="scrollable-content">
-                                        <div class="theaterNumber-group">
-                                            <h4>3관</h4>
-                                            <ul>
-                                                <li class="schedule-item">
-                                                    <h5>10:00</h5>
-                                                    <h6>125석</h6>
-                                                </li>
-                                            </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -154,6 +142,9 @@
                                 event.preventDefault();
                                 $(".theater-name.clicked").removeClass("clicked");
                                 $(this).addClass('clicked');
+                                $('#select-theater-th').text($(this).text());
+
+                                sendAjaxRequest();
                             });
                         } else {
                             const $tr = $("<tr class='theater-row'></tr>");
@@ -191,6 +182,9 @@
                 e.preventDefault();
                 $('.movie-item').removeClass('clicked');
                 $(this).addClass('clicked');
+                $('#select-movie-th').text($(this).text());
+
+                sendAjaxRequest();
             });
 
             const dateGroup = $('#select-date-group ul');
@@ -198,14 +192,14 @@
             const today = new Date();
             const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 7; i++) {
                 const date = new Date(today);
                 date.setDate(today.getDate() + i);
 
                 const paragraph = document.createElement("li");
                 paragraph.classList.add("date-btn");
                 paragraph.innerHTML = "<h5>" + (date.getMonth() + 1) + "/" + date.getDate() + "</h5>" +
-                    "<h6>" + weekdays[(date.getDay()) % 7] + "</h6>";
+                    "<h6><div class='circle'>" + weekdays[(date.getDay()) % 7] + "</div></h6>";
 
                 dateGroup.append(paragraph);
             }
@@ -214,13 +208,154 @@
                 e.preventDefault();
                 $('.date-btn').removeClass('clicked');
                 $(this).addClass('clicked');
+
+                const h5 = $(this).find('h5').text();
+                const date = formatDateToISOJson(h5);
+                const h6 = $(this).find('h6').html();
+
+                $('#select-time-th').html("<h5>" + date + "</h5><h6>" + h6 + "</h6>");
+
+                sendAjaxRequest();
             });
 
-            $('.schedule-item').on('click', function (e) {
+            $('#select-time-group').on('click', '.schedule-item', function(e) {
                 e.preventDefault();
                 $('.schedule-item').removeClass('clicked');
                 $(this).addClass('clicked');
+
+                const moviePosterPath = $(".movie-item.clicked input[type='hidden']").data('poster');
+                const h5 = $(".date-btn.clicked h5").text();
+                const date = formatDateToISOJson(h5);
+                const startTime = $(".schedule-item.clicked h5").text();
+                const endTime = $(".schedule-item.clicked input[type='hidden']").val();
+                const totalSeats = $(".schedule-item.clicked h6").text();
+
+                const certification = $(".movie-item.clicked .certification-img").data('certification');
+                let imageUrl, certificationTitle, certificationInfo;
+
+                switch (certification) {
+                    case '12세 이상 관람가':
+                        imageUrl = '/images/ratings/12.png';
+                        certificationTitle = '12세 이상 관람가';
+                        certificationInfo = `만 12세 이하 고객님은<br>
+                                            반드시 부모님 또는 성인 보호자의<br>
+                                            동반하에 관람이 가능합니다.<br>
+                                            연령 확인 불가 시 입장이 제한될 수 있습니다.`;
+                        break;
+                    case '15세 이상 관람가':
+                        imageUrl = '/images/ratings/15.png';
+                        certificationTitle = '15세 이상 관람가';
+                        certificationInfo = `이 영화는 15세 이상 관람가로, <br>
+                                            청소년에게 부적절할 수 있는 강한 언어, 폭력 또는 <br>
+                                            성적 내용이 포함되어 있습니다. <br>
+                                            15세 미만의 관객은 관람이 제한됩니다.`;
+                        break;
+                    case 19:
+                    case '18세 이상 관람가':
+                        imageUrl = '/images/ratings/18.png';
+                        certificationTitle = '18세 이상 관람가';
+                        certificationInfo = `이 영화는 성인 대상의 콘텐츠로, <br>
+                                            강한 폭력, 성적 내용, 또는 기타 성인만을 <br>
+                                            위한 요소가 포함되어 있습니다. <br>
+                                            18세 미만은 관람할 수 없습니다.`
+                        break;
+                    default:
+                        imageUrl = '/images/ratings/all.svg';
+                        certificationTitle = '전체 관람가';
+                        certificationInfo =`이 영화는 모든 연령이 관람할 수 있는 <br>
+                                            전체 관람가 등급입니다.<br>
+                                            가족 모두가 즐길 수 있는 안전한 콘텐츠를 담고 있습니다.`;
+                }
+
+                Swal.fire({
+                    title: `${date} ${startTime}~${endTime}`,
+                    html: `남은 좌석 ${totalSeats}`,
+                    imageUrl: `https://image.tmdb.org/t/p/w500/${moviePosterPath}`,
+                    imageWidth: 200,
+                    imageAlt: "Custom image",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "인원/좌석 선택",
+                    cancelButtonText: "취소"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: certificationTitle,
+                            html: certificationInfo,
+                            imageUrl: imageUrl,
+                            imageWidth: 100,
+                            imageAlt: "Custom image"
+                        });
+                    }
+                });
             });
+
+            function sendAjaxRequest() {
+                const theaterName = $(".theater-name.clicked").text();
+                const movieId = $(".movie-item.clicked input[type='hidden']").val();
+                const date = $(".date-btn.clicked h5").text();
+                const isoDate = formatDateToISOJson(date);
+                console.log(theaterName, movieId, isoDate);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/reservation/ByConditions",
+                    data: {
+                        theaterName: theaterName,
+                        movieId: movieId,
+                        date: isoDate
+                    },
+                    success: function(data) {
+                        console.log("성공적으로 데이터를 받았습니다:", data);
+                        renderSchedules(data);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX 요청 실패:", error);
+                    }
+                });
+            }
+
+            function formatDateToISOJson(dateString) {
+                const [month, day] = dateString.split('/');
+                return new Date().getFullYear() + '-' + month.padStart(2, '0') + '-' + day.padStart(2, '0');
+            }
+
+            function renderSchedules(schedules) {
+                const selectTimeGroup = $("#select-time-group");
+
+                selectTimeGroup.empty();
+
+                schedules.forEach(schedule => {
+                    const theaterNumber = schedule.theaterNumber; // 극장 번호
+                    const startTime = schedule.startTime; // 시작 시간
+                    const endTime = schedule.endTime;
+                    const totalSeats = schedule.totalSeats;
+
+                    let theaterNumberGroup = selectTimeGroup.find(`.theaterNumber-group[data-theater-number="${theaterNumber}"]`);
+                    if (theaterNumberGroup.length === 0) {
+                        theaterNumberGroup = $(`
+                <div class="theaterNumber-group" data-theater-number="${theaterNumber}">
+                    <h4>${theaterNumber}관</h4>
+                    <ul></ul>
+                </div>
+            `);
+                        selectTimeGroup.append(theaterNumberGroup);
+                    }
+
+                    // 시간표 항목 생성
+                    const scheduleItem = $(`
+            <li class="schedule-item">
+                <h5>${startTime}</h5>
+                <h6>${totalSeats}석</h6>
+                <input type="hidden" class="end-time" value="${endTime}" />
+            </li>
+        `);
+
+                    // 시간표 항목을 해당 극장 번호 그룹에 추가
+                    theaterNumberGroup.find("ul").append(scheduleItem);
+                });
+            }
         });
     </script>
 
