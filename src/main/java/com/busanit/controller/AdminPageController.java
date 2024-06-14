@@ -7,6 +7,7 @@ import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
+import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MessageRepository;
 import com.busanit.service.*;
 import com.busanit.domain.NoticeDTO;
@@ -32,9 +33,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import java.util.Map;
 
 
@@ -99,7 +98,15 @@ public class AdminPageController {
     }
 
     @PostMapping("/movieRegister")
-    public String movieRegister(Model model) {
+    public String movieRegister() {
+        return "admin/admin_movie_register";
+    }
+
+    @PostMapping("/movieUpdate")
+    public String movieUpdate(@RequestParam(name = "movieId") Long movieId, Model model) {
+
+        model.addAttribute("movieId", movieId);
+
         return "admin/admin_movie_register";
     }
 

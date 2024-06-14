@@ -147,7 +147,7 @@ public class MovieController {
     // 영화 등록 (어드민페이지에서)
     @PostMapping("/movies/regist")
     public ResponseEntity<String> registMovie(
-            @RequestParam("id") Long movieId,
+            @RequestParam("id") Long id,
             @RequestParam("title") String movieTitle,
             @RequestParam("overview") String movieOverview,
             @RequestParam("certifications") String certifications,
@@ -164,6 +164,7 @@ public class MovieController {
 
         System.out.println("actors 체크 === " + actors);
 
+        System.out.println("수정할때 movieId 체크 === " + id);
 
         String stillCutRelativeUploadDir = "uploads/stillCuts/";
         String backdropRelativeUploadDir = "uploads/backdrops/";
@@ -190,7 +191,7 @@ public class MovieController {
 
         try {
             movieService2.saveMovie(
-                    movieId, movieTitle, movieOverview, movieReleaseDate, certifications,
+                    id, movieTitle, movieOverview, movieReleaseDate, certifications,
                     posterRelativeFilePath, backdropRelativeFilePath, stillCutFiles, genres, video, runtime, actors
             );
         } catch (DataIntegrityViolationException e) {
@@ -207,10 +208,16 @@ public class MovieController {
 
     // 영화 삭제 (어드민 페이지에서)
     @PostMapping("/movies/delete/{id}")
-    public String deleteMovieAndAddToBlacklist(@PathVariable("id") Long movieId) {
-        movieService2.deleteMovie(movieId);
-        movieService2.addToBlacklist(movieId);
-        return "admin/admin_layout"; // 영화 목록 페이지로
+    @ResponseBody
+    public ResponseEntity<String> deleteMovieAndAddToBlacklist(@PathVariable("id") Long movieId) {
+        try {
+            movieService2.deleteMovie(movieId);
+            movieService2.addToBlacklist(movieId);
+
+            return ResponseEntity.ok("영화가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("영화 삭제 중 오류가 발생했습니다.");
+        }
     }
 
     // 영화 수정 폼을 불러오는 핸들러 (어드민 페이지에서)

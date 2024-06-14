@@ -619,19 +619,31 @@ public class MovieService {
         return movieRepository.count();
     }
 
+    @Transactional
     //어드민 페이지 영화 등록
     public void saveMovie(
             Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
             String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime, List<Long> actors) {
 
-        Movie movie = new Movie();
-        movie.setMovieId(movieId);
+        Optional<Movie> optionalMovie = movieRepository.findById(movieId);
+        Movie movie;
+
+        if (optionalMovie.isPresent()) {
+            // 기존 영화를 수정하는 경우
+            movie = optionalMovie.get();
+        } else {
+            // 새로운 영화를 등록하는 경우
+            movie = new Movie();
+            movie.setMovieId(movieId); // 새로운 영화의 경우 movieId 설정
+        }
+
         movie.setTitle(movieTitle);
         movie.setOverview(movieOverview);
 
-
-
-        MovieDetail movieDetail = new MovieDetail();
+        MovieDetail movieDetail = movie.getMovieDetail();
+        if (movieDetail == null) {
+            movieDetail = new MovieDetail();
+        }
         movieDetail.setCertification(certifications);
         movieDetail.setReleaseDate(movieReleaseDate);
         movieDetail.setVideo(video);
@@ -639,42 +651,48 @@ public class MovieService {
         movie.setMovieDetail(movieDetail);
 
         // 배우 추가
-
+        List<MovieActor> updatedActors = new ArrayList<>();
         for (Long actorId : actors) {
             MovieActor actor = movieActorRepository.findById(actorId)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid actor ID: " + actorId));
-            movie.addActor(actor);
+            updatedActors.add(actor);
         }
+        movie.setActors(updatedActors);
 
-
-
-        // 장르 추가
+        movie.getGenres().clear();
+        // 장르 업데이트
+        List<Genre> updatedGenres = new ArrayList<>();
         for (String genreStr : genres) {
-            Genre genre = new Genre(); // 새로운 장르 엔티티 생성
-            genre.setGenreName(genreStr); // 장르 이름 설정
-            genreRepository.save(genre);
-            movie.addGenre(genre); // 영화에 장르 추가
+            // 데이터베이스에서 해당 장르를 찾거나 새로 생성합니다.
+            Genre genre = genreRepository.findByGenreName(genreStr)
+                    .orElseGet(() -> {
+                        Genre newGenre = new Genre();
+                        newGenre.setGenreName(genreStr);
+                        return genreRepository.save(newGenre);
+                    });
+            updatedGenres.add(genre);
         }
+        // 영화에 새로운 장르 목록을 설정합니다.
+        movie.setGenres(updatedGenres);
 
-        // 스틸컷 추가
+            // 스틸컷 업데이트
+        List<MovieStillCut> updatedStillCuts = new ArrayList<>();
         for (String stillCutPath : stillCut) {
             MovieStillCut stillCutEntity = new MovieStillCut(); // 새로운 스틸컷 엔티티 생성
             stillCutEntity.setStillCuts(stillCutPath); // 스틸컷 경로 설정
             movieStillCutRepository.save(stillCutEntity);
-            movie.addStillCut(stillCutEntity); // 영화에 스틸컷 추가
+            updatedStillCuts.add(stillCutEntity);
         }
+        movie.setStillCuts(updatedStillCuts);
 
-        // 포스터 이미지와 백드롭 이미지를 저장
+        // 포스터 이미지와 백드롭 이미지 업데이트
         MovieImage movieImage = new MovieImage();
         movieImage.setPosterPath(registeredPoster);
         movieImage.setBackdropPath(registeredBackdrop);
         movieImageRepository.save(movieImage);
         movie.addImage(movieImage);
 
-
-
-
-        movieRepository.save(movie);
+        movieRepository.save(movie); // 변경 감지에 의해 자동으로 데이터베이스에 저장됨
     }
 
     // 영화 등록 관련 로직
@@ -758,5 +776,9 @@ public class MovieService {
         } else {
             throw new IllegalArgumentException("Actor with ID " + actorId + " not found");
         }
+    }
+
+    public Optional<Movie> findById(Long id) {
+        return movieRepository.findById(id);
     }
 }

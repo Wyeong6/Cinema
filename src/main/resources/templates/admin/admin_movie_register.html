@@ -113,7 +113,7 @@
                     <div class="mb-3">
                         <label class="form-label" for="id">영화 ID</label>
                         <div class="input-group">
-                        <input class="form-control" id="id" name="id" placeholder="ID를 입력해주세요." required type="text"/>
+                        <input class="form-control" id="id" name="id" th:value="${movie != null ? movie.movieId : ''}" placeholder="ID를 입력해주세요." required type="text"/>
                         <button class="btn btn-outline-secondary" type="button" id="check-id-button" onclick="duplicateCheck()">중복 확인</button>
                         </div>
                         <span id="id-error" class="error-message"></span>
@@ -305,11 +305,24 @@
     const videoInput = document.getElementById('video');
     // ID 중복체크
     const idError = document.getElementById('id-error');
+    let resetForm = false;
 
 
 
     console.log(idInput)
     // 아이디 중복 미리 체크
+
+
+    // 수정 모드인지 여부를 확인하는 변수
+    let isEditMode = false;
+
+    // 수정 모드일 때 초기화 함수
+    function initializeEditMode(movieId) {
+        isEditMode = true;
+        idInput.value = movieId;
+        idInput.disabled = true; // 수정 모드에서는 ID 필드를 비활성화합니다.
+    }
+
 
     function duplicateCheck() {
 
@@ -347,22 +360,27 @@
 
         console.log("영화 ID:", id);
 
-        if (!/^\d{10}$/.test(id)) {
-            alert('영화 ID는 10자리를 입력해주세요');
-            // 알람 창이 닫힌 후에 포커스를 설정하기 위해 setTimeout 사용
-            setTimeout(() => {
-                idInput.focus(); // 입력란에 포커스를 맞추는 부분입니다.
-            }, 0);
-            return false;
+        if (!isEditMode) { // 수정 모드가 아닐 때만 ID 유효성 검사를 합니다.
+            console.log("영화 ID:", id);
+            if (!/^\d{10}$/.test(id)) {
+                alert('영화 ID는 10자리를 입력해주세요');
+                setTimeout(() => {
+                    idInput.focus();
+                }, 0);
+                return false;
+            }
         }
 
-        if (titleInput.value.trim() === '') {
-            alert('영화 제목을 입력해주세요.');
-            setTimeout(() => {
-                titleInput.focus();
-            }, 0);
-            return false;
+        if(!isEditMode) {
+            if (titleInput.value.trim() === '') {
+                alert('영화 제목을 입력해주세요.');
+                setTimeout(() => {
+                    titleInput.focus();
+                }, 0);
+                return false;
+            }
         }
+
 
         if (overviewInput.value.trim() === '') {
             alert('영화 줄거리를 입력해주세요.');
@@ -475,12 +493,19 @@
         // 모든 유효성 검사 통과 시 폼 제출
         const formData = new FormData(form);
 
+        // 수정일때 : formData에 기존 id 추가
+        if (isEditMode) {
+            formData.append('id', id);
+        }
+
         // 스틸컷 이미지를 FormData에 추가
         const stillCutFiles = stillCutPathsInput.files;
 
         for (let i = 0; i < stillCutFiles.length; i++) {
             formData.append('RegisteredStillCut', stillCutFiles[i]);
         }
+
+        console.log("formData 체크 === " + formData)
 
         fetch('/movies/regist', {
             method: 'POST',
@@ -495,10 +520,15 @@
             .then(data => {
                 console.log('Form submitted successfully:', data);
                 alert('영화가 성공적으로 등록되었습니다.');
-
+                console.log("formData 체크 === " + formData)
+                console.log("data 체크 === " + data)
                 resetForm = true;
             })
             .catch(error => {
+                console.log("에러 떴을때 폼데이터 항목 하나하나 체크")
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
                 console.error('Error submitting form:', error);
                 if (error.message.includes('이미 존재하는 영화 ID입니다.')) {
                     alert('이미 존재하는 영화 ID입니다.');
