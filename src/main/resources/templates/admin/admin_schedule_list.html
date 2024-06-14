@@ -37,6 +37,7 @@
                 <th>영화 제목</th>
                 <th>지점명</th>
                 <th>상영관 번호</th>
+                <th>상영일자</th>
                 <th>상영 시작 시간</th>
                 <th>상영시간</th>
                 <th>상영타입</th>
@@ -56,6 +57,7 @@
                 <td th:text="${schedule.movieTitle}"></td>
                 <td th:text="${schedule.theaterName}"></td>
                 <td th:text="${schedule.theaterNumber}"></td>
+                <td th:text="${schedule.date}"></td>
                 <td th:text="${schedule.startTime}" class="start-time" th:data-start="${schedule.startTime}"></td>
                 <td th:text="${schedule.endTime}" class="end-time" th:data-end="${schedule.endTime}" style="display: none"></td>
                 <td id="running-time"></td>
@@ -108,33 +110,27 @@
         $('.start-time').each(function () {
             let startTimeString = $(this).data('start');
             let endTimeString = $(this).closest('tr').find('.end-time').data('end');
-            // 시작 시간과 종료 시간이 올바른 ISO 형식인지 확인
             if (startTimeString && endTimeString) {
                 let startTimeParts = startTimeString.split(":");
                 let startHours = parseInt(startTimeParts[0]);
                 let startMinutes = parseInt(startTimeParts[1]);
 
-                // 종료 시간 문자열을 시간과 분으로 분리
                 let endTimeParts = endTimeString.split(":");
                 let endHours = parseInt(endTimeParts[0]);
                 let endMinutes = parseInt(endTimeParts[1]);
                 console.log(endHours);
                 console.log(endMinutes);
 
-                // 시작 시간과 종료 시간을 분 단위로 계산
                 let startTimeInMinutes = startHours * 60 + startMinutes;
                 let endTimeInMinutes = endHours * 60 + endMinutes;
                 console.log(startTimeInMinutes);
                 console.log(endTimeInMinutes);
 
-                // 시간 차이를 분 단위로 계산
                 let diffInMinutes = endTimeInMinutes - startTimeInMinutes;
                 console.log(diffInMinutes);
 
-                // 계산된 시간을 해당 행의 running-time 셀에 설정
                 $(this).closest('tr').find('#running-time').text(diffInMinutes + '분');
             } else {
-                // 오류 처리: 시작 시간 또는 종료 시간이 없을 경우
                 console.error('시작 시간 또는 종료 시간이 유효하지 않습니다.');
             }
         });
@@ -159,7 +155,6 @@
                     return response.text();
                 })
                 .then(html => {
-                    // 응답을 .container-xxl 요소에 로드
                     $('.container-xxl').html(html);
                 })
                 .catch(error => console.error('There was a problem with your fetch operation:', error));
@@ -185,7 +180,6 @@
                     url: '/admin/scheduleDelete',
                     data: { scheduleId: scheduleId, page: page },
                     success: function(response) {
-                        // 페이지 로드 후 필요한 작업 수행
                         $('.container-xxl').html(response);
                         Swal.fire('삭제완료되었습니다.', '', 'success');
                     },

@@ -1,20 +1,21 @@
 package com.busanit.controller;
 
+import com.busanit.domain.ScheduleDTO;
 import com.busanit.domain.TheaterDTO;
 import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.movie.MovieDTO;
+import com.busanit.entity.Schedule;
 import com.busanit.entity.Theater;
-import com.busanit.service.MovieService;
-import com.busanit.service.MovieService2;
-import com.busanit.service.TheaterNumberService;
-import com.busanit.service.TheaterService;
+import com.busanit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +24,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReservationController {
 
+    private final MovieService movieService;
     private final TheaterService theaterService;
     private final TheaterNumberService theaterNumberService;
-    private final MovieService movieService;
+    private final ScheduleService scheduleService;
 
     @GetMapping("/screeningSchedule")
     public String screeningSchedule(Model model) {
@@ -53,6 +55,14 @@ public class ReservationController {
         Optional<Theater> theaterOptional = theaterService.findByTheaterName(theaterName);
         Theater theater = theaterOptional.orElseThrow(() -> new IllegalArgumentException("극장을 찾을 수 없습니다: " + theaterName));
         return TheaterDTO.toDTO(theater);
+    }
+
+    @GetMapping("/ByConditions")
+    @ResponseBody
+    public List<ScheduleDTO> getSchedulesByConditions(@RequestParam String theaterName,
+                                                      @RequestParam Long movieId,
+                                                      @DateTimeFormat(pattern = "yyyy-M-d") @RequestParam LocalDate date) {
+        return scheduleService.findSchedulesByConditions(theaterName, movieId,date);
     }
 
 }

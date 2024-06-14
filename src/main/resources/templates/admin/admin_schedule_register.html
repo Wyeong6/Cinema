@@ -267,9 +267,16 @@
                 contentType: "application/json",
                 data: JSON.stringify(scheduleData), // JSON 형식으로 데이터 전송
                 success: function (response) {
-                    // 저장 성공 시 처리
-                    alert('저장되었습니다.');
-                    window.location.href = "/admin/adminMain";
+                    Swal.fire({
+                        position: "center_top",
+                        icon: "success",
+                        title: "스케줄 등록 성공하였습니다.",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    setTimeout(function() {
+                        $('.container-xxl').load('/admin/scheduleList');
+                    }, 1500);
                 },
                 error: function (xhr, status, error) {
                     // 에러 처리

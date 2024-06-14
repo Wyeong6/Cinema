@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -128,5 +129,30 @@ public class ScheduleService {
 
     public void deleteScheduleById(Long id) {
         scheduleRepository.deleteById(id);
+    }
+
+    // 지점별, 영화별, 일자별 상영일정 찾기
+    public List<ScheduleDTO> findSchedulesByConditions(String theaterName, Long movieId, LocalDate date) {
+        List<Schedule> schedules = scheduleRepository.findSchedulesByConditions(theaterName, movieId, date);
+
+        return schedules.stream()
+                .map(entity -> {
+                    return ScheduleDTO.builder()
+                            .id(entity.getId())
+                            .movieId(entity.getMovie().getMovieId())
+                            .movieTitle(entity.getMovie().getTitle())
+                            .theaterNumberId(entity.getTheaterNumber().getId())
+                            .theaterNumber(entity.getTheaterNumber().getTheaterNumber())
+                            .theaterName(entity.getTheaterNumber().getTheater().getTheaterName())
+                            .date(entity.getDate())
+                            .startTime(entity.getStartTime().toString())
+                            .endTime(entity.getEndTime().toString())
+                            .sessionType(entity.getSessionType())
+                            .totalSeats(entity.getTotalSeats())
+                            .unavailableSeats(entity.getUnavailableSeats())
+                            .status(entity.getStatus())
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
