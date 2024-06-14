@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js" async></script>
+
+    <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" async></script>
 
     <title>Event List</title>
     <style>
@@ -17,7 +20,7 @@
             top: 0;
             width: 100%;
             height: 100vh; /* 모달 창의 높이를 화면 전체로 설정 */
-            background-color: rgba(0,0,0,0.4); /* 반투명 배경 */
+            background-color: rgba(0, 0, 0, 0.4); /* 반투명 배경 */
             padding-top: 60px;
         }
 
@@ -53,110 +56,171 @@
 </head>
 <body>
 <!-- Navbar 생략 -->
-
-<h5 class="card-header">Event List</h5>
-<div class="table-responsive text-nowrap">
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>방 번호</th>
-            <th>카테고리</th>
-            <th>메세지</th>
-            <th>회원 이메일</th>
-            <th>회원 이름</th>
-        </tr>
-        </thead>
-        <tbody class="chat-table">
-        <!-- 데이터는 자바스크립트로 동적으로 추가됩니다 -->
-        </tbody>
-    </table>
-    <!-- 페이지네이션 -->
-    <div id="pagination"></div>
+<div class="card">
+    <h5 class="card-header">Event List</h5>
+    <div class="table-responsive text-nowrap">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>방 번호</th>
+                <th>카테고리</th>
+                <th>메세지</th>
+                <th>회원 이메일</th>
+                <th>회원 이름</th>
+            </tr>
+            </thead>
+            <tbody class="chat-table">
+            <!-- 데이터는 자바스크립트로 동적으로 추가됩니다 -->
+            </tbody>
+        </table>
+        <!-- 페이지네이션 -->
+        <div id="pagination"></div>
+    </div>
 </div>
-
 <!-- 모달 -->
 
 <script>
 
-    $(document).ready(function() {
-        var currentPage = 1;
+    $(document).ready(function () {
+        var stompClient = null; // 전역 변수로 선언
+        // 웹소켓 연결
+        connectWebSocket();
 
-        function loadChatList(page) {
+        // 페이지를 떠날 때 웹소켓 연결 해제
+        $(window).on('beforeunload', function () {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+        });
 
+    });
+
+        // 웹소켓 연결 설정
+        function connectWebSocket() {
+            console.log("Connecting to WebSocket server...");
+            var socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected to WebSocket: ' + frame);
+
+                // '/queue/chatList'를 구독하여 새로운 메시지 받기
+                stompClient.subscribe('/user/queue/chatList', function (message) {
+                    var response = JSON.parse(message.body);
+                    console.log("Received message:", response);
+                    displayChatList(response); // 받은 데이터를 화면에 표시하는 함수 호출
+                    updateUnreadCount(response)
+                });
+                // 최초 페이지 로드 시 데이터 로드
+                loadChatList(1, 8);
+            });
+        }
+
+        function updateUnreadCount(response) {
+            var totalUnreadCount = 0;
+
+            response.chatRoom.forEach(function (chatRoom) {
+                totalUnreadCount += chatRoom.unreadMessageCount;
+            });
+
+            // 두 번째 HTML 파일의 특정 요소에 unreadMessageCount 업데이트
+            window.parent.postMessage({unreadCount: totalUnreadCount}, '*');
+        }
+
+
+        // 채팅 목록 업데이트 함수
+        function displayChatList(response) {
+            var chatList = response.chatRoom;
+            var $chatListContainer = $(".chat-table");
+
+            // 기존 목록을 비우고 새로운 목록 생성
+            $chatListContainer.empty();
+
+            chatList.forEach(function (chatRoom) {
+                var lastMessageContent = "";
+
+                if (chatRoom.messages && chatRoom.messages.length > 0) {
+                    var lastMessage = chatRoom.messages[chatRoom.messages.length - 1];
+                    if (lastMessage) {
+                        lastMessageContent = lastMessage.content;
+                    }
+                }
+
+                var chatRoomRow =
+                    "<tr data-room-id='" + chatRoom.id + "' onclick='openChatModal(this)'>" +
+                    "<td>" + chatRoom.id + "</td>" +
+                    "<td>" + chatRoom.chatRoomTitle + "(" + chatRoom.type + ")" + "</td>" +
+                    "<td>" + lastMessageContent + " (" + chatRoom.unreadMessageCount + "개 메시지)" + "</td>" +
+                    "<td>" + chatRoom.userEmail + "</td>" +
+                    "<td>" + chatRoom.userName + "</td>" +
+                    "</tr>";
+                $chatListContainer.append(chatRoomRow);
+            });
+
+            // 페이징 정보 업데이트
+            var $pagination = $("#pagination");
+            $pagination.empty();
+
+            var paginationHtml = '<div style="text-align: center;">';
+            for (var i = response.startPage; i <= response.endPage; i++) {
+                paginationHtml += '<a href="#" data-page="' + i + '" class="paging-btn">[' + i + ']</a>';
+            }
+            paginationHtml += '</div>';
+
+            $pagination.html(paginationHtml);
+        }
+
+// 서버에서 채팅 목록 로드
+        function loadChatList(page, size) {
             $.ajax({
-                url: "/admin/api/chatList",
+                url: "/admin/getChatList",
                 data: {
                     page: page,
-                    size: 8
+                    size: size,
                 },
-                type: "GET",
-                success: function(response) {
-                    var chatList = response.chatRoom;
-                    var $chatListContainer = $(".chat-table");
-                    $chatListContainer.empty(); // 기존 목록을 비우고
-
-                    // 새로운 목록 생성
-                    chatList.forEach(function(chatRoom) {
-                        var lastMessageContent = "";
-
-                        // 메시지가 존재하는지 확인
-                        if (chatRoom.messages && chatRoom.messages.length > 0) {
-                            var lastMessage = chatRoom.messages[chatRoom.messages.length - 1];
-                            if (lastMessage) {
-                                lastMessageContent = lastMessage.content;
-                            }
-                        }
-
-                        var chatRoomRow =
-                            "<tr data-room-id='" + chatRoom.id + "' onclick='openChatModal(this)'>" +
-                            "<td>" + chatRoom.id + "</td>" +
-                            "<td>" + chatRoom.messageTitle + "</td>" +
-                            "<td>" + lastMessageContent + " (" + chatRoom.unreadMessageCount + "개 메시지)" + "</td>" +
-                            "<td>" + chatRoom.userEmail + "</td>" +
-                            "<td>" + chatRoom.userName + "</td>" +
-                            "</tr>";
-                        $chatListContainer.append(chatRoomRow);
-                    });
-                    // 마지막 메시지를 구독하여 새로운 메시지가 도착할 때마다 해당 행 업데이트
-
-
-                    // 페이징 정보 업데이트
-                    var $pagination = $("#pagination");
-                    $pagination.empty();
-
-                    var paginationHtml = '<div style="text-align: center;">';
-                    for (var i = response.startPage; i <= response.endPage; i++) {
-                        paginationHtml += '<a href="#" data-page="' + i + '" class="paging-btn">[' + i + ']</a>';
-                    }
-                    paginationHtml += '</div>';
-
-                    $pagination.html(paginationHtml);
+                type: "POST",
+                contentType: "application/json",
+                success: function (response) {
+                    console.log("응답 데이터:", response);
+                    memberEmail = response.memberEmail;
+                    displayChatList(response); // 받은 데이터를 화면에 표시하는 함수 호출
+                    updateUnreadCount(response)
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log("Error: ", error);
                 }
             });
         }
-        // 최초 페이지 로드 시 데이터 로드
-        loadChatList(currentPage);
 
         // 클릭된 페이지에 대한 채팅 목록 로드
-        $(document).on('click', '.paging-btn', function() {
-            currentPage = $(this).data('page');
-            loadChatList(currentPage);
+        $(document).on('click', '.paging-btn', function () {
+            var currentPage = $(this).data('page');
+            loadChatList(currentPage, 8); // 페이지 크기는 8로 설정
         });
 
-        // 3초마다 현재 페이지 데이터 자동 새로고침
-        setInterval(function() {
-            loadChatList(currentPage);
-        }, 3000);
+    // // WebSocket 연결 설정
+    // function connectWebSocket() {
+    //     var socket = new SockJS('/ws');
+    //     stompClient = Stomp.over(socket);
+    //     stompClient.connect({}, function (frame) {
+    //         console.log('Connected: ' + frame);
+    //
+    //         // 채팅 목록 갱신을 위한 구독 설정
+    //         stompClient.subscribe('/queue/chatList', function (message) {
+    //             loadChatList(1); // 새로운 메시지가 도착할 때마다 채팅 목록 갱신
+    //         });
+    //     });
+    // }
 
-    });
-
+    var memberEmail = '';
     var currentRecipient = ''; // 전역 변수로 선언
-    var messageTitle = '';
+    var chatRoomTitle = '';
+    var chatRoomId = '';
     var isConnected = false;
-    var stompClient = null;
+    var stompClient = null; // STOMP 클라이언트 변수 선언
+    var typingTimeout = null;
+    var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
+    var typingIndicatorSent = false;  // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
+    var status = null;
 
     // DOM 요소를 가져오는 함수
     function getElement(id) {
@@ -170,32 +234,50 @@
         messageElement.className = 'message-style'; // 메시지 스타일 클래스 추가
         messageElement.textContent = message;
         messages.appendChild(messageElement);
+        document.getElementById('typingIndicatorDTO').style.display = 'none';
     }
 
     // Stomp 연결 함수
     function connect() {
         if (isConnected) return;
-        console.log("currentMessageTitle" + currentRecipient);
+        console.log("currentchatRoomTitle" + currentRecipient);
 
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
-        stompClient.connect({}, function(frame) {
+        stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             subscribeToRecipient();
+            // 타이핑 이벤트를 감지하여 서버로 전송
+            document.getElementById('message').addEventListener('input', handleTypingEvent);
+
         });
         isConnected = true;
     }
 
     // 수신자 구독
     function subscribeToRecipient() {
-        stompClient.subscribe('/user/queue/private/' + currentRecipient, function(message){
+        stompClient.subscribe('/user/queue/private/' + chatRoomId, function (message) {
             console.log("Private Message: " + message.body);
-            var parsedMessage = JSON.parse(message.body);
-            showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
 
-            messageTitle = parsedMessage.messageTitle;
-            console.log("messageTitle" + messageTitle);
+            document.getElementById('message').disabled = false;
+            var parsedMessage = JSON.parse(message.body);
+
+
+            chatRoomTitle = parsedMessage.chatRoomTitle;
+            // chatRoomId = parsedMessage.chatRoomId;
+            // console.log("chatRoomId" + chatRoomId)
+
+            console.log("chatRoomTitle" + chatRoomTitle);
             currentRecipient = parsedMessage.sender;
+
+            if (parsedMessage.typing === "typing") {
+                // 상대방이 타이핑 중임을 표시하는 UI 업데이트 등을 수행
+                showTypingIndicator();
+            } else if (parsedMessage.typing === "not_typing") {
+                hideTypingIndicator();
+            } else {
+                showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
+            }
         });
     }
 
@@ -212,23 +294,84 @@
         var messageContent = getElement('message').value;
         if (messageContent && currentRecipient) {
             var message = {
-                sender: 'admin@admin.com',
+                chatRoomId: chatRoomId,
+                sender: memberEmail,
                 recipient: currentRecipient,
                 content: messageContent,
-                // messageTitle: messageTitle
-
+                status: "active"
             };
             console.log("Sending message:", message);
-            stompClient.send("/app/chat/admin", {}, JSON.stringify(message));
-            showMessage('관리자: ' + messageContent);
+            stompClient.send("/app/chat/private", {}, JSON.stringify(message));
+            showMessage('관리자 : ' + messageContent);
             getElement('message').value = '';
         }
     }
 
+    // 타이핑 이벤트를 처리하는 함수
+    function handleTypingEvent() {
+        if (!typingIndicatorSent) {
+            const type = "typing";
+            sendTypingIndicator(type); // 처음 입력 시 타이핑 상태 전송
+            typingIndicatorSent = true;
+        }
+
+        clearTimeout(typingTimeout); // 기존 타이머 제거
+
+        typingTimeout = setTimeout(function () {
+
+            const type = "not_typing";
+            sendTypingIndicator(type); // 사용자가 일정 시간 입력을 멈추면 타이핑 상태 전송
+            typingIndicatorSent = false; // 타이핑 상태 초기화
+        }, TYPING_DELAY);
+    }
+
+    // 타이핑 인디케이터 전송 함수
+    function sendTypingIndicator(type) {
+        var typingIndicatorDTO = {
+            chatRoomId: chatRoomId,
+            sender: memberEmail,
+            recipient: currentRecipient,
+            typing: type
+        };
+        stompClient.send("/app/chat/typing", {}, JSON.stringify(typingIndicatorDTO));
+    }
+
+    // 종료 메시지 전송 함수
+    function sendEndChatMessage() {
+        console.log("메세지종료 chatRoomId" + chatRoomId)
+        var endUserChatMessage = {
+            chatRoomId: chatRoomId,
+            sender: memberEmail,
+            recipient: currentRecipient,
+            content: '상담이 완료되었습니다.',
+            status: "inactive"
+        };
+
+        console.log("Sending end chat message:", endUserChatMessage);
+        stompClient.send("/app/chat/private", {}, JSON.stringify(endUserChatMessage));
+
+        // // // 추가 문구 전송
+        // var adminMessage = {
+        //     sender: memberEmail,
+        //     recipient: currentRecipient,
+        //     content: '상담이 완료되었습니다.'
+        // };
+        // console.log("Sending follow-up message:", adminMessage);
+        // stompClient.send("/app/chat/admin", {}, JSON.stringify(adminMessage));
+
+
+        disconnect();
+        // 관리자 측 채팅창에도 메시지 표시
+        showMessage(endUserChatMessage.content);
+        //입력필드 비활성화
+        document.getElementById('message').disabled = true;
+    }
+
     // 메시지 가져오기 함수
-    function fetchMessages() {
-        console.log("currentRecipient 연결 " + currentRecipient);
-        fetch(`/chat/private/${currentRecipient}`)
+    function fetchMessages(chatRoomId) {
+
+        console.log("chatRoomId 클릭한 " + chatRoomId);
+        fetch(`/chat/clickChat/${chatRoomId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok ' + response.statusText);
                 return response.json();
@@ -238,9 +381,12 @@
                 data.forEach(item => {
                     if (Array.isArray(item.messages)) {
                         item.messages.forEach(message => {
-                            let displayMessage = message.sender  === currentRecipient ? `${message.sender}: ${message.content}` : `관리자 : ${message.content}`;
+                            // chatRoomTitle이 "endChat"이 아닌 메시지만 화면에 표시
+                            if (message.chatRoomTitle !== "endChat") {
+                                let displayMessage = message.recipient === currentRecipient ? `관리자 : ${message.content}` : `${message.sender} : ${message.content}`;
 
-                            showMessage(displayMessage);
+                                showMessage(displayMessage);
+                            }
                         });
                     }
                 });
@@ -248,8 +394,21 @@
             .catch(error => console.error('Error fetching messages:', error));
     }
 
+    // 타이핑 인디케이터를 보여주는 함수
+    function showTypingIndicator() {
+        document.getElementById('typingIndicatorDTO').style.display = 'block'; // 타이핑 인디케이터 표시
+
+    }
+
+    // 타이핑 인디케이터를 숨기는 함수
+    function hideTypingIndicator() {
+        document.getElementById('typingIndicatorDTO').style.display = 'none'; // 타이핑 인디케이터 숨김
+    }
+
     // 채팅 모달 열기 함수
     function openChatModal(row) {
+
+        chatRoomId = row.getAttribute('data-room-id');
         currentRecipient = row.querySelector('td:nth-child(4)').innerText; // 현재 수신자 업데이트
         getElement('messages').innerHTML = ''; // 메시지 요소 초기화
 
@@ -257,9 +416,8 @@
             disconnect(); // 이미 연결된 경우, 연결 해제
         }
 
+        fetchMessages(chatRoomId);
         connect();
-        fetchMessages();
-
         const modal = getElement('myModal');
         getElement('userEmail').innerText = currentRecipient;
         modal.style.display = 'block';
@@ -270,6 +428,9 @@
         currentRecipient = '';
         const modal = getElement('myModal');
         modal.style.display = 'none';
+
+        // 모달을 닫으면 새로운 채팅 목록을 다시 가져오기
+        loadChatList(1, 8);
     }
 </script>
 <div id="myModal" class="modal">
@@ -280,6 +441,8 @@
         <div>
             <input type="text" id="message" placeholder="Type a message..."/>
             <button onclick="sendMessage()">Send</button>
+            <button onclick="sendEndChatMessage()">대화 종료</button>
+            <div id="typingIndicatorDTO" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
         </div>
     </div>
 </div>

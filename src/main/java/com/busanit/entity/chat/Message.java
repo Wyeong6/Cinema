@@ -37,19 +37,13 @@ public class Message extends BaseTimeEntity {
 
     private String content;
 
-//    private String messageTitle;
-
-    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MessageReadStatus> readStatuses = new ArrayList<>();
-//
-//    public void addReadStatus(MessageReadStatus messageReadStatus) {
-//        // 현재 메시지에 읽음 상태를 추가
-//        this.readStatuses.add(messageReadStatus);
-//        // messageReadStatus의 message 참조가 현재 메시지가 아니라면 업데이트
-//        if (messageReadStatus.getMessage() != this) {
-//            messageReadStatus.setMessage(this);
-//        }
-//    }
-
+    public static Message createMessage(Member sender, Member receiver, MessageDTO messageDTO, ChatRoom chatRoom) {
+        Message message = new Message();
+        message.setSender(sender);
+        message.setReceiver(receiver);
+        message.setContent(messageDTO.getContent());
+        message.setChatRoom(chatRoom);
+        return message;
+    }
 
 }

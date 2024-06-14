@@ -3,8 +3,9 @@ package com.busanit.entity;
 import com.busanit.constant.Role;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.entity.chat.ChatRoom;
+import com.busanit.entity.chat.ChatRoomReadStatus;
 import com.busanit.entity.chat.Message;
-import com.busanit.entity.chat.MessageReadStatus;
+
 import com.busanit.entity.movie.Comment;
 import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieReaction;
@@ -66,13 +67,9 @@ public class Member extends BaseTimeEntity {
 
     //멤버별 메세지 읽음 상태를 관리
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<MessageReadStatus> readStatuses = new ArrayList<>();
+    private List<ChatRoomReadStatus> readStatuses = new ArrayList<>();
 
-    //채팅룸 연관관계
-    @ManyToMany
-    @JoinTable(name = "member_chatroom",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "chatroom_id"))
+    @ManyToMany(mappedBy = "members", cascade = CascadeType.ALL)
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
     // 영화 찜
@@ -94,30 +91,6 @@ public class Member extends BaseTimeEntity {
             message.setSender(this);
         }
     }
-    //    //회원 삭제시 채팅룸 삭제
-//    @PreRemove
-//    private void preRemove() {
-//        for (ChatRoom chatRoom : chatRooms) {
-//            chatRoom.getMembers().remove(this);
-//            if (chatRoom.getMembers().isEmpty()) {
-//                chatRoomRepository.delete(chatRoom); // chatRoomRepository를 주입받아 사용해야 합니다.
-//            }
-//        }
-//    }
-//
-//    public void removeSentMessage(Message message) {
-//        this.sentMessages.remove(message);
-//        if (message.getSender() == this) {
-//            message.setSender(null);
-//        }
-//    }
-//
-//    public void removeReceivedMessage(Message message) {
-//        this.receivedMessages.remove(message);
-//        if (message.getReceiver() == this) {
-//            message.setReceiver(null);
-//        }
-//    }
 
     // 포인트
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
@@ -134,16 +107,19 @@ public class Member extends BaseTimeEntity {
         }
     }
 
-    //채팅룸 연관관계
-    public void addChatRoom(ChatRoom chatRoom) {
-        this.chatRooms.add(chatRoom);
-        chatRoom.getMembers().add(this);
-    }
+//    //채팅룸 연관관계
+//    public void addChatRoom(ChatRoom chatRoom) {
+//        this.chatRooms.add(chatRoom);
+//        chatRoom.getMembers().add(this);
+//    }
+public void addChatRoom(ChatRoom chatRoom) {
+    this.chatRooms.add(chatRoom);
+}
     //메세지상태 연관관계
-    public void addReadStatus(MessageReadStatus readStatus) {
-        this.readStatuses.add(readStatus);
-        if (readStatus.getMember() != this) {
-            readStatus.setMember(this);
+    public void addReadStatus(ChatRoomReadStatus chatRoomReadStatus) {
+        this.readStatuses.add(chatRoomReadStatus);
+        if (chatRoomReadStatus.getMember() != this) {
+            chatRoomReadStatus.setMember(this);
         }
     }
     // 리액션 연관관계 및 그외 메서드 시작
