@@ -1,23 +1,24 @@
 package com.busanit.controller;
 
-import com.busanit.domain.EventDTO;
-import com.busanit.domain.TheaterNumberDTO;
-import com.busanit.domain.SnackDTO;
+import com.busanit.domain.*;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
+import com.busanit.entity.*;
 import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MessageRepository;
+import com.busanit.repository.MovieRepository;
+import com.busanit.repository.TheaterNumberRepository;
 import com.busanit.service.*;
-import com.busanit.domain.NoticeDTO;
-import com.busanit.domain.TheaterDTO;
-import com.busanit.entity.Theater;
 import com.busanit.service.ChatService;
 import com.busanit.service.EventService;
 import com.busanit.service.SnackService;
 import com.busanit.service.TheaterService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +28,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map;
 
@@ -47,6 +51,10 @@ public class AdminPageController {
 //    private static final Logger log = LoggerFactory.getLogger(AdminPageController.class);
     private final TheaterService theaterService;
     private final TheaterNumberService theaterNumberService;
+    private final SeatService seatService;
+    private final ScheduleService scheduleService;
+    private final MovieRepository movieRepository;
+    private final TheaterNumberRepository theaterNumberRepository;
     private final SnackService snackService;
     private final EventService eventService;
     private final NoticeService noticeService;
@@ -166,23 +174,44 @@ public class AdminPageController {
     }
 
     @GetMapping("/seatRegister")
-    public String showSeatRegisterFormSelect(@RequestParam(required = false) String region, @RequestParam(required = false) String theaterName, Model model) {
-        if(region == null) {
-            region = ""; // 빈 값일 때 처리
-        }
+    public String showSeatRegisterFormSelect(@RequestParam(required = false) String region,
+                                             @RequestParam(required = false) String theaterName,
+                                             Model model) {
+        TheaterDTO theaterDTO = new TheaterDTO();
 
-        if(theaterName == null) {
-            theaterName = ""; // 빈 값일 때 처리
-        }
-        TheaterDTO seatForm = new TheaterDTO();
-        seatForm.setRegion(region);
-        seatForm.setTheaterName(theaterName);
+        theaterDTO.setRegion(region != null ? region : "");
+        theaterDTO.setTheaterName(theaterName != null ? theaterName : "");
 
-        model.addAttribute("seatForm", seatForm);
+        if (theaterDTO.getRegion() != null && theaterDTO.getTheaterName() != null
+                && !theaterDTO.getRegion().isEmpty() && !theaterDTO.getTheaterName().isEmpty()) {
+            // theaterService.getTheaterDTOWithSeats()로 seatForm 객체 업데이트
+            theaterDTO = theaterService.getTheaterDTOWithSeats(region, theaterName);
+        }
+        model.addAttribute("theaterDTO", theaterDTO);
 
         return "admin/admin_seat_register";
     }
 
+    @PostMapping("/seatRegister")
+    public String Seatsregister(@RequestParam("seatData") String seatData) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<SeatDTO> seatDTOList;
+        try {
+            seatDTOList = objectMapper.readValue(seatData, new TypeReference<List<SeatDTO>>() {});
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "error";
+        }
+
+        try {
+            seatService.save(seatDTOList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error";
+        }
+
+        return "redirect:/admin/adminMain";
+    }
 
     @GetMapping("/getTheatersByRegion")
     @ResponseBody
@@ -235,10 +264,112 @@ public class AdminPageController {
     }
 
     @GetMapping("/scheduleList")
-    public String scheduleList() { return "admin/admin_schedule_list"; }
+    public String scheduleList(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
+                               @PageableDefault(size = 15, direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ScheduleDTO> scheduleDTOList = null;
+
+        scheduleDTOList = scheduleService.getScheduleAll(pageable);
+        model.addAttribute("scheduleDTOList", scheduleDTOList);
+
+        int startPage= Math.max(1, scheduleDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(scheduleDTOList.getTotalPages(), scheduleDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_schedule_list";
+    }
 
     @GetMapping("/scheduleRegister")
-    public String scheduleRegister() { return "admin/admin_schedule_register"; }
+    public String scheduleRegister(Model model) {
+        try {
+            List<MovieDTO> allMovies = movieService.getAll();
+            model.addAttribute("movies", allMovies);
+            System.out.println("Movies: " + allMovies);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
+        }
+
+        return "admin/admin_schedule_register"; }
+
+    @PostMapping("/scheduleRegister")
+    public ResponseEntity<String> scheduleRegister(@RequestBody @Valid ScheduleDTO scheduleDTO, BindingResult bindingResult) {
+        // 로깅 추가
+        System.out.println("Received ScheduleDTO: " + scheduleDTO);
+
+        if (bindingResult.hasErrors()) {
+            StringBuilder errors = new StringBuilder();
+            bindingResult.getAllErrors().forEach(error -> errors.append(error.getDefaultMessage()).append("\n"));
+            return ResponseEntity.badRequest().body(errors.toString());
+        }
+
+        try {
+            scheduleService.save(scheduleDTO);
+            return ResponseEntity.ok("Schedule saved successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace(); // 또는 로깅 프레임워크를 사용하여 로그 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
+        }
+    }
+
+    @GetMapping("/scheduleEdit")
+    public String scheduleEdit(@RequestParam(name="scheduleId") long scheduleId, Model model) {
+
+        try {
+            List<MovieDTO> allMovies = movieService.getAll();
+            ScheduleDTO scheduleDTO = scheduleService.getScheduleById(scheduleId);
+
+            model.addAttribute("movies", allMovies);
+            model.addAttribute("schedule", scheduleDTO);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
+        }
+
+        return "admin/admin_schedule_edit";
+    }
+
+    @PostMapping("/scheduleEdit")
+    public ResponseEntity<String> scheduleEdit(@RequestBody @Valid ScheduleDTO scheduleDTO, BindingResult bindingResult) {
+        // 로깅 추가
+        System.out.println("Received ScheduleDTO: " + scheduleDTO);
+
+        if (bindingResult.hasErrors()) {
+            StringBuilder errors = new StringBuilder();
+            bindingResult.getAllErrors().forEach(error -> errors.append(error.getDefaultMessage()).append("\n"));
+            return ResponseEntity.badRequest().body(errors.toString());
+        }
+
+        if (scheduleDTO.getId() == null) {
+            return ResponseEntity.badRequest().body("Schedule ID is required.");
+        }
+
+        try {
+            scheduleService.editSchedule(scheduleDTO);
+            return ResponseEntity.ok("Schedule saved successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace(); // 또는 로깅 프레임워크를 사용하여 로그 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
+        }
+    }
+
+    @PostMapping("/scheduleDelete")
+    public String scheduleDelete(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "scheduleId") long scheduleId,
+                                Model model, @PageableDefault(size = 15) Pageable pageable, ScheduleDTO scheduleDTO) {
+        scheduleService.deleteScheduleById(scheduleId);
+
+        Page<ScheduleDTO> scheduleDTOList = scheduleService.getScheduleAll(pageable);
+        model.addAttribute("scheduleDTOList", scheduleDTOList);
+
+        int startPage = Math.max(1, scheduleDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(scheduleDTOList.getTotalPages(), scheduleDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_schedule_list";
+    }
 
     @GetMapping("/snackList")
     public String snackList(Model model,

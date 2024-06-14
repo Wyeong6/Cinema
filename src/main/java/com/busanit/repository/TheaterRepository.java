@@ -28,4 +28,12 @@ public interface TheaterRepository extends JpaRepository<Theater, Long> {
     @Transactional
     @Query("SELECT t FROM Theater t WHERE t.region = :theaterRegion")
     List<Theater> findTheatersByRegion(@Param("theaterRegion") String theaterRegion);
+
+    @Transactional
+    @Query("SELECT t FROM Theater t WHERE t.theaterName = :theaterName")
+    Optional<Theater> findByTheaterName(@Param("theaterName") String theaterName);
+
+    @Transactional
+    @Query("SELECT t FROM Theater t WHERE t.theaterName = :theaterName AND t.region = :region")
+    Optional<Theater> findByRegionAndTheaterName(String region, String theaterName);
 }

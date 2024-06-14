@@ -1,24 +1,44 @@
 package com.busanit.controller;
 
+import com.busanit.domain.ScheduleDTO;
 import com.busanit.domain.TheaterDTO;
-import com.busanit.service.TheaterService;
+import com.busanit.domain.TheaterNumberDTO;
+import com.busanit.domain.movie.MovieDTO;
+import com.busanit.entity.Schedule;
+import com.busanit.entity.Theater;
+import com.busanit.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/reservation")
 @RequiredArgsConstructor
 public class ReservationController {
 
+    private final MovieService movieService;
     private final TheaterService theaterService;
+    private final TheaterNumberService theaterNumberService;
+    private final ScheduleService scheduleService;
 
     @GetMapping("/screeningSchedule")
     public String screeningSchedule(Model model) {
-        model.addAttribute("theaters", null);
+        try {
+            List<MovieDTO> allMovies = movieService.getAll();
+            model.addAttribute("movies", allMovies);
+            System.out.println("Movies: " + allMovies);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
+        }
+
         return "reservation/screening_schedule";
     }
 
@@ -28,4 +48,21 @@ public class ReservationController {
         System.out.println("Region: " + region);
         return theaterService.findTheatersByRegion(region);
     }
+
+    @GetMapping("/getTheaterByTheaterName")
+    @ResponseBody
+    public TheaterDTO findByTheaterName(String theaterName) {
+        Optional<Theater> theaterOptional = theaterService.findByTheaterName(theaterName);
+        Theater theater = theaterOptional.orElseThrow(() -> new IllegalArgumentException("극장을 찾을 수 없습니다: " + theaterName));
+        return TheaterDTO.toDTO(theater);
+    }
+
+    @GetMapping("/ByConditions")
+    @ResponseBody
+    public List<ScheduleDTO> getSchedulesByConditions(@RequestParam String theaterName,
+                                                      @RequestParam Long movieId,
+                                                      @DateTimeFormat(pattern = "yyyy-M-d") @RequestParam LocalDate date) {
+        return scheduleService.findSchedulesByConditions(theaterName, movieId,date);
+    }
+
 }

@@ -17,97 +17,116 @@
     <div class="col-xl">
         <div class="card mb-4">
             <div class="card-body schedule_reg">
-                <form id="theater-form" method="post" th:action="@{/admin/seatRegister}" th:object="${seatForm}">
+                <form id="seat-form" method="post" th:action="@{/admin/seatRegister}" th:object="${theaterDTO}">
                     <div class="mb-3">
                         <div class="input-group">
                             <label class="input-group-text label-text" for="region-select">지역 선택</label>
                             <select class="form-select" id="region-select" th:field="*{region}">
-                                <option value="">지역을 선택해주세요.</option>
-                                <option value="Seo" th:selected="${seatForm.region == 'Seo'}" th:text="'서울'"></option>
-                                <option value="Inc" th:selected="${seatForm.region == 'Inc'}" th:text="'인천 / 경기'"></option>
-                                <option value="Gan" th:selected="${seatForm.region == 'Gan'}" th:text="'강원'"></option>
-                                <option value="Chu" th:selected="${seatForm.region == 'Chu'}" th:text="'대전 / 충청'"></option>
-                                <option value="Dae" th:selected="${seatForm.region == 'Dae'}" th:text="'대구 / 경북'"></option>
-                                <option value="Bus" th:selected="${seatForm.region == 'Bus'}" th:text="'부산 / 울산 / 경남'"></option>
-                                <option value="Gwa" th:selected="${seatForm.region == 'Gwa'}" th:text="'광주 / 전라'"></option>
-                                <option value="Jeju" th:selected="${seatForm.region == 'Jeju'}" th:text="'제주'"></option>
+                                <option th:selected="${theaterDTO?.region == ''}" value="">지역을 선택해주세요.</option>
+                                <option value="Seo" th:selected="${theaterDTO?.region == 'Seo'}" th:text="'서울'"></option>
+                                <option value="Inc" th:selected="${theaterDTO?.region == 'Inc'}" th:text="'인천 / 경기'"></option>
+                                <option value="Gan" th:selected="${theaterDTO?.region == 'Gan'}" th:text="'강원'"></option>
+                                <option value="Chu" th:selected="${theaterDTO?.region == 'Chu'}" th:text="'대전 / 충청'"></option>
+                                <option value="Dae" th:selected="${theaterDTO?.region == 'Dae'}" th:text="'대구 / 경북'"></option>
+                                <option value="Bus" th:selected="${theaterDTO?.region == 'Bus'}" th:text="'부산 / 울산 / 경남'"></option>
+                                <option value="Gwa" th:selected="${theaterDTO?.region == 'Gwa'}" th:text="'광주 / 전라'"></option>
+                                <option value="Jeju" th:selected="${theaterDTO?.region == 'Jeju'}" th:text="'제주'"></option>
                             </select>
+                            <input type="hidden" id="region-input" th:value="${theaterDTO?.region}" name="region"/>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="input-group">
                             <label class="input-group-text label-text" for="theater-names-select">지점명 선택</label>
                             <select class="form-select" id="theater-names-select" th:field="*{theaterName}">
-                                <option value="">극장을 선택해주세요.</option>
-                                <option th:value="${seatForm.theaterName}" th:selected="${seatForm.theaterName}" th:text="${seatForm.theaterName}"></option>
-
+                                <option th:selected="${theaterDTO?.theaterName == null || theaterDTO?.theaterName == ''}" value=''>극장을 선택해주세요.</option>
+                                <option th:value="${theaterDTO?.theaterName}" th:selected="${theaterDTO?.theaterName}"
+                                        th:text="${theaterDTO?.theaterName}" th:if="${theaterDTO?.theaterName != ''}"></option>
                             </select>
+                            <input type="hidden" id="theater-name-input" th:value="${theaterDTO?.theaterName}" name="theaterName">
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="input-group">
-                            <label class="input-group-text label-text" for="theater-numbers">상영관 번호 선택</label>
-                            <select class="form-select" id="theater-numbers">
-                                <option selected>상영관을 선택해주세요.</option>
-                            </select>
+                                <label class="input-group-text label-text" for="theater-numbers-select">상영관 번호 선택</label>
+                                <select class="form-select" id="theater-numbers-select" th:field="*{theaterNumbers}" >
+                                    <option value="" selected>상영관을 선택해주세요.</option>
+                                    <option th:each="theaterNumber : ${theaterDTO?.theaterNumbers}"
+                                            th:value="${theaterNumber.id}"
+                                            th:data-seats-per-theater="${theaterNumber.seatsPerTheater}"
+                                            th:text="${theaterNumber.theaterNumber + '관'}"></option>
+                                </select>
+                            <input type="hidden" id="theater-number-selected" />
+                            <input type="hidden" id="theaterNumberId" name="theaterNumberId">
                         </div>
                     </div>
                     <div class="mb-3 theater-seat-cnt">
-                        <label class="form-label" for="seats-count">총 보유한 좌석 수</label>
-                        <input type="number" id="seats-count" readonly class="form-control-plaintext" />
                     </div>
                     <div class="mb-3 row">
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="A" class="form-label">A열</label>
+                            <label for="A-input" class="form-label" name="seatColumn" value="A">A열</label>
                             <input
-                                    id="A"
+                                    id="A-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
+                                    max="20"
                                     placeholder="A열 좌석 수를 입력하세요."
+                                    required
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="B" class="form-label">B열</label>
+                            <label for="B-input" class="form-label" name="seatColumn" value="B">B열</label>
                             <input
-                                    id="B"
+                                    id="B-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
+                                    max="20"
                                     placeholder="B열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="C" class="form-label">C열</label>
+                            <label for="C-input" class="form-label" name="seatColumn" value="C">C열</label>
                             <input
-                                    id="C"
+                                    id="C-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
+                                    max="20"
                                     placeholder="C열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="D" class="form-label">D열</label>
+                            <label for="D-input" class="form-label" name="seatColumn" value="D">D열</label>
                             <input
-                                    id="D"
+                                    id="D-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
+                                    max="20"
                                     placeholder="D열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="E" class="form-label">E열</label>
+                            <label for="E-input" class="form-label" name="seatColumn" value="E">E열</label>
                             <input
-                                    id="E"
+                                    id="E-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
+                                    max="20"
                                     placeholder="E열 좌석 수를 입력하세요."
                             />
                         </div>
                         <div class="mt-2 mb-3 col-sm-3">
-                            <label for="F" class="form-label">F열</label>
+                            <label for="F-input" class="form-label" name="seatColumn" value="F">F열</label>
                             <input
-                                    id="F"
+                                    id="F-input"
                                     class="form-control form-control-lg"
                                     type="number"
+                                    name="seatRow"
+                                    max="20"
                                     placeholder="F열 좌석 수를 입력하세요."
                             />
                         </div>
@@ -115,30 +134,58 @@
                             <button type="button" class="btn btn-gray add-column-btn">+</button>
                         </div>
                     </div>
-                    <button class="btn btn-gray" type="button">좌석 배치도 결과보기</button>
+                    <button class="btn btn-gray arrangement-show"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exLargeModal">좌석 배치도 결과보기</button>
+                    <input type="hidden" id="seatData" name="seatData">
                     <button class="btn btn-primary" type="submit">등록하기</button>
                 </form>
+                <div class="row gy-3">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="modal fade" id="exLargeModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-xl seats-arrangement" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="exampleModalLabel4">Modal title</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="d-flex justify-content-center">
+                                            <div class="screen"></div>
+                                        </div>
+                                        <div>
+                                            <div class="seating-area"></div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                                            닫기
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap JS (Optional) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 
-<script>
+<script th:inline="javascript">
     $(document).ready(function () {
-        const regionValue = "<%= region %>";
-        let theaterNameValue = "<%= theaterName %>";
-
-        $('#region-select').val(regionValue);
-        $('#theater-names-select').val(theaterNameValue);
+        const theaterNumbersSelect = $("#theater-numbers-select");
+        const theaterNamesSelect = $("#theater-names-select");
+        let theaterNumberSelected = $('theater-numbers-input');
+        const regionSelect = $('#region-select');
 
         let columnCount = 1;
         const alphabet = 'FGHIJKLMN';
+
         $('.add-column-btn').on('click', function (e) {
             e.preventDefault();
             if (columnCount < alphabet.length) {
@@ -146,8 +193,9 @@
                 columnCount++;
                 const newColumn = `
                 <div class="mt-2 mb-3 col-sm-3">
-                    <label for="${letter}" class="form-label">${letter}열</label>
-                    <input id="${letter}" class="form-control form-control-lg" type="number" placeholder="${letter}열 좌석 수를 입력하세요." />
+                    <label for="${letter}-input" class="form-label" name="seatColumn" value="${letter}">${letter}열</label>
+                    <input id="${letter}-input" class="form-control form-control-lg" name="seatRow"
+                    type="number" max="20" placeholder="${letter}열 좌석 수를 입력하세요." />
                 </div>
             `;
                 $(newColumn).insertBefore('.add-column:first');
@@ -167,21 +215,17 @@
             }
         });
 
-        $('#region-select').change(function(event) {
+        regionSelect.change(function(event) {
             event.preventDefault();
             const selectedValue = $(this).val();
             $.ajax({
                 type: "GET",
                 url: "/reservation/getTheatersByRegion",
-                data: {
-                    region: selectedValue
-                },
+                data: { region: selectedValue },
                 success: function(data) {
-                    const theaterNamesSelect = $("#theater-names-select");
                     theaterNamesSelect.empty();
-
-                    theaterNamesSelect.append($("<option selected>지역을 선택해주세요.</option>"));
-                    if(data.length > 0) {
+                    theaterNamesSelect.append($("<option selected>영화관 지점명을 선택해주세요.</option>"));
+                    if (data.length > 0) {
                         $.each(data, function(index, theater) {
                             const $option = $("<option></option>").val(theater.theaterName).text(theater.theaterName);
                             theaterNamesSelect.append($option);
@@ -192,9 +236,182 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error("AJAX 요청 실패:", error); // 오류 메시지 출력
+                    console.error("AJAX 요청 실패:", error);
                 }
             });
+        });
+
+        theaterNamesSelect.change(function(event) {
+            event.preventDefault();
+            const selectedValue = $(this).val();
+            const selectedText = $(this).find('option:selected').text();
+            $.ajax({
+                type: "GET",
+                url: "/reservation/getTheaterByTheaterName",
+                data: { theaterName: selectedValue },
+                success: function(data) {
+                    console.log(data);
+                    theaterNumbersSelect.empty();
+                    theaterNumbersSelect.append($("<option selected>상영관을 선택해주세요.</option>"));
+                    if (data.theaterNumbers.length > 0) {
+                        $.each(data.theaterNumbers, function(index, theaterNumber) {
+                            const $option = $("<option></option>").val(theaterNumber.theaterNumber).text(theaterNumber.theaterNumber + '관');
+                            theaterNumbersSelect.append($option);
+                        });
+
+                        theaterNumbersSelect.change(function(event) {
+                            event.preventDefault();
+                            const selectedNumberValue = $(this).val();
+                            console.log(selectedNumberValue);
+                            const selectedTheaterNumber = data.theaterNumbers.find(theaterNumber => theaterNumber.theaterNumber == selectedNumberValue);
+                            const seatsPerTheater = selectedTheaterNumber.seatsPerTheater;
+                            displaySeatsPerTheater(seatsPerTheater);
+                        });
+                        $('#theater-name-input').val(selectedValue);
+                        $('.modal-title').text(selectedText);
+                    } else {
+                        const $option = $("<option></option>").val("").text("해당 영화관에 상영관이 없습니다.");
+                        theaterNumbersSelect.append($option);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX 요청 실패:", error);
+                }
+            });
+        });
+
+        theaterNumbersSelect.change(function (event) {
+            event.preventDefault();
+            const selectedOption = $(this).find('option:selected');
+            const selectedText = $(this).find('option:selected').text();
+            const selectedValue = $(this).val();
+            theaterNumberSelected.val(selectedValue);
+            const seatsPerTheater = selectedOption.data('seats-per-theater');
+            if (seatsPerTheater !== undefined) {
+                displaySeatsPerTheater(seatsPerTheater);
+            }
+            const modalTitle = $('.modal-title');
+            const oldText = modalTitle.text();
+            const newText = oldText + ' ' + selectedText;
+            modalTitle.text(newText);
+        });
+
+        function displaySeatsPerTheater(seatsPerTheater) {
+            const seatsInfoContainer = $('.theater-seat-cnt');
+            seatsInfoContainer.empty(); // 기존 내용을 지우기
+
+            const label = $('<label></label>')
+                .addClass('form-label')
+                .attr('for', 'seats-count')
+                .text('총 보유한 좌석 수');
+
+            const input = $('<input>')
+                .attr('type', 'number')
+                .attr('id', 'seats-count')
+                .attr('readonly', true)
+                .addClass('form-control-plaintext')
+                .val(seatsPerTheater);
+
+            const span = $('<span></span>').text('석');
+
+            seatsInfoContainer.append(label, input, span);
+        }
+
+        $('.arrangement-show').on('click', function() {
+            $('.seating-area').empty();
+
+            for (let i = 0; i < 14; i++) {
+                let column = String.fromCharCode(65 + i);
+                let inputId = column + "-input";
+                let seatCount = $('#' + inputId).val();
+
+                if (seatCount === null || seatCount === '' || seatCount === undefined) {
+                    console.log(column + '의 입력 값이 null이거나 비어 있습니다.');
+                    continue;
+                }
+
+                let columnDiv = $('<div></div>').addClass('d-flex justify-content-center seat-' + column);
+                columnDiv.css({
+                    display: 'flex',
+                    justifyContent: 'row',
+                    height: 'auto'
+                });
+                $('.seating-area').append(columnDiv);
+                if (seatCount == null || seatCount === '') {
+                    console.log(column + seatCount + '가 null입니다.');
+                } else {
+                    let columnTextDiv = $('<div></div>').addClass('column').text(column);
+                    columnDiv.append(columnTextDiv);
+                    for (let j = 1; j <= 22; j++) {
+                        let newDiv = $('<div></div>').addClass('seat');
+                        columnDiv.append(newDiv);
+                    }
+
+                    columnDiv.find('.seat:nth-child(6)').addClass('remove');
+                    columnDiv.find('.seat:nth-last-child(5)').addClass('remove');
+
+                    let seatsToRemove = Math.max(Math.floor((20 - seatCount) / 2), 0);
+                    console.log(seatsToRemove);
+
+                    for (let k = 0; k < seatsToRemove; k++) {
+                        columnDiv.find('.seat:nth-child(' + (k + 2) + ')').addClass('remove'); // columnTextDiv로 인해 인덱스가 1씩 증가
+                        columnDiv.find('.seat:nth-last-child(' + (k + 1) + ')').addClass('remove');
+                    }
+
+                    if (seatCount < 11) {
+                        columnDiv.children('.seat:not(.remove)').first().addClass('remove');
+                        columnDiv.children('.seat:not(.remove)').last().addClass('remove');
+                    }
+
+                    if (seatCount % 2 !== 0) {
+                        columnDiv.children('.seat:not(.remove)').last().addClass('remove');
+                    }
+                }
+            }
+        });
+
+        $('#seat-form').on('submit', function (e) {
+            e.preventDefault();
+
+            const selectedTheaterId = $('#theater-numbers-select').val();
+            $('#theaterNumberId').val(selectedTheaterId);
+
+            const seatsPerTheater = $('#seats-count').val();
+
+            let totalSeats = 0;
+            const seatDTOList = [];
+            $('.form-control-lg').each(function() {
+                const seatCount = parseInt($(this).val(), 10);
+                const seatColumn = $(this).siblings('label').attr('value');
+
+                totalSeats += seatCount;
+
+                for (let i = 1; i <= seatCount; i++) {
+                    const dto = {
+                        seatRow: i,
+                        seatColumn: seatColumn,
+                        theaterNumberId: selectedTheaterId // 추가된 theaterNumberId
+                    };
+                    seatDTOList.push(dto);
+                }
+            });
+
+            if (totalSeats != seatsPerTheater) {
+                Swal.fire({
+                    title: '총 좌석 수는 ' + seatsPerTheater + '석 입니다.',
+                    text: '확인 후 다시 시도해주세요.',
+                    icon: 'error'
+                });
+                console.log(totalSeats);
+                console.log(seatsPerTheater);
+                return false;
+            }
+
+            const seatDataJson = JSON.stringify(seatDTOList);
+            document.getElementById('seatData').value = seatDataJson;
+
+            // 폼을 제출
+            this.submit();
         });
     });
 </script>

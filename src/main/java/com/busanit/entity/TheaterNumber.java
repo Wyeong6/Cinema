@@ -23,7 +23,7 @@ public class TheaterNumber {
     private Long seatsPerTheater; // 상영관 별 좌석 수
 
     @OneToMany(mappedBy = "theaterNumber", cascade = CascadeType.ALL)
-    private List<Seat> Seats = new ArrayList<>();
+    private List<Seat> seats = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theater_id")

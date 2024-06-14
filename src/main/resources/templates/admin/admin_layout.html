@@ -206,7 +206,6 @@
                 <div class="container-xxl flex-grow-1 container-p-y">
 
                 </div>
-                <div class="content-backdrop fade"></div>
             </div>
             <!-- Content wrapper -->
         </div>
@@ -256,7 +255,16 @@
         });
         $('.seat_reg_btn').on('click', function (e) {
             e.preventDefault();
-            $('.container-xxl').load('/admin/seatRegister');
+            $.ajax({
+                type: "GET",
+                url: "/admin/seatRegister",
+                success: function(data) {
+                    $('.container-xxl').html(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX 요청 실패:", error);
+                }
+            });
         });
         $('.theater_btn').on('click', function () {
             $('.container-xxl').load('/admin/theaterList');
