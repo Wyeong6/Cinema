@@ -1,5 +1,6 @@
 package com.busanit.service;
 
+import com.busanit.domain.movie.ActorDTO;
 import com.busanit.entity.movie.*;
 import com.busanit.repository.*;
 import com.busanit.domain.movie.MovieDTO;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.busanit.domain.movie.ActorDTO.convertToDto;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -74,10 +77,10 @@ public class MovieService {
         fetchAndStoreMovieRuntimeAndReleaseData();
         fetchAndStoreMovieStillCuts();
         fetchAndStoreCertificationData();
-//        fetchKoreanActors(); 지우지마세요
+        fetchKoreanActors();
 
-        // 데이터 캐시 갱신
-//        cachedActors = fetchKoreanActors(); 지우지마세요
+        // 데이터 로컬 캐시 전략
+        cachedActors = getActors();
         cachedVideoMovies = getVideoMovies();
         cachedAllMovies = getAll();
         cachedHotMovies = getHotMovies();
@@ -378,10 +381,9 @@ public class MovieService {
 
     // 영화 배우 가져오기
     public void fetchKoreanActors() throws IOException {
-        int totalPages = fetchTotalPages();
         List<MovieActor> koreanActors = new ArrayList<>();
 
-        for (int page = 1; page <= totalPages; page++) {
+        for (int page = 1; page <= 50; page++) {
             String url = "https://api.themoviedb.org/3/person/popular?language=ko-KR&page=" + page + "&api_key=" + apiKey;
             Request request = new Request.Builder().url(url).build();
 
@@ -395,9 +397,13 @@ public class MovieService {
                         if (isKoreanName(name)) {
                             int gender = node.get("gender").asInt();
                             String profilePath = node.get("profile_path").asText(null);
-                            MovieActor actor = new MovieActor(name, getGender(gender), profilePath);
-                            koreanActors.add(actor);
-                            movieActorRepository.save(actor);  // Save to database
+                            // 중복 체크
+                            if (!isActorExists(name)) {
+                                // 데이터베이스에 존재하지 않는 경우에만 추가
+                                MovieActor actor = new MovieActor(name, getGender(gender), profilePath);
+                                koreanActors.add(actor);
+                                movieActorRepository.save(actor);  // Save to database
+                            }
                         }
                     }
                 }
@@ -410,13 +416,17 @@ public class MovieService {
     private boolean isKoreanName(String name) {
         return name.matches(".*[가-힣].*");
     }
+    private boolean isActorExists(String name) {
+        // 배우 이름으로 데이터베이스에서 검색하여 존재 여부 확인
+        return movieActorRepository.existsByActorName(name);
+    }
 
     private static String getGender(int genderCode) {
         switch (genderCode) {
             case 1:
-                return "남자";
-            case 2:
                 return "여자";
+            case 2:
+                return "남자";
             default:
                 return "Not specified";
         }
@@ -514,11 +524,11 @@ public class MovieService {
     }
 
     // 지우지마세요
-//    public List<MovieDTO> getActors() {
-//        List<MovieActor> movieActors = movieActorRepository.findAll();
-//        return movieActors.stream().map(MovieDTO::convertToDTO)
-//                .collect(Collectors.toList());
-//    }
+    public List<MovieDTO> getActors() {
+        List<MovieActor> movieActors = movieActorRepository.findAll();
+        return movieActors.stream().map(MovieDTO::convertActorToDTO)
+                .collect(Collectors.toList());
+    }
 
     //로그인되어있는 유저 email받아오기
     public String getUserEmail() {
@@ -589,12 +599,13 @@ public class MovieService {
     //어드민 페이지 영화 등록
     public void saveMovie(
             Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
-            String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime) {
+            String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime, List<Long> actors) {
 
         Movie movie = new Movie();
         movie.setMovieId(movieId);
         movie.setTitle(movieTitle);
         movie.setOverview(movieOverview);
+
 
 
         MovieDetail movieDetail = new MovieDetail();
@@ -603,6 +614,15 @@ public class MovieService {
         movieDetail.setVideo(video);
         movieDetail.setRuntime(runtime);
         movie.setMovieDetail(movieDetail);
+
+        // 배우 추가
+
+        for (Long actorId : actors) {
+            MovieActor actor = movieActorRepository.findById(actorId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid actor ID: " + actorId));
+            movie.addActor(actor);
+        }
+
 
 
         // 장르 추가
@@ -629,11 +649,33 @@ public class MovieService {
         movie.addImage(movieImage);
 
 
+
+
         movieRepository.save(movie);
     }
 
 
     public boolean checkIfMovieIdExists(String id) {
         return movieRepository.existsById(Long.valueOf(id));
+    }
+
+    public List<MovieActor> findByActorNameContaining(String query) {
+        return movieActorRepository.findByActorNameContaining(query);
+    }
+
+
+    public List<Long> getActorIdsByMovieId(String movieId) {
+        // Movie ID를 기반으로 해당 영화에 출연한 배우들의 ID 목록을 데이터베이스에서 조회하여 반환
+        return movieActorRepository.findActorIdsByMovieId(movieId);
+    }
+
+    public ActorDTO getActorById(Long actorId) {
+        Optional<MovieActor> optionalMovieActor = movieActorRepository.findById(actorId);
+        if (optionalMovieActor.isPresent()) {
+            MovieActor movieActor = optionalMovieActor.get();
+            return convertToDto(movieActor);
+        } else {
+            throw new IllegalArgumentException("Actor with ID " + actorId + " not found");
+        }
     }
 }

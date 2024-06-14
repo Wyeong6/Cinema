@@ -2276,7 +2276,7 @@ progress {
 
 .form-control-plaintext {
   display: block;
-  width: 100%;
+  margin-left: 0.5em;
   padding: 0.4375rem 0;
   margin-bottom: 0;
   line-height: 1.53;
@@ -2358,7 +2358,6 @@ textarea.form-control-lg {
 .form-select {
   display: block;
   width: 100%;
-  padding: 0.4375rem 1.875rem 0.4375rem 0.875rem;
   -moz-padding-start: calc(0.875rem - 3px);
   font-size: 0.9375rem;
   font-weight: 400;
@@ -2703,7 +2702,8 @@ textarea.form-control-lg {
 .input-group-text {
   display: flex;
   align-items: center;
-  padding: 0.4375rem 0.875rem;
+  justify-content: center;
+  padding: 0.4375rem 1rem;
   font-size: 0.9375rem;
   font-weight: 400;
   line-height: 1.53;
@@ -4601,7 +4601,7 @@ textarea.form-control-lg {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1090;
+  z-index: 2000;
   display: none;
   width: 100%;
   height: 100%;
@@ -4677,6 +4677,7 @@ textarea.form-control-lg {
   opacity: 0;
 }
 .modal-backdrop.show {
+
   opacity: 0.5;
 }
 
@@ -6853,30 +6854,28 @@ label.btn {
 }
 
 .btn-gray {
-  color: #fff;
+  color: #3B353C;
   background-color: rgba(67, 89, 113, 0.1);
-  border-color: rgba(67, 89, 113, 0.1);
   box-shadow: 0 0.125rem 0.25rem 0 rgba(67, 89, 113, 0.4);
 }
 .btn-gray:hover {
-  color: #fff;
-  background-color: rgba(22, 29, 36, 0.19);
-  border-color: rgba(22, 29, 36, 0.19);
+  color: #3B353C;
+  background-color: rgba(67, 89, 113, 0.2);
   transform: translateY(-1px);
 }
-.btn-check:focus + .btn-gray, .btn-gray:focus, .btn-gray.focus {
+.btn-check:focus + .btn-gray {
   color: #fff;
   background-color: rgba(22, 29, 36, 0.19);
   border-color: rgba(22, 29, 36, 0.19);
   transform: translateY(0);
   box-shadow: none;
 }
-.btn-check:checked + .btn-gray, .btn-check:active + .btn-gray, .btn-gray:active, .btn-gray.active, .show > .btn-gray.dropdown-toggle {
+.btn-check:checked + .btn-gray, .btn-check:active + .btn-gray, .show > .btn-gray.dropdown-toggle {
   color: #fff;
   background-color: rgba(15, 20, 26, 0.235);
   border-color: rgba(15, 20, 26, 0.235);
 }
-.btn-check:checked + .btn-gray:focus, .btn-check:active + .btn-gray:focus, .btn-gray:active:focus, .btn-gray.active:focus, .show > .btn-gray.dropdown-toggle:focus {
+.btn-check:checked + .btn-gray:focus, .btn-check:active + .btn-gray:focus, .show > .btn-gray.dropdown-toggle:focus {
   box-shadow: none;
 }
 .btn-gray.disabled, .btn-gray:disabled {

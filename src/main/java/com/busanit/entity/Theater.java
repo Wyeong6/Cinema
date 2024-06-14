@@ -49,7 +49,7 @@ public class Theater {
                 theaterNumber.setTheater(theater);
 
                 // "지역-지점명-상영관번호" 형태로 설정
-                String theaterIdx = theaterDTO.getRegion() + "-" + theaterDTO.getTheaterName() + "-" + theaterNumberDTO.getTheaterNumber();
+                String theaterIdx = theaterDTO.getRegion() + theaterDTO.getTheaterNameEng() + theaterNumberDTO.getTheaterNumber();
                 theaterNumber.setTheaterIdx(theaterIdx);
 
                 theaterNumber.setTheaterNumber(theaterNumberDTO.getTheaterNumber());

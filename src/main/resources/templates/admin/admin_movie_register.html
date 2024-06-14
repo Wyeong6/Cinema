@@ -15,6 +15,10 @@
         background-color: rgba(0,0,0,0.9);
     }
 
+    .actor-checkbox {
+        margin-right: 10px; /* 체크박스와 이름 사이의 간격 설정 */
+    }
+
     .modal-content {
         margin: 15% auto;
         padding: 20px;
@@ -77,10 +81,8 @@
     }
 </style>
 
-<nav
-        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-        id="layout-navbar" style="margin-bottom: 10px;"
->
+<nav class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+        id="layout-navbar" style="margin-bottom: 10px;" >
 
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <!-- Search -->
@@ -111,8 +113,7 @@
                     <div class="mb-3">
                         <label class="form-label" for="id">영화 ID</label>
                         <div class="input-group">
-                        <input class="form-control" id="id" name="id" placeholder="ID를 입력해주세요."
-                               required type="text"/>
+                        <input class="form-control" id="id" name="id" placeholder="ID를 입력해주세요." required type="text"/>
                         <button class="btn btn-outline-secondary" type="button" id="check-id-button" onclick="duplicateCheck()">중복 확인</button>
                         </div>
                         <span id="id-error" class="error-message"></span>
@@ -260,17 +261,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="actor-search">배우 검색</label>
-                        <input type="text" class="form-control" id="actor-search" placeholder="배우 이름을 입력하세요" oninput="searchActors()">
+                        <label class="form-label" for="actorSearch">배우 검색</label>
+                        <input class="form-control" id="actorSearch" type="text" placeholder="배우 이름을 입력하세요" oninput="searchActors()">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="actors">배우 목록</label>
-                        <select class="form-control" id="actors" name="actors[]" multiple>
-                            <!-- 배우 목록을 서버에서 받아와서 렌더링 -->
-                        </select>
+                        <label class="form-label" for="actorCheckboxes">배우 선택</label>
+                        <div id="actorCheckboxes" >
+                            <!-- 검색 결과가 여기에 체크박스로 추가됩니다 -->
+                        </div>
                     </div>
-
-
+                    <div id="selectedActorsDisplay"></div>
+                    <input type="hidden" id="selectedActorIds" name="actors" value="">
                     <button class="btn btn-primary" type="button" id="formSubmit" onclick="validateForm()">등록하기</button>
                 </form>
             </div>
@@ -453,6 +454,23 @@
             return false;
         }
 
+        const actorCheckboxes = document.querySelectorAll('input[name="actors[]"]');
+        let isActorSelected = false;
+        actorCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                isActorSelected = true;
+                return;
+            }
+        });
+
+        if (!isActorSelected) {
+            alert('배우를 선택해 주세요.');
+            return false;
+        }
+
+        // 선택된 배우 ID 배열 생성
+        const selectedActorIds = selectedActors.map(actor => actor.actorId);
+        document.getElementById('selectedActorIds').value = selectedActorIds;
 
         // 모든 유효성 검사 통과 시 폼 제출
         const formData = new FormData(form);
@@ -463,6 +481,7 @@
         for (let i = 0; i < stillCutFiles.length; i++) {
             formData.append('RegisteredStillCut', stillCutFiles[i]);
         }
+
         fetch('/movies/regist', {
             method: 'POST',
             body: formData
@@ -494,6 +513,8 @@
                     genreCheckboxes.forEach(checkbox => checkbox.checked = false);
                     certificationInputs.forEach(input => input.checked = false);
                     idError.textContent = '';
+                    selectedActors = [];
+                    updateSelectedActorsDisplay();
                 }
             });
 
@@ -536,6 +557,88 @@
     }
 
 
+    // 배우 검색 관련
+
+
+    // 선택된 배우 목록을 저장할 배열
+    let selectedActors = [];
+
+    // 배우 정보를 저장할 배열
+    let actors = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('actorSearch').addEventListener('input', searchActors);
+    });
+
+
+    function searchActors() {
+        const query = document.getElementById('actorSearch').value;
+        if (query.length >= 2) {
+            fetch(`/actors/search?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const actorCheckboxes = document.getElementById('actorCheckboxes');
+                    actorCheckboxes.innerHTML = '';
+
+                    // 검색 결과로 받은 배우 정보를 저장
+                    actors = data;
+
+                    data.forEach(actor => {
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = `actor-${actor.actorId}`;
+                        checkbox.name = 'actors[]';
+                        checkbox.value = actor.actorId;
+
+                        // 현재 선택된 배우 목록에 있는 배우인지 확인하여 체크 여부 설정
+                        checkbox.checked = selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId);
+
+                        const label = document.createElement('label');
+                        label.htmlFor = `actor-${actor.actorId}`;
+                        label.textContent = actor.actorName;
+
+                        const div = document.createElement('div');
+                        div.appendChild(checkbox);
+                        div.appendChild(label);
+
+                        actorCheckboxes.appendChild(div);
+
+                        checkbox.addEventListener('change', function() {
+                            if (checkbox.checked) {
+                                if (!selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId)) {
+                                    selectedActors.push(actor);
+                                }
+                            } else {
+                                selectedActors = selectedActors.filter(selectedActor => selectedActor.actorId !== actor.actorId);
+                            }
+                            updateSelectedActorsDisplay(); // 선택된 배우 목록을 업데이트
+                        });
+                    });
+
+                    // updateSelectedActorsDisplay();
+                })
+                .catch(error => {
+                    console.error('Error searching actors:', error);
+                });
+        }
+    }
+
+    // 선택된 배우 목록을 업데이트하고 화면에 표시하는 함수
+    // 선택된 배우 목록을 업데이트하고 화면에 표시하는 함수
+    function updateSelectedActorsDisplay() {
+        const selectedActorsDisplay = document.getElementById('selectedActorsDisplay');
+        selectedActorsDisplay.innerHTML = '';
+
+        if (selectedActors.length > 0) {
+            const selectedActorsText = document.createElement('p');
+            selectedActorsText.textContent = "선택한 배우: " + selectedActors.map(selectedActor => {
+                console.log("액터체크 === " + selectedActor);
+                return selectedActor ? selectedActor.actorName : "";
+            }).join(", ");
+
+            selectedActorsDisplay.appendChild(selectedActorsText);
+        }
+    }
 
 
 </script>

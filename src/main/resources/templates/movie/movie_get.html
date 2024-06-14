@@ -1094,6 +1094,65 @@
                 console.error('필요한 요소를 찾을 수 없습니다.');
             }
         }
+
+
+        // 직접 등록한 영화 배우목록 화면에 띄우기
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // movieId가 10자리인 경우에만 실행되는 코드
+            if (movieId.length === 10) {
+                // 무비 ID를 기반으로 서버에 요청하여 해당 무비에 출연한 배우들의 ID 데이터를 가져옴
+                fetch(`/actors/${movieId}`)
+                    .then(response => response.json())
+                    .then(actorIds => {
+                        // 각 배우의 ID를 사용하여 추가적인 데이터를 요청하고 처리
+                        actorIds.forEach(actorId => {
+                            fetch(`/actor/${actorId}`)
+                                .then(response => response.json())
+                                .then(actorData => {
+                                    // actorData를 사용하여 필요한 작업 수행
+                                    console.log(actorData + " === actorData 체크");
+                                    // 각 배우 정보를 화면에 추가
+                                    const movieInfoDiv = document.getElementById('movie-info');
+                                    const actorDiv = createPersonDiv(actorData.actorName, actorData.actorProfilePic);
+                                    movieInfoDiv.appendChild(actorDiv);
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching actor data:', error);
+                                });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching actor IDs:', error);
+                    });
+            }
+
+            // 인물 정보와 이미지를 담은 div 생성 함수
+            function createPersonDiv(name, profilePath) {
+                const personDiv = document.createElement('div'); // 새로운 div 생성
+                personDiv.style.margin = '8px'; // 간격 설정
+                personDiv.style.width = '200px';
+                personDiv.style.height = '300px';
+
+                const p = document.createElement('p');
+                p.innerHTML = `<p>${name}</p>`;
+                p.style.fontSize = '1em'; // 글자 크기 작게 설정
+
+                const img = document.createElement('img');
+                img.src = profilePath ? `https://image.tmdb.org/t/p/w200${profilePath}` : '/images/img_not_ready2.png';
+                img.alt = `${name}'s profile image`;
+                img.style.width = '100%';
+                img.style.height = 'auto'; // 높이를 자동으로 설정
+
+                personDiv.appendChild(img);
+                personDiv.appendChild(p);
+
+                return personDiv;
+            }
+        });
+
+
+
     </script>
 </th:block>
 </body>

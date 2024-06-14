@@ -115,6 +115,12 @@
                     </a>
                 </li>
                 <li class="menu-item">
+                    <a href="#" class="menu-link seat_reg_btn">
+                        <i class="menu-icon tf-icons bx bx-collection"></i>
+                        <div data-i18n="Basic">상영관 좌석 배치하기</div>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <a href="javascript:void(0)" class="menu-link theater_btn">
                         <i class="menu-icon tf-icons bx bx-box"></i>
                         <div data-i18n="User interface">상영관 목록</div>
@@ -212,7 +218,6 @@
                 <div class="container-xxl flex-grow-1 container-p-y">
 
                 </div>
-                <div class="content-backdrop fade"></div>
             </div>
             <!-- Content wrapper -->
         </div>
@@ -259,6 +264,19 @@
         $('.theater_reg_btn').on('click', function (e) {
             e.preventDefault();
             $('.container-xxl').load('/admin/theaterRegister');
+        });
+        $('.seat_reg_btn').on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "GET",
+                url: "/admin/seatRegister",
+                success: function(data) {
+                    $('.container-xxl').html(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX 요청 실패:", error);
+                }
+            });
         });
         $('.theater_btn').on('click', function () {
             $('.container-xxl').load('/admin/theaterList');

@@ -13,6 +13,8 @@
             <link rel="stylesheet" href="/assets/css/noscript.css"/>
         </noscript>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- 채팅 메세지 갯수 기능-->
         <script th:inline="javascript"> /*<![CDATA[*/
         window.addEventListener('message', function (event) {
             if (event.data.userUnreadCount !== undefined) {
