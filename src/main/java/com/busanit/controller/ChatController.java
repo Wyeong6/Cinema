@@ -53,6 +53,10 @@ public class ChatController {
         }else if("active".equals(messageDTO.getStatus())){
             chatService.saveMessage(messageDTO);
         }
+
+        // 메시지 처리 후, 채팅 리스트 업데이트 요청
+        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), 1, 8);
+
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
     }
     //카테고리 선택 시 채팅룸 생성
@@ -98,14 +102,12 @@ public class ChatController {
     }
 
 
-    @MessageMapping("/chat/chatList") // 클라이언트에서 메시지 보낼 때 사용할 주제
-    @SendTo("/queue/chatList") // 클라이언트가 구독할 주제
-    public Map<String, Object> updateChatList(@Payload Map<String, Object> request, Principal principal) {
-        int page = (int) request.getOrDefault("page", 1);
-        int size = (int) request.getOrDefault("size", 8);
-        System.out.println("리스트업데이트시작");
-        String memberEmail = principal.getName();
-        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
+//    @MessageMapping("/chat/chatList") // 클라이언트에서 메시지 보낼 때 사용할 주제
+//    @SendTo("/queue/chatList") // 클라이언트가 구독할 주제
+    public void updateChatList(String sender, String recipient, int page, int size) {
+
+
+        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, recipient);
 
         int totalPages = chatRoom.getTotalPages();
         int startPage = Math.max(1, page - 5);
@@ -117,13 +119,13 @@ public class ChatController {
         response.put("totalPages", totalPages);
         response.put("startPage", startPage);
         response.put("endPage", endPage);
-        response.put("memberEmail", memberEmail);
+        response.put("memberEmail", sender);
 
         // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
-//        messagingTemplate.convertAndSend("/queue/chatList", response);
+        messagingTemplate.convertAndSendToUser(recipient, "/queue/chatList", response);
 
-        System.out.println("response" + response);
-        return response;
+//        System.out.println("response" + response);
+//        return response;
     }
 
 }

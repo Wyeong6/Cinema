@@ -2,77 +2,89 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <th:block th:fragment="header">
-<head>
-    <meta charset="UTF-8">
-    <title>Cinemacast</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="/assets/css/custom.css" />
-    <link rel="stylesheet" href="/assets/css/main.css" />
-    <link rel="stylesheet" href="/assets/css/nav.css" />
-    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-<!-- Header -->
-<div id="header">
-    <h1 class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
+    <head>
+        <meta charset="UTF-8">
+        <title>Cinemacast</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+        <link rel="stylesheet" href="/assets/css/custom.css"/>
+        <link rel="stylesheet" href="/assets/css/main.css"/>
+        <link rel="stylesheet" href="/assets/css/nav.css"/>
+        <noscript>
+            <link rel="stylesheet" href="/assets/css/noscript.css"/>
+        </noscript>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script th:inline="javascript"> /*<![CDATA[*/
+        window.addEventListener('message', function (event) {
+            if (event.data.userUnreadCount !== undefined) {
+                document.getElementById('userUnreadCount').textContent = event.data.userUnreadCount;
+                console.log("Received userUnreadCount: " + event.data.userUnreadCount);
+            }
+        }); /*]]>*/ </script>
+    </head>
+    <body>
+    <!-- Header -->
+    <div id="header">
+        <h1 class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
 
-    <!-- info -->
-    <div id="info" th:data-username="${#authentication.name}">
-        <ul>
-            <li sec:authorize="isAnonymous()">
-                <a href="/member/new">회원가입</a>
-            </li>
-            <li sec:authorize="isAnonymous()">
-                <a href="/member/login">로그인</a>
-            </li>
-            <li sec:authorize="isAuthenticated()">
-                <a href="/member/logout" id="logoutLink">로그아웃</a>
-            </li>
-            <li sec:authorize="hasRole('USER')">
-                <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
-            </li>
-            <li sec:authorize="hasRole('ADMIN')">
-                <a th:href="@{/admin/adminMain}" th:text="'관리자페이지'"></a>
-            </li>
-            <li><a href="/payment/cartList">장바구니</a></li>
-        </ul>
+        <!-- info -->
+        <div id="info" th:data-username="${#authentication.name}">
+            <ul>
+                <li sec:authorize="isAnonymous()">
+                    <a href="/member/new">회원가입</a>
+                </li>
+                <li sec:authorize="isAnonymous()">
+                    <a href="/member/login">로그인</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a href="/member/logout" id="logoutLink">로그아웃</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <span id="userUnreadCount">0</span>
+                </li>
+                <li sec:authorize="hasRole('USER')">
+                    <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
+                </li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/adminMain}" th:text="'관리자페이지'"></a>
+                </li>
+                <li><a href="/payment/cartList">장바구니</a></li>
+            </ul>
+        </div>
+
+        <!-- Nav -->
+        <nav id="nav">
+            <ul>
+                <li>
+                    <a href="#">영화</a>
+                    <ul>
+                        <li><a href="movie_list_full.html">영화 전체보기</a></li>
+                        <li><a href="movie_list_now.html">현재 상영작</a></li>
+                        <li><a href="movie_list_comming.html">상영 예정작</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">예매</a>
+                    <ul>
+                        <li><a href="#">예매</a></li>
+                        <li><a th:href="@{/reservation/screeningSchedule}">상영 시간표</a></li>
+                    </ul>
+                </li>
+                <li><a href="/snack/snackList">스낵 스토어</a></li>
+                <li><a href="/event/eventList">이벤트</a></li>
+                <li><a href="/notice/noticeList">공지사항</a></li>
+            </ul>
+        </nav>
+
     </div>
+    </body>
+    <script th:inline="javascript">
+        // 로그아웃시 session storage값 삭제
+        $("#logoutLink").click(function (event) {
+            event.preventDefault();
+            sessionStorage.removeItem("userInfo");
 
-    <!-- Nav -->
-    <nav id="nav">
-        <ul>
-            <li>
-                <a href="#">영화</a>
-                <ul>
-                    <li><a href="movie_list_full.html">영화 전체보기</a></li>
-                    <li><a href="movie_list_now.html">현재 상영작</a></li>
-                    <li><a href="movie_list_comming.html">상영 예정작</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="#">예매</a>
-                <ul>
-                    <li><a href="#">예매</a></li>
-                    <li><a th:href="@{/reservation/screeningSchedule}">상영 시간표</a></li>
-                </ul>
-            </li>
-            <li><a href="/snack/snackList">스낵 스토어</a></li>
-            <li><a href="/event/eventList">이벤트</a></li>
-            <li><a href="/notice/noticeList">공지사항</a></li>
-        </ul>
-    </nav>
-
-</div>
-</body>
-<script th:inline="javascript">
-    // 로그아웃시 session storage값 삭제
-    $("#logoutLink").click(function(event) {
-        event.preventDefault();
-        sessionStorage.removeItem("userInfo");
-
-        window.location.href = "/member/logout";
-    });
-</script>
+            window.location.href = "/member/logout";
+        });
+    </script>
 </th:block>
 </html>

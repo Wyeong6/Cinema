@@ -41,20 +41,6 @@ public class ChatRoom {
           message.setChatRoom(this);
     }
 
-//    public void addMembers(List<Member> newMembers) {
-//        if (newMembers != null) {
-//            this.members.addAll(newMembers);
-//            newMembers.forEach(member -> member.addChatRoom(this));
-//        }
-//    }
-//
-//    public void addMembers(List<Member> newMembers) {
-//        if (newMembers != null) {
-//            this.members.addAll(newMembers);
-//        }
-//    }
-//
-
     public void addMembers(List<Member> newMembers) {
         if (newMembers != null) {
             newMembers.forEach(member -> {

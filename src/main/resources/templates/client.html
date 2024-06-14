@@ -24,6 +24,37 @@
         var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수var roomId = null;
         var status = null;
 
+        function connectWebSocket() {
+            console.log("Connecting to WebSocket server...");
+            var socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected to WebSocket: ' + frame);
+
+                // '/queue/chatList'를 구독하여 새로운 메시지 받기
+                stompClient.subscribe('/user/queue/chatList', function (message) {
+                    var response = JSON.parse(message.body);
+                    console.log("Received message:", response);
+                    updateUnreadCount(response)
+                });
+
+            });
+        }
+        function updateUnreadCount(response) {
+            var totalUnreadCount = 0;
+
+            response.chatRoom.forEach(function (chatRoom) {
+                if (chatRoom.type === "active") {
+                    totalUnreadCount += chatRoom.unreadMessageCount;
+                }
+            });
+            console.log("totalUnreadCount" + totalUnreadCount)
+
+            // 두 번째 HTML 파일의 특정 요소에 unreadMessageCount 업데이트
+            window.parent.postMessage({ userUnreadCount: totalUnreadCount }, '*');
+        }
+
+
         // WebSocket 연결 함수
         function connect() {
             var socket = new SockJS('/ws'); // SockJS를 사용하여 '/ws' 엔드포인트에 연결
@@ -39,7 +70,7 @@
                 stompClient.subscribe('/user/queue/private/' + chatRoomId, function (message) {
 
                     var parsedMessage = JSON.parse(message.body);
-                    console.log("Message type:", typeof parsedMessage.type);
+                    console.log("Message "+JSON.stringify(parsedMessage));
                     // 메시지 타입에 따른 처리
                     if (parsedMessage.status === 'inactive') {
                         console.log("대화종료메세지오기전에")
@@ -110,10 +141,9 @@
                 };
                 console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
                 stompClient.send("/app/chat/private" , {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
-                stompClient.send("/app/chat/chatList", {}, JSON.stringify({ page: 1, size: 8, sender: sender, recipient: recipient}));
+                // stompClient.send("/app/chat/chatList", {}, JSON.stringify({ page: 1, size: 8, sender: sender, recipient: recipient}));
                 showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
                 document.getElementById('message').value = ''; // 입력 필드를 비움
-
             }
         }
 
@@ -167,7 +197,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ adminEmail: recipient, sender: sender, chatRoomTitle: category })
+                body: JSON.stringify({ adminEmail: recipient, userEmail: sender, chatRoomTitle: category })
             })
                 .then(response => {
                     if (!response.ok) {
@@ -176,7 +206,7 @@
                     return response.json(); // 서버 응답을 JSON 형식으로 파싱
                 })
                 .then(data => {
-                     chatRoomId = data.chatRoomId; // 서버 응답에서 채팅방 ID 추출
+                    chatRoomId = data.chatRoomId; // 서버 응답에서 채팅방 ID 추출
                     console.log("Created chat room ID:", chatRoomId);
                     // 채팅방 생성 후 연결
                     connect();
@@ -196,7 +226,7 @@
         }
 
         window.onload = async function () {
-
+            connectWebSocket();
             recipient = await fetchRecipientEmail();
             console.log("로드된 recipient" + recipient)
             console.log("로드시 로그인된 이메일" + sender)
@@ -227,15 +257,16 @@
                         throw new Error('Network response was not ok ' + response.statusText);
                     }
                     console.log("response :" + response);
-                    return response.text();
+                    return response.json();
                 })
-                .then(text => {
+                .then(data => {
                     try {
-                        const data = JSON.parse(text);
+
                         console.log('Data:', data);
                         let messageExist = false;
-                        console.log('Dataid:', data[0].id);
-                        chatRoomId = data[0].id;
+                        if (Array.isArray(data) && data.length > 0){
+                            chatRoomId = data[0].id;
+                        }
                         // 각 메시지 객체를 순회합니다.
                         data.forEach(item => {
                             // 여기서 'messages' 필드가 실제 메시지 배열을 가지고 있음

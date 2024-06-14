@@ -60,14 +60,16 @@ public class ChatService {
         // 발신자의 마지막 읽은 시간을 현재 시간으로 설정
         senderReadStatus.setLastReadTimestamp(LocalDateTime.now());
 
-        //유저가 다른 카테고리 선택시,수신자가 다른 사용자일 경우, 수신자의 읽음 상태를 업데이트
-        if (!receiverReadStatus.getMember().equals(receiver)) {
-            receiverReadStatus = findOrCreateReadStatus(chatRoom, receiver);
-        }
+//        //유저가 다른 카테고리 선택시,수신자가 다른 사용자일 경우, 수신자의 읽음 상태를 업데이트
+//        if (!receiverReadStatus.getMember().equals(receiver)) {
+//            receiverReadStatus = findOrCreateReadStatus(chatRoom, receiver);
+//        }
 
         // 변경사항을 데이터베이스에 저장
         chatRoom.addReadStatus(senderReadStatus);
         chatRoom.addReadStatus(receiverReadStatus);
+
+        chatRoomRepository.save(chatRoom);
 
     }
 
@@ -101,7 +103,7 @@ public class ChatService {
                     System.out.println("Before calculateUnreadMessages - getRecipient(): " + lastMessageRecipient);
 
                     // 읽지 않은 메시지 수 계산
-                    int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), lastMessageRecipient);
+                    int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), memberEmail);
                     chatRoomDTO.setUnreadMessageCount(unreadMessages);
                     System.out.println("After calculateUnreadMessages - unreadMessages: " + unreadMessages); // unreadMessages 값 확인
                 })
@@ -165,6 +167,9 @@ public class ChatService {
 
     // 이메일로 회원 조회
     private Member findMemberByEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Invalid email: " + email);
+        }
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email: " + email));
     }
