@@ -255,7 +255,20 @@ public class AdminPageController {
     }
 
     @GetMapping("/scheduleList")
-    public String scheduleList() { return "admin/admin_schedule_list"; }
+    public String scheduleList(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
+                               @PageableDefault(size = 15, direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ScheduleDTO> scheduleDTOList = null;
+
+        scheduleDTOList = scheduleService.getScheduleAll(pageable);
+        model.addAttribute("scheduleDTOList", scheduleDTOList);
+
+        int startPage= Math.max(1, scheduleDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(scheduleDTOList.getTotalPages(), scheduleDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_schedule_list";
+    }
 
     @GetMapping("/scheduleRegister")
     public String scheduleRegister(Model model) {
@@ -289,6 +302,64 @@ public class AdminPageController {
             e.printStackTrace(); // 또는 로깅 프레임워크를 사용하여 로그 출력
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
         }
+    }
+
+    @GetMapping("/scheduleEdit")
+    public String scheduleEdit(@RequestParam(name="scheduleId") long scheduleId, Model model) {
+
+        try {
+            List<MovieDTO> allMovies = movieService.getAll();
+            ScheduleDTO scheduleDTO = scheduleService.getScheduleById(scheduleId);
+
+            model.addAttribute("movies", allMovies);
+            model.addAttribute("schedule", scheduleDTO);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
+        }
+
+        return "admin/admin_schedule_edit";
+    }
+
+    @PostMapping("/scheduleEdit")
+    public ResponseEntity<String> scheduleEdit(@RequestBody @Valid ScheduleDTO scheduleDTO, BindingResult bindingResult) {
+        // 로깅 추가
+        System.out.println("Received ScheduleDTO: " + scheduleDTO);
+
+        if (bindingResult.hasErrors()) {
+            StringBuilder errors = new StringBuilder();
+            bindingResult.getAllErrors().forEach(error -> errors.append(error.getDefaultMessage()).append("\n"));
+            return ResponseEntity.badRequest().body(errors.toString());
+        }
+
+        if (scheduleDTO.getId() == null) {
+            return ResponseEntity.badRequest().body("Schedule ID is required.");
+        }
+
+        try {
+            scheduleService.editSchedule(scheduleDTO);
+            return ResponseEntity.ok("Schedule saved successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace(); // 또는 로깅 프레임워크를 사용하여 로그 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
+        }
+    }
+
+    @PostMapping("/scheduleDelete")
+    public String scheduleDelete(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "scheduleId") long scheduleId,
+                                Model model, @PageableDefault(size = 15) Pageable pageable, ScheduleDTO scheduleDTO) {
+        scheduleService.deleteScheduleById(scheduleId);
+
+        Page<ScheduleDTO> scheduleDTOList = scheduleService.getScheduleAll(pageable);
+        model.addAttribute("scheduleDTOList", scheduleDTOList);
+
+        int startPage = Math.max(1, scheduleDTOList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(scheduleDTOList.getTotalPages(), scheduleDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_schedule_list";
     }
 
     @GetMapping("/snackList")

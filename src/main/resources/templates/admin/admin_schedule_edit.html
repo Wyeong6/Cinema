@@ -1,0 +1,300 @@
+<nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar" style="margin-bottom: 10px;">
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <h4>상영관 좌석 배치하기</h4>
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+<!-- / Navbar -->
+
+<!-- Basic Layout -->
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body schedule_reg">
+                <form id="schedule-form" method="post" th:action="@{/admin/scheduleEdit}">
+                    <input type="hidden" id="schedule-id" th:value="${schedule.id}" />
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <label class="input-group-text label-text" for="theater-movies-select">영화 선택</label>
+                            <select class="form-select" id="theater-movies-select">
+                                <option value=''>영화를 선택해주세요.</option>
+                                <option th:each="movie : ${movies}"
+                                        th:value="${movie.id}"
+                                        th:text="${movie.title}"
+                                        th:data-runningtime="${movie.runtime}"
+                                        th:attr="data-movie=${movie}"
+                                        th:selected="${movie.title == schedule.movieTitle}"
+                                ></option>
+                                <input type="hidden" id="movie-input-hidden" th:value="${schedule.movieId}"/>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <label class="input-group-text label-text" for="runningtime-input">영화 상영시간</label>
+                            <input class="form-control" value="상영시간" id="runningtime-input" th:value="${schedule.runningTime} + '분'"/>
+                            <input type="hidden" id="runningtime-input-hidden" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <label class="input-group-text label-text" for="region-select">지역 선택</label>
+                            <select class="form-select" id="region-select">
+                                <option value="">지역을 선택해주세요.</option>
+                                <option value="Seo" th:text="'서울'" th:selected="${schedule.region == 'Seo'}"></option>
+                                <option value="Inc" th:text="'인천 / 경기'" th:selected="${schedule.region == 'Inc'}"></option>
+                                <option value="Gan" th:text="'강원'" th:selected="${schedule.region == 'Gan'}"></option>
+                                <option value="Chu" th:text="'대전 / 충청'" th:selected="${schedule.region == 'Chu'}"></option>
+                                <option value="Dae" th:text="'대구 / 경북'" th:selected="${schedule.region == 'Dae'}"></option>
+                                <option value="Bus" th:text="'부산 / 울산 / 경남'" th:selected="${schedule.region == 'Bus'}"></option>
+                                <option value="Gwa" th:text="'광주 / 전라'" th:selected="${schedule.region == 'Gwa'}"></option>
+                                <option value="Jeju" th:text="'제주'" th:selected="${schedule.region == 'Jeju'}"></option>
+                            </select>
+                            <input type="hidden" id="region-input" name="region" th:value="${schedule.region}"/>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <label class="input-group-text label-text" for="theater-names-select">지점명 선택</label>
+                            <select class="form-select" id="theater-names-select">
+                                <option value=''>영화관 지점명을 선택해주세요.</option>
+                            </select>
+                            <input type="hidden" id="theater-name-input" name="theaterName" th:value="${schedule.theaterName}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                                <label class="input-group-text label-text" for="theater-numbers-select">상영관 번호 선택</label>
+                                <select class="form-select" id="theater-numbers-select">
+                                    <option value="">상영관을 선택해주세요.</option>
+                                </select>
+                                <input type="hidden" id="theater-number-input" name="theaterNumber" th:value="${schedule.theaterNumber}">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="input-group">
+                            <label for="date-input" class="input-group-text label-text">상영날짜</label>
+                            <input class="form-control" type="date" id="date-input" name="date" th:value="${schedule.date}"/>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="input-group">
+                            <label for="start-time-input" class="input-group-text label-text">상영 시작 시간</label>
+                            <input class="form-control" type="time" value="12:30" id="start-time-input"
+                                   name="startTime" th:value="${schedule.startTime}"/>
+                            <label for="end-time-input" class="input-group-text label-text">상영 종료 시간</label>
+                            <input class="form-control" type="time" value="" id="end-time-input" name="endTime" th:value="${schedule.endTime}"/>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">수정하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $('#theater-movies-select').on('change', function () {
+            const selectedOption = $(this).find('option:selected');
+            const selectedMovieData = selectedOption.val();
+
+            $('#movie-input-hidden').val(selectedMovieData);
+
+            $('.movie-input').remove();
+            const movieInput = $('<input>')
+                .attr('type', 'hidden')
+                .attr('name', 'movieId')
+                .val(selectedMovieData)
+                .addClass('movie-input');
+            $('#schedule-form').append(movieInput);
+
+            const runningTime = selectedOption.data('runningtime');
+
+            if (runningTime) {
+                $('#runningtime-input').val(runningTime + '분');
+                $('#runningtime-input-hidden').val(runningTime);
+            } else {
+                $('#runningtime-input').val('');
+                $('#runningtime-input-hidden').val('');
+            }
+            updateEndTime();
+        });
+
+        $('#start-time-input').on('input', function () {
+            updateEndTime();
+        });
+
+        function getTodayDate() {
+            const today = new Date();
+            const day = ('0' + today.getDate()).slice(-2);
+            const month = ('0' + (today.getMonth() + 1)).slice(-2);
+            const year = today.getFullYear();
+            return year + '-' + month + '-' + day;
+        }
+
+        $('#date-input').val(getTodayDate());
+
+        const region = $('#region-input').val();
+        const selectedTheaterName = $('#theater-name-input').val();
+        const selectedTheaterNumber = $('#theater-number-input').val();
+        fetchTheatersByRegion(region, selectedTheaterName);
+        fetchTheatersByTheaterName(selectedTheaterName, selectedTheaterNumber);
+
+        $('#region-select').change(function (event) {
+            event.preventDefault();
+            const selectedValue = $(this).val();
+            fetchTheatersByRegion(selectedValue);
+        });
+
+        $('#theater-names-select').change(function (event) {
+            event.preventDefault();
+            const selectedValue = $(this).val();
+            fetchTheatersByTheaterName(selectedValue);
+        });
+
+        $('#theater-numbers-select').change(function (event) {
+            event.preventDefault();
+            const selectedValue = $(this).val();
+            $('#theater-number-input').val(selectedValue);
+        });
+
+        // 지역에 따른 영화관을 가져와서 select 옵션에 추가하는 함수
+        function fetchTheatersByRegion(region, selectedTheaterName) {
+            $.ajax({
+                type: "GET",
+                url: "/reservation/getTheatersByRegion",
+                data: {region: region},
+                success: function (data) {
+                    const theaterNamesSelect = $('#theater-names-select');
+                    theaterNamesSelect.empty();
+                    theaterNamesSelect.append($("<option value=''>영화관 지점명을 선택해주세요.</option>"));
+                    if (data.length > 0) {
+                        $.each(data, function (index, theater) {
+                            const $option = $("<option></option>").val(theater.theaterName).text(theater.theaterName);
+                            if (theater.theaterName === selectedTheaterName) {
+                                $option.prop('selected', true); // 선택된 옵션 설정
+                            }
+                            theaterNamesSelect.append($option);
+                        });
+                    } else {
+                        theaterNamesSelect.append($("<option value=''>해당 지역에 영화관이 없습니다.</option>"));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX 요청 실패:", error);
+                }
+            });
+        }
+
+        function fetchTheatersByTheaterName(theaterName, selectedTheaterNumber) {
+            $.ajax({
+                type: "GET",
+                url: "/reservation/getTheaterByTheaterName",
+                data: {theaterName: theaterName},
+                success: function (data) {
+                    const theaterNumbersSelect = $('#theater-numbers-select');
+                    theaterNumbersSelect.empty();
+                    theaterNumbersSelect.append($("<option value=''>상영관을 선택해주세요.</option>")); // 기본 선택 옵션 추가
+
+                    if (data.theaterNumbers.length > 0) {
+                        $.each(data.theaterNumbers, function (index, theaterNumber) {
+                            const $option = $("<option></option>").val(theaterNumber.id).text(theaterNumber.theaterNumber + '관');
+                            theaterNumbersSelect.append($option);
+
+                            if (theaterNumber.theaterNumber === parseInt(selectedTheaterNumber)) {
+                                $option.prop('selected', true); // 선택된 옵션 설정
+                            }
+                        });
+                        $('#theater-name-input').val(theaterName); // 선택된 영화관 이름을 숨은 입력 필드에 설정
+                    } else {
+                        theaterNumbersSelect.append($("<option value=''>해당 영화관에 상영관이 없습니다.</option>"));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX 요청 실패:", error);
+                }
+            });
+        }
+
+        function updateEndTime() {
+            const selectedOption = $('#theater-movies-select').find('option:selected');
+            const runningTime = selectedOption.data('runningtime');
+
+            if (runningTime) {
+                const startTime = $('#start-time-input').val();
+                const endTime = calculateEndTime(startTime, runningTime);
+                $('#end-time-input').val(endTime);
+            } else {
+                $('#end-time-input').val('');
+            }
+        }
+
+        function calculateEndTime(startTime, runningTime) {
+            const startParts = startTime.split(':');
+            const runningMinutes = parseInt(runningTime, 10);
+
+            const startHours = parseInt(startParts[0], 10);
+            const startMinutes = parseInt(startParts[1], 10);
+
+            const totalMinutes = startHours * 60 + startMinutes + runningMinutes;
+            let endHours = Math.floor(totalMinutes / 60);
+            let endMinutes = totalMinutes % 60;
+
+            endHours = endHours % 24; // 24시간을 넘지 않도록 함
+            endHours = ('0' + endHours).slice(-2);
+            endMinutes = ('0' + endMinutes).slice(-2);
+
+            return endHours + ':' + endMinutes;
+        }
+
+        $('#schedule-form').submit(function (event) {
+            event.preventDefault();
+
+            // 필요한 데이터 수집
+            const id = parseInt($('#schedule-id').val(), 10);
+            const movieId = parseInt($('#movie-input-hidden').val(), 10);
+            const theaterNumberId = parseInt($('#theater-number-input').val(), 10);
+            const date = $('#date-input').val();
+            const startTime = $('#start-time-input').val() + ':00';
+            const endTime = $('#end-time-input').val() + ':00';
+
+            var scheduleData = {
+                id: id,
+                movieId: movieId,
+                theaterNumberId: theaterNumberId,
+                date: date,
+                startTime: startTime,
+                endTime: endTime
+            };
+            console.log("Schedule Data: ", scheduleData);
+
+            // AJAX를 통한 저장 요청
+            $.ajax({
+                type: "POST",
+                url: "/admin/scheduleEdit",
+                contentType: "application/json",
+                data: JSON.stringify(scheduleData), // JSON 형식으로 데이터 전송
+                success: function (response) {
+                    alert('저장되었습니다.');
+                    window.location.href = "/admin/adminMain";
+                },
+                error: function (xhr, status, error) {
+                    console.error("저장 요청 실패:", error);
+                    console.error("Status: ", status);
+                    console.error("Response: ", xhr.responseText);
+                }
+            });
+        });
+    });
+</script>

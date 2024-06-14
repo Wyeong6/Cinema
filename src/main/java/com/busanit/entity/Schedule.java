@@ -8,10 +8,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 
 @Getter
 @Setter
@@ -22,23 +19,22 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
     private Movie movie;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theaterNumber_id")
     private TheaterNumber theaterNumber;
 
     private LocalDate date;
-
     private LocalTime startTime;
     private LocalTime endTime;
+    private String sessionType;
 
     private Long totalSeats = 0L;
     private Long unavailableSeats = 0L;
     private Boolean status = true;
-    private double ticketPrice;
 
     public static Schedule toEntity(ScheduleDTO scheduleDTO) {
         Schedule schedule = new Schedule();
@@ -47,43 +43,42 @@ public class Schedule {
         schedule.setEndTime(LocalTime.parse(scheduleDTO.getEndTime()));
         schedule.setUnavailableSeats(0L);
         schedule.updateStatus();
-        schedule.determineTicketPrice();
-
+        schedule.setSessionType(determineSessionType(scheduleDTO.getDate(), LocalTime.parse(scheduleDTO.getStartTime())));
         return schedule;
     }
 
-    public void setTheaterNumberAndCalculateSeats(TheaterNumber theaterNumber) {
-        if (theaterNumber == null) {
-            throw new IllegalArgumentException("TheaterNumber must not be null.");
+    public void setStartTimeAndCalculateStatus(LocalDate date, LocalTime startTime, Long totalSeats) {
+        if (date == null || startTime == null || totalSeats == null) {
+            throw new IllegalArgumentException("Date, startTime, and totalSeats must not be null.");
         }
 
-        this.theaterNumber = theaterNumber;
-        this.totalSeats = theaterNumber.getSeatsPerTheater();
+        this.date = date;
+        this.startTime = startTime;
+        this.totalSeats = totalSeats;
 
-        if (this.totalSeats == null) {
-            throw new IllegalArgumentException("Seats per theater must be specified for the given theater.");
-        }
-
-        updateStatus();  // totalSeats가 설정되어 있으므로 안전하게 호출할 수 있음
+        updateStatus();
     }
 
     private void updateStatus() {
-        this.status = calculateAvailableSeats() > 0;
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+        this.status = (date.isBefore(currentDate) || (date.equals(currentDate) && startTime.isBefore(currentTime)) || calculateAvailableSeats() == 0);
     }
 
     private Long calculateAvailableSeats() {
         return this.totalSeats - this.unavailableSeats;
     }
 
-    public void determineTicketPrice() {
-        if (isEarlyMorning(this.startTime)) {
-            this.ticketPrice = 9000.0; // 조조 할인 가격 설정
-        } else if (isNightTime(this.startTime)) {
-            this.ticketPrice = 13000.0; // 심야 할인 가격 설정
-        } else if (isWeekend(this.date)) {
-            this.ticketPrice = 15000.0; // 주말 가격 설정
+    private static String determineSessionType(LocalDate date, LocalTime startTime) {
+        if (isWeekend(date)) {
+            return "주말";
+        } else if (isEarlyMorning(startTime)) {
+            return "조조";
+        } else if (isNightTime(startTime)) {
+            return "심야";
         } else {
-            this.ticketPrice = 12000.0; // 기본 가격 설정
+            return "평일";
         }
     }
 
