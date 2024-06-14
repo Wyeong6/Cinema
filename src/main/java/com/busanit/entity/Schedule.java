@@ -19,11 +19,11 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
     private Movie movie;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theaterNumber_id")
     private TheaterNumber theaterNumber;
 
@@ -63,7 +63,15 @@ public class Schedule {
         LocalDate currentDate = LocalDate.now();
         LocalTime currentTime = LocalTime.now();
 
-        this.status = (date.isBefore(currentDate) || (date.equals(currentDate) && startTime.isBefore(currentTime)) || calculateAvailableSeats() == 0);
+        boolean isBeforeCurrentDate = date.isBefore(currentDate);
+        boolean isEqualCurrentDateAndBeforeCurrentTime = date.equals(currentDate) && startTime.isBefore(currentTime);
+        boolean isAvailableSeatsZero = calculateAvailableSeats() == 0;
+
+        if(isBeforeCurrentDate || isEqualCurrentDateAndBeforeCurrentTime || isAvailableSeatsZero) {
+            this.status = false;
+        } else {
+            this.status = true;
+        }
     }
 
     private Long calculateAvailableSeats() {
