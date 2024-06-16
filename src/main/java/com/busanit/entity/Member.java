@@ -83,6 +83,9 @@ public class Member extends BaseTimeEntity {
     //리액션 관계 ( 재밌어요 슬퍼요 재미없어요 등..)
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MovieReaction> reactions = new ArrayList<>();
+    //문의 관계
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Inquiry> inquiries = new ArrayList<>();
 
     //보낸메세지 연관관계
     public void addSentMessage(Message message) {
@@ -100,6 +103,17 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     List<SnackPayment> snackPaymentList;
 
+    //문의 연관관계
+    public void addInquiry(Inquiry inquiry) {
+        inquiries.add(inquiry);
+        inquiry.setMember(this);
+    }
+
+    public void removeInquiry(Inquiry inquiry) {
+        inquiries.remove(inquiry);
+        inquiry.setMember(null);
+    }
+
     public void addReceivedMessage(Message message) {
         this.receivedMessages.add(message);
         if (message.getReceiver() != this) {
@@ -107,21 +121,6 @@ public class Member extends BaseTimeEntity {
         }
     }
 
-//    //채팅룸 연관관계
-//    public void addChatRoom(ChatRoom chatRoom) {
-//        this.chatRooms.add(chatRoom);
-//        chatRoom.getMembers().add(this);
-//    }
-public void addChatRoom(ChatRoom chatRoom) {
-    this.chatRooms.add(chatRoom);
-}
-    //메세지상태 연관관계
-    public void addReadStatus(ChatRoomReadStatus chatRoomReadStatus) {
-        this.readStatuses.add(chatRoomReadStatus);
-        if (chatRoomReadStatus.getMember() != this) {
-            chatRoomReadStatus.setMember(this);
-        }
-    }
     // 리액션 연관관계 및 그외 메서드 시작
     @Transactional
     public void addReaction(Movie movie, ReactionType reactionType) {

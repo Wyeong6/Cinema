@@ -17,6 +17,10 @@
     <noscript>
         <link rel="stylesheet" href="/assets/css/noscript.css"/>
     </noscript>
+    <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+    <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <!--    댓글-->
     <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
     <style>
@@ -164,11 +168,46 @@
             transform: translate(-50%, -50%); /* 화면 중앙 정렬 */
             z-index: 1000; /* 필요에 따라 조정 */
         }
-
-
+        /*안읽은 메세지 고정*/
+        .fixed-bottom-right {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            display: none; /* 초기에는 숨김 */
+        }
+        .fixed-bottom-right img {
+            width: 40px; /* 이미지 크기에 맞게 조정 */
+            height: 40px;
+            cursor: pointer; /* 클릭 가능하도록 설정 */
+        }
     </style>
+    <!--안 읽은 메세지-->
+    <script type="module">
+        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatMessageCount.js';
+        window.addEventListener('DOMContentLoaded', function () {
+            loadChatList(1, 8, true);
+            setupWebSocketConnection();
+        });
+
+        async function setupWebSocketConnection() {
+            console.log('Setting up WebSocket connection');
+            const options = {
+                subscribeCallback: handleWebSocketMessage
+            };
+            connectWebSocket(options); // WebSocket 연결 함수 호출
+        }
+
+        function handleWebSocketMessage(response) {
+            console.log('WebSocket message received:', response);
+            updateUnreadCount(response);
+        }
+    </script>
 </head>
 <body class="right-sidebar is-preload">
+
 <th:block layout:fragment="content">
     <div id="page-wrapper">
 
@@ -176,7 +215,6 @@
 
         <!-- Main -->
         <div class="wrapper style1">
-
             <div class="container" th:each="movie, iterStat : ${movieInfos}">
                 <input type="hidden" id="movieId" th:value="${movie.id}">
                 <div class="row">
@@ -347,6 +385,12 @@
                         </button>
                     </a>
                     <span>카카오톡 공유</span>
+                </div>
+                <!-- 안읽은 메세지 표시 -->
+                <div class="fixed-bottom-right" id="unreadMessages" onclick="redirectToChatRoom()">
+                    <img src="/images/funny.png" alt="Unread Messages"> <!-- 안 읽은 메세지 아이콘 이미지 경로에 맞게 수정 -->
+                     <!-- 안 읽은 메시지 수를 표시할 요소 -->
+                    <span id="unreadCount">0</span>
                 </div>
             </div>
         </div>
@@ -1149,8 +1193,10 @@
                 return personDiv;
             }
         });
-
-
+        //메세지알람 누르면 채팅방이동
+        function redirectToChatRoom() {
+            window.location.href = '/chatUser';
+        }
 
     </script>
 </th:block>

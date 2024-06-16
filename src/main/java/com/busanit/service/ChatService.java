@@ -39,7 +39,6 @@ public class ChatService {
     public void saveMessage(MessageDTO messageDTO) {
         Member sender = findMemberByEmail(messageDTO.getSender());
         Member receiver = findMemberByEmail(messageDTO.getRecipient());
-//      ChatRoom chatRoom = getOrCreateChatRoom(messageDTO.getChatRoomTitle(), messageDTO.getSender(), messageDTO.getRecipient());
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(messageDTO.getChatRoomId());
         //메세지 생성
         Message message = Message.createMessage(sender, receiver, messageDTO, chatRoom);
@@ -47,7 +46,7 @@ public class ChatService {
         updateEntitiesWithNewMessage(sender, receiver, chatRoom, message);
         //메세지 저장
         messageRepository.save(message);
-//       //메세지 상태추가
+        //메세지 상태추가
         createReadStatus(chatRoom, sender, receiver);
     }
 
@@ -59,11 +58,6 @@ public class ChatService {
 
         // 발신자의 마지막 읽은 시간을 현재 시간으로 설정
         senderReadStatus.setLastReadTimestamp(LocalDateTime.now());
-
-//        //유저가 다른 카테고리 선택시,수신자가 다른 사용자일 경우, 수신자의 읽음 상태를 업데이트
-//        if (!receiverReadStatus.getMember().equals(receiver)) {
-//            receiverReadStatus = findOrCreateReadStatus(chatRoom, receiver);
-//        }
 
         // 변경사항을 데이터베이스에 저장
         chatRoom.addReadStatus(senderReadStatus);
@@ -98,10 +92,6 @@ public class ChatService {
                 .peek(chatRoomDTO -> { // map 대신 peek을 사용하여 DTO 변환 후 처리
                     System.out.println("Before calculateUnreadMessages - chatRoomDTO: " + chatRoomDTO); // convertToChatRoomDTO 결과 확인
 
-                    // 마지막 메시지의 받는 사람 가져오기
-                    String lastMessageRecipient = getLastMessageRecipient(chatRoomDTO);
-                    System.out.println("Before calculateUnreadMessages - getRecipient(): " + lastMessageRecipient);
-
                     // 읽지 않은 메시지 수 계산
                     int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), memberEmail);
                     chatRoomDTO.setUnreadMessageCount(unreadMessages);
@@ -112,16 +102,6 @@ public class ChatService {
         System.out.println("chatRoomList: " + chatRoomList); // 최종 chatRoomList 상태 확인
 
         return new PageImpl<>(chatRoomList, pageable, chatRoomPage.getTotalElements());
-    }
-
-    // ChatRoomDTO에서 마지막 메시지의 받는 사람 가져오기
-    private String getLastMessageRecipient(ChatRoomDTO chatRoomDTO) {
-        List<MessageDTO> messages = chatRoomDTO.getMessages();
-        if (messages != null && !messages.isEmpty()) {
-            MessageDTO lastMessage = messages.get(messages.size() - 1);
-            return lastMessage.getRecipient();
-        }
-        return null; // 만약 메시지가 없을 경우 null 반환 혹은 예외처리 추가
     }
 
     // 사용자 이메일로 채팅방 메세지 조회
@@ -150,16 +130,12 @@ public class ChatService {
 
     }
 
+    //클릭한 채팅방 메세지 읽음 표시
     public List<ChatRoomDTO> findChatRoomByChatRoomId(Long chatRoomId) {
 
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId);
 
-        Optional<Message> firstMessageOptional = chatRoom.getMessages().stream().findFirst();
-        Member sender = firstMessageOptional.map(Message::getSender).orElse(null);
-        Member receiver = firstMessageOptional.map(Message::getReceiver).orElse(null);
-
         //메세지 상태추가
-//        createReadStatus(chatRoom, sender, receiver);
         updateLastReadTimestamp(chatRoomId);
 
         return Collections.singletonList(convertToChatRoomDTO(chatRoom));
@@ -167,12 +143,10 @@ public class ChatService {
 
     // 이메일로 회원 조회
     private Member findMemberByEmail(String email) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Invalid email: " + email);
-        }
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email: " + email));
     }
+
 
     //로그인한 유저의 채팅중인 채팅룸
     public List<String> findCHatRoomByRecipient() {
@@ -195,7 +169,7 @@ public class ChatService {
 
         // sender와 receiver가 동일한 채팅방이 active인 지 확인 후 없으면 생성
         return sender.getChatRooms().stream()
-                .filter(chatRoom -> chatRoom.getMembers().contains(receiver) && chatRoom.getType().equals("active") )
+                .filter(chatRoom -> chatRoom.getMembers().contains(receiver) && chatRoom.getType().equals("active"))
                 .findFirst()
                 .orElseGet(() -> createNewChatRoom(chatRoomTitle, sender, receiver));
     }
@@ -222,17 +196,14 @@ public class ChatService {
         receiver.addReceivedMessage(message);
         chatRoom.addMessage(message);
     }
-    //상태 업데이트
+
+    //채팅 상태를 종료로 설정
     public void updateChatRoomStatus(Long chatRoomId, String status) {
-        Optional<ChatRoom> optionalChatRoom = chatRoomRepository.findById(chatRoomId);
-        if (optionalChatRoom.isPresent()) {
-            ChatRoom chatRoom = optionalChatRoom.get();
-            chatRoom.setType(status);
-            chatRoomRepository.save(chatRoom);
-        } else {
-            // 채팅 방이 없는 경우 예외 처리
-            throw new IllegalArgumentException("Chat room not found with ID: " + chatRoomId);
-        }
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException("Chat room not found with ID: " + chatRoomId));
+
+        chatRoom.setType(status);
+        chatRoomRepository.save(chatRoom);
     }
 
     // 읽지 않은 메시지 수를 계산하는 메서드
@@ -250,7 +221,7 @@ public class ChatService {
         }
     }
 
-    // 사용자의 마지막 읽은 시간을 업데이트하는 메서드
+    //사용자의 마지막 읽은 시간을 업데이트하는 메서드
     public void updateLastReadTimestamp(Long chatRoomId) {
 
         String readEmail = getAuthenticatedUserEmail();
@@ -282,12 +253,17 @@ public class ChatService {
 
     // ChatRoomDTO 변환
     private ChatRoomDTO convertToChatRoomDTO(ChatRoom chatRoom) {
-        Optional<Member> userMemberOpt = chatRoom.getMembers().stream()
+        String userEmail = chatRoom.getMembers().stream()
                 .filter(member -> member.getRole() == Role.USER)
-                .findFirst();
+                .findFirst()
+                .map(Member::getEmail)
+                .orElse("No user found");
 
-        String userEmail = userMemberOpt.map(Member::getEmail).orElse("No user found");
-        String userName = userMemberOpt.map(Member::getName).orElse("No user found");
+        String userName = chatRoom.getMembers().stream()
+                .filter(member -> member.getRole() == Role.USER)
+                .findFirst()
+                .map(Member::getName)
+                .orElse("No user found");
 
         List<MessageDTO> messageDTOs = messageRepository.findByChatRoomId(chatRoom.getId()).stream()
                 .map(MessageDTO::toMessageDTO)

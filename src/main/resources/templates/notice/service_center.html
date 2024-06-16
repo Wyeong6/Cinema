@@ -122,25 +122,25 @@
                     <h2>문의하기</h2>
                     <p>기타 문의 사항은 메일로 보내주시면 회신드리겠습니다.</p>
                 </header>
-                <form action="#" method="post">
+                <form action="/register/inquiry" method="post" th:object="${Inquiry}">
                     <div>
-                        <div class="row">
-                            <div class="col-6 col-12-medium">
-                                <input name="name" placeholder="Name" type="text"/>
-                            </div>
-                            <div class="col-6 col-12-medium">
-                                <input name="email" placeholder="Email" type="text"/>
-                            </div>
-                            <div class="col-12">
-                                <input name="subject" placeholder="Subject" type="text"/>
-                            </div>
-                            <div class="col-12">
-                                <textarea name="message" placeholder="Message" rows="6"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <input style="font-size: 20px" type="submit" value="Send Message"/>
-                            </div>
-                        </div>
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" th:field="*{name}" required>
+                    </div>
+                    <div>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" th:field="*{email}" required>
+                    </div>
+                    <div>
+                        <label for="subject">Subject:</label>
+                        <input type="text" id="subject" name="subject" th:field="*{subject}" required>
+                    </div>
+                    <div>
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" th:field="*{message}" rows="6" required></textarea>
+                    </div>
+                    <div>
+                        <button type="submit">Send Message</button>
                     </div>
                 </form>
             </article>

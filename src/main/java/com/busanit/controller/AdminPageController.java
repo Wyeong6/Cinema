@@ -625,51 +625,6 @@ public class AdminPageController {
         return "admin/admin_chatList";
     }
 
-//    //채팅리스트
-//    @RequestMapping(value = "/getChatList", method = {RequestMethod.GET, RequestMethod.POST})
-//    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
-//
-//        System.out.println(" 채팅리스트 발아아앙동");
-//        String memberEmail = movieService.getUserEmail();
-//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
-//
-//        int totalPages = chatRoom.getTotalPages();
-//        int startPage = Math.max(1, page - 5);
-//        int endPage = Math.min(totalPages, page + 4);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("chatRoom", chatRoom.getContent());
-//        response.put("currentPage", page);
-//        response.put("totalPages", totalPages);
-//        response.put("startPage", startPage);
-//        response.put("endPage", endPage);
-//        response.put("memberEmail", memberEmail);
-//
-//        return response;
-//    }
-
-//    //채팅리스트
-//    @GetMapping("/chatList")
-//    @ResponseBody
-//    public Map<String, Object> chatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
-//        String memberEmail = "admin@example.com"; // 예시용 이메일
-//        Page<ChatRoomDTO> chatRooms = chatService.getChatList(page - 1, size, memberEmail);
-//
-//        int totalPages = chatRooms.getTotalPages();
-//        int startPage = Math.max(1, page - 5);
-//        int endPage = Math.min(totalPages, page + 4);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("chatRooms", chatRooms.getContent());
-//        response.put("currentPage", page);
-//        response.put("totalPages", totalPages);
-//        response.put("startPage", startPage);
-//        response.put("endPage", endPage);
-//        response.put("memberEmail", memberEmail);
-//
-//        return response;
-//    }
-
     @PostMapping("/getChatList")
     @ResponseBody
     public Map<String, Object> pagingChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {

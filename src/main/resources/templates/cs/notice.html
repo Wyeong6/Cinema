@@ -1,173 +1,173 @@
-<!DOCTYPE HTML>
-<html lang="" xmlns:sec="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Notice</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/><link rel="stylesheet" href="/assets/css/main.css" />
-    <link href="/assets/css/main.css" rel="stylesheet"/>
-    <link href="/assets/css/custom.css" rel="stylesheet"/>
-    <link href="/assets/css/nav.css" rel="stylesheet"/>
-    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-</head>
-<body class="no-sidebar is-preload">
-<div id="page-wrapper">
+<!--<!DOCTYPE HTML>-->
+<!--<html lang="" xmlns:sec="http://www.w3.org/1999/xhtml">-->
+<!--<head>-->
+<!--    <title>Notice</title>-->
+<!--    <meta charset="utf-8"/>-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/><link rel="stylesheet" href="/assets/css/main.css" />-->
+<!--    <link href="/assets/css/main.css" rel="stylesheet"/>-->
+<!--    <link href="/assets/css/custom.css" rel="stylesheet"/>-->
+<!--    <link href="/assets/css/nav.css" rel="stylesheet"/>-->
+<!--    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>-->
+<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
+<!--</head>-->
+<!--<body class="no-sidebar is-preload">-->
+<!--<div id="page-wrapper">-->
 
-    <!-- Header -->
-    <div id="header">
-        <div class="overlay"></div>
-        <h1 class="logo" style="font-size: 2em;">CINEMACAST</h1>
+<!--    &lt;!&ndash; Header &ndash;&gt;-->
+<!--    <div id="header">-->
+<!--        <div class="overlay"></div>-->
+<!--        <h1 class="logo" style="font-size: 2em;">CINEMACAST</h1>-->
 
-        <!-- info -->
-        <div id="info" th:data-username="${#authentication.name}">
-            <ul>
-                <li sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다.</li>
-                <li sec:authorize="isAnonymous()">
-                    <a href="/member/new">회원가입</a>
-                </li>
-                <li sec:authorize="isAnonymous()">
-                    <a href="/member/login">로그인</a>
-                </li>
-                <li sec:authorize="isAuthenticated()">
-                    <a href="/member/logout">로그아웃</a>
-                </li>
-                <li><a href="#">장바구니</a></li>
-            </ul>
-        </div>
+<!--        &lt;!&ndash; info &ndash;&gt;-->
+<!--        <div id="info" th:data-username="${#authentication.name}">-->
+<!--            <ul>-->
+<!--                <li sec:authorize="hasRole('USER')"><span sec:authentication="name"/> 님 환영합니다.</li>-->
+<!--                <li sec:authorize="isAnonymous()">-->
+<!--                    <a href="/member/new">회원가입</a>-->
+<!--                </li>-->
+<!--                <li sec:authorize="isAnonymous()">-->
+<!--                    <a href="/member/login">로그인</a>-->
+<!--                </li>-->
+<!--                <li sec:authorize="isAuthenticated()">-->
+<!--                    <a href="/member/logout">로그아웃</a>-->
+<!--                </li>-->
+<!--                <li><a href="#">장바구니</a></li>-->
+<!--            </ul>-->
+<!--        </div>-->
 
-        <!-- Nav -->
-        <nav id="nav">
-            <ul>
-                <li>
-                    <a href="#">영화</a>
-                    <ul>
-                        <li><a href="movie_list_full.html">영화 전체보기</a></li>
-                        <li><a href="movie_list_now.html">현재 상영작</a></li>
-                        <li><a href="movie_list_comming.html">상영 예정작</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#">예매</a>
-                    <ul>
-                        <li><a href="#">예매</a></li>
-                        <li><a href="#">상영 시간표</a></li>
-                    </ul>
-                </li>
-                <li><a href="snack_list.html">스낵 스토어</a></li>
-                <li><a href="event_list.html">이벤트</a></li>
-                <li><a href="/cs/notice">공지사항</a></li>
-            </ul>
-        </nav>
+<!--        &lt;!&ndash; Nav &ndash;&gt;-->
+<!--        <nav id="nav">-->
+<!--            <ul>-->
+<!--                <li>-->
+<!--                    <a href="#">영화</a>-->
+<!--                    <ul>-->
+<!--                        <li><a href="movie_list_full.html">영화 전체보기</a></li>-->
+<!--                        <li><a href="movie_list_now.html">현재 상영작</a></li>-->
+<!--                        <li><a href="movie_list_comming.html">상영 예정작</a></li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#">예매</a>-->
+<!--                    <ul>-->
+<!--                        <li><a href="#">예매</a></li>-->
+<!--                        <li><a href="#">상영 시간표</a></li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li><a href="snack_list.html">스낵 스토어</a></li>-->
+<!--                <li><a href="event_list.html">이벤트</a></li>-->
+<!--                <li><a href="/cs/notice">공지사항</a></li>-->
+<!--            </ul>-->
+<!--        </nav>-->
 
-    </div>
+<!--    </div>-->
 
-    <div class="wrapper style1 snack_list list">
+<!--    <div class="wrapper style1 snack_list list">-->
 
-        <div class="container">
-            <article id="main" class="special">
-                <header>
-                    <h2><a href="cs/notice">공지사항</a></h2>
-                </header>
-            </article>
-            <hr/>
-            <!--						공지사항 목록 table -->
-            <div class="row notice_list">
-                <table class="default">
-                    <thead>
-                        <th>번호</th>
-                        <th>제목</th>
-                        <th>조회수</th>
-                        <th>등록일자</th>
-                    </thead>
-                    <tbody>
-                        <tr th:each="notice : ${noticeList}">
-                            <td>
-                                <div th:if="${notice.pinned}">
-                                    <img src="/images/imp.png" alt="Important" />
-                                </div>
-                                <span th:unless="${notice.pinned}" th:text="${notice.id}"></span>
-                            </td>
-                            <td><a th:href="@{/cs/notice/{id}(id=${notice.id}, page=${currentPage}, size=${size})}" th:text="${notice.title}"></a></td>
-                            <td th:text="${notice.viewCount}"></td>
-                            <td th:text="${notice.regDate}"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="paging_btn">
-                    <ul>
-                        <a th:href="@{/cs/notice(page=${firstPage})}"
-                           th:onclick="${currentPage == 1} ? 'return false;'"><<</a><a>&nbsp;</a>
-                        <a th:href="@{/cs/notice(page=${previousPage})}"
-                            th:onclick="${currentPage == 1} ? 'return false;'">&lt;</a><a>&nbsp;</a>
-                        <li th:each="pageNum : ${pageNumbers}">
-                            <a th:href="@{/cs/notice(page=${pageNum}, size=${size})}"
-                               th:text="${pageNum}"
-                               th:onclick="${pageNum == currentPage} ? 'return false;'"></a>
-                        </li><span>&nbsp;</span>
-                        <a>&nbsp;</a>
-                        <a th:href="@{/cs/notice(page=${nextPage})}"
-                           th:onclick="${currentPage == totalPages} ? 'return false;'">&gt;</a><a>&nbsp;</a>
-                        <span></span>
-                        <a th:href="@{/cs/notice(page=${totalPages})}"
-                           th:onclick="${currentPage == totalPages} ? 'return false;'">>></a>
-                    </ul>
-                </div>
-            </div>
-        </div>
+<!--        <div class="container">-->
+<!--            <article id="main" class="special">-->
+<!--                <header>-->
+<!--                    <h2><a href="cs/notice">공지사항</a></h2>-->
+<!--                </header>-->
+<!--            </article>-->
+<!--            <hr/>-->
+<!--            &lt;!&ndash;						공지사항 목록 table &ndash;&gt;-->
+<!--            <div class="row notice_list">-->
+<!--                <table class="default">-->
+<!--                    <thead>-->
+<!--                        <th>번호</th>-->
+<!--                        <th>제목</th>-->
+<!--                        <th>조회수</th>-->
+<!--                        <th>등록일자</th>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                        <tr th:each="notice : ${noticeList}">-->
+<!--                            <td>-->
+<!--                                <div th:if="${notice.pinned}">-->
+<!--                                    <img src="/images/imp.png" alt="Important" />-->
+<!--                                </div>-->
+<!--                                <span th:unless="${notice.pinned}" th:text="${notice.id}"></span>-->
+<!--                            </td>-->
+<!--                            <td><a th:href="@{/cs/notice/{id}(id=${notice.id}, page=${currentPage}, size=${size})}" th:text="${notice.title}"></a></td>-->
+<!--                            <td th:text="${notice.viewCount}"></td>-->
+<!--                            <td th:text="${notice.regDate}"></td>-->
+<!--                        </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--                <div class="paging_btn">-->
+<!--                    <ul>-->
+<!--                        <a th:href="@{/cs/notice(page=${firstPage})}"-->
+<!--                           th:onclick="${currentPage == 1} ? 'return false;'"><<</a><a>&nbsp;</a>-->
+<!--                        <a th:href="@{/cs/notice(page=${previousPage})}"-->
+<!--                            th:onclick="${currentPage == 1} ? 'return false;'">&lt;</a><a>&nbsp;</a>-->
+<!--                        <li th:each="pageNum : ${pageNumbers}">-->
+<!--                            <a th:href="@{/cs/notice(page=${pageNum}, size=${size})}"-->
+<!--                               th:text="${pageNum}"-->
+<!--                               th:onclick="${pageNum == currentPage} ? 'return false;'"></a>-->
+<!--                        </li><span>&nbsp;</span>-->
+<!--                        <a>&nbsp;</a>-->
+<!--                        <a th:href="@{/cs/notice(page=${nextPage})}"-->
+<!--                           th:onclick="${currentPage == totalPages} ? 'return false;'">&gt;</a><a>&nbsp;</a>-->
+<!--                        <span></span>-->
+<!--                        <a th:href="@{/cs/notice(page=${totalPages})}"-->
+<!--                           th:onclick="${currentPage == totalPages} ? 'return false;'">>></a>-->
+<!--                    </ul>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
 
-    </div>
+<!--    </div>-->
 
-<!--    <footer data-include-path="footer.html"></footer>-->
+<!--&lt;!&ndash;    <footer data-include-path="footer.html"></footer>&ndash;&gt;-->
 
-</div>
+<!--</div>-->
 
-<!-- Scripts -->
-<script src="/assets/js/jquery.min.js"></script>
-<script src="/assets/js/jquery.dropotron.min.js"></script>
-<script src="/assets/js/jquery.scrolly.min.js"></script>
-<script src="/assets/js/jquery.scrollex.min.js"></script>
-<script src="/assets/js/browser.min.js"></script>
-<script src="/assets/js/breakpoints.min.js"></script>
-<script src="/assets/js/util.js"></script>
-<script src="/assets/js/main.js"></script>
+<!--&lt;!&ndash; Scripts &ndash;&gt;-->
+<!--<script src="/assets/js/jquery.min.js"></script>-->
+<!--<script src="/assets/js/jquery.dropotron.min.js"></script>-->
+<!--<script src="/assets/js/jquery.scrolly.min.js"></script>-->
+<!--<script src="/assets/js/jquery.scrollex.min.js"></script>-->
+<!--<script src="/assets/js/browser.min.js"></script>-->
+<!--<script src="/assets/js/breakpoints.min.js"></script>-->
+<!--<script src="/assets/js/util.js"></script>-->
+<!--<script src="/assets/js/main.js"></script>-->
 
-<script>
-    // include.js
-    window.addEventListener('load', function () {
-        const allElements = document.getElementsByTagName('*');
-        Array.prototype.forEach.call(allElements, function (el) {
-            const includePath = el.dataset.includePath;
-            if (includePath) {
-                const xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function () {
-                    if (this.readyState === 4 && this.status === 200) {
-                        el.outerHTML = this.responseText;
-                    }
-                };
-                xhttp.open('GET', includePath, true);
-                xhttp.send();
-            }
-        });
-    }); // 이 부분을 추가하여 괄호를 닫습니다.
+<!--<script>-->
+<!--    // include.js-->
+<!--    window.addEventListener('load', function () {-->
+<!--        const allElements = document.getElementsByTagName('*');-->
+<!--        Array.prototype.forEach.call(allElements, function (el) {-->
+<!--            const includePath = el.dataset.includePath;-->
+<!--            if (includePath) {-->
+<!--                const xhttp = new XMLHttpRequest();-->
+<!--                xhttp.onreadystatechange = function () {-->
+<!--                    if (this.readyState === 4 && this.status === 200) {-->
+<!--                        el.outerHTML = this.responseText;-->
+<!--                    }-->
+<!--                };-->
+<!--                xhttp.open('GET', includePath, true);-->
+<!--                xhttp.send();-->
+<!--            }-->
+<!--        });-->
+<!--    }); // 이 부분을 추가하여 괄호를 닫습니다.-->
 
-    // Save scroll position before navigating away
-    document.addEventListener('DOMContentLoaded', function() {
-        const paginationLinks = document.querySelectorAll('.paging_btn a');
-        paginationLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                localStorage.setItem('scrollPosition', window.scrollY);
-            });
-        });
-    });
+<!--    // Save scroll position before navigating away-->
+<!--    document.addEventListener('DOMContentLoaded', function() {-->
+<!--        const paginationLinks = document.querySelectorAll('.paging_btn a');-->
+<!--        paginationLinks.forEach(link => {-->
+<!--            link.addEventListener('click', function(event) {-->
+<!--                localStorage.setItem('scrollPosition', window.scrollY);-->
+<!--            });-->
+<!--        });-->
+<!--    });-->
 
-    // Restore scroll position after page load
-    window.addEventListener('load', function() {
-        const scrollPosition = localStorage.getItem('scrollPosition');
-        if (scrollPosition) {
-            window.scrollTo(0, parseInt(scrollPosition, 10));
-            localStorage.removeItem('scrollPosition'); // Clean up
-        }
-    });
-</script>
-</body>
-</html>
+<!--    // Restore scroll position after page load-->
+<!--    window.addEventListener('load', function() {-->
+<!--        const scrollPosition = localStorage.getItem('scrollPosition');-->
+<!--        if (scrollPosition) {-->
+<!--            window.scrollTo(0, parseInt(scrollPosition, 10));-->
+<!--            localStorage.removeItem('scrollPosition'); // Clean up-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
