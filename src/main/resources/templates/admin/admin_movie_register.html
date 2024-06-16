@@ -292,33 +292,22 @@
 <script>
 
     // 폼 벨리데이션
-    const form = document.querySelector('form');
-    const idInput = document.getElementById('id');
-    const titleInput = document.getElementById('title');
-    const overviewInput = document.getElementById('overview');
-    const runtimeInput = document.getElementById('runtime');
-    const certificationInputs = document.querySelectorAll('input[name="certifications"]');
-    const releaseDateInput = document.getElementById('releaseDate');
-    const posterPathInput = document.getElementById('RegisteredPoster');
-    const backdropPathInput = document.getElementById('RegisteredBackdrop');
-    const stillCutPathsInput = document.getElementById('RegisteredStillCut');
-    const videoInput = document.getElementById('video');
-    // ID 중복체크
-    const idError = document.getElementById('id-error');
-    let resetForm = false;
+
+
+    // 전역 변수가 이미 선언되었는지 확인
+    if (typeof window.isEditMode === 'undefined') {
+        // 전역 변수가 선언되지 않았다면 초기화
+        window.isEditMode = false;
 
 
 
-    console.log(idInput)
-    // 아이디 중복 미리 체크
-
-
-    // 수정 모드인지 여부를 확인하는 변수
-    let isEditMode = false;
+    }
 
     // 수정 모드일 때 초기화 함수
     function initializeEditMode(movieId) {
-        isEditMode = true;
+
+        const idInput = document.getElementById('id');
+        window.isEditMode = true;
         idInput.value = movieId;
         idInput.disabled = true; // 수정 모드에서는 ID 필드를 비활성화합니다.
     }
@@ -326,7 +315,8 @@
 
     function duplicateCheck() {
 
-        const id = idInput.value.trim();
+        const id = document.getElementById('id').value.trim();
+        const idError = document.getElementById('id-error');
 
         if(!/^\d{10}$/.test(id)) {
             idError.textContent = '영화 ID는 10자리를 입력해주세요.';
@@ -356,11 +346,27 @@
     // 폼 제출 및 벨리데이션
     function validateForm() {
 
+        // 폼 벨리데이션
+        const form = document.getElementById('movieForm');
+        const idInput = document.getElementById('id');
+        const titleInput = document.getElementById('title');
+        const overviewInput = document.getElementById('overview');
+        const runtimeInput = document.getElementById('runtime');
+        const certificationInputs = document.querySelectorAll('input[name="certifications"]');
+        const releaseDateInput = document.getElementById('releaseDate');
+        const posterPathInput = document.getElementById('RegisteredPoster');
+        const backdropPathInput = document.getElementById('RegisteredBackdrop');
+        const stillCutPathsInput = document.getElementById('RegisteredStillCut');
+        const videoInput = document.getElementById('video');
         const id = idInput.value.trim();
+        const idError = document.getElementById('id-error');
+
+
+        let resetForm = false;
 
         console.log("영화 ID:", id);
 
-        if (!isEditMode) { // 수정 모드가 아닐 때만 ID 유효성 검사를 합니다.
+        if (!window.isEditMode) { // 수정 모드가 아닐 때만 ID 유효성 검사를 합니다.
             console.log("영화 ID:", id);
             if (!/^\d{10}$/.test(id)) {
                 alert('영화 ID는 10자리를 입력해주세요');
@@ -371,7 +377,7 @@
             }
         }
 
-        if(!isEditMode) {
+        if(!window.isEditMode) {
             if (titleInput.value.trim() === '') {
                 alert('영화 제목을 입력해주세요.');
                 setTimeout(() => {
@@ -487,7 +493,7 @@
         }
 
         // 선택된 배우 ID 배열 생성
-        const selectedActorIds = selectedActors.map(actor => actor.actorId);
+        const selectedActorIds = window.selectedActors.map(actor => actor.actorId);
         document.getElementById('selectedActorIds').value = selectedActorIds;
 
         // 모든 유효성 검사 통과 시 폼 제출
@@ -543,7 +549,7 @@
                     genreCheckboxes.forEach(checkbox => checkbox.checked = false);
                     certificationInputs.forEach(input => input.checked = false);
                     idError.textContent = '';
-                    selectedActors = [];
+                    window.selectedActors = [];
                     updateSelectedActorsDisplay();
                 }
             });
@@ -586,20 +592,28 @@
         openModal();
     }
 
-
     // 배우 검색 관련
+    if (typeof window.selectedActors === 'undefined') {
+        // 전역 변수가 선언되지 않았다면 초기화
+        // 선택된 배우 목록을 저장할 배열
+        window.selectedActors = [];
+    }
+    if (typeof window.actors === 'undefined') {
+        // 전역 변수가 선언되지 않았다면 초기화
+        // 배우 정보를 저장할 배열
+        window.actors = [];
+    }
 
-
-    // 선택된 배우 목록을 저장할 배열
-    let selectedActors = [];
-
-    // 배우 정보를 저장할 배열
-    let actors = [];
 
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('actorSearch').addEventListener('input', searchActors);
     });
 
+    // 선택된 배우 초기화 함수 ( 등록하지 않아도 페이지 이동하면 선택된 배우 초기화되게 하는 함수 )
+    function clearSelectedActors() {
+        window.selectedActors = [];
+        updateSelectedActorsDisplay(); // 선택된 배우 목록 업데이트
+    }
 
     function searchActors() {
         const query = document.getElementById('actorSearch').value;
@@ -611,7 +625,7 @@
                     actorCheckboxes.innerHTML = '';
 
                     // 검색 결과로 받은 배우 정보를 저장
-                    actors = data;
+                    window.actors = data;
 
                     data.forEach(actor => {
                         const checkbox = document.createElement('input');
@@ -621,7 +635,7 @@
                         checkbox.value = actor.actorId;
 
                         // 현재 선택된 배우 목록에 있는 배우인지 확인하여 체크 여부 설정
-                        checkbox.checked = selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId);
+                        checkbox.checked =  window.selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId);
 
                         const label = document.createElement('label');
                         label.htmlFor = `actor-${actor.actorId}`;
@@ -635,11 +649,11 @@
 
                         checkbox.addEventListener('change', function() {
                             if (checkbox.checked) {
-                                if (!selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId)) {
-                                    selectedActors.push(actor);
+                                if (!window.selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId)) {
+                                    window.selectedActors.push(actor);
                                 }
                             } else {
-                                selectedActors = selectedActors.filter(selectedActor => selectedActor.actorId !== actor.actorId);
+                                window.selectedActors =  window.selectedActors.filter(selectedActor => selectedActor.actorId !== actor.actorId);
                             }
                             updateSelectedActorsDisplay(); // 선택된 배우 목록을 업데이트
                         });
@@ -654,14 +668,13 @@
     }
 
     // 선택된 배우 목록을 업데이트하고 화면에 표시하는 함수
-    // 선택된 배우 목록을 업데이트하고 화면에 표시하는 함수
     function updateSelectedActorsDisplay() {
         const selectedActorsDisplay = document.getElementById('selectedActorsDisplay');
         selectedActorsDisplay.innerHTML = '';
 
-        if (selectedActors.length > 0) {
+        if (window.selectedActors.length > 0) {
             const selectedActorsText = document.createElement('p');
-            selectedActorsText.textContent = "선택한 배우: " + selectedActors.map(selectedActor => {
+            selectedActorsText.textContent = "선택한 배우: " +  window.selectedActors.map(selectedActor => {
                 console.log("액터체크 === " + selectedActor);
                 return selectedActor ? selectedActor.actorName : "";
             }).join(", ");
