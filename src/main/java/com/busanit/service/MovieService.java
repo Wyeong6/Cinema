@@ -39,6 +39,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -113,6 +114,7 @@ public class MovieService {
         // api 링크를 요청할때 직접 등록한 영화의 id로 api 링크를 요청하면 오류가 나기때문에 (api 서버에 등록된 movieId가아니라 어드민이 직접등록한 movieId라서 오류가뜬다)
         // 그걸 방지하기위해 어드민에게 movieId를 직접 입력받을때 숫자 10자리로 입력받게하고(벨리데이션) api링크 요청함수에서 movieId가 10자리인 movieId를 필터링해줘 오류를 방지한다!
         return movies.stream()
+                .filter(movie -> !movie.isModified())
                 .map(Movie::getMovieId)
                 .filter(movieId -> String.valueOf(movieId).length() != 10)
                 .collect(Collectors.toList());
@@ -120,7 +122,8 @@ public class MovieService {
 
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
 
-        List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
+        List<Long> blacklistedMovieIds = getBlacklistedMovieIds(); // 삭제된 영화 ID 목록 가져오기
+        List<Long> modifiedMovieIds = getAllMovieIds(); // 수정된 영화 ID 목록 가져오기
 
         int totalPages = fetchTotalPages();
         for (int page = 1; page <= totalPages; page++) {
@@ -128,7 +131,7 @@ public class MovieService {
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody, blacklistedMovieIds);
+                processResponse(responseBody, blacklistedMovieIds, modifiedMovieIds );
             }
         }
     }
@@ -138,13 +141,14 @@ public class MovieService {
     public void fetchAndStoreMoviesUpcoming() throws IOException {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
+        List<Long> modifiedMovieIds = getAllMovieIds(); // 수정된 영화 목록 가져오기
 
         for (int page = 1; page <= 8; page++) {
             String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody, blacklistedMovieIds);
+                processResponse(responseBody, blacklistedMovieIds, modifiedMovieIds);
             }
         }
     }
@@ -193,15 +197,16 @@ public class MovieService {
         return null;
     }
 
-    private void processResponse(String responseBody, List<Long> blacklistedMovieIds) throws IOException {
+    private void processResponse(String responseBody, List<Long> blacklistedMovieIds, List<Long> modifiedMovieIds) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
             for (JsonNode node : results) {
                 Long movieId = node.get("id").asLong();
-                if (!blacklistedMovieIds.contains(movieId)) {
-                    processMovieData(node);
+                if (blacklistedMovieIds.contains(movieId) || modifiedMovieIds.contains(movieId)) {
+                    continue;
                 }
+                processMovieData(node);
             }
         }
     }
@@ -625,12 +630,12 @@ public class MovieService {
             Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
             String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime, List<Long> actors) {
 
-        Optional<Movie> optionalMovie = movieRepository.findById(movieId);
         Movie movie;
 
-        if (optionalMovie.isPresent()) {
+        if (movieRepository.existsById(movieId)) {
             // 기존 영화를 수정하는 경우
-            movie = optionalMovie.get();
+            movie = movieRepository.findById(movieId).orElseThrow(() -> new NoSuchElementException("Movie not found"));
+            movie.setModified(true);
         } else {
             // 새로운 영화를 등록하는 경우
             movie = new Movie();
@@ -644,9 +649,11 @@ public class MovieService {
         if (movieDetail == null) {
             movieDetail = new MovieDetail();
         }
+
         movieDetail.setCertification(certifications);
         movieDetail.setReleaseDate(movieReleaseDate);
         movieDetail.setVideo(video);
+
         movieDetail.setRuntime(runtime);
         movie.setMovieDetail(movieDetail);
 
@@ -657,7 +664,8 @@ public class MovieService {
                     .orElseThrow(() -> new IllegalArgumentException("Invalid actor ID: " + actorId));
             updatedActors.add(actor);
         }
-        movie.setActors(updatedActors);
+        movie.getActors().clear();
+        updatedActors.forEach(movie::addActor);
 
         movie.getGenres().clear();
         // 장르 업데이트
@@ -683,7 +691,9 @@ public class MovieService {
             movieStillCutRepository.save(stillCutEntity);
             updatedStillCuts.add(stillCutEntity);
         }
-        movie.setStillCuts(updatedStillCuts);
+        // 기존 스틸컷 목록을 지우고 새로운 스틸컷 목록으로 대체
+        movie.getStillCuts().clear();
+        updatedStillCuts.forEach(movie::addStillCut);
 
         // 포스터 이미지와 백드롭 이미지 업데이트
         MovieImage movieImage = new MovieImage();

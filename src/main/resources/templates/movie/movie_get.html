@@ -380,6 +380,10 @@
 
         async function fetchMovieCredits(movieId) {
 
+            if(movieId.length === 10) {
+                return;
+            }
+
             try {
                 const apiKey = '547e2cd4d0e26e68fb907dafef4f90ac';
                 const url = `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR&api_key=${apiKey}`;
@@ -402,6 +406,9 @@
                         break;
                     case '15세 이상 관람가':
                         imgElement.src = '/images/ratings/15.png';
+                        break;
+                    case '18세 이상 관람가':
+                        imgElement.src = '/images/ratings/18.png';
                         break;
                     case '19':
                         certificationElement.textContent = '청소년 관람불가';
@@ -1111,8 +1118,10 @@
                                 .then(actorData => {
                                     // actorData를 사용하여 필요한 작업 수행
                                     console.log(actorData + " === actorData 체크");
-                                    // 각 배우 정보를 화면에 추가
+                                    // 각 배우 정보를 화면에 추가 (가로로 나열)
                                     const movieInfoDiv = document.getElementById('movie-info');
+                                    movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
+                                    movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
                                     const actorDiv = createPersonDiv(actorData.actorName, actorData.actorProfilePic);
                                     movieInfoDiv.appendChild(actorDiv);
                                 })

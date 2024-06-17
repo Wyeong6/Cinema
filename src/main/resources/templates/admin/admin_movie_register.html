@@ -298,18 +298,26 @@
     if (typeof window.isEditMode === 'undefined') {
         // 전역 변수가 선언되지 않았다면 초기화
         window.isEditMode = false;
-
-
-
     }
 
     // 수정 모드일 때 초기화 함수
     function initializeEditMode(movieId) {
 
         const idInput = document.getElementById('id');
+        const posterPathInput = document.getElementById('RegisteredPoster');
+        const backdropPathInput = document.getElementById('RegisteredBackdrop');
+        const stillCutPathsInput = document.getElementById('RegisteredStillCut');
+        const videoInput = document.getElementById('video');
+        const actorInput = document.getElementById('actorSearch');
+
         window.isEditMode = true;
         idInput.value = movieId;
         idInput.disabled = true; // 수정 모드에서는 ID 필드를 비활성화합니다.
+        posterPathInput.disabled = true;
+        backdropPathInput.disabled = true;
+        stillCutPathsInput.disabled = true;
+        videoInput.placeholder = '미입력시 기존 트레일러 키 사용, 또는 새로운 트레일러 키를 입력하세요.';
+        actorInput.disabled = true;
     }
 
 
@@ -377,7 +385,7 @@
             }
         }
 
-        if(!window.isEditMode) {
+
             if (titleInput.value.trim() === '') {
                 alert('영화 제목을 입력해주세요.');
                 setTimeout(() => {
@@ -385,8 +393,6 @@
                 }, 0);
                 return false;
             }
-        }
-
 
         if (overviewInput.value.trim() === '') {
             alert('영화 줄거리를 입력해주세요.');
@@ -428,40 +434,43 @@
             return false;
         }
 
-        const posterPath = posterPathInput.value.trim();
-        if (posterPath === '') {
-            alert('포스터 이미지명을 입력해주세요.');
-            setTimeout(() => {
-                posterPathInput.focus();
-            }, 0);
-            return false;
-        }
+        // 수정 모드 일때는 스킵 / 등록 모드 일때만 유효성검사 진행
+        if (!window.isEditMode) {
+            const posterPath = posterPathInput.value.trim();
+            if (posterPath === '') {
+                alert('포스터 이미지명을 입력해주세요.');
+                setTimeout(() => {
+                    posterPathInput.focus();
+                }, 0);
+                return false;
+            }
 
-        const backdropPath = backdropPathInput.value.trim();
-        if (backdropPath === '') {
-            alert('배경 이미지를 입력해주세요.');
-            setTimeout(() => {
-                backdropPathInput.focus();
-            }, 0);
-            return false;
-        }
+            const backdropPath = backdropPathInput.value.trim();
+            if (backdropPath === '') {
+                alert('배경 이미지를 입력해주세요.');
+                setTimeout(() => {
+                    backdropPathInput.focus();
+                }, 0);
+                return false;
+            }
 
-        const stillCutPaths = stillCutPathsInput.value.trim();
-        if (stillCutPaths === '') {
-            alert('스틸컷 이미지를 등록해주세요.');
-            setTimeout(() => {
-                stillCutPathsInput.focus();
-            }, 0);
-            return false;
-        }
+            const stillCutPaths = stillCutPathsInput.value.trim();
+            if (stillCutPaths === '') {
+                alert('스틸컷 이미지를 등록해주세요.');
+                setTimeout(() => {
+                    stillCutPathsInput.focus();
+                }, 0);
+                return false;
+            }
 
-        const video = videoInput.value.trim();
-        if (video === '') {
-            alert('트레일러 키를 입력해주세요.');
-            setTimeout(() => {
-                videoInput.focus();
-            }, 0);
-            return false;
+            const video = videoInput.value.trim();
+            if (video === '') {
+                alert('트레일러 키를 입력해주세요.');
+                setTimeout(() => {
+                    videoInput.focus();
+                }, 0);
+                return false;
+            }
         }
 
         const genreCheckboxes = document.querySelectorAll('input[name="genres[]"]');
@@ -487,7 +496,7 @@
             }
         });
 
-        if (!isActorSelected) {
+        if (!isActorSelected && !window.isEditMode) {
             alert('배우를 선택해 주세요.');
             return false;
         }
@@ -495,6 +504,13 @@
         // 선택된 배우 ID 배열 생성
         const selectedActorIds = window.selectedActors.map(actor => actor.actorId);
         document.getElementById('selectedActorIds').value = selectedActorIds;
+
+        // 비활성화된 필드들을 활성화
+        const disabledFields = form.querySelectorAll(':disabled');
+        disabledFields.forEach(function(field) {
+            field.disabled = false;
+        });
+
 
         // 모든 유효성 검사 통과 시 폼 제출
         const formData = new FormData(form);

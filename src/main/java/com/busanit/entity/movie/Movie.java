@@ -24,6 +24,9 @@ public class Movie {
     @Column(length = 1024)
     private String overview;
 
+    //수정 여부
+    private boolean isModified;
+
     //장르 관계
     @ManyToMany
     @JoinTable(name = "movie_genre",
