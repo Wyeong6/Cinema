@@ -49,11 +49,11 @@ public class EventService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NullPointerException("event null"));
         return EventDTO.toDTO(event);
     }
-
+    //이전 글
     public Event getPreviousEvent(Long id) {
         return eventRepository.findPreviousEvent(id);
     }
-
+    //다음 글
     public Event getNextEvent(Long id) {
         return eventRepository.findNextEvent(id);
     }

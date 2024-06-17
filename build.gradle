@@ -63,6 +63,10 @@ dependencies {
     // Spring Boot 웹소켓 스타터 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    //메일 api
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'javax.mail:javax.mail-api:1.6.2'
+
 }
 
 tasks.named('test') {

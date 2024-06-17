@@ -1,0 +1,56 @@
+<!-- admin/reply_inquiry.html -->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reply to Inquiry</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom styles can be added here */
+    </style>
+</head>
+
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Reply to Inquiry</h2>
+
+    <!-- Displaying Inquiry Details -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Inquiry Details</h5>
+            <p><strong>문의 번호:</strong> <span th:text="${inquiry.id}"></span></p>
+            <p><strong>작성자 이름:</strong> <span th:text="${inquiry.name}"></span></p>
+            <p><strong>작성자 이메일:</strong> <span th:text="${inquiry.email}"></span></p>
+            <p><strong>제목:</strong> <span th:text="${inquiry.subject}"></span></p>
+            <p><strong>내용:</strong> <span th:text="${inquiry.message}"></span></p>
+            <p><strong>유형:</strong> <span th:text="${inquiry.type}"></span></p>
+        </div>
+    </div>
+
+    <!-- Reply Form -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Reply Form</h5>
+            <form action="/admin/sendReply" method="post">
+                <input type="hidden" name="inquiryId" th:value="${inquiry.id}">
+                <div class="form-group">
+                    <label for="replyMessage">Reply Message</label>
+                    <textarea class="form-control" id="replyMessage" name="replyMessage" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Reply</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap and any additional scripts can be included here -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

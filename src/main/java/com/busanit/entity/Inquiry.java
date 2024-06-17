@@ -1,7 +1,9 @@
 package com.busanit.entity;
 
+import com.busanit.domain.InquiryDTO;
 import jakarta.persistence.*;
 import lombok.*;
+
 @Entity
 @Getter
 @Setter
@@ -18,7 +20,7 @@ public class Inquiry {
     private String email;
     private String subject;
     private String message;
-
+    private String type;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
@@ -34,4 +36,16 @@ public class Inquiry {
             member.getInquiries().remove(this);
         }
     }
+
+    public static Inquiry toEntity(InquiryDTO dto) {
+        return Inquiry.builder()
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .subject(dto.getSubject())
+                .message(dto.getMessage())
+                .type("unanswered")
+                .build();
+
+    }
+
 }

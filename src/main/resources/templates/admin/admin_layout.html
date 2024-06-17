@@ -221,7 +221,13 @@
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link chat_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form interface">1:1 문의 </div>
+                        <div data-i18n="Form interface">1:1 채팅 </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link inquiry_btn">
+                        <i class="menu-icon tf-icons bx bx-detail"></i>
+                        <div data-i18n="Form interface">이메일 문의 </div>
                     </a>
                 </li>
 
@@ -352,6 +358,10 @@
         //채팅 관리
         $('.chat_btn').on('click', function () {
             $('.container-xxl').load('/admin/chatList');
+        });
+        //이메일 문의 관리
+        $('.inquiry_btn').on('click', function () {
+            $('.container-xxl').load('/admin/inquiryList');
         });
     });
 
