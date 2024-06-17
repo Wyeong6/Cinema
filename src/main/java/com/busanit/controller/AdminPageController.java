@@ -110,12 +110,8 @@ public class AdminPageController {
     }
 
     @PostMapping("/movieRegister")
-    public String movieRegister(@RequestParam(value = "movieId", required = false) Long movieId, Model model) {
-        if (movieId != null) {
-            Movie movie = movieService.getMovieById(movieId);
-            model.addAttribute("movie", movie); // 수정할 영화 객체를 모델에 추가
-        }
-        return "admin/admin_movie_register"; // 등록 폼을 재활용
+    public String movieRegister() {
+        return "admin/admin_movie_register";
     }
 
     @PostMapping("/movieUpdate")
