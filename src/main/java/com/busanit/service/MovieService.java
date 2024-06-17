@@ -683,17 +683,24 @@ public class MovieService {
         // 영화에 새로운 장르 목록을 설정합니다.
         movie.setGenres(updatedGenres);
 
-            // 스틸컷 업데이트
-        List<MovieStillCut> updatedStillCuts = new ArrayList<>();
-        for (String stillCutPath : stillCut) {
-            MovieStillCut stillCutEntity = new MovieStillCut(); // 새로운 스틸컷 엔티티 생성
-            stillCutEntity.setStillCuts(stillCutPath); // 스틸컷 경로 설정
-            movieStillCutRepository.save(stillCutEntity);
-            updatedStillCuts.add(stillCutEntity);
+        // 스틸컷 업데이트
+        if (stillCut != null && !stillCut.isEmpty()) {
+            // 새로운 스틸컷 엔티티 리스트 생성
+            List<MovieStillCut> updatedStillCuts = new ArrayList<>();
+            for (String stillCutPath : stillCut) {
+                MovieStillCut stillCutEntity = new MovieStillCut();
+                stillCutEntity.setStillCuts(stillCutPath);
+                // 스틸컷 엔티티 저장
+                movieStillCutRepository.save(stillCutEntity);
+                updatedStillCuts.add(stillCutEntity);
+            }
+            // 기존 스틸컷 목록을 모두 제거하고 새로운 목록으로 대체
+            movie.getStillCuts().clear();
+            movie.getStillCuts().addAll(updatedStillCuts);
+        } else {
+            // 만약 새로운 스틸컷이 제공되지 않으면 기존 목록을 유지합니다.
+            movie.setStillCuts(movie.getStillCuts());
         }
-        // 기존 스틸컷 목록을 지우고 새로운 스틸컷 목록으로 대체
-        movie.getStillCuts().clear();
-        updatedStillCuts.forEach(movie::addStillCut);
 
         // 포스터 이미지와 백드롭 이미지 업데이트
         MovieImage movieImage = new MovieImage();

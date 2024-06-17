@@ -518,6 +518,12 @@
         // 수정일때 : formData에 기존 id 추가
         if (isEditMode) {
             formData.append('id', id);
+
+            const stillCutFiles = stillCutPathsInput.files;
+
+            for (let i = 0; i < stillCutFiles.length; i++) {
+                formData.append('RegisteredStillCut', stillCutFiles[i]);
+            }
         }
 
         // 스틸컷 이미지를 FormData에 추가
