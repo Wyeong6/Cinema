@@ -31,7 +31,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +57,7 @@ public class MovieService {
     private final MovieImageRepository movieImageRepository;
     private final MovieActorRepository movieActorRepository;
     private final GenreRepository genreRepository;
+    private final MovieBlacklistRepository movieBlacklistRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${TMDB.apiKey}")
@@ -87,6 +90,17 @@ public class MovieService {
         lastFetchDate = LocalDate.now();
     }
 
+    // 어드민페이지에서 영화를 삭제했을때 만약 API에서 주기적으로 받아와 서버에 저장하고있는 영화라면
+    //
+    private List<Long> getBlacklistedMovieIds() {
+        return movieBlacklistRepository.findAll()
+                .stream()
+                .map(MovieBlacklist::getMovieId)
+                .collect(Collectors.toList());
+    }
+
+
+
     /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
 
     // API에서 받아온 현재상영목록 리스트에서 모든 영화 ID 추출하는 메서드
@@ -105,13 +119,16 @@ public class MovieService {
     }
 
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
+
+        List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
+
         int totalPages = fetchTotalPages();
         for (int page = 1; page <= totalPages; page++) {
             String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody);
+                processResponse(responseBody, blacklistedMovieIds);
             }
         }
     }
@@ -119,12 +136,15 @@ public class MovieService {
     // 상영예정작 DB에 넣기
     @Async
     public void fetchAndStoreMoviesUpcoming() throws IOException {
+
+        List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
+
         for (int page = 1; page <= 8; page++) {
             String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody);
+                processResponse(responseBody, blacklistedMovieIds);
             }
         }
     }
@@ -173,12 +193,15 @@ public class MovieService {
         return null;
     }
 
-    private void processResponse(String responseBody) throws IOException {
+    private void processResponse(String responseBody, List<Long> blacklistedMovieIds) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
             for (JsonNode node : results) {
-                processMovieData(node);
+                Long movieId = node.get("id").asLong();
+                if (!blacklistedMovieIds.contains(movieId)) {
+                    processMovieData(node);
+                }
             }
         }
     }
@@ -523,7 +546,7 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    // 지우지마세요
+
     public List<MovieDTO> getActors() {
         List<MovieActor> movieActors = movieActorRepository.findAll();
         return movieActors.stream().map(MovieDTO::convertActorToDTO)
@@ -596,19 +619,31 @@ public class MovieService {
         return movieRepository.count();
     }
 
+    @Transactional
     //어드민 페이지 영화 등록
     public void saveMovie(
             Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
             String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime, List<Long> actors) {
 
-        Movie movie = new Movie();
-        movie.setMovieId(movieId);
+        Optional<Movie> optionalMovie = movieRepository.findById(movieId);
+        Movie movie;
+
+        if (optionalMovie.isPresent()) {
+            // 기존 영화를 수정하는 경우
+            movie = optionalMovie.get();
+        } else {
+            // 새로운 영화를 등록하는 경우
+            movie = new Movie();
+            movie.setMovieId(movieId); // 새로운 영화의 경우 movieId 설정
+        }
+
         movie.setTitle(movieTitle);
         movie.setOverview(movieOverview);
 
-
-
-        MovieDetail movieDetail = new MovieDetail();
+        MovieDetail movieDetail = movie.getMovieDetail();
+        if (movieDetail == null) {
+            movieDetail = new MovieDetail();
+        }
         movieDetail.setCertification(certifications);
         movieDetail.setReleaseDate(movieReleaseDate);
         movieDetail.setVideo(video);
@@ -616,42 +651,106 @@ public class MovieService {
         movie.setMovieDetail(movieDetail);
 
         // 배우 추가
-
+        List<MovieActor> updatedActors = new ArrayList<>();
         for (Long actorId : actors) {
             MovieActor actor = movieActorRepository.findById(actorId)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid actor ID: " + actorId));
-            movie.addActor(actor);
+            updatedActors.add(actor);
         }
+        movie.setActors(updatedActors);
 
-
-
-        // 장르 추가
+        movie.getGenres().clear();
+        // 장르 업데이트
+        List<Genre> updatedGenres = new ArrayList<>();
         for (String genreStr : genres) {
-            Genre genre = new Genre(); // 새로운 장르 엔티티 생성
-            genre.setGenreName(genreStr); // 장르 이름 설정
-            genreRepository.save(genre);
-            movie.addGenre(genre); // 영화에 장르 추가
+            // 데이터베이스에서 해당 장르를 찾거나 새로 생성합니다.
+            Genre genre = genreRepository.findByGenreName(genreStr)
+                    .orElseGet(() -> {
+                        Genre newGenre = new Genre();
+                        newGenre.setGenreName(genreStr);
+                        return genreRepository.save(newGenre);
+                    });
+            updatedGenres.add(genre);
         }
+        // 영화에 새로운 장르 목록을 설정합니다.
+        movie.setGenres(updatedGenres);
 
-        // 스틸컷 추가
+            // 스틸컷 업데이트
+        List<MovieStillCut> updatedStillCuts = new ArrayList<>();
         for (String stillCutPath : stillCut) {
             MovieStillCut stillCutEntity = new MovieStillCut(); // 새로운 스틸컷 엔티티 생성
             stillCutEntity.setStillCuts(stillCutPath); // 스틸컷 경로 설정
             movieStillCutRepository.save(stillCutEntity);
-            movie.addStillCut(stillCutEntity); // 영화에 스틸컷 추가
+            updatedStillCuts.add(stillCutEntity);
         }
+        movie.setStillCuts(updatedStillCuts);
 
-        // 포스터 이미지와 백드롭 이미지를 저장
+        // 포스터 이미지와 백드롭 이미지 업데이트
         MovieImage movieImage = new MovieImage();
         movieImage.setPosterPath(registeredPoster);
         movieImage.setBackdropPath(registeredBackdrop);
         movieImageRepository.save(movieImage);
         movie.addImage(movieImage);
 
+        movieRepository.save(movie); // 변경 감지에 의해 자동으로 데이터베이스에 저장됨
+    }
+
+    // 영화 등록 관련 로직
+
+    public List<String> saveStillCutImages(List<MultipartFile> registeredStillCut, String uploadDirectory, String stillCutRelativeUploadDir) throws IOException {
+        List<String> stillCutFiles = new ArrayList<>();
+        for (MultipartFile file : registeredStillCut) {
+            String fileName = file.getOriginalFilename();
+            String relativeFilePath = stillCutRelativeUploadDir + fileName;
+            String filePath = uploadDirectory + File.separator + relativeFilePath;
+
+            // 파일을 지정된 경로에 저장합니다.
+            file.transferTo(new File(filePath));
+            stillCutFiles.add(relativeFilePath);
+        }
+        return stillCutFiles;
+    }
+
+    public String saveImage(MultipartFile image, String uploadDirectory, String relativeUploadDir) throws IOException {
+        String fileName = image.getOriginalFilename();
+        String relativeFilePath = relativeUploadDir + fileName;
+        String filePath = uploadDirectory + File.separator + relativeFilePath;
+
+        // 파일을 지정된 경로에 저장합니다.
+        image.transferTo(new File(filePath));
+        return relativeFilePath;
+    }
+
+    public void createDirectories(String uploadDirectory, String stillCutRelativeUploadDir, String backdropRelativeUploadDir, String posterRelativeUploadDir) {
+        File stillCutDir = new File(uploadDirectory + "/" + stillCutRelativeUploadDir);
+        File backdropDir = new File(uploadDirectory + "/" + backdropRelativeUploadDir);
+        File posterDir = new File(uploadDirectory + "/" + posterRelativeUploadDir);
+        // 디렉터리가 존재하지 않으면 생성합니다.
+        if (!stillCutDir.exists()) {
+            stillCutDir.mkdirs();
+        }
+        if (!backdropDir.exists()) {
+            backdropDir.mkdirs();
+        }
+        if (!posterDir.exists()) {
+            posterDir.mkdirs();
+        }
+    }
+
+    // 영화 삭제 (어드민 페이지)
+    public void deleteMovie(Long movieId) {
+        movieRepository.deleteById(movieId);
+    }
+
+    //영화 수정 (어드민 페이지)
+    public Movie getMovieById(Long movieId) {
+        return movieRepository.findById(movieId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid movie Id:" + movieId));
+    }
 
 
-
-        movieRepository.save(movie);
+    public void addToBlacklist(Long movieId) {
+        movieBlacklistRepository.save(new MovieBlacklist(movieId));
     }
 
 
@@ -677,5 +776,9 @@ public class MovieService {
         } else {
             throw new IllegalArgumentException("Actor with ID " + actorId + " not found");
         }
+    }
+
+    public Optional<Movie> findById(Long id) {
+        return movieRepository.findById(id);
     }
 }

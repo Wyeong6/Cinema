@@ -39,29 +39,36 @@
                     </header>
                 </article>
                 <hr/>
-                <div class="table-responsive text-nowrap">
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>공지사항 번호</th>
-                            <th>공지사항 제목</th>
-                            <th>조회수</th>
-                            <th>일자</th>
-                        </tr>
-                        </thead>
-                        <tbody class="table-border-bottom-0">
-                        <tr th:each="notice : ${noticeList}">
-                            <td><strong th:text="${notice.noticeId}"></strong></td>
-                            <td><a th:href="@{'/notice_get/' + ${notice.noticeId}}">
-                                <strong th:text="${notice.noticeTitle}"></strong></a></td>
-                            <td><strong th:text="${notice.viewCount}"></strong></td>
-                            <td><strong th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}"></strong></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <div style="text-align: center;">
-                        <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}"
-                           th:text="'[' + ${i} + ']'" class="paging-btn"></a>
+                <div class="table-responsive text-nowrap" th:if="${!#lists.isEmpty(noticeList.content)}">
+                    <div>
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>공지사항 번호</th>
+                                <th>공지사항 제목</th>
+                                <th>조회수</th>
+                                <th>일자</th>
+                            </tr>
+                            </thead>
+                            <tbody class="table-border-bottom-0">
+                            <tr th:each="notice : ${noticeList}">
+                                <td><strong th:text="${notice.noticeId}"></strong></td>
+                                <td><a th:href="@{'/notice_get/' + ${notice.noticeId}}">
+                                    <strong th:text="${notice.noticeTitle}"></strong></a></td>
+                                <td><strong th:text="${notice.viewCount}"></strong></td>
+                                <td><strong th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}"></strong></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!-- 페이지네이션 -->
+                        <div style="text-align: center;">
+                            <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}"
+                               th:text="'[' + ${i} + ']'" class="paging-btn"></a>
+                        </div>
+                    </div>
+                    <!-- 공지사항이 없을 때 메시지 -->
+                    <div style="text-align: center" th:if="${#lists.isEmpty(noticeList.content)}">
+                        <h3>준비중 입니다.</h3>
                     </div>
                 </div>
             </div>

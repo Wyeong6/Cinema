@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/assets/css/nav.css"/>
     <meta property="og:title" content="${movie.title}">
     <meta property="og:description" id="og-description" content="">
-    <meta property="og:url" content="http://localhost:8080/movies/${eventId}">
+    <meta property="og:url" content="http://localhost:8080/movies/${movieId}">
     <meta property="og:image" content="https://image.tmdb.org/t/p/original' + ${movie.posterPath}}">
     <noscript>
         <link rel="stylesheet" href="/assets/css/noscript.css"/>
@@ -204,8 +204,7 @@
                                                class="button" style="height: 3em;">트레일러 보기</a>
                                         </header>
                                         <br>
-                                        <!--<div class="movie_detail">-->
-                                        <div>
+                                        <div class="movie_detail">
                                             <span th:text="${movie.releaseDate}">releasedate</span>
                                             <span th:text="${#strings.arrayJoin(movie.genres, ', ')}"></span>
                                             <span th:text="${movie.runtime} + '분'">runtime</span>

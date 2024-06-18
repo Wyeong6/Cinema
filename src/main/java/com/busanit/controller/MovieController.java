@@ -3,6 +3,7 @@ package com.busanit.controller;
 import com.busanit.domain.movie.ActorDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.domain.SnackDTO;
+import com.busanit.entity.movie.Movie;
 import com.busanit.entity.movie.MovieActor;
 import com.busanit.repository.MovieActorRepository;
 import com.busanit.service.MovieService;
@@ -146,7 +147,7 @@ public class MovieController {
     // 영화 등록 (어드민페이지에서)
     @PostMapping("/movies/regist")
     public ResponseEntity<String> registMovie(
-            @RequestParam("id") Long movieId,
+            @RequestParam("id") Long id,
             @RequestParam("title") String movieTitle,
             @RequestParam("overview") String movieOverview,
             @RequestParam("certifications") String certifications,
@@ -163,6 +164,7 @@ public class MovieController {
 
         System.out.println("actors 체크 === " + actors);
 
+        System.out.println("수정할때 movieId 체크 === " + id);
 
         String stillCutRelativeUploadDir = "uploads/stillCuts/";
         String backdropRelativeUploadDir = "uploads/backdrops/";
@@ -171,64 +173,25 @@ public class MovieController {
         // 실제 파일 시스템 경로를 설정합니다.
         String uploadDirectory = resourceLoader.getResource("classpath:/static").getFile().getAbsolutePath();
 
-        File stillCutDir = new File(uploadDirectory + "/" + stillCutRelativeUploadDir);
-        File backdropDir = new File(uploadDirectory + "/" + backdropRelativeUploadDir);
-        File posterDir = new File(uploadDirectory + "/" + posterRelativeUploadDir);
-        // 디렉터리가 존재하지 않으면 생성합니다.
-        if (!stillCutDir.exists()) {
-            stillCutDir.mkdirs();
-        }
-        if (!backdropDir.exists()) {
-            backdropDir.mkdirs();
-        }
-        if (!posterDir.exists()) {
-            posterDir.mkdirs();
-        }
+        movieService2.createDirectories(uploadDirectory, stillCutRelativeUploadDir, backdropRelativeUploadDir, posterRelativeUploadDir);
 
-
-
-        List<String> stillCutFiles = new ArrayList<>();
-        String posterRelativeFilePath = "";
-        String backdropRelativeFilePath = "";
+        List<String> stillCutFiles;
+        String posterRelativeFilePath;
+        String backdropRelativeFilePath;
 
         try {
-            // 스틸컷 이미지를 저장
-            for (MultipartFile file : registeredStillCut) {
-                String fileName = file.getOriginalFilename();
-                String relativeFilePath = stillCutRelativeUploadDir + fileName;
-                String filePath = uploadDirectory + File.separator + stillCutRelativeUploadDir + fileName;
-
-                // 파일을 지정된 경로에 저장합니다.
-                file.transferTo(new File(filePath));
-                stillCutFiles.add(relativeFilePath);
-            }
-            // 포스터 이미지를 저장
-            String posterFileName = registeredPoster.getOriginalFilename();
-            posterRelativeFilePath = posterRelativeUploadDir + posterFileName;
-            String posterFilePath = uploadDirectory + File.separator + posterRelativeFilePath;
-
-            // 파일을 지정된 경로에 저장합니다.
-            registeredPoster.transferTo(new File(posterFilePath));
-
-            // 백드롭 이미지를 저장
-            String backdropFileName = registeredBackdrop.getOriginalFilename();
-            backdropRelativeFilePath = backdropRelativeUploadDir + backdropFileName;
-            String backdropFilePath = uploadDirectory + File.separator + backdropRelativeFilePath;
-
-            // 파일을 지정된 경로에 저장합니다.
-            registeredBackdrop.transferTo(new File(backdropFilePath));
-
+            stillCutFiles = movieService2.saveStillCutImages(registeredStillCut, uploadDirectory, stillCutRelativeUploadDir);
+            posterRelativeFilePath = movieService2.saveImage(registeredPoster, uploadDirectory, posterRelativeUploadDir);
+            backdropRelativeFilePath = movieService2.saveImage(registeredBackdrop, uploadDirectory, backdropRelativeUploadDir);
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("message", "파일 저장 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 중 오류가 발생했습니다.");
         }
 
-
-
         try {
             movieService2.saveMovie(
-                    movieId, movieTitle, movieOverview, movieReleaseDate, certifications,
+                    id, movieTitle, movieOverview, movieReleaseDate, certifications,
                     posterRelativeFilePath, backdropRelativeFilePath, stillCutFiles, genres, video, runtime, actors
             );
         } catch (DataIntegrityViolationException e) {
@@ -242,6 +205,65 @@ public class MovieController {
         model.addAttribute("message", "영화 정보가 성공적으로 등록되었습니다.");
         return ResponseEntity.ok("영화 정보가 성공적으로 등록되었습니다.");
     }
+
+    // 영화 삭제 (어드민 페이지에서)
+    @PostMapping("/movies/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<String> deleteMovieAndAddToBlacklist(@PathVariable("id") Long movieId) {
+        try {
+            movieService2.deleteMovie(movieId);
+            movieService2.addToBlacklist(movieId);
+
+            return ResponseEntity.ok("영화가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("영화 삭제 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 영화 수정 폼을 불러오는 핸들러 (어드민 페이지에서)
+    @GetMapping("/movies/edit/{id}")
+    public String showEditMovieForm(@PathVariable("id") Long movieId, Model model) {
+        Movie movie = movieService2.getMovieById(movieId);
+        model.addAttribute("movie", movie); // 수정할 영화 객체를 모델에 추가
+        return "admin/admin_movie_register"; // 등록 폼을 재활용
+    }
+
+
+
+//    public ResponseEntity<String> registMovie(
+//            @RequestParam("id") Long movieId,
+//            @RequestParam("title") String movieTitle,
+//            @RequestParam("overview") String movieOverview,
+//            @RequestParam("certifications") String certifications,
+//            @RequestParam("releaseDate") String movieReleaseDate,
+//            @RequestParam("RegisteredPoster") MultipartFile registeredPoster,
+//            @RequestParam("RegisteredBackdrop") MultipartFile registeredBackdrop,
+//            @RequestParam("runtime") String runtime,
+//            @RequestParam("video") String video,
+//            @RequestParam("genres") List<String> genres,
+//            @RequestParam("RegisteredStillCut") List<MultipartFile> registeredStillCut,
+//            @RequestParam("actors") List<Long> actors,
+    // 영화 저장 핸들러 (수정 후 저장)
+//    @PostMapping("/movies/save")
+//    public String saveMovie(
+//                            @RequestParam("id") Long movieId,
+//                            @RequestParam("title") String movieTitle,
+//                            @RequestParam("overview") String movieOverview,
+//                            @RequestParam("certifications") String certifications,
+//                            @RequestParam("releaseDate") String movieReleaseDate,
+//                            @RequestParam("RegisteredPoster") String registeredPoster,
+//                            @RequestParam("RegisteredBackdrop") String registeredBackdrop,
+//                            @RequestParam("runtime") String runtime,
+//                            @RequestParam("video") String video,
+//                            @RequestParam("genres") List<String> genres,
+//                            @RequestParam("RegisteredStillCut") List<MultipartFile> registeredStillCut,
+//
+//                            @RequestParam("actors") List<Long> actors) {
+//        movieService2.saveMovie(movieId, movieTitle, movieOverview, movieReleaseDate, certifications, registeredPoster, registeredBackdrop, registeredStillCut, genres, video, runtime, actors);
+//        return "redirect:/admin/movieList"; // 수정 후 영화 목록으로 리다이렉트
+//    }
+
+
 
     // 아이디 중복확인 버튼용
     @GetMapping("/movies/checkId")

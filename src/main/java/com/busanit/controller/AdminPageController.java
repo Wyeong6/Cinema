@@ -3,6 +3,8 @@ package com.busanit.controller;
 import com.busanit.domain.*;
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.movie.MovieDTO;
+import com.busanit.entity.Member;
+import com.busanit.entity.Snack;
 import com.busanit.entity.*;
 import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MessageRepository;
@@ -25,6 +27,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +37,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,9 +62,10 @@ public class AdminPageController {
     private final EventService eventService;
     private final NoticeService noticeService;
     private final ChatService chatService;
-    private final MessageRepository messageRepository;
     private final MemberService memberService;
     private final MovieService movieService;
+    private final SimpMessagingTemplate messagingTemplate;
+
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -105,7 +110,15 @@ public class AdminPageController {
     }
 
     @PostMapping("/movieRegister")
-    public String movieRegister(Model model) {
+    public String movieRegister() {
+        return "admin/admin_movie_register";
+    }
+
+    @PostMapping("/movieUpdate")
+    public String movieUpdate(@RequestParam(name = "movieId") Long movieId, Model model) {
+
+        model.addAttribute("movieId", movieId);
+
         return "admin/admin_movie_register";
     }
 
@@ -606,25 +619,121 @@ public class AdminPageController {
         return "admin/admin_chatList";
     }
 
-    //채팅리스트
-    @GetMapping("/api/chatList")
-    @ResponseBody
-    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
-        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size);
+//    //채팅리스트
+//    @RequestMapping(value = "/getChatList", method = {RequestMethod.GET, RequestMethod.POST})
+//    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
+//
+//        System.out.println(" 채팅리스트 발아아앙동");
+//        String memberEmail = movieService.getUserEmail();
+//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
+//
+//        int totalPages = chatRoom.getTotalPages();
+//        int startPage = Math.max(1, page - 5);
+//        int endPage = Math.min(totalPages, page + 4);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("chatRoom", chatRoom.getContent());
+//        response.put("currentPage", page);
+//        response.put("totalPages", totalPages);
+//        response.put("startPage", startPage);
+//        response.put("endPage", endPage);
+//        response.put("memberEmail", memberEmail);
+//
+//        return response;
+//    }
 
-        int totalPages = chatRoom.getTotalPages();
+//    //채팅리스트
+//    @GetMapping("/chatList")
+//    @ResponseBody
+//    public Map<String, Object> chatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
+//        String memberEmail = "admin@example.com"; // 예시용 이메일
+//        Page<ChatRoomDTO> chatRooms = chatService.getChatList(page - 1, size, memberEmail);
+//
+//        int totalPages = chatRooms.getTotalPages();
+//        int startPage = Math.max(1, page - 5);
+//        int endPage = Math.min(totalPages, page + 4);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("chatRooms", chatRooms.getContent());
+//        response.put("currentPage", page);
+//        response.put("totalPages", totalPages);
+//        response.put("startPage", startPage);
+//        response.put("endPage", endPage);
+//        response.put("memberEmail", memberEmail);
+//
+//        return response;
+//    }
+
+    @PostMapping("/getChatList")
+    @ResponseBody
+    public Map<String, Object> pagingChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+        String memberEmail =  movieService.getUserEmail();
+
+        Page<ChatRoomDTO> chatRooms = chatService.getChatList(page - 1, size, memberEmail);
+
+        int totalPages = chatRooms.getTotalPages();
         int startPage = Math.max(1, page - 5);
         int endPage = Math.min(totalPages, page + 4);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("chatRoom", chatRoom.getContent());
+        response.put("chatRoom", chatRooms.getContent());
         response.put("currentPage", page);
         response.put("totalPages", totalPages);
         response.put("startPage", startPage);
         response.put("endPage", endPage);
+        response.put("memberEmail", memberEmail);
 
         return response;
     }
+
+//    @MessageMapping("/updateChatList") // 클라이언트에서 메시지 보낼 때 사용할 주제
+//    @SendTo("/queue/chatList") // 클라이언트가 구독할 주제
+//    public Map<String, Object> updateChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+//        System.out.println("리스트업데이트시작");
+//        String memberEmail = movieService.getUserEmail();
+//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
+//
+//        int totalPages = chatRoom.getTotalPages();
+//        int startPage = Math.max(1, page - 5);
+//        int endPage = Math.min(totalPages, page + 4);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("chatRoom", chatRoom.getContent());
+//        response.put("currentPage", page);
+//        response.put("totalPages", totalPages);
+//        response.put("startPage", startPage);
+//        response.put("endPage", endPage);
+//        response.put("memberEmail", memberEmail);
+//
+//        // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
+////        messagingTemplate.convertAndSend("/queue/chatList", response);
+//
+//        System.out.println("리스트업데이트돼라얍");
+//        return response;
+//    }
+
+//    @PostMapping("/admin/chatList") // POST 방식으로 요청 처리
+//    @ResponseBody
+//    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
+//        String memberEmail = movieService.getUserEmail();
+//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
+//
+//        int totalPages = chatRoom.getTotalPages();
+//        int startPage = Math.max(1, page - 5);
+//        int endPage = Math.min(totalPages, page + 4);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("chatRoom", chatRoom.getContent());
+//        response.put("currentPage", page);
+//        response.put("totalPages", totalPages);
+//        response.put("startPage", startPage);
+//        response.put("endPage", endPage);
+//        response.put("memberEmail", memberEmail);
+//
+//        return response;
+//    }
+
+
 
     //채팅 모달창
     @GetMapping("/chatModal")
