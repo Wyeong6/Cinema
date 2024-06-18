@@ -109,6 +109,10 @@ public class Movie {
     }
 
 
+    public boolean isModified() {
+        return isModified;
+    }
+
 
 }
 

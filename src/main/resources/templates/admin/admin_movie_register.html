@@ -512,26 +512,27 @@
         });
 
 
+
         // 모든 유효성 검사 통과 시 폼 제출
         const formData = new FormData(form);
 
         // 수정일때 : formData에 기존 id 추가
-        if (isEditMode) {
-            formData.append('id', id);
+        if (window.isEditMode) {
+            formData.set('RegisteredPoster', null);
+            formData.set('RegisteredBackdrop', null);
+        }
 
-            const stillCutFiles = stillCutPathsInput.files;
 
+
+        // 스틸컷 이미지를 FormData에 추가
+        const stillCutFiles = stillCutPathsInput.files;
+        if (stillCutFiles.length > 0) {
             for (let i = 0; i < stillCutFiles.length; i++) {
                 formData.append('RegisteredStillCut', stillCutFiles[i]);
             }
         }
 
-        // 스틸컷 이미지를 FormData에 추가
-        const stillCutFiles = stillCutPathsInput.files;
 
-        for (let i = 0; i < stillCutFiles.length; i++) {
-            formData.append('RegisteredStillCut', stillCutFiles[i]);
-        }
 
         console.log("formData 체크 === " + formData)
 
@@ -547,7 +548,11 @@
             })
             .then(data => {
                 console.log('Form submitted successfully:', data);
-                alert('영화가 성공적으로 등록되었습니다.');
+                if(isEditMode) {
+                    alert('수정되었습니다.')
+                } else {
+                    alert('영화가 성공적으로 등록되었습니다.');
+                }
                 console.log("formData 체크 === " + formData)
                 console.log("data 체크 === " + data)
                 resetForm = true;
