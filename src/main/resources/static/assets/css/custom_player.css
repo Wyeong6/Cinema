@@ -106,22 +106,16 @@ div.mb-3 {
 }
 .seat {
     margin: 0.5em;
-    width: 2em;
-    height: 2em;
+    width: 1.7em;
+    height: 1.7em;
     border-radius: 50% 50% 0 0; /* 위쪽만 둥글게 */
     background-color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
 }
 .seat.remove {
     margin: 0.5em;
-    width: 2em;
-    height: 2em;
     background: #000;
     cursor: default;
-}
-.seat:hover {
-    cursor: pointer;
-    transform: scale(1.2);
 }
 /* 상영 스케줄 등록하기 */
 #schedule-form input {

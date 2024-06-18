@@ -1,6 +1,7 @@
 package com.busanit.controller;
 
 import com.busanit.domain.ScheduleDTO;
+import com.busanit.domain.SeatDTO;
 import com.busanit.domain.TheaterDTO;
 import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.domain.movie.MovieDTO;
@@ -16,8 +17,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/reservation")
@@ -62,7 +66,28 @@ public class ReservationController {
     public List<ScheduleDTO> getSchedulesByConditions(@RequestParam String theaterName,
                                                       @RequestParam Long movieId,
                                                       @DateTimeFormat(pattern = "yyyy-M-d") @RequestParam LocalDate date) {
-        return scheduleService.findSchedulesByConditions(theaterName, movieId,date);
+        return scheduleService.findSchedulesByConditions(theaterName, movieId, date);
+    }
+
+    @GetMapping("/seatSelection/{scheduleId}")
+    public String seatSelection(@PathVariable Long scheduleId, Model model) {
+        try {
+            ScheduleDTO scheduleDTO = scheduleService.getScheduleById(scheduleId);
+            List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(scheduleDTO.getMovieId());
+            TheaterNumberDTO theaterNumberDTO = theaterNumberService.getTheaterNumberById(scheduleDTO.getTheaterNumberId());
+
+            Map<String, List<SeatDTO>> seatsByColumn = theaterNumberDTO.getSeats().stream()
+                    .sorted(Comparator.comparingLong(SeatDTO::getSeatRow)) // SeatDTO의 seatRow 필드를 기준으로 정렬
+                    .collect(Collectors.groupingBy(SeatDTO::getSeatColumn));
+
+            model.addAttribute("scheduleDTO", scheduleDTO);
+            model.addAttribute("movieDTOs", movieDTOs);
+            model.addAttribute("seatsByColumn", seatsByColumn);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
+        }
+
+        return "reservation/seat_selection";
     }
 
 }

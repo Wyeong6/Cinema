@@ -93,11 +93,7 @@
                                         </ul>
                                     </div>
                                     <div id="select-time-group">
-                                        <div class="scrollable-content">
-                                            <div class="theaterNumber-group">
-
-                                            </div>
-                                        </div>
+                                        <div class="scrollable-content"></div>
                                     </div>
                                 </td>
                             </tr>
@@ -210,7 +206,7 @@
                 $(this).addClass('clicked');
 
                 const h5 = $(this).find('h5').text();
-                const date = formatDateToISOJson(h5);
+                const date = formatDateToISO(h5);
                 const h6 = $(this).find('h6').html();
 
                 $('#select-time-th').html("<h5>" + date + "</h5><h6>" + h6 + "</h6>");
@@ -225,10 +221,12 @@
 
                 const moviePosterPath = $(".movie-item.clicked input[type='hidden']").data('poster');
                 const h5 = $(".date-btn.clicked h5").text();
-                const date = formatDateToISOJson(h5);
+                const date = formatDateToISO(h5);
+                const scheduleId = $(".schedule-item.clicked input.schedule-id").val();
                 const startTime = $(".schedule-item.clicked h5").text();
-                const endTime = $(".schedule-item.clicked input[type='hidden']").val();
+                const endTime = $(".schedule-item.clicked input.end-time").val();
                 const totalSeats = $(".schedule-item.clicked h6").text();
+                console.log(date, scheduleId, startTime, endTime, totalSeats);
 
                 const certification = $(".movie-item.clicked .certification-img").data('certification');
                 let imageUrl, certificationTitle, certificationInfo;
@@ -272,7 +270,7 @@
                     html: `남은 좌석 ${totalSeats}`,
                     imageUrl: `https://image.tmdb.org/t/p/w500/${moviePosterPath}`,
                     imageWidth: 200,
-                    imageAlt: "Custom image",
+                    imageAlt: "영화 포스터",
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
@@ -285,7 +283,11 @@
                             html: certificationInfo,
                             imageUrl: imageUrl,
                             imageWidth: 100,
-                            imageAlt: "Custom image"
+                            imageAlt: "연령고지 이미지"
+                        }).then((innerResult) => {
+                            if (innerResult.isConfirmed) {
+                                window.location.href = `/reservation/seatSelection/${scheduleId}`;
+                            }
                         });
                     }
                 });
@@ -296,7 +298,7 @@
                 const movieId = $(".movie-item.clicked input[type='hidden']").val();
                 const date = $(".date-btn.clicked h5").text();
                 const isoDate = formatDateToISOJson(date);
-                console.log(theaterName, movieId, isoDate);
+                console.log("AJAX 요청 매개변수:", theaterName, movieId, isoDate);
 
                 $.ajax({
                     type: "GET",
@@ -316,21 +318,40 @@
                 });
             }
 
+            function formatDateToISO(dateString) {
+                const [month, day] = dateString.split('/');
+                if (month && day) {
+                    return new Date().getFullYear() + '-' + month.padStart(2, '0') + '-' + day.padStart(2, '0');
+                } else {
+                    console.error('Invalid date format:', dateString);
+                    return null; // 또는 다른 적절한 에러 처리
+                }
+            }
+
             function formatDateToISOJson(dateString) {
                 const [month, day] = dateString.split('/');
-                return new Date().getFullYear() + '-' + month.padStart(2, '0') + '-' + day.padStart(2, '0');
+                if (month && day) {
+                    // 앞에 0을 제거하고, 그대로 반환합니다.
+                    return new Date().getFullYear() + '-' + parseInt(month, 10) + '-' + parseInt(day, 10);
+                } else {
+                    console.error('잘못된 날짜 형식:', dateString);
+                    return null; // 또는 다른 적절한 에러 처리
+                }
             }
 
             function renderSchedules(schedules) {
-                const selectTimeGroup = $("#select-time-group");
+                console.log("Rendering schedules with data:", schedules);
+                const selectTimeGroup = $("#select-time-group .scrollable-content");
 
                 selectTimeGroup.empty();
 
                 schedules.forEach(schedule => {
                     const theaterNumber = schedule.theaterNumber; // 극장 번호
+                    const scheduleId = schedule.id;
                     const startTime = schedule.startTime; // 시작 시간
                     const endTime = schedule.endTime;
                     const totalSeats = schedule.totalSeats;
+                    console.log("시간표 항목:", startTime, endTime, totalSeats);
 
                     let theaterNumberGroup = selectTimeGroup.find(`.theaterNumber-group[data-theater-number="${theaterNumber}"]`);
                     if (theaterNumberGroup.length === 0) {
@@ -346,13 +367,13 @@
                     // 시간표 항목 생성
                     const scheduleItem = $(`
             <li class="schedule-item">
+                <input type="hidden" class="schedule-id" value="${scheduleId}" />
                 <h5>${startTime}</h5>
                 <h6>${totalSeats}석</h6>
                 <input type="hidden" class="end-time" value="${endTime}" />
             </li>
         `);
 
-                    // 시간표 항목을 해당 극장 번호 그룹에 추가
                     theaterNumberGroup.find("ul").append(scheduleItem);
                 });
             }

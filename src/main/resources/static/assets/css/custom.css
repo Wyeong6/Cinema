@@ -1036,3 +1036,175 @@ td.theater-name.clicked {
 .schedule-item.clicked h5, .schedule-item.clicked h6 {
     color: #FFFFFF;
 }
+
+/* 상영좌석표 */
+.seat-selection header {
+    width: 100%;
+}
+.seat-selection header > h4 {
+    text-align: center;
+    color: #F2F2F2;
+    padding: 1em;
+}
+.seat-selection header > div {
+    background: #F2F2F2;
+}
+#select-info {
+    padding: 1em;
+    display: flex;
+    flex-direction: row;
+    border-radius: 15px;
+}
+#select-info > div {
+    padding: 1em 2em;
+}
+#movie-info {
+    display: flex;
+    flex-direction: row;
+    background: #FFFFFF;
+    border-radius: 15px;
+}
+#movie-info img {
+    margin-right: 1em;
+    width: 4em;
+}
+#movie-info > .text > .movie-title {
+    display: flex;
+    flex-direction: row;
+}
+#movie-info > .text img {
+    width: 1.5em;
+}
+#select-info-form {
+    display: flex;
+    align-items: center;
+}
+#select-info-form > form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+#select-info-form > form label {
+    margin-right: 1em;
+    font-size: 0.9em;
+}
+#select-info-form > form input {
+    margin-left: 0.5em;
+    padding-left: 1em;
+    border: 1px solid #c4c3ca;
+    border-radius: 5px;
+}
+#select-info-form > form button {
+    margin: 0 0 1em 0;
+    padding: 0.65em 2em 0.65em 2em;
+    height: 100%;
+    font-size: 0.8em;
+    color: #F2F2F2;
+    background: #5155A6;
+}
+#seats-select {
+    padding: 2em 1em;
+}
+.screen-field {
+    padding: 3em 0 4em;
+}
+.screen-field .screen {
+    margin: 0 auto;
+    height: 1.2em;
+}
+.seating-area {
+    padding: 0 3em;
+}
+.column-group {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+}
+.column-group .column-header {
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+.column-group h4 {
+    margin-right: 0.5em;
+}
+.column-group .seat {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+.column-group .seat p {
+    color:#c4c3ca;
+    font-weight: 400;
+}
+.seats-info {
+    padding: 3em 4em 0;
+    display: flex;
+    flex-direction: row;
+}
+.seats-info > div {
+    display: flex;
+    flex-direction: row;
+}
+.seats-info > div p {
+    font-size: 0.7em;
+    color: #F2F2F2;
+}
+.seat.small {
+    width: 0.7em;
+    height: 0.7em;
+}
+.seat.selected {
+    border: 2px solid #F28379;
+    background: #F24949;
+}
+.seat.selected p {
+    color: #FFFFFF;
+}
+.seat.able:hover {
+    cursor: pointer;
+    transform: scale(1.2);
+}
+.seat.disabled {
+    background: #566a7f;
+    position: relative;
+}
+.diagonal-line {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.diagonal-line::before {
+    content: '';
+    position: absolute;
+    top: 100%; /* 선을 요소의 중간에 위치시키기 위해 top 값을 조정합니다. */
+    left: 0;
+    width: 120%;
+    height: 2px; /* 선의 두께 조절 */
+    background-color: #1e2c3c; /* 선의 색상 */
+    transform: translateY(-50%) rotate(-45deg); /* 대각선 방향 및 위치 조정 */
+    transform-origin: left top; /* 회전 기준 설정 */
+}
+.seat.reserved {
+    background: #566a7f;
+}
+#pay-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+#pay-box div {
+    display: flex;
+    flex-direction: row;
+}
+#pay-box h3, #pay-box h4 {
+    color: #F2F2F2;
+    margin-right: 1em;
+    line-height: 64px;
+}
+#pay-box button {
+    margin: 0 1em 0 1em;
+    padding: 1em 3em 1em 3em;
+    font-size: 1em;
+    font-weight: 400;
+}
