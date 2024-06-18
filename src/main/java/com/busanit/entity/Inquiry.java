@@ -24,6 +24,10 @@ public class Inquiry {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+
+    @OneToOne(mappedBy = "inquiry", cascade = CascadeType.ALL)
+    private InquiryReply reply;
+
     // 연관관계 메서드
     public void setMember(Member member) {
         this.member = member;
@@ -37,13 +41,18 @@ public class Inquiry {
         }
     }
 
+    // Inquiry 타입 변경 메서드
+    public void markAsAnswered() {
+        this.type = "답변완료";
+    }
+
     public static Inquiry toEntity(InquiryDTO dto) {
         return Inquiry.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .subject(dto.getSubject())
                 .message(dto.getMessage())
-                .type("unanswered")
+                .type("미답변")
                 .build();
 
     }

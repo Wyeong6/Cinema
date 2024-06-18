@@ -52,10 +52,10 @@
             <tr>
                 <th>문의 번호</th>
                 <th>작성자 이름</th>
-                <th>작성자 이메일</th>
                 <th>제목</th>
                 <th>내용</th>
-                <th>유형</th>
+                <th>작성자 이메일</th>
+                <th>문의상태</th>
             </tr>
             </thead>
             <tbody>
@@ -66,9 +66,10 @@
                 th:data-id="${inquiry.id}">
                 <td th:text="${inquiry.id}"></td>
                 <td th:text="${inquiry.name}"></td>
-                <td th:text="${inquiry.email}"></td>
                 <td th:text="${inquiry.subject}"></td>
                 <td th:text="${inquiry.message}"></td>
+                <td style="display: none;"  th:text="${inquiry.recipientEmail}"></td>
+                <td th:text="${inquiry.email}"></td>
                 <td th:text="${inquiry.type}"></td>
             </tr>
             </tbody>
@@ -91,19 +92,34 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p><strong>문의 번호:</strong> <span id="modal-inquiry-id"></span></p>
-                <p><strong>작성자 이름:</strong> <span id="modal-inquiry-name"></span></p>
-                <p><strong>작성자 이메일:</strong> <span id="modal-inquiry-email"></span></p>
-                <p><strong>제목:</strong> <span id="modal-inquiry-subject"></span></p>
-                <p><strong>내용:</strong> <span id="modal-inquiry-message"></span></p>
-                <p><strong>유형:</strong> <span id="modal-inquiry-type"></span></p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>문의 번호:</strong> <span id="modal-inquiry-id"></span></p>
+                        <p><strong>작성자:</strong> <span id="modal-inquiry-name"></span></p>
+                        <p><strong>제목:</strong> <span id="modal-inquiry-subject"></span></p>
+
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>문의상태:</strong> <span id="modal-inquiry-type"></span></p>
+                        <p><strong>답변받을 이메일:</strong> <span id="modal-inquiry-email"></span></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p><strong>내용:</strong></p>
+                        <p><span id="modal-inquiry-message"></span></p>
+                    </div>
+                </div>
             </div>
 
             <!-- Reply Form -->
             <div class="card-body">
                 <form action="/admin/sendReply" method="post">
                     <input type="hidden" id="inquiryIdInput" name="inquiryId">
-                    <input type="hidden" id="modal-inquiry-email-input" name="inquiryEmail">
+                    <input type="hidden" id="modal-inquiry-name-input" name="userName">
+                    <input type="hidden" id="modal-inquiry-email-input" name="userEmail">
+                    <input type="hidden" id="modal-inquiry-subject-input" name="subject">
+                    <input type="hidden" id="modal-inquiry-message-input" name="message">
                     <div class="form-group">
                         <label for="replyMessage">답변 내용</label>
                         <textarea class="form-control" id="replyMessage" name="replyMessage" rows="5"
@@ -125,44 +141,57 @@
             var inquiryId = $(this).data('id'); // 클릭한 행의 inquiry.id 가져오기
             var inquiry = $(this).children('td');
 
-            $('#inquiryIdInput').val(inquiryId);
-
-
             // 모달의 각 항목에 클릭한 행의 정보를 할당
             $('#modal-inquiry-id').text(inquiry.eq(0).text());
             $('#modal-inquiry-name').text(inquiry.eq(1).text());
-            $('#modal-inquiry-email').text(inquiry.eq(2).text());
-            $('#modal-inquiry-subject').text(inquiry.eq(3).text());
-            $('#modal-inquiry-message').text(inquiry.eq(4).text());
-            $('#modal-inquiry-type').text(inquiry.eq(5).text());
+            $('#modal-inquiry-subject').text(inquiry.eq(2).text());
+            $('#modal-inquiry-message').text(inquiry.eq(3).text());
+            $('#modal-inquiry-email').text(inquiry.eq(4).text());
+            $('#modal-recipient-email').text(inquiry.eq(5).text());
+            $('#modal-inquiry-type').text(inquiry.eq(6).text());
 
-            console.log("inquiryId: " + inquiryId);
+            //모달의 입력값을 할당
+            $('#inquiryIdInput').val(inquiryId);
+            $('#modal-inquiry-name-input').val(inquiry.eq(1).text().trim()); // 작성자 이름
+            $('#modal-inquiry-email-input').val(inquiry.eq(2).text().trim()); // 작성자 이메일
+            $('#modal-inquiry-subject-input').val(inquiry.eq(3).text().trim()); // 제목
+            $('#modal-inquiry-message-input').val(inquiry.eq(4).text().trim()); // 내용
 
         });
 
         $('#replyForm').on('submit', function (event) {
             event.preventDefault();
 
-            var formData = $(this).serialize(); // 폼 데이터 직렬화
+            // FormData 객체 생성
+            var formData = new FormData(this);
 
-            // Ajax를 이용하여 서버로 데이터 전송
-            $.ajax({
-                url: '/admin/sendReply',
-                type: 'post',
-                data: formData,
-                success: function (response) {
+            // // 추가할 값들을 직접 FormData 객체에 추가
+            // formData.append('inquiryId',$('#modal-inquiry-id').text().trim());
+            // formData.append('userName', $('#modal-inquiry-name').text().trim());
+            // formData.append('subject', $('#modal-inquiry-subject').text().trim());
+            // formData.append('message', $('#modal-inquiry-message').text().trim());
+            // formData.append('userEmail', $('#modal-inquiry-email-input').val().trim());
+            // // 답변 내용 추가
+            // formData.append('replyMessage', $('#replyMessage').val().trim());
+            // console.log("FormData:", formData);
+
+            // sendRequest 함수를 사용하여 서버로 데이터 전송
+            sendRequest('POST', '/admin/sendReply', formData, function (response) {
+                if (response === 'success') {
                     alert('답변이 성공적으로 전송되었습니다.');
                     $('#inquiryModal').modal('hide'); // 모달 닫기
-                },
-                error: function () {
+                } else {
                     alert('답변 전송 중 오류가 발생했습니다.');
                 }
+            }, function (xhr, status, error) {
+                alert('답변 전송 중 오류가 발생했습니다.');
             });
         });
+    });
         // AJAX 요청을 보내는 공통 함수
-        function sendRequest(url, data, onSuccess, onError) {
+        function sendRequest(type, url, data, onSuccess, onError) {
             $.ajax({
-                type: 'GET',
+                type: type,
                 url: url,
                 data: data,
                 success: onSuccess,
@@ -187,7 +216,7 @@
             var eventId = $(this).data('id');
             var pageNumber = $(this).data('page');
             setPageNumber(pageNumber);
-            sendRequest('/admin/eventUpdate', {eventId: eventId}, function (response) {
+            sendRequest('GET', '/admin/eventUpdate', {eventId: eventId}, function (response) {
                 $('.container-xxl').html(response);
             });
         });
@@ -196,7 +225,7 @@
         $('.paging-btn').click(function (e) {
             e.preventDefault();
             var pageNumber = $(this).data('page');
-            sendRequest('/admin/eventList?page=' + pageNumber, {}, function (response) {
+            sendRequest('GET', '/admin/inquiryList?page=' + pageNumber, {}, function (response) {
                 $('.container-xxl').html(response);
                 setPageNumber(pageNumber);
             });
@@ -232,7 +261,6 @@
                 }
             });
         });
-    });
 
 </script>
 </body>

@@ -2,14 +2,18 @@ package com.busanit.service;
 
 
 import com.busanit.domain.InquiryDTO;
+import com.busanit.domain.InquiryReplyDTO;
 import com.busanit.domain.NoticeDTO;
 import com.busanit.entity.Inquiry;
+import com.busanit.entity.InquiryReply;
 import com.busanit.entity.Member;
 import com.busanit.entity.Notice;
+import com.busanit.repository.InquiryReplyRepository;
 import com.busanit.repository.InquiryRepository;
 import com.busanit.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.messaging.MessagingException;
 import org.springframework.security.core.Authentication;
@@ -30,9 +34,15 @@ public class InquiryService {
 
     private final MemberRepository memberRepository;
     private final InquiryRepository inquiryRepository;
+    private final InquiryReplyRepository inquiryReplyRepository;
     private final JavaMailSender mailSender;
-    //추가
-    public void register(InquiryDTO inquiryDTO) throws MessagingException, jakarta.mail.MessagingException  {
+
+    //properties 에 설정한 환경변수 값을 가져옴
+    @Value("${spring.mail.username}")
+    private String adminEmail;
+
+    //문의 추가
+    public void InquiryRegister(InquiryDTO inquiryDTO) throws MessagingException, jakarta.mail.MessagingException  {
 
         String email = getAuthenticatedUserEmail();
         Optional<Member> optionalMember = memberRepository.findByEmail(email);
@@ -48,6 +58,24 @@ public class InquiryService {
         }
         inquiryRepository.save(inquiry);
 
+    }
+
+    //문의답변 추가
+    public void InquiryReplyRegister(String replyMessage,Long inquiryId) throws MessagingException, jakarta.mail.MessagingException {
+        Optional<Inquiry> optionalInquiry = inquiryRepository.findById(inquiryId);
+        if (optionalInquiry.isPresent()) {
+            Inquiry inquiry = optionalInquiry.get();
+
+            // 문의글의 타입을 "answered"로 변경
+            inquiry.markAsAnswered();
+            inquiryRepository.save(inquiry);
+
+            // InquiryReply 엔티티 생성
+            InquiryReply inquiryReply = InquiryReply.toEntity(replyMessage);
+            inquiryReply.setInquiry(inquiry);
+            inquiryReplyRepository.save(inquiryReply);
+
+        }
     }
 
     public InquiryDTO findById(Long id) {
@@ -66,18 +94,61 @@ public class InquiryService {
         return new PageImpl<>(inquiryDTOList, pageable, inquiryPage.getTotalElements());
     }
 
-    //문의 이메일전송
-    public void sendInquiryEmail(String name, String userEmailAddress, String subject, String message) throws MessagingException, jakarta.mail.MessagingException {
+    //문의하기 이메일전송
+    public void sendInquiry(String userName, String recipientEmail, String subject, String message) throws MessagingException, jakarta.mail.MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
         helper.setFrom("qudgns8882@naver.com");
-        helper.setTo("dnduddl1381@gmail.com");
+        helper.setTo("qudgns8882@naver.com");
         helper.setSubject(subject);
         // 메일 본문 설정
-        String mailContent = "문의한 유저: " + name + "\n"
-                + "답변받을 이메일: " + userEmailAddress + "\n\n"
-                + "문의내용:\n" + message;
+        String mailContent = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"
+                + "<h3>사용자 문의</h3>"
+                + "<p>안녕하세요,</p>"
+                + "<p>다음과 같은 문의가 접수되었습니다:</p>"
+                + "<div style='display: inline-block; max-width: 100%; padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9;'>"
+                + "<p><strong>사용자 이름:</strong> " + userName + "</p>"
+                + "<p><strong>답변받을 이메일:</strong> " + recipientEmail + "</p>"
+                + "<p><strong>문의 내용:</strong></p>"
+                + "<p>" + message + "</p>"
+                + "</div>"
+                + "<p>감사합니다.</p>"
+                + "<p>관리자 드림</p>"
+                + "</div>";
+
+        helper.setText(mailContent, true);
+
+        mailSender.send(mimeMessage);
+    }
+
+    //문의답변 이메일전송
+    public void sendInquiryReply(String userName, String recipientEmail, String subject, String message ,String replyMessage) throws MessagingException, jakarta.mail.MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+        helper.setFrom("qudgns8882@naver.com");
+        helper.setTo(recipientEmail);
+        helper.setSubject(subject);
+
+        // 메일 본문 설정
+        String mailContent = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"
+                + "<h3>문의 답변 내용</h3>"
+                + "<p>안녕하세요, " + userName + "님.</p>"
+                + "<p>고객님의 문의에 대해 아래와 같이 답변드립니다:</p>"
+                + "<div style='padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9;'>"
+                + "<p><strong>문의 내용:</strong></p>"
+                + "<p>" + message + "</p>"
+                + "</div>"
+                + "<div style='padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9;'>"
+                + "<p><strong>답변 내용:</strong></p>"
+                + "<p>" + replyMessage + "</p>"
+                + "</div>"
+                + "<p>추가 질문이 있으시면 언제든지 <a href='http://localhost:8080/inquiry#contact'>여기</a>를 클릭하여 문의해 주세요.</p>"
+                + "<p>감사합니다.</p>"
+                + "<p>고객 지원팀 드림</p>"
+                + "</div>";
+
 
         helper.setText(mailContent, true);
 

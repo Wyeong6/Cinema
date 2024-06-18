@@ -2,6 +2,8 @@ package com.busanit.controller;
 
 import com.busanit.domain.InquiryDTO;
 import com.busanit.entity.Inquiry;
+import com.busanit.entity.InquiryReply;
+import com.busanit.repository.InquiryReplyRepository;
 import com.busanit.service.InquiryService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -26,28 +28,35 @@ public class InquiryController {
 
     //문의 등록
     @PostMapping("/register/inquiry")
-    public String processInquiryForm(@Valid @ModelAttribute("Inquiry") InquiryDTO inquiryDTO) throws MessagingException {
+    public String sendInquiry(@Valid @ModelAttribute("Inquiry") InquiryDTO inquiryDTO) throws MessagingException {
 
-            inquiryService.sendInquiryEmail(inquiryDTO.getName(),inquiryDTO.getEmail(), inquiryDTO.getSubject(), inquiryDTO.getMessage());
-            inquiryService.register(inquiryDTO); // 폼 데이터를 서비스를 통해 저장하거나 처리하는 로직 수행
+            inquiryService.sendInquiry(inquiryDTO.getName(),inquiryDTO.getEmail(), inquiryDTO.getSubject(), inquiryDTO.getMessage());
+            inquiryService.InquiryRegister(inquiryDTO); // 폼 데이터를 서비스를 통해 저장하거나 처리하는 로직 수행
 
         return "redirect:/inquiry"; // 폼 제출 후 보여줄 페이지로 리다이렉트
     }
 
     @PostMapping("/admin/sendReply")
     @ResponseBody
-    public String sendReply(@RequestBody InquiryDTO inquiryDTO) {
-        //데이터베이스에 문의 답변 저장
+    public String sendReply( @RequestParam("inquiryId") Long inquiryId,
+                             @RequestParam("recipientEmail") String recipientEmail,
+                             @RequestParam("userName") String userName,
+                             @RequestParam("subject") String subject,
+                             @RequestParam("message") String message,
+                             @RequestParam("replyMessage") String replyMessage) throws MessagingException {
 
-        //사용자의 이메일로 문의답변과 함께 이메일 전송
+        try {
+            // 사용자의 이메일로 문의 답변과 함께 이메일 전송
+            inquiryService.sendInquiryReply(userName, recipientEmail, subject, message, replyMessage);
 
-        return "success";
+            // 데이터베이스에 문의 답변 저장
+            inquiryService.InquiryReplyRegister(replyMessage, inquiryId);
+
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "failure";
+        }
     }
 
-//    @GetMapping("/replyInquiry")
-//    public String replyInquiry(@RequestParam(name = "id") long id, Model model) {
-//        InquiryDTO inquiryDTO = inquiryService.findById(id);
-//        model.addAttribute("inquiry", inquiryDTO);
-//        return "admin/admin_reply_inquiry";
-//    }
 }
