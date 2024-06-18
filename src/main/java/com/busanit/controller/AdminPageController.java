@@ -202,14 +202,8 @@ public class AdminPageController {
         List<SeatDTO> seatDTOList;
         try {
             seatDTOList = objectMapper.readValue(seatData, new TypeReference<List<SeatDTO>>() {});
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return "error";
-        }
-
-        try {
             seatService.save(seatDTOList);
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
             return "error";
         }

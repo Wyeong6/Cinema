@@ -18,8 +18,8 @@ public class Seat {
 
     private Long seatRow;
     private String seatColumn;
-    private boolean isReserved;
-    private boolean isAvailable;
+    private boolean isReserved = false;
+    private boolean isAvailable = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theaterNumber_id")
@@ -72,6 +72,7 @@ public class Seat {
             seat.setSeatRow((long) i);
             seat.setSeatColumn(seatDTO.getSeatColumn());
             seat.setReserved(seatDTO.isReserved());
+            seat.setAvailable(seat.isAvailable());
             seat.setTheaterNumber(theaterNumber);
             seat.setId(generateId(seat.getSeatColumn(), seat.getSeatRow(), theaterNumber.getId()));
 
