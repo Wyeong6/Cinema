@@ -5,7 +5,6 @@ import com.busanit.domain.chat.MessageDTO;
 import com.busanit.domain.chat.TypingIndicatorDTO;
 import com.busanit.entity.chat.ChatRoom;
 import com.busanit.service.ChatService;
-import com.busanit.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -34,7 +33,7 @@ public class ChatController {
         if (chatService.isAuthenticated()) {
             String userEmail = chatService.getAuthenticatedUserEmail();
             model.addAttribute("userEmail", userEmail);
-            return "/admin/client"; // templates 폴더의 client.html 파일을 렌더링
+            return "/cs/chat"; // templates 폴더의 chat.html 파일을 렌더링
         } else {
             return "redirect:/login"; // 로그인 페이지로 리다이렉트
         }

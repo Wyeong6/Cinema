@@ -185,6 +185,7 @@
         createChatRoomAndConnect(recipient, category);
     }
 
+    //관리자이메일과 카테고리로 채팅방 생성
     function createChatRoomAndConnect(recipient, category) {
         console.log("sender" + sender);
         // 채팅방 생성 및 연결 요청
@@ -223,7 +224,7 @@
             }
         }
     };
-
+    //유저이메일로 현재 채팅중인 관리자 이메일 찾기
     async function fetchRecipientEmail() {
         try {
             const response = await fetch('/chat/getRecipientEmail');
@@ -236,7 +237,7 @@
             return '오류 발생';
         }
     }
-
+    //관리자 이메일로 채팅중인 채팅룸반환
     async function fetchMessages(recipient) {
         console.log("fetchMessages의 recipient: " + recipient);
         try {

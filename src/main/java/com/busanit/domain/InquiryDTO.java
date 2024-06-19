@@ -5,6 +5,7 @@ import com.busanit.entity.Member;
 import com.busanit.entity.Notice;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Getter
@@ -21,6 +22,7 @@ public class InquiryDTO {
     private String subject;
     private String message;
     private String type;
+    private LocalDateTime createdAt;
 
     public static InquiryDTO toDTO(Inquiry inquiry) {
 
@@ -36,6 +38,7 @@ public class InquiryDTO {
                 .subject(inquiry.getSubject())
                 .message(inquiry.getMessage())
                 .type(inquiry.getType())
+                .createdAt(inquiry.getCreatedAt())
                 .build();
     }
 }

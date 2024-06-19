@@ -8,6 +8,8 @@ import com.busanit.service.InquiryService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +39,8 @@ public class InquiryController {
     }
 
     @PostMapping("/admin/sendReply")
-    @ResponseBody
-    public String sendReply( @RequestParam("inquiryId") Long inquiryId,
+    public ResponseEntity<String> sendReply(
+                            @RequestParam("inquiryId") Long inquiryId,
                              @RequestParam("recipientEmail") String recipientEmail,
                              @RequestParam("userName") String userName,
                              @RequestParam("subject") String subject,
@@ -52,11 +54,10 @@ public class InquiryController {
             // 데이터베이스에 문의 답변 저장
             inquiryService.InquiryReplyRegister(replyMessage, inquiryId);
 
-            return "success";
+            return ResponseEntity.ok("success");
         } catch (Exception e) {
             e.printStackTrace();
-            return "failure";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failure");
         }
     }
-
 }

@@ -3,6 +3,10 @@ package com.busanit.entity;
 import com.busanit.domain.InquiryDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -10,6 +14,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(value = {AuditingEntityListener.class})
 public class Inquiry {
 
     @Id
@@ -23,6 +28,8 @@ public class Inquiry {
     private String type;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
 
     @OneToOne(mappedBy = "inquiry", cascade = CascadeType.ALL)

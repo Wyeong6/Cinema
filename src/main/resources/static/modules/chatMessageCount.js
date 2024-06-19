@@ -1,3 +1,5 @@
+import { updateTimeSinceCreated } from './timeSinceCreated.js';
+
 /**
  * 웹소켓 연결 함수
  * @param {Object} options - 구독 콜백 및 초기 데이터 로드 옵션
@@ -148,25 +150,31 @@ export function displayChatList(response) {
 
     chatList.forEach(function (chatRoom) {
         var lastMessageContent = "";
+        var lastMessageCreatedAt = "";
 
         // 가장 최근 메시지의 내용을 가져옴
         if (chatRoom.messages && chatRoom.messages.length > 0) {
             var lastMessage = chatRoom.messages[chatRoom.messages.length - 1];
             if (lastMessage) {
                 lastMessageContent = lastMessage.content;
+                lastMessageCreatedAt = lastMessage.createAt;
+                console.log("lastMessageCreatedAt" + lastMessageCreatedAt)
             }
         }
 
         var chatRoomRow =
-            "<tr data-room-id='" + chatRoom.id + "' onclick='openChatModal(this)'>" +
-            "<td>" + chatRoom.id + "</td>" +
-            "<td>" + chatRoom.chatRoomTitle + "(" + chatRoom.type + ")" + "</td>" +
-            "<td>" + lastMessageContent + " (" + chatRoom.unreadMessageCount + "개 메시지)" + "</td>" +
-            "<td>" + chatRoom.userEmail + "</td>" +
-            "<td>" + chatRoom.userName + "</td>" +
-            "</tr>";
+            `<tr data-room-id='${chatRoom.id}' onclick='openChatModal(this)'>
+        <td>${chatRoom.id}</td>
+        <td>${chatRoom.chatRoomTitle}(${chatRoom.type})</td>
+        <td>${lastMessageContent} (${chatRoom.unreadMessageCount}개 메시지)</td>
+        <td>${chatRoom.userEmail}</td>
+        <td>${chatRoom.userName}</td>
+        <td data-createdat='${lastMessageCreatedAt}'> <span class="time-since-created"></span></td>
+    </tr>`;
         $chatListContainer.append(chatRoomRow);
     });
+
+    updateTimeSinceCreated();
 
     // 페이징 정보 업데이트
     var $pagination = $("#pagination");
