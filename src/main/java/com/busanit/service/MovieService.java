@@ -98,8 +98,14 @@ public class MovieService {
                 .map(MovieBlacklist::getMovieId)
                 .collect(Collectors.toList());
     }
-
-
+    public List<Movie> getModifiedMovies() {
+        return movieRepository.findByModifiedTrue();
+    }
+    // 수정된 영화인지 확인하는 메소드
+    private boolean isModifiedMovie(Long movieId, List<Movie> modifiedMovies) {
+        return modifiedMovies.stream()
+                .anyMatch(movie -> movie.getMovieId().equals(movieId) && movie.isModified());
+    }
 
     /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
 
@@ -121,10 +127,8 @@ public class MovieService {
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds(); // 삭제된 영화 ID 목록 가져오기
-        List<Long> modifiedMovieIds = getAllMovieIds(); // 수정된 영화 ID 목록 가져오기
+        List<Movie> modifiedMovies = getModifiedMovies();
 
-        System.out.println("모디파이 아이디 체크 === " + blacklistedMovieIds);
-        System.out.println("블랙리스트 아이디 체크 === " + modifiedMovieIds);
 
         int totalPages = fetchTotalPages();
         for (int page = 1; page <= totalPages; page++) {
@@ -132,7 +136,7 @@ public class MovieService {
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody, blacklistedMovieIds, modifiedMovieIds );
+                processResponse(responseBody, blacklistedMovieIds, modifiedMovies );
             }
         }
     }
@@ -142,14 +146,14 @@ public class MovieService {
     public void fetchAndStoreMoviesUpcoming() throws IOException {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
-        List<Long> modifiedMovieIds = getAllMovieIds(); // 수정된 영화 목록 가져오기
+        List<Movie> modifiedMovies = getModifiedMovies();
 
         for (int page = 1; page <= 8; page++) {
             String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody, blacklistedMovieIds, modifiedMovieIds);
+                processResponse(responseBody, blacklistedMovieIds, modifiedMovies);
             }
         }
     }
@@ -198,17 +202,23 @@ public class MovieService {
         return null;
     }
 
-    private void processResponse(String responseBody, List<Long> blacklistedMovieIds, List<Long> modifiedMovieIds) throws IOException {
+    private void processResponse(String responseBody, List<Long> blacklistedMovieIds, List<Movie> modifiedMovies) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
             for (JsonNode node : results) {
                 Long movieId = node.get("id").asLong();
                 System.out.println("현재 movieId: " + movieId);
-                if (blacklistedMovieIds.stream().map(String::valueOf).toList().contains(String.valueOf(movieId)) ||
-                        modifiedMovieIds.stream().map(String::valueOf).toList().contains(String.valueOf(movieId))) {
+
+                if (isModifiedMovie(movieId, modifiedMovies)) {
+                    System.out.println("수정된 영화입니다. 덮어씌우지 않습니다.");
                     continue;
                 }
+
+                if (blacklistedMovieIds.contains(movieId)) {
+                    continue;
+                }
+
                 System.out.println("movieId 체크 === " + movieId);
                 processMovieData(node);
             }
@@ -650,6 +660,13 @@ public class MovieService {
         movie.setOverview(movieOverview);
 
         MovieDetail movieDetail = movie.getMovieDetail();
+
+        // movieDetail이 null인 경우 초기화
+        if (movieDetail == null) {
+            movieDetail = new MovieDetail();
+            movie.setMovieDetail(movieDetail);
+        }
+
 
         movieDetail.setCertification(certifications);
         movieDetail.setReleaseDate(movieReleaseDate);

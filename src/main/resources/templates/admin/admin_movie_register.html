@@ -103,7 +103,7 @@
 
 <!-- / Navbar -->
 
-<h4 class="fw-bold py-3 mb-4">영화 등록</h4>
+<h4 class="fw-bold py-3 mb-4" id="formTitle">영화 등록</h4>
 <!-- Basic Layout -->
 <div class="row">
     <div class="col-xl">
@@ -309,8 +309,11 @@
         const stillCutPathsInput = document.getElementById('RegisteredStillCut');
         const videoInput = document.getElementById('video');
         const actorInput = document.getElementById('actorSearch');
+        const formTitle = document.getElementById('formTitle');
+
 
         window.isEditMode = true;
+        formTitle.set('영화 수정');
         idInput.value = movieId;
         idInput.disabled = true; // 수정 모드에서는 ID 필드를 비활성화합니다.
         posterPathInput.disabled = true;
@@ -318,6 +321,7 @@
         stillCutPathsInput.disabled = true;
         videoInput.placeholder = '미입력시 기존 트레일러 키 사용, 또는 새로운 트레일러 키를 입력하세요.';
         actorInput.disabled = true;
+
     }
 
 

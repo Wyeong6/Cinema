@@ -25,7 +25,8 @@ public class Movie {
     private String overview;
 
     //수정 여부
-    private boolean isModified;
+    @Column(name = "modified")
+    private boolean modified;
 
     //장르 관계
     @ManyToMany
@@ -106,11 +107,6 @@ public class Movie {
     public void addImage(MovieImage image) {
         this.images.add(image);
         image.setMovie(this);
-    }
-
-
-    public boolean isModified() {
-        return isModified;
     }
 
 
