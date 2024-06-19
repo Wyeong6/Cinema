@@ -23,6 +23,11 @@ public class PaymentController {
     @Value("${html5_inicis_key}")
     private String html5InicisKey;
 
+    @GetMapping("/")
+    public String payment() {
+        return "payment/payment_window";
+    }
+
     @PostMapping("/test") /*이름 수정예정*/
     public String payTest(Model model) {
         model.addAttribute("html5InicisKey", html5InicisKey);

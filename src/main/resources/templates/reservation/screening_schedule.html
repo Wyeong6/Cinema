@@ -354,15 +354,34 @@
                         selectTimeGroup.append(theaterNumberGroup);
                     }
 
+                    // startTime을 Date 객체로 변환
+                    const [startHour, startMinute] = startTime.split(':');
+                    const startDateTime = new Date();
+                    startDateTime.setHours(startHour, startMinute, 0, 0);
+
+                    const morning = new Date();
+                    morning.setHours(12, 0, 0, 0);
+                    const night = new Date();
+                    night.setHours(22, 0, 0, 0);
+
                     // 시간표 항목 생성
                     const scheduleItem = $(`
-            <li class="schedule-item">
-                <input type="hidden" class="schedule-id" value="${scheduleId}" />
-                <h5>${startTime}</h5>
-                <h6>${totalSeats}석</h6>
-                <input type="hidden" class="end-time" value="${endTime}" />
-            </li>
-        `);
+                    <li class="schedule-item">
+                        <input type="hidden" class="schedule-id" value="${scheduleId}" />
+                        <img src="/images/sun.png" alt="조조" style="display: none;"/>
+                        <img src="/images/moon.png" alt="심야" style="display: none;"/>
+                        <h5>${startTime}</h5>
+                        <h6>${totalSeats}석</h6>
+                        <input type="hidden" class="end-time" value="${endTime}" />
+                    </li>
+                `);
+
+                    // startTime과 비교하여 이미지 표시
+                    if (startDateTime < morning) {
+                        scheduleItem.find('img[alt="조조"]').css('display', 'inline');
+                    } else if (startDateTime >= night) {
+                        scheduleItem.find('img[alt="심야"]').css('display', 'inline');
+                    }
 
                     theaterNumberGroup.find("ul").append(scheduleItem);
                 });

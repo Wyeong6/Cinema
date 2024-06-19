@@ -1,7 +1,7 @@
 package com.busanit.entity;
 
-import com.busanit.domain.SeatDTO;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,20 +63,20 @@ public class Seat {
         isAvailable = true;
     }
 
-    public static List<Seat> toEntity(SeatDTO seatDTO, TheaterNumber theaterNumber) {
+    public static List<Seat> toEntity(TheaterNumber theaterNumber) {
         List<Seat> seats = new ArrayList<>();
 
-        // 여러 좌석을 생성하여 리스트에 추가
-        for (int i = 1; i <= seatDTO.getSeatRow(); i++) {
-            Seat seat = new Seat();
-            seat.setSeatRow((long) i);
-            seat.setSeatColumn(seatDTO.getSeatColumn());
-            seat.setReserved(seatDTO.isReserved());
-            seat.setAvailable(seat.isAvailable());
-            seat.setTheaterNumber(theaterNumber);
-            seat.setId(generateId(seat.getSeatColumn(), seat.getSeatRow(), theaterNumber.getId()));
-
-            seats.add(seat);
+        // theaterNumber에 속하는 좌석들만 가져와서 리스트에 추가
+        List<Seat> theaterSeats = theaterNumber.getSeats();
+        for (Seat seat : theaterSeats) {
+            Seat newSeat = new Seat();
+            newSeat.setSeatRow(seat.getSeatRow());
+            newSeat.setSeatColumn(seat.getSeatColumn());
+            newSeat.setReserved(false); // 예약 여부 초기화
+            newSeat.setAvailable(true); // 사용 가능 여부 초기화
+            newSeat.setTheaterNumber(theaterNumber);
+            newSeat.setId(Seat.generateId(seat.getSeatColumn(), seat.getSeatRow(), theaterNumber.getId()));
+            seats.add(newSeat);
         }
 
         return seats;

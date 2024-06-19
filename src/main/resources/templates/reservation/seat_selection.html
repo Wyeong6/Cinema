@@ -118,7 +118,7 @@
                         <div>
                             <h3>총 금액 </h3><h3 id="total-price">0</h3><h4>원</h4>
                         </div>
-                        <button type="button">결제하기</button>
+                        <button type="button" onclick="moveToPaymentPage()">결제하기</button>
                     </div>
                 </article>
             </div>
@@ -217,6 +217,10 @@
                 selectedCount = 0;
             });
         });
+
+        function moveToPaymentPage() {
+            window.location.href = "/payment/";
+        }
     </script>
 
     <script src="/assets/js/jquery.dropotron.min.js"></script>

@@ -1026,9 +1026,17 @@ td.theater-name.clicked {
 }
 .schedule-item {
     margin-right: 0.5em;
-    padding: 0.5em 1em;
+    padding: 1em 1.3em 0.7em 1.3em;
     background: #FFFFFF;
     border-radius: 10px;
+    position: relative;
+}
+.schedule-item img {
+    margin: 0.3em 0 0 0.3em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1em;
 }
 .schedule-item.clicked {
     background: #733C6F;
@@ -1040,6 +1048,7 @@ td.theater-name.clicked {
 /* 상영좌석표 */
 .seat-selection header {
     width: 100%;
+    text-align: left !important;
 }
 .seat-selection header > h4 {
     text-align: center;
@@ -1052,7 +1061,7 @@ td.theater-name.clicked {
 #select-info {
     padding: 1em;
     display: flex;
-    flex-direction: row;
+    justify-content: space-between;
     border-radius: 15px;
 }
 #select-info > div {
@@ -1083,14 +1092,16 @@ td.theater-name.clicked {
     display: flex;
     flex-direction: row;
     align-items: center;
+    padding-right: 3em;
 }
 #select-info-form > form label {
     margin-right: 1em;
     font-size: 0.9em;
 }
 #select-info-form > form input {
+    width: 6em;
     margin-left: 0.5em;
-    padding-left: 1em;
+    padding-left: 0.5em;
     border: 1px solid #c4c3ca;
     border-radius: 5px;
 }

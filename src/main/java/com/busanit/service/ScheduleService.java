@@ -1,14 +1,17 @@
 package com.busanit.service;
 
 import com.busanit.domain.ScheduleDTO;
+import com.busanit.domain.SeatDTO;
 import com.busanit.domain.TheaterDTO;
 import com.busanit.domain.TheaterNumberDTO;
 import com.busanit.entity.Schedule;
+import com.busanit.entity.Seat;
 import com.busanit.entity.Theater;
 import com.busanit.entity.TheaterNumber;
 import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.ScheduleRepository;
+import com.busanit.repository.SeatRepository;
 import com.busanit.repository.TheaterNumberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +35,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final MovieRepository movieRepository;
     private final TheaterNumberRepository theaterNumberRepository;
+    private final SeatRepository seatRepository;
 
     @Transactional
     public void save(ScheduleDTO scheduleDTO) {
@@ -52,11 +57,7 @@ public class ScheduleService {
             throw new IllegalArgumentException("주어진 theaterNumberId에 해당하는 TheaterNumber를 찾을 수 없습니다.");
         }
 
-        // DTO를 엔티티로 변환
-        Schedule schedule = Schedule.toEntity(scheduleDTO);
-        schedule.setMovie(movie);  // Movie 설정
-        schedule.setTheaterNumber(theaterNumber);  // TheaterNumber 설정
-        schedule.setStartTimeAndCalculateStatus(scheduleDTO.getDate(), LocalTime.parse(scheduleDTO.getStartTime()), theaterNumber.getSeatsPerTheater());
+        Schedule schedule = Schedule.toEntity(scheduleDTO, theaterNumber, movie);
 
         // 스케줄 엔티티 저장
         scheduleRepository.save(schedule);
@@ -133,7 +134,8 @@ public class ScheduleService {
 
     // 지점별, 영화별, 일자별 상영일정 찾기
     public List<ScheduleDTO> findSchedulesByConditions(String theaterName, Long movieId, LocalDate date) {
-        List<Schedule> schedules = scheduleRepository.findSchedulesByConditions(theaterName, movieId, date);
+        LocalTime currentTime = LocalTime.now();
+        List<Schedule> schedules = scheduleRepository.findSchedulesByConditions(theaterName, movieId, date, currentTime);
 
         return schedules.stream()
                 .map(entity -> {

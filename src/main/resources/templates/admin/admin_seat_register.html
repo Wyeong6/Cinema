@@ -49,13 +49,14 @@
                     <div class="mb-3">
                         <div class="input-group">
                                 <label class="input-group-text label-text" for="theater-numbers-select">상영관 번호 선택</label>
-                                <select class="form-select" id="theater-numbers-select" th:field="*{theaterNumbers}" >
-                                    <option value="" selected>상영관을 선택해주세요.</option>
-                                    <option th:each="theaterNumber : ${theaterDTO?.theaterNumbers}"
-                                            th:value="${theaterNumber.id}"
-                                            th:data-seats-per-theater="${theaterNumber.seatsPerTheater}"
-                                            th:text="${theaterNumber.theaterNumber + '관'}"></option>
-                                </select>
+                            <select class="form-select" id="theater-numbers-select">
+                                <option value="" selected>상영관을 선택해주세요.</option>
+                                <option th:each="theaterNumber : ${theaterDTO.theaterNumbers}"
+                                        th:value="${theaterNumber.id}"
+                                        th:data-seats-per-theater="${theaterNumber.seatsPerTheater}"
+                                        th:text="${theaterNumber.theaterNumber + '관'}">
+                                </option>
+                            </select>
                             <input type="hidden" id="theater-number-input" />
                             <input type="hidden" id="theaterNumberId" name="theaterNumberId">
                         </div>

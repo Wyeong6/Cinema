@@ -6,8 +6,6 @@ import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
 import com.busanit.entity.*;
-import com.busanit.entity.movie.Movie;
-import com.busanit.repository.MessageRepository;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.TheaterNumberRepository;
 import com.busanit.service.*;
