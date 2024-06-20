@@ -118,16 +118,15 @@
                 let endTimeParts = endTimeString.split(":");
                 let endHours = parseInt(endTimeParts[0]);
                 let endMinutes = parseInt(endTimeParts[1]);
-                console.log(endHours);
-                console.log(endMinutes);
 
                 let startTimeInMinutes = startHours * 60 + startMinutes;
                 let endTimeInMinutes = endHours * 60 + endMinutes;
-                console.log(startTimeInMinutes);
-                console.log(endTimeInMinutes);
+
+                if (endTimeInMinutes < startTimeInMinutes) {
+                    endTimeInMinutes += 24 * 60;
+                }
 
                 let diffInMinutes = endTimeInMinutes - startTimeInMinutes;
-                console.log(diffInMinutes);
 
                 $(this).closest('tr').find('#running-time').text(diffInMinutes + '분');
             } else {

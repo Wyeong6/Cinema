@@ -1,6 +1,7 @@
 package com.busanit.entity;
 
 import com.busanit.domain.ScheduleDTO;
+import com.busanit.domain.SeatDTO;
 import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.TheaterNumberRepository;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,14 +39,20 @@ public class Schedule {
     private Long unavailableSeats = 0L;
     private Boolean status = true;
 
-    public static Schedule toEntity(ScheduleDTO scheduleDTO) {
+    public static Schedule toEntity(ScheduleDTO scheduleDTO, TheaterNumber theaterNumber, Movie movie) {
         Schedule schedule = new Schedule();
         schedule.setDate(scheduleDTO.getDate());
         schedule.setStartTime(LocalTime.parse(scheduleDTO.getStartTime()));
         schedule.setEndTime(LocalTime.parse(scheduleDTO.getEndTime()));
         schedule.setUnavailableSeats(0L);
-        schedule.updateStatus();
         schedule.setSessionType(determineSessionType(scheduleDTO.getDate(), LocalTime.parse(scheduleDTO.getStartTime())));
+        schedule.setTheaterNumber(theaterNumber);
+        schedule.setMovie(movie);
+        schedule.setTotalSeats(theaterNumber.getSeatsPerTheater());
+
+        // 상태 업데이트
+        schedule.updateStatus();
+
         return schedule;
     }
 
@@ -67,7 +76,7 @@ public class Schedule {
         boolean isEqualCurrentDateAndBeforeCurrentTime = date.equals(currentDate) && startTime.isBefore(currentTime);
         boolean isAvailableSeatsZero = calculateAvailableSeats() == 0;
 
-        if(isBeforeCurrentDate || isEqualCurrentDateAndBeforeCurrentTime || isAvailableSeatsZero) {
+        if (isBeforeCurrentDate || isEqualCurrentDateAndBeforeCurrentTime || isAvailableSeatsZero) {
             this.status = false;
         } else {
             this.status = true;
@@ -75,6 +84,10 @@ public class Schedule {
     }
 
     private Long calculateAvailableSeats() {
+        if (this.totalSeats == null) {
+            this.totalSeats = 0L;
+        }
+
         return this.totalSeats - this.unavailableSeats;
     }
 
@@ -90,18 +103,16 @@ public class Schedule {
         }
     }
 
-    // 조조인지 확인
     private static boolean isEarlyMorning(LocalTime time) {
         return time.getHour() < 12;
     }
 
-    // 심야인지 확인
     private static boolean isNightTime(LocalTime time) {
         return time.getHour() >= 22;
     }
 
-    // 주말인지 확인 (토요일 또는 일요일)
     private static boolean isWeekend(LocalDate date) {
-        return date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
     }
 }

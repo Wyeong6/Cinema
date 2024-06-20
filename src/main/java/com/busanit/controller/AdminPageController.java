@@ -6,8 +6,6 @@ import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
 import com.busanit.entity.*;
-import com.busanit.entity.movie.Movie;
-import com.busanit.repository.MessageRepository;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.TheaterNumberRepository;
 import com.busanit.service.*;
@@ -110,12 +108,8 @@ public class AdminPageController {
     }
 
     @PostMapping("/movieRegister")
-    public String movieRegister(@RequestParam(value = "movieId", required = false) Long movieId, Model model) {
-        if (movieId != null) {
-            Movie movie = movieService.getMovieById(movieId);
-            model.addAttribute("movie", movie); // 수정할 영화 객체를 모델에 추가
-        }
-        return "admin/admin_movie_register"; // 등록 폼을 재활용
+    public String movieRegister() {
+        return "admin/admin_movie_register";
     }
 
     @PostMapping("/movieUpdate")
@@ -206,14 +200,8 @@ public class AdminPageController {
         List<SeatDTO> seatDTOList;
         try {
             seatDTOList = objectMapper.readValue(seatData, new TypeReference<List<SeatDTO>>() {});
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return "error";
-        }
-
-        try {
             seatService.save(seatDTOList);
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
             return "error";
         }

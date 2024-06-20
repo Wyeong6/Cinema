@@ -543,7 +543,7 @@ public class MovieService {
         return getMoviesPagingAndSorting(page, size, false);
     }
 
-    //인기순 영화 정렬
+    // 인기순 영화 정렬
     public List<MovieDTO> getHotMovies() {
         List<Movie> movieList = movieRepository.findAllByOrderByMovieDetailPopularityDesc();
         return movieList.stream().map(MovieDTO::convertToDTO)
@@ -558,7 +558,7 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    //영화 상세보기
+    // 영화 상세보기
     public List<MovieDTO> getMovieDetailInfo(Long movieId) {
         Optional<Movie> movieList = movieRepository.findById(movieId);
         return movieList.stream().map(MovieDTO::convertToDTO)

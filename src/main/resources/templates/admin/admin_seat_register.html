@@ -49,14 +49,15 @@
                     <div class="mb-3">
                         <div class="input-group">
                                 <label class="input-group-text label-text" for="theater-numbers-select">상영관 번호 선택</label>
-                                <select class="form-select" id="theater-numbers-select" th:field="*{theaterNumbers}" >
-                                    <option value="" selected>상영관을 선택해주세요.</option>
-                                    <option th:each="theaterNumber : ${theaterDTO?.theaterNumbers}"
-                                            th:value="${theaterNumber.id}"
-                                            th:data-seats-per-theater="${theaterNumber.seatsPerTheater}"
-                                            th:text="${theaterNumber.theaterNumber + '관'}"></option>
-                                </select>
-                            <input type="hidden" id="theater-number-selected" />
+                            <select class="form-select" id="theater-numbers-select">
+                                <option value="" selected>상영관을 선택해주세요.</option>
+                                <option th:each="theaterNumber : ${theaterDTO.theaterNumbers}"
+                                        th:value="${theaterNumber.id}"
+                                        th:data-seats-per-theater="${theaterNumber.seatsPerTheater}"
+                                        th:text="${theaterNumber.theaterNumber + '관'}">
+                                </option>
+                            </select>
+                            <input type="hidden" id="theater-number-input" />
                             <input type="hidden" id="theaterNumberId" name="theaterNumberId">
                         </div>
                     </div>
@@ -180,7 +181,7 @@
     $(document).ready(function () {
         const theaterNumbersSelect = $("#theater-numbers-select");
         const theaterNamesSelect = $("#theater-names-select");
-        let theaterNumberSelected = $('theater-numbers-input');
+        let theaterNumberSelected = $('#theater-number-input');
         const regionSelect = $('#region-select');
 
         let columnCount = 1;
@@ -255,7 +256,7 @@
                     theaterNumbersSelect.append($("<option selected>상영관을 선택해주세요.</option>"));
                     if (data.theaterNumbers.length > 0) {
                         $.each(data.theaterNumbers, function(index, theaterNumber) {
-                            const $option = $("<option></option>").val(theaterNumber.theaterNumber).text(theaterNumber.theaterNumber + '관');
+                            const $option = $("<option></option>").val(theaterNumber.id).text(theaterNumber.theaterNumber + '관');
                             theaterNumbersSelect.append($option);
                         });
 
@@ -263,7 +264,7 @@
                             event.preventDefault();
                             const selectedNumberValue = $(this).val();
                             console.log(selectedNumberValue);
-                            const selectedTheaterNumber = data.theaterNumbers.find(theaterNumber => theaterNumber.theaterNumber == selectedNumberValue);
+                            const selectedTheaterNumber = data.theaterNumbers.find(theaterNumber => theaterNumber.id == selectedNumberValue);
                             const seatsPerTheater = selectedTheaterNumber.seatsPerTheater;
                             displaySeatsPerTheater(seatsPerTheater);
                         });
@@ -326,16 +327,10 @@
                 let seatCount = $('#' + inputId).val();
 
                 if (seatCount === null || seatCount === '' || seatCount === undefined) {
-                    console.log(column + '의 입력 값이 null이거나 비어 있습니다.');
                     continue;
                 }
 
-                let columnDiv = $('<div></div>').addClass('d-flex justify-content-center seat-' + column);
-                columnDiv.css({
-                    display: 'flex',
-                    justifyContent: 'row',
-                    height: 'auto'
-                });
+                let columnDiv = $('<div></div>').addClass('d-flex justify-content-center column-group seat-' + column);
                 $('.seating-area').append(columnDiv);
                 if (seatCount == null || seatCount === '') {
                     console.log(column + seatCount + '가 null입니다.');
@@ -373,44 +368,43 @@
         $('#seat-form').on('submit', function (e) {
             e.preventDefault();
 
-            const selectedTheaterId = $('#theater-numbers-select').val();
-            $('#theaterNumberId').val(selectedTheaterId);
-
+            const selectedTheaterId = theaterNumberSelected.val();
             const seatsPerTheater = $('#seats-count').val();
+            const seatsPerTheaterInt = parseInt(seatsPerTheater, 10);
 
             let totalSeats = 0;
             const seatDTOList = [];
             $('.form-control-lg').each(function() {
-                const seatCount = parseInt($(this).val(), 10);
+                const inputValue = $(this).val();
+                const seatCount = parseInt(inputValue, 10);
                 const seatColumn = $(this).siblings('label').attr('value');
 
-                totalSeats += seatCount;
+                if (!isNaN(seatCount) && seatCount > 0) {
+                    totalSeats += seatCount;
 
-                for (let i = 1; i <= seatCount; i++) {
-                    const dto = {
-                        seatRow: i,
-                        seatColumn: seatColumn,
-                        theaterNumberId: selectedTheaterId // 추가된 theaterNumberId
-                    };
-                    seatDTOList.push(dto);
+                    for (let i = 1; i <= seatCount; i++) {
+                        const dto = {
+                            seatRow: i,
+                            seatColumn: seatColumn,
+                            theaterNumberId: selectedTheaterId
+                        };
+                        seatDTOList.push(dto);
+                    }
                 }
             });
 
-            if (totalSeats != seatsPerTheater) {
+            if (totalSeats !== seatsPerTheaterInt) {
                 Swal.fire({
-                    title: '총 좌석 수는 ' + seatsPerTheater + '석 입니다.',
+                    title: '총 좌석 수는 ' + seatsPerTheaterInt + '석 입니다.',
                     text: '확인 후 다시 시도해주세요.',
                     icon: 'error'
                 });
-                console.log(totalSeats);
-                console.log(seatsPerTheater);
                 return false;
             }
 
             const seatDataJson = JSON.stringify(seatDTOList);
             document.getElementById('seatData').value = seatDataJson;
 
-            // 폼을 제출
             this.submit();
         });
     });

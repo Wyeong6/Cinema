@@ -5,8 +5,7 @@ import com.busanit.entity.Schedule;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,6 +27,7 @@ public class ScheduleDTO {
     private String sessionType;
     private Long totalSeats;
     private Long unavailableSeats;
+    private List<SeatDTO> seats;
     private Boolean status;
 
     public static ScheduleDTO toDTO(Schedule schedule) {
