@@ -140,13 +140,15 @@
     function handleWebSocketMessage(response) {
         displayChatList(response);  //화면에 표시
         updateUnreadCount(response); //않은 메시지 수를 업데이트
-        // updateLastReadTimestamp(response)
     }
 
     // 클릭된 페이지에 대한 채팅 목록 로드
-    $(document).on('click', '.paging-btn', function () {
+    $(document).on('click', '.paging-btn', function (e) {
+        e.preventDefault();
+
         const currentPage = $(this).data('page');
-        loadChatList(currentPage, 8, true); // 페이지 크기는 8로 설정
+        console.log("클릭한 페이지 " + currentPage)
+        loadChatList(currentPage, 8, false); // 페이지 크기는 8로 설정
     });
 </script>
 
@@ -241,8 +243,20 @@
             stompClient.send("/app/chat/private", {}, JSON.stringify(message));
             showMessage('관리자 : ' + messageContent);
             getElement('message').value = '';
+
+            // 메시지 전송 후 타이핑 상태 초기화
+            clearTimeout(typingTimeout);
+            typingIndicatorSent = false;
         }
     }
+
+    // Enter 키 입력 시 메시지 전송
+    document.getElementById("message").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Enter 키의 기본 동작(새 줄 추가)을 막음
+            sendMessage(); // sendMessage 함수 호출
+        }
+    });
 
     // 타이핑 이벤트를 처리하는 함수
     function handleTypingEvent() {

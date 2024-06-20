@@ -37,15 +37,15 @@
     var chatRoomTitle = null;
     var recipient = null;  // 수신자 이메일을 고정
     var stompClient = null; // STOMP 클라이언트 변수 선언
-    var typingTimeout = null;
+    var typingTimeout = null; //타이핑 타이머
     var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
-    var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수var roomId = null;
-    var status = null;
+    var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
+    var status = null; //채팅방 상태
 
     // WebSocket 연결 함수
     function connect() {
-        var socket = new SockJS('/ws'); // SockJS를 사용하여 '/ws' 엔드포인트에 연결
-        stompClient = Stomp.over(socket); // STOMP 프로토콜을 사용하여 SockJS 소켓을 Wrapping
+        var socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
             // 연결 성공 시 콘솔에 로그 출력
             console.log('Connected: ' + frame);
@@ -65,19 +65,21 @@
     // 메시지 타입에 따른 처리
     function handleMessage(parsedMessage) {
 
+        //채팅종료 시
         if (parsedMessage.status === 'inactive') {
             console.log("대화종료메세지오기전에");
             showMessage(parsedMessage.content);
             showMessage('다른 문의가 있으면 카테고리를 선택해주세요.');
             updateCategoryButtonsDisplay('block');
-
+        //타이핑 중이면
         } else if (parsedMessage.typing === "typing") {
             console.log("상대방이 타이핑 중입니다.");
             updateTypingIndicatorDisplay('block');
-
+        //타이핑 안할 때
         } else if (parsedMessage.typing === "not_typing") {
             console.log("채팅안함");
             updateTypingIndicatorDisplay('none');
+            //일반 메세지
         } else {
             console.log("일반메세지.");
             showMessage('관리자 : ' + parsedMessage.content);
@@ -143,7 +145,19 @@
             stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
             showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
             document.getElementById('message').value = ''; // 입력 필드를 비움
+
+        // 메시지 전송 후 타이핑 상태 초기화
+        clearTimeout(typingTimeout);
+        typingIndicatorSent = false;
     }
+
+    // Enter 키 입력 시 메시지 전송
+    document.getElementById("message").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Enter 키의 기본 동작(새 줄 추가)을 막음
+            sendMessage(); // sendMessage 함수 호출
+        }
+    });
 
     //메세지 표현
     function showMessage(message) {
@@ -157,6 +171,13 @@
     //카테고리를 선택한 후
     function selectCategory(category) {
         console.log("선택한 category" + category)
+
+        var messages = document.getElementById('messages');
+        // messages 요소의 자식 노드를 모두 제거
+        while (messages.firstChild) {
+            messages.removeChild(messages.firstChild);
+        }
+
         chatRoomTitle = category;
         showMessage('문의사항을 남겨주시면 신속히 답변해드리겠습니다.');
 
@@ -211,19 +232,6 @@
             .catch(error => console.error('Error creating chat room:', error));
     }
 
-    window.onload = async function () {
-
-        recipient = await fetchRecipientEmail();
-        console.log("로드된 recipient" + recipient)
-        console.log("로드시 로그인된 이메일" + sender)
-
-        if (recipient) {
-            await fetchMessages(recipient);
-            if (chatRoomId) {
-                connect(); // chatRoomId가 있는 경우에만 커넥션 설정
-            }
-        }
-    };
     //유저이메일로 현재 채팅중인 관리자 이메일 찾기
     async function fetchRecipientEmail() {
         try {

@@ -623,11 +623,13 @@ public class AdminPageController {
     public String chatList() {
         return "admin/admin_chatList";
     }
+
     //채팅리스트
     @PostMapping("/getChatList")
     @ResponseBody
     public Map<String, Object> pagingChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
-        String memberEmail =  movieService.getUserEmail();
+        System.out.println("Received page: " + page);
+        String memberEmail = movieService.getUserEmail();
 
         Page<ChatRoomDTO> chatRooms = chatService.getChatList(page - 1, size, memberEmail);
 
@@ -646,12 +648,13 @@ public class AdminPageController {
         return response;
     }
 
-    //문의채팅리스트 페이지 이동
+    //문의리스트 페이지 이동
     @GetMapping("/inquiry")
     public String inquiryList() {
         return "admin/admin_inquiry_list";
     }
 
+    //문의리스트 반환
     @GetMapping("/inquiryList")
     public String inquiryList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
         Page<InquiryDTO> inquiryDTO = inquiryService.getInquiryList(page - 1, size);

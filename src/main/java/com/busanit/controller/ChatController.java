@@ -59,7 +59,7 @@ public class ChatController {
     @ResponseBody
     public ResponseEntity<Map<String, Long>> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
 
-        ChatRoom createChatRoom = chatService.getOrCreateChatRoom(chatRoomDTO.getChatRoomTitle(), chatRoomDTO.getUserEmail(), chatRoomDTO.getAdminEmail());
+        ChatRoom createChatRoom = chatService.handleUserMessage(chatRoomDTO.getChatRoomTitle(), chatRoomDTO.getUserEmail(), chatRoomDTO.getAdminEmail());
 
         Map<String, Long> response = new HashMap<>();
         response.put("chatRoomId", createChatRoom.getId());

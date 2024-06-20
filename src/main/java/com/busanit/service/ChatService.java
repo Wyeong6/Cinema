@@ -104,7 +104,7 @@ public class ChatService {
         return new PageImpl<>(chatRoomList, pageable, chatRoomPage.getTotalElements());
     }
 
-    // 사용자 이메일로 채팅방 메세지 조회
+    // 사용자 이메일로 채팅방의 상태가 active인 메세지 조회
     public List<ChatRoomDTO> findChatRoomByUserEmail(String recipient) {
         //로그인 한 사람
         String readEmail = getAuthenticatedUserEmail();
@@ -123,12 +123,12 @@ public class ChatService {
                 })
                 .collect(Collectors.toList());
     }
-
-    // 채팅방 생성 또는 조회
-    public ChatRoom getOrCreateChatRoom(String chatRoomTitle, String senderEmail, String recipientEmail) {
-        return handleUserMessage(chatRoomTitle, senderEmail, recipientEmail);
-
-    }
+//
+//    // 채팅방 생성 또는 조회
+//    public ChatRoom getOrCreateChatRoom(String chatRoomTitle, String senderEmail, String recipientEmail) {
+//        return handleUserMessage(chatRoomTitle, senderEmail, recipientEmail);
+//
+//    }
 
     //클릭한 채팅방 메세지 읽음 표시
     public List<ChatRoomDTO> findChatRoomByChatRoomId(Long chatRoomId) {
@@ -163,7 +163,7 @@ public class ChatService {
     }
 
     // 사용자 메시지 처리
-    private ChatRoom handleUserMessage(String chatRoomTitle, String senderEmail, String recipientEmail) {
+    public ChatRoom handleUserMessage(String chatRoomTitle, String senderEmail, String recipientEmail) {
         Member sender = findMemberByEmail(senderEmail);
         Member receiver = findMemberByEmail(recipientEmail);
 

@@ -85,21 +85,23 @@ export let adminEmail = '';
  * @returns {Promise} - AJAX 요청의 Promise 객체 반환
  */
 export function loadChatList(page, size, isUpdateUnreadCountOnly) {
-
+    console.log("모듈의 page" + page)
     console.log("모달창닫은 후 loadChatList");
     $.ajax({
         url: "/admin/getChatList",
         data: {
             page: page,
-            size: size,
+            size: size
         },
         type: "POST",
-        contentType: "application/json",
+        contentType: "application/x-www-form-urlencoded",
         success: function (response) {
             console.log("응답 데이터:", response);
             adminEmail = response.memberEmail;
             console.log("응답 memberEmail:", adminEmail);
 
+            response.currentPage = page;
+            console.log("currentPage" + response.currentPage)
 
             if (isUpdateUnreadCountOnly) {
                 updateUnreadCount(response);
@@ -124,7 +126,7 @@ export function updateUnreadCount(response) {
     var unreadCountSpan = document.getElementById('unreadCount');
 
     // 안 읽은 메시지 수 업데이트
-    unreadCountSpan.textContent = totalUnreadCount;
+    unreadCountSpan.textContent = `(${totalUnreadCount})`;
 
     // 안 읽은 메시지가 있는 경우 표시
     if (totalUnreadCount > 0) {
@@ -132,9 +134,7 @@ export function updateUnreadCount(response) {
     } else {
         unreadMessagesDiv.style.display = 'none';
     }
-
 }
-
 
 /**
  * 채팅 목록을 화면에 표시하는 함수
@@ -174,6 +174,7 @@ export function displayChatList(response) {
         $chatListContainer.append(chatRoomRow);
     });
 
+    //경과시간
     updateTimeSinceCreated();
 
     // 페이징 정보 업데이트
@@ -188,6 +189,8 @@ export function displayChatList(response) {
 
     $pagination.html(paginationHtml);
 }
+
+
 
 
 // 전역 객체에 loadChatList 함수 추가
