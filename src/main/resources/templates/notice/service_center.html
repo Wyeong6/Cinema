@@ -17,7 +17,7 @@
         <!-- Nav -->
         <nav id="nav">
             <a class="icon solid fa-question-circle" href="#"></a>
-            <a class="icon solid fa-comments" href="#work" id="loadChat"></a>
+            <a class="icon solid fa-comments" href="#work" id="loadChat" onclick="checkLoginStatus(event)"></a>
             <a class="icon solid fa-envelope" href="#contact"></a>
             <a class="icon solid fa-home" href="/"></a>
         </nav>
@@ -279,126 +279,46 @@
     <script src="/assets/centerjs/main.js"></script>
 
     <script>
-        $(document).ready(function () {
-            // 페이지 로드 시 실행할 코드
-            loadContentIfNeeded();
-        });
+        function checkLoginStatus(event) {
+            event.preventDefault(); // Prevent the default action of the link (navigation)
 
-        function loadContentIfNeeded() {
-            // 특정 조건에 따라 AJAX 요청을 보냅니다.
-
-                $.ajax({
-                    url: '/chatUser',  // 서버에서 가져올 HTML 경로
-                    type: 'GET',
-                    dataType: 'html',
-                    success: function (response) {
-                        // 성공적으로 가져온 HTML을 DOM에 삽입합니다.
-                        $('#work').html(response);
-
-                        async function afterChatLoaded() {
-                            recipient = await fetchRecipientEmail();
-                            console.log("로드된 recipient" + recipient);
-                            console.log("로드시 로그인된 이메일" + sender);
-
-                            if (recipient) {
-                                await fetchMessages(recipient);
-                                if (chatRoomId) {
-                                    connect(); // chatRoomId가 있는 경우에만 커넥션 설정
-                                }
-                            }
-                        }
-
-                        // 추가적인 작업을 수행할 수 있는 함수 호출
-                        afterChatLoaded();
-                    },
-                    error: function (error) {
-                        // AJAX 요청 실패 시 처리할 코드
-                        console.error('Failed to fetch chat HTML:', error);
-                        alert("Failed to load content. Please try again.");
+            $.ajax({
+                url: '/checkLoginStatus',  // URL to check login status
+                type: 'GET',
+                success: function (response) {
+                    if (response.loggedIn) {
+                        // User is logged in, load chat content
+                        loadChatContent();
+                    } else {
+                        // User is not logged in, show notification
+                        alert('로그인 후 이용 가능합니다.');
+                        history.back(); // 클릭 이벤트 발생 전 주소로 되돌아감
+                        // Optionally redirect to login page
+                        // window.location.href = '/login';
                     }
-                });
-            }
+                },
+                error: function (error) {
+                    console.error('Failed to check login status:', error);
+                    alert("Failed to load content. Please try again.");
+                }
+            });
+        }
 
-
-
-
-
-
-
-
-
-
-
-        //
-        // $(document).ready(function () {
-        //     // Click event handler for 1:1 CHAT link
-        //     $('#loadChat').on('click', function (e) {
-        //         e.preventDefault();
-        //
-        //         // Load content from chat.html
-        //         $.ajax({
-        //             url: '/chatUser',  // Replace with the correct path to your chat.html file
-        //             type: 'GET',
-        //             dataType: 'html',
-        //             success: function (response) {
-        //                 // Replace the content of #work with the loaded content
-        //                 $('#work').html(response);
-        //
-        //                 async function afterChatLoaded() {
-        //                     recipient = await fetchRecipientEmail();
-        //                     console.log("로드된 recipient" + recipient);
-        //                     console.log("로드시 로그인된 이메일" + sender);
-        //
-        //                     if (recipient) {
-        //                         await fetchMessages(recipient);
-        //                         if (chatRoomId) {
-        //                             connect(); // chatRoomId가 있는 경우에만 커넥션 설정
-        //                         }
-        //                     }
-        //                 }
-        //
-        //                 afterChatLoaded();
-        //             },
-        //             error: function (error) {
-        //                 alert("Failed to load content. Please try again.");
-        //             }
-        //         });
-        //     });
-        //
-        //     // 해시 변경 이벤트 리스너
-        //     $(window).on('hashchange', function () {
-        //         // 현재 해시 값에 따라 패널 업데이트
-        //         var hash = window.location.hash;
-        //         if (hash === '#work') {
-        //             // chat.html 다시 로드
-        //             $.ajax({
-        //                 url: '/chatUser',
-        //                 type: 'GET',
-        //                 dataType: 'html',
-        //                 success: function (response) {
-        //                     $('#work').html(response);
-        //
-        //                     async function afterChatLoaded() {
-        //                         recipient = await fetchRecipientEmail();
-        //                         console.log("로드된 recipient" + recipient);
-        //                         console.log("로드시 로그인된 이메일" + sender);
-        //
-        //                         if (recipient) {
-        //                             await fetchMessages(recipient);
-        //                             if (chatRoomId) {
-        //                                 connect(); // chatRoomId가 있는 경우에만 커넥션 설정
-        //                             }
-        //                         }
-        //                     }
-        //                     afterChatLoaded();
-        //                 },
-        //                 error: function (error) {
-        //                     alert("콘텐츠 로드에 실패하였습니다. 다시 시도해주세요.");
-        //                 }
-        //             });
-        //         }
-        //     });
-        // });
+        function loadChatContent() {
+            $.ajax({
+                url: '/chatUser',  // URL to load chat content
+                type: 'GET',
+                dataType: 'html',
+                success: function (response) {
+                    $('#work').html(response);
+                    // afterChatLoaded(); // Optionally perform additional actions after chat content is loaded
+                },
+                error: function (error) {
+                    console.error('Failed to fetch chat HTML:', error);
+                    alert("Failed to load content. Please try again.");
+                }
+            });
+        }
     </script>
 
 </body>

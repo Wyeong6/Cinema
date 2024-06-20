@@ -4,6 +4,7 @@ import com.busanit.domain.InquiryDTO;
 import com.busanit.entity.Inquiry;
 import com.busanit.entity.InquiryReply;
 import com.busanit.repository.InquiryReplyRepository;
+import com.busanit.service.ChatService;
 import com.busanit.service.InquiryService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -14,11 +15,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequiredArgsConstructor
 public class InquiryController {
 
     private final InquiryService inquiryService;
+    private  final ChatService chatService;
 
     // 문의하기 폼 페이지로 이동
     @GetMapping("/inquiry")
@@ -59,5 +64,13 @@ public class InquiryController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failure");
         }
+    }
+
+    @GetMapping("/checkLoginStatus")
+    @ResponseBody
+    public Map<String, Boolean> checkLoginStatus() {
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("loggedIn", chatService.isAuthenticated()); // Check if user is authenticated
+        return response;
     }
 }

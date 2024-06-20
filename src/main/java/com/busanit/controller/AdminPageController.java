@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -646,23 +647,60 @@ public class AdminPageController {
         return "admin/admin_inquiry_list";
     }
 
+
     //문의리스트 반환
     @GetMapping("/inquiryList")
-    public String inquiryList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
-        Page<InquiryDTO> inquiryDTO = inquiryService.getInquiryList(page - 1, size);
+    public String inquiryList(Model model, @RequestParam(defaultValue = "1") int page,
+                              @RequestParam(defaultValue = "8") int size) {
 
-        int totalPages = inquiryDTO.getTotalPages();
-        int startPage = Math.max(1, page - 5);
-        int endPage = Math.min(totalPages, page + 4);
+        // 미답변 문의 리스트와 페이지 정보
+        Page<InquiryDTO> unansweredInquiries = inquiryService.getUnansweredInquiryList(page - 1, size);
+        addPagingAttributesToModel(model, "unanswered", unansweredInquiries, page, size);
 
-        model.addAttribute("inquiryList", inquiryDTO); //이벤트 게시글
-        model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
-        model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
+        // 답변 완료된 문의 리스트와 페이지 정보
+        Page<InquiryDTO> answeredInquiries = inquiryService.getAnsweredInquiryList(page - 1, size);
+        addPagingAttributesToModel(model, "answered", answeredInquiries, page, size);
 
         return "admin/admin_inquiry_list";
     }
+
+    private void addPagingAttributesToModel(Model model, String type, Page<InquiryDTO> inquiries, int page, int size) {
+        int totalPages = inquiries.getTotalPages();
+        int startPage = Math.max(1, page - 5);
+        int endPage = Math.min(totalPages, page + 4);
+
+        model.addAttribute(type + "InquiryList", inquiries);
+        model.addAttribute("current" + type + "Page", page);
+        model.addAttribute("total" + type + "Pages", totalPages);
+        model.addAttribute("start" + type + "Page", startPage);
+        model.addAttribute("end" + type + "Page", endPage);
+    }
+    @GetMapping("/inquiryReplies/{inquiryId}")
+    public ResponseEntity<InquiryReplyDTO> getInquiryDetails(@PathVariable Long inquiryId, Model model) {
+        InquiryReplyDTO inquiryReply = inquiryService.findInquiryReplyByInquiryId(inquiryId);
+        return ResponseEntity.ok(inquiryReply);
+    }
+
+//
+//    //문의리스트 반환
+//    @GetMapping("/inquiryList")
+//    public String inquiryList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+//        Page<InquiryDTO> inquiryDTO = inquiryService.getInquiryList(page - 1, size);
+//
+//
+//
+//        int totalPages = inquiryDTO.getTotalPages();
+//        int startPage = Math.max(1, page - 5);
+//        int endPage = Math.min(totalPages, page + 4);
+//
+//        model.addAttribute("inquiryList", inquiryDTO); //이벤트 게시글
+//        model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
+//        model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
+//        model.addAttribute("startPage", startPage);
+//        model.addAttribute("endPage", endPage);
+//
+//        return "admin/admin_inquiry_list";
+//    }
 
 
 

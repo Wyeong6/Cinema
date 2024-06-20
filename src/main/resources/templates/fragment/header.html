@@ -106,36 +106,6 @@
 
             window.location.href = "/member/logout";
         });
-
-        // $(document).ready(function () {
-        //     const socket = new SockJS('/ws'); // WebSocket 엔드포인트 '/ws'로 연결
-        //     const stompClient = Stomp.over(socket); // Stomp 클라이언트 객체 생성
-        //
-        //     stompClient.connect({}, function (frame) {
-        //         console.log('Connected to WebSocket: ' + frame);
-        //
-        //         // '/user/queue/unreadCount' 주제를 구독하여 메시지 처리
-        //         stompClient.subscribe('/user/queue/chatList', function (message) {
-        //             const response = JSON.parse(message.body);
-        //             console.log("Received message:", response);
-        //
-        //             updateUnreadCount(response); // Update unread message count
-        //
-        //             // Determine display based on unread count
-        //             if (response.totalUnreadCount > 0) {
-        //                 $('#unreadMessages').show(); // Show element if there are unread messages
-        //             } else {
-        //                 $('#unreadMessages').hide(); // Hide element if no unread messages
-        //             }
-        //         });
-        //     });
-        // });
-        //
-        // function updateUnreadCount(response) {
-        //     var totalUnreadCount = response.chatRoom.reduce((sum, chatRoom) => sum + chatRoom.unreadMessageCount, 0);
-        //     document.getElementById('unreadCount').textContent = totalUnreadCount; // Update unread count display
-        //     return totalUnreadCount; // Return total unread count
-        // }
     </script>
     </body>
 </th:block>

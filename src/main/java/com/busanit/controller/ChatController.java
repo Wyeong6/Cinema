@@ -30,13 +30,13 @@ public class ChatController {
     //로그인 여부확인 후 페이지이동
     @GetMapping("/chatUser")
     public String chatUser(Model model) {
-        if (chatService.isAuthenticated()) {
+//        if (chatService.isAuthenticated()) {
             String userEmail = chatService.getAuthenticatedUserEmail();
             model.addAttribute("userEmail", userEmail);
             return "/cs/chat"; // templates 폴더의 chat.html 파일을 렌더링
-        } else {
-            return "redirect:/login"; // 로그인 페이지로 리다이렉트
-        }
+//        } else {
+//            return "redirect:/login"; // 로그인 페이지로 리다이렉트
+//        }
     }
 
     //메세지 처리
