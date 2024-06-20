@@ -32,14 +32,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static com.busanit.domain.movie.ActorDTO.convertToDto;
 
 @Service
@@ -71,9 +69,7 @@ public class MovieService {
     // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-
-//    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
-    @Scheduled(fixedRate = 120000) // 2분
+    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
     public void fetchAndStoreMovies() throws IOException {
         fetchAndStoreMoviesNowPlaying();
         fetchAndStoreMoviesUpcoming();
@@ -128,7 +124,6 @@ public class MovieService {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds(); // 삭제된 영화 ID 목록 가져오기
         List<Movie> modifiedMovies = getModifiedMovies();
-
 
         int totalPages = fetchTotalPages();
         for (int page = 1; page <= totalPages; page++) {
@@ -296,7 +291,6 @@ public class MovieService {
                             return genreRepository.save(newGenre); // 데이터베이스에 저장
                         });
                 movie.addGenre(genre); // 영화에 장르 추가
-
             }
         }
     }
@@ -329,7 +323,7 @@ public class MovieService {
         movieDetailRepository.save(movieDetail);
     }
 
-//    https://api.themoviedb.org/3/movie/653346?language=ko-KR&api_key=547e2cd4d0e26e68fb907dafef4f90ac
+//   체크용 링크 https://api.themoviedb.org/3/movie/653346?language=ko-KR&api_key=547e2cd4d0e26e68fb907dafef4f90ac
 
     public void fetchAndStoreMovieStillCuts() throws IOException {
 
@@ -347,7 +341,6 @@ public class MovieService {
     public void processStillCutsResponse(String responseBody) throws IOException {
         MovieStillCutDTO movieStillCutDTO = objectMapper.readValue(responseBody, MovieStillCutDTO.class);
 
-//        List<String> filePaths = new ArrayList<>();
         if (movieStillCutDTO.getBackdrops() != null) {
             for (MovieStillCutDTO.ImageDTO backdrop : movieStillCutDTO.getBackdrops()) {
                 saveSingleStillCut(movieStillCutDTO.getId(), backdrop.getFile_path());
@@ -358,7 +351,6 @@ public class MovieService {
                 saveSingleStillCut(movieStillCutDTO.getId(), poster.getFile_path());
             }
         }
-
     }
 
     private void saveSingleStillCut(Long movieId, String filePath) {
@@ -367,13 +359,10 @@ public class MovieService {
         }
         Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + movieId));
         MovieStillCut movieStillCut = new MovieStillCut();
-//        movieStillCut.setMovieStillCutId(movieId);
         movieStillCut.setStillCuts(filePath); // 여기서는 각각의 filePath를 별도로 저장합니다.
         movie.addStillCut(movieStillCut);
         movieStillCutRepository.save(movieStillCut);
-//        movieRepository.save(movie);
     }
-
 
     private boolean hasImage(List<MovieImage> images, String posterPath, String backdropPath) {
         for (MovieImage image : images) {
@@ -392,7 +381,6 @@ public class MovieService {
         }
         Movie existingMovie = optionalMovie.get();
 
-
         String posterPath = node.get("poster_path").asText();
         String backdropPath = node.get("backdrop_path").asText();
 
@@ -401,9 +389,7 @@ public class MovieService {
             MovieImage movieImage = new MovieImage();
             movieImage.setPosterPath(posterPath);
             movieImage.setBackdropPath(backdropPath);
-
             existingMovie.addImage(movieImage);
-
             // 수정된 movie를 저장
         }
     }
@@ -421,7 +407,7 @@ public class MovieService {
         }
     }
 
-    // 영화 배우 가져오기
+    // 영화 배우 가져오기(한국어로 된거만)
     public void fetchKoreanActors() throws IOException {
         List<MovieActor> koreanActors = new ArrayList<>();
 
@@ -451,7 +437,6 @@ public class MovieService {
                 }
             }
         }
-
         koreanActors.forEach(System.out::println);
     }
 
@@ -462,7 +447,6 @@ public class MovieService {
         // 배우 이름으로 데이터베이스에서 검색하여 존재 여부 확인
         return movieActorRepository.existsByActorName(name);
     }
-
     private static String getGender(int genderCode) {
         switch (genderCode) {
             case 1:
@@ -473,7 +457,6 @@ public class MovieService {
                 return "Not specified";
         }
     }
-
 
     public void processCertificationResponse(String responseBody, Long movieId) throws IOException {
         MovieDetailDTO.ReleaseDatesDTO releaseDatesDTO = objectMapper.readValue(responseBody, MovieDetailDTO.ReleaseDatesDTO.class);
@@ -496,7 +479,6 @@ public class MovieService {
         } else if ("ALL".equals(certification) || "All".equals(certification)) {
             certification = "전체 관람가";
         }
-
 
         if (certification != null) {
             Movie movie = movieRepository.findById(movieId).orElse(new Movie());
@@ -542,14 +524,12 @@ public class MovieService {
     public Page<MovieDTO> getCurrentMoviesPagingAndSorting(int page, int size) {
         return getMoviesPagingAndSorting(page, size, false);
     }
-
     // 인기순 영화 정렬
     public List<MovieDTO> getHotMovies() {
         List<Movie> movieList = movieRepository.findAllByOrderByMovieDetailPopularityDesc();
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
-
     //인기순 영화 중 영상있는 것
     public List<MovieDTO> getVideoMovies() {
         Pageable topFive = PageRequest.of(0, 5);
@@ -557,7 +537,6 @@ public class MovieService {
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
-
     // 영화 상세보기
     public List<MovieDTO> getMovieDetailInfo(Long movieId) {
         Optional<Movie> movieList = movieRepository.findById(movieId);
@@ -565,13 +544,11 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-
     public List<MovieDTO> getActors() {
         List<MovieActor> movieActors = movieActorRepository.findAll();
         return movieActors.stream().map(MovieDTO::convertActorToDTO)
                 .collect(Collectors.toList());
     }
-
     //로그인되어있는 유저 email받아오기
     public String getUserEmail() {
         String userEmail = null;
@@ -583,7 +560,6 @@ public class MovieService {
         }
         return userEmail;
     }
-
     //모든 영화에서 개봉일자가 4개월 전/후 로 필터링 하는 함수
     //매개변수의 boolean 값으로 4개월 전으로 나눌지 4개월 후로 나눌지 선택할수있음!
     public List<MovieDTO> getFilteredMovies(List<MovieDTO> allMovies, boolean isUpcoming) {
@@ -610,14 +586,12 @@ public class MovieService {
                 })
                 .collect(Collectors.toList());
     }
-
     // 검색기능
     public List<MovieDTO> searchMovies(String query) {
         List<Movie> searchResults = movieRepository.findByTitleContaining(query);
         return searchResults.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
-
     // 페이징된  !!!모든영화!!!  무비리스트
     public List<MovieDTO> getMoviesWithPaging(int page, int pageSize) {
         // JPA 페이징 처리를 위한 Pageable 객체 생성
@@ -666,7 +640,6 @@ public class MovieService {
             movieDetail = new MovieDetail();
             movie.setMovieDetail(movieDetail);
         }
-
 
         movieDetail.setCertification(certifications);
         movieDetail.setReleaseDate(movieReleaseDate);
@@ -722,7 +695,6 @@ public class MovieService {
             // 만약 새로운 스틸컷이 제공되지 않으면 기존 목록을 유지합니다.
             movie.setStillCuts(movie.getStillCuts());
         }
-
         // 포스터 이미지와 백드롭 이미지 업데이트
         MovieImage movieImage = new MovieImage();
 
@@ -735,15 +707,10 @@ public class MovieService {
             movieImageRepository.save(movieImage);
             movie.addImage(movieImage);
         }
-
-//        movieImage.setPosterPath(registeredPoster != null ? registeredPoster : "");
-//        movieImage.setBackdropPath(registeredBackdrop != null ? registeredBackdrop : "");
-
         movieRepository.save(movie); // 변경 감지에 의해 자동으로 데이터베이스에 저장됨
     }
 
     // 영화 등록 관련 로직
-
     public List<String> saveStillCutImages(List<MultipartFile> registeredStillCut, String uploadDirectory, String stillCutRelativeUploadDir) throws IOException {
 
         if (registeredStillCut == null) {
@@ -801,11 +768,9 @@ public class MovieService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid movie Id:" + movieId));
     }
 
-
     public void addToBlacklist(Long movieId) {
         movieBlacklistRepository.save(new MovieBlacklist(movieId));
     }
-
 
     public boolean checkIfMovieIdExists(String id) {
         return movieRepository.existsById(Long.valueOf(id));
@@ -814,7 +779,6 @@ public class MovieService {
     public List<MovieActor> findByActorNameContaining(String query) {
         return movieActorRepository.findByActorNameContaining(query);
     }
-
 
     public List<Long> getActorIdsByMovieId(String movieId) {
         // Movie ID를 기반으로 해당 영화에 출연한 배우들의 ID 목록을 데이터베이스에서 조회하여 반환
