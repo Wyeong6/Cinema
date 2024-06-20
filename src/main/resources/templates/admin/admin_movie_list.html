@@ -133,7 +133,8 @@
                     success: function (data) {
                         // 삭제 성공 시 메시지 표시 또는 영화 목록 갱신 등의 작업 수행
                         alert('영화가 성공적으로 삭제되었습니다.');
-                        loadMovieList(); // 영화 목록 다시 로드 (예시 함수)
+                        $('.container-xxl').load('/admin/movieList', { type : 'POST' });
+                        // loadMovieList(); // 영화 목록 다시 로드 (예시 함수)
                     },
                     error: function () {
                         alert('영화 삭제 중 오류가 발생했습니다.');
@@ -147,7 +148,7 @@
 
 
 
-    // 영화 목록 로드 함수
+    //영화 목록 로드 함수
         function loadMovieList(page) {
             $.ajax({
                 url: '/admin/movieList',
@@ -155,7 +156,7 @@
                 data: { page: page },
                 success: function(data) {
                     // 컨테이너에 결과 HTML 넣기
-                    $('.movie-list-container').html(data);
+                    $('#movie-list-container').html(data);
                 },
                 error: function() {
                     alert('영화 목록 로드 중 오류가 발생했습니다.');

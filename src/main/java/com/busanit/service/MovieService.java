@@ -486,7 +486,7 @@ public class MovieService {
                 .orElse(null);
 
         if ("".equals(certification)) {
-            certification = "-";
+            certification = "정보없음";
         } else if ("18".equals(certification)) {
             certification = "18세 이상 관람가";
         } else if ("15".equals(certification)) {
