@@ -298,7 +298,8 @@
             $('.container-xxl').load('/admin/movieList', {type: 'POST'});
         });
         $('.movie_register_btn').on('click', function () {
-            $('.container-xxl').load('/admin/movieRegister', {type: 'POST'});
+            $('.container-xxl').load('/admin/movieRegister', { type : 'POST' });
+            clearSelectedActors();
         });
         // 상영관 관리
         $('.theater_reg_btn').on('click', function (e) {

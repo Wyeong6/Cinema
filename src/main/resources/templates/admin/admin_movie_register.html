@@ -103,7 +103,7 @@
 
 <!-- / Navbar -->
 
-<h4 class="fw-bold py-3 mb-4">영화 등록</h4>
+<h4 class="fw-bold py-3 mb-4" id="formTitle">영화 등록</h4>
 <!-- Basic Layout -->
 <div class="row">
     <div class="col-xl">
@@ -120,7 +120,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="title">영화 제목</label>
-                        <input class="form-control" id="title" name="title" placeholder="상품 제목을 입력해주세요."
+                        <input class="form-control" id="title" name="title" th:value="${movie != null ? movie.title : ''}" placeholder="상품 제목을 입력해주세요."
                                required type="text"/>
                     </div>
                     <div class="mb-3">
@@ -129,36 +129,38 @@
                                 class="form-control"
                                 id="overview"
                                 name="overview"
+                                th:text="${movie != null ? movie.overview : ''}"
                                 placeholder="영화 줄거리를 입력해주세요." required
                         ></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="runtime">상영시간</label>
                         <input class="form-control" id="runtime" name="runtime"
+                               th:value="${movie != null ? movie.movieDetail.runtime : ''}"
                                placeholder="상영시간을 입력해주세요" type="number"/>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="cert-all" style="margin-right: 15px">관람 등급</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certifications" id="cert-all" value="전체이용가">
+                            <input class="form-check-input" type="radio" name="certifications" id="cert-all" value="전체이용가" th:checked="${movie != null && movie.movieDetail.certification == '전체이용가'}">
                             <label class="form-check-label" for="cert-all">전체 관람가</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certifications" id="cert-12" value="12세 이상 관람가">
+                            <input class="form-check-input" type="radio" name="certifications" id="cert-12" value="12세 이상 관람가" th:checked="${movie != null && movie.movieDetail.certification == '12세 이상 관람가'}">
                             <label class="form-check-label" for="cert-12">12세 이상 관람가</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certifications" id="cert-15" value="15세 이상 관람가">
+                            <input class="form-check-input" type="radio" name="certifications" id="cert-15" value="15세 이상 관람가" th:checked="${movie != null && movie.movieDetail.certification == '15세 이상 관람가'}">
                             <label class="form-check-label" for="cert-15">15세 이상 관람가</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certifications" id="cert-18" value="18세 이상 관람가">
+                            <input class="form-check-input" type="radio" name="certifications" id="cert-18" value="18세 이상 관람가" th:checked="${movie != null && movie.movieDetail.certification == '18세 이상 관람가'}">
                             <label class="form-check-label" for="cert-18">18세 이상 관람가</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="releaseDate">개봉 일자</label>
-                        <input class="form-control" id="releaseDate" name="releaseDate" placeholder="개봉 일자를 입력해주세요. ex) 2024-05-05"
+                        <input class="form-control" id="releaseDate" name="releaseDate" th:value="${movie != null ? movie.movieDetail.releaseDate : ''}" placeholder="개봉 일자를 입력해주세요. ex) 2024-05-05"
                                required type="date"/>
                     </div>
                     <div class="mb-3">
@@ -193,7 +195,7 @@
                             <label class="form-check-label" for="genre-sf">SF</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-adventure" value="액션">
+                            <input class="form-check-input" type="checkbox" name="genres[]" id="genre-adventure" value="모험">
                             <label class="form-check-label" for="genre-adventure">모험</label>
                         </div>
                         <div class="form-check">
@@ -272,7 +274,8 @@
                     </div>
                     <div id="selectedActorsDisplay"></div>
                     <input type="hidden" id="selectedActorIds" name="actors" value="">
-                    <button class="btn btn-primary" type="button" id="formSubmit" onclick="validateForm()">등록하기</button>
+                    <button class="btn btn-primary" type="button" id="formSubmit" onclick="validateForm()">등록</button>
+                    <button class="btn btn-secondary" type="button" id="formCancel" onclick="cancelForm()">취소</button>
                 </form>
             </div>
         </div>
@@ -289,44 +292,63 @@
     </div>
 </div>
 
-<script>
-
-    // 폼 벨리데이션
-    const form = document.querySelector('form');
-    const idInput = document.getElementById('id');
-    const titleInput = document.getElementById('title');
-    const overviewInput = document.getElementById('overview');
-    const runtimeInput = document.getElementById('runtime');
-    const certificationInputs = document.querySelectorAll('input[name="certifications"]');
-    const releaseDateInput = document.getElementById('releaseDate');
-    const posterPathInput = document.getElementById('RegisteredPoster');
-    const backdropPathInput = document.getElementById('RegisteredBackdrop');
-    const stillCutPathsInput = document.getElementById('RegisteredStillCut');
-    const videoInput = document.getElementById('video');
-    // ID 중복체크
-    const idError = document.getElementById('id-error');
-    let resetForm = false;
+<script th:inline="javascript">
 
 
+    // 취소 버튼 (뒤로가기)
+    function cancelForm() {
+        fetch('/admin/movieList', {
+            method: 'POST'
+        }).then(response => {
+            if (response.ok) {
+                $('.container-xxl').load('/admin/movieList', { type : 'POST' });
+            } else {
+                console.error('POST request failed');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
 
-    console.log(idInput)
-    // 아이디 중복 미리 체크
 
-
-    // 수정 모드인지 여부를 확인하는 변수
-    let isEditMode = false;
+    // 전역 변수가 이미 선언되었는지 확인
+    if (typeof window.isEditMode === 'undefined') {
+        // 전역 변수가 선언되지 않았다면 초기화
+        window.isEditMode = false;
+    }
 
     // 수정 모드일 때 초기화 함수
     function initializeEditMode(movieId) {
-        isEditMode = true;
+
+        const idInput = document.getElementById('id');
+        const posterPathInput = document.getElementById('RegisteredPoster');
+        const backdropPathInput = document.getElementById('RegisteredBackdrop');
+        const stillCutPathsInput = document.getElementById('RegisteredStillCut');
+        const videoInput = document.getElementById('video');
+        const actorInput = document.getElementById('actorSearch');
+        const formTitle = document.getElementById('formTitle');
+        const formSubmit = document.getElementById('formSubmit');
+
+
+        window.isEditMode = true;
+        formTitle.textContent = ('영화 수정');
+        formSubmit.textContent = ('수정')
         idInput.value = movieId;
         idInput.disabled = true; // 수정 모드에서는 ID 필드를 비활성화합니다.
+        posterPathInput.disabled = true;
+        backdropPathInput.disabled = true;
+        stillCutPathsInput.disabled = true;
+        videoInput.placeholder = '미입력시 기존 트레일러 키 사용, 또는 새로운 트레일러 키를 입력하세요.';
+        actorInput.disabled = true;
+
+
     }
 
 
     function duplicateCheck() {
 
-        const id = idInput.value.trim();
+        const id = document.getElementById('id').value.trim();
+        const idError = document.getElementById('id-error');
 
         if(!/^\d{10}$/.test(id)) {
             idError.textContent = '영화 ID는 10자리를 입력해주세요.';
@@ -356,11 +378,27 @@
     // 폼 제출 및 벨리데이션
     function validateForm() {
 
+        // 폼 벨리데이션
+        const form = document.getElementById('movieForm');
+        const idInput = document.getElementById('id');
+        const titleInput = document.getElementById('title');
+        const overviewInput = document.getElementById('overview');
+        const runtimeInput = document.getElementById('runtime');
+        const certificationInputs = document.querySelectorAll('input[name="certifications"]');
+        const releaseDateInput = document.getElementById('releaseDate');
+        const posterPathInput = document.getElementById('RegisteredPoster');
+        const backdropPathInput = document.getElementById('RegisteredBackdrop');
+        const stillCutPathsInput = document.getElementById('RegisteredStillCut');
+        const videoInput = document.getElementById('video');
         const id = idInput.value.trim();
+        const idError = document.getElementById('id-error');
+
+
+        let resetForm = false;
 
         console.log("영화 ID:", id);
 
-        if (!isEditMode) { // 수정 모드가 아닐 때만 ID 유효성 검사를 합니다.
+        if (!window.isEditMode) { // 수정 모드가 아닐 때만 ID 유효성 검사를 합니다.
             console.log("영화 ID:", id);
             if (!/^\d{10}$/.test(id)) {
                 alert('영화 ID는 10자리를 입력해주세요');
@@ -371,7 +409,7 @@
             }
         }
 
-        if(!isEditMode) {
+
             if (titleInput.value.trim() === '') {
                 alert('영화 제목을 입력해주세요.');
                 setTimeout(() => {
@@ -379,8 +417,6 @@
                 }, 0);
                 return false;
             }
-        }
-
 
         if (overviewInput.value.trim() === '') {
             alert('영화 줄거리를 입력해주세요.');
@@ -422,40 +458,43 @@
             return false;
         }
 
-        const posterPath = posterPathInput.value.trim();
-        if (posterPath === '') {
-            alert('포스터 이미지명을 입력해주세요.');
-            setTimeout(() => {
-                posterPathInput.focus();
-            }, 0);
-            return false;
-        }
+        // 수정 모드 일때는 스킵 / 등록 모드 일때만 유효성검사 진행
+        if (!window.isEditMode) {
+            const posterPath = posterPathInput.value.trim();
+            if (posterPath === '') {
+                alert('포스터 이미지명을 입력해주세요.');
+                setTimeout(() => {
+                    posterPathInput.focus();
+                }, 0);
+                return false;
+            }
 
-        const backdropPath = backdropPathInput.value.trim();
-        if (backdropPath === '') {
-            alert('배경 이미지를 입력해주세요.');
-            setTimeout(() => {
-                backdropPathInput.focus();
-            }, 0);
-            return false;
-        }
+            const backdropPath = backdropPathInput.value.trim();
+            if (backdropPath === '') {
+                alert('배경 이미지를 입력해주세요.');
+                setTimeout(() => {
+                    backdropPathInput.focus();
+                }, 0);
+                return false;
+            }
 
-        const stillCutPaths = stillCutPathsInput.value.trim();
-        if (stillCutPaths === '') {
-            alert('스틸컷 이미지를 등록해주세요.');
-            setTimeout(() => {
-                stillCutPathsInput.focus();
-            }, 0);
-            return false;
-        }
+            const stillCutPaths = stillCutPathsInput.value.trim();
+            if (stillCutPaths === '') {
+                alert('스틸컷 이미지를 등록해주세요.');
+                setTimeout(() => {
+                    stillCutPathsInput.focus();
+                }, 0);
+                return false;
+            }
 
-        const video = videoInput.value.trim();
-        if (video === '') {
-            alert('트레일러 키를 입력해주세요.');
-            setTimeout(() => {
-                videoInput.focus();
-            }, 0);
-            return false;
+            const video = videoInput.value.trim();
+            if (video === '') {
+                alert('트레일러 키를 입력해주세요.');
+                setTimeout(() => {
+                    videoInput.focus();
+                }, 0);
+                return false;
+            }
         }
 
         const genreCheckboxes = document.querySelectorAll('input[name="genres[]"]');
@@ -481,29 +520,43 @@
             }
         });
 
-        if (!isActorSelected) {
+        if (!isActorSelected && !window.isEditMode) {
             alert('배우를 선택해 주세요.');
             return false;
         }
 
         // 선택된 배우 ID 배열 생성
-        const selectedActorIds = selectedActors.map(actor => actor.actorId);
+        const selectedActorIds = window.selectedActors.map(actor => actor.actorId);
         document.getElementById('selectedActorIds').value = selectedActorIds;
+
+        // 비활성화된 필드들을 활성화
+        const disabledFields = form.querySelectorAll(':disabled');
+        disabledFields.forEach(function(field) {
+            field.disabled = false;
+        });
+
+
 
         // 모든 유효성 검사 통과 시 폼 제출
         const formData = new FormData(form);
 
         // 수정일때 : formData에 기존 id 추가
-        if (isEditMode) {
-            formData.append('id', id);
+        if (window.isEditMode) {
+            formData.set('RegisteredPoster', null);
+            formData.set('RegisteredBackdrop', null);
         }
+
+
 
         // 스틸컷 이미지를 FormData에 추가
         const stillCutFiles = stillCutPathsInput.files;
-
-        for (let i = 0; i < stillCutFiles.length; i++) {
-            formData.append('RegisteredStillCut', stillCutFiles[i]);
+        if (stillCutFiles.length > 0) {
+            for (let i = 0; i < stillCutFiles.length; i++) {
+                formData.append('RegisteredStillCut', stillCutFiles[i]);
+            }
         }
+
+
 
         console.log("formData 체크 === " + formData)
 
@@ -519,7 +572,11 @@
             })
             .then(data => {
                 console.log('Form submitted successfully:', data);
-                alert('영화가 성공적으로 등록되었습니다.');
+                if(isEditMode) {
+                    alert('수정되었습니다.')
+                } else {
+                    alert('영화가 성공적으로 등록되었습니다.');
+                }
                 console.log("formData 체크 === " + formData)
                 console.log("data 체크 === " + data)
                 resetForm = true;
@@ -543,7 +600,7 @@
                     genreCheckboxes.forEach(checkbox => checkbox.checked = false);
                     certificationInputs.forEach(input => input.checked = false);
                     idError.textContent = '';
-                    selectedActors = [];
+                    window.selectedActors = [];
                     updateSelectedActorsDisplay();
                 }
             });
@@ -586,20 +643,28 @@
         openModal();
     }
 
-
     // 배우 검색 관련
+    if (typeof window.selectedActors === 'undefined') {
+        // 전역 변수가 선언되지 않았다면 초기화
+        // 선택된 배우 목록을 저장할 배열
+        window.selectedActors = [];
+    }
+    if (typeof window.actors === 'undefined') {
+        // 전역 변수가 선언되지 않았다면 초기화
+        // 배우 정보를 저장할 배열
+        window.actors = [];
+    }
 
-
-    // 선택된 배우 목록을 저장할 배열
-    let selectedActors = [];
-
-    // 배우 정보를 저장할 배열
-    let actors = [];
 
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('actorSearch').addEventListener('input', searchActors);
     });
 
+    // 선택된 배우 초기화 함수 ( 등록하지 않아도 페이지 이동하면 선택된 배우 초기화되게 하는 함수 )
+    function clearSelectedActors() {
+        window.selectedActors = [];
+        updateSelectedActorsDisplay(); // 선택된 배우 목록 업데이트
+    }
 
     function searchActors() {
         const query = document.getElementById('actorSearch').value;
@@ -611,7 +676,7 @@
                     actorCheckboxes.innerHTML = '';
 
                     // 검색 결과로 받은 배우 정보를 저장
-                    actors = data;
+                    window.actors = data;
 
                     data.forEach(actor => {
                         const checkbox = document.createElement('input');
@@ -621,7 +686,7 @@
                         checkbox.value = actor.actorId;
 
                         // 현재 선택된 배우 목록에 있는 배우인지 확인하여 체크 여부 설정
-                        checkbox.checked = selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId);
+                        checkbox.checked =  window.selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId);
 
                         const label = document.createElement('label');
                         label.htmlFor = `actor-${actor.actorId}`;
@@ -635,11 +700,11 @@
 
                         checkbox.addEventListener('change', function() {
                             if (checkbox.checked) {
-                                if (!selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId)) {
-                                    selectedActors.push(actor);
+                                if (!window.selectedActors.some(selectedActor => selectedActor.actorId === actor.actorId)) {
+                                    window.selectedActors.push(actor);
                                 }
                             } else {
-                                selectedActors = selectedActors.filter(selectedActor => selectedActor.actorId !== actor.actorId);
+                                window.selectedActors =  window.selectedActors.filter(selectedActor => selectedActor.actorId !== actor.actorId);
                             }
                             updateSelectedActorsDisplay(); // 선택된 배우 목록을 업데이트
                         });
@@ -654,14 +719,13 @@
     }
 
     // 선택된 배우 목록을 업데이트하고 화면에 표시하는 함수
-    // 선택된 배우 목록을 업데이트하고 화면에 표시하는 함수
     function updateSelectedActorsDisplay() {
         const selectedActorsDisplay = document.getElementById('selectedActorsDisplay');
         selectedActorsDisplay.innerHTML = '';
 
-        if (selectedActors.length > 0) {
+        if (window.selectedActors.length > 0) {
             const selectedActorsText = document.createElement('p');
-            selectedActorsText.textContent = "선택한 배우: " + selectedActors.map(selectedActor => {
+            selectedActorsText.textContent = "선택한 배우: " +  window.selectedActors.map(selectedActor => {
                 console.log("액터체크 === " + selectedActor);
                 return selectedActor ? selectedActor.actorName : "";
             }).join(", ");

@@ -368,7 +368,6 @@
                         <table class="default" id="reviews-table">
                             <!-- 댓글이 여기에 추가될 것입니다 -->
                         </table>
-                        <!--스틸컷 더보기 접기-->
                     </div>
                     <p id="showMore_review" style="cursor: pointer;"><a>more</a></p>
                     <p id="showLess_review" style="cursor: pointer; display:none;"><a>접기</a></p>
@@ -424,6 +423,10 @@
 
         async function fetchMovieCredits(movieId) {
 
+            if(movieId.length === 10) {
+                return;
+            }
+
             try {
                 const apiKey = '547e2cd4d0e26e68fb907dafef4f90ac';
                 const url = `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR&api_key=${apiKey}`;
@@ -446,6 +449,9 @@
                         break;
                     case '15세 이상 관람가':
                         imgElement.src = '/images/ratings/15.png';
+                        break;
+                    case '18세 이상 관람가':
+                        imgElement.src = '/images/ratings/18.png';
                         break;
                     case '19':
                         certificationElement.textContent = '청소년 관람불가';
@@ -687,6 +693,7 @@
 
         //            댓글리스트    --------------------------------------------------
         const loadComments = () => {
+
             const emojiMap = {
                 1: '😡',
                 2: '😠',
@@ -701,14 +708,63 @@
                 dataType: 'json',
                 success: (data) => {
                     console.log(data)
+
+                    let currentCommentIndex = 0;
+                    const maxCommentDisplay = 3;
+                    const remainingCommentCount = data.comments.length - currentCommentIndex;
+
+
                     //평점
                     const movieDataSection = $('.movie_data_averageRating');
                     movieDataSection.html(`<h4>평점</h4><p>${data.averageRating !== null ? data.averageRating : 0}</p>`);
+
                     //댓글정보
                     const reviewsSection = $('#reviews-table');
                     reviewsSection.empty();
-                    data.comments.forEach((comment) => {
-                        appendReviewRow(reviewsSection, comment, emojiMap);
+                    data.comments.forEach((comment, index) => {
+                        if (index < maxCommentDisplay) {
+                            appendReviewRow(reviewsSection, comment, emojiMap);
+                        }
+                    });
+
+
+                    if (remainingCommentCount > 0) {
+                        $('#showMore_review').show(); // "more" 버튼 표시
+                    } else {
+                        $('#showMore_review').hide(); // "more" 버튼 숨김
+                    }
+
+                    if (currentCommentIndex > 0) {
+                        $('#showLess_review').show(); // "접기" 버튼 표시
+                    } else {
+                        $('#showLess_review').hide(); // "접기" 버튼 숨김
+                    }
+
+                    // "더보기" 버튼 클릭 이벤트 핸들러
+                    $('#showMore_review').click(() => {
+                        currentCommentIndex += maxCommentDisplay;
+                        reviewsSection.empty();
+                        data.comments.forEach((comment, index) => {
+                            if (index < currentCommentIndex + maxCommentDisplay) {
+                                appendReviewRow(reviewsSection, comment, emojiMap);
+                            }
+                        });
+
+                        $('#showMore_review').toggle(currentCommentIndex + maxCommentDisplay < data.comments.length);
+                        $('#showLess_review').show();
+                    });
+
+                    // "접기" 버튼 클릭 이벤트 핸들러
+                    $('#showLess_review').click(() => {
+                        currentCommentIndex = 0;
+                        reviewsSection.empty();
+                        data.comments.forEach((comment, index) => {
+                            if (index < maxCommentDisplay) {
+                                appendReviewRow(reviewsSection, comment, emojiMap);
+                            }
+                        });
+                        $('#showMore_review').show();
+                        $('#showLess_review').hide();
                     });
                 },
                 error: (xhr, status, error) => {
@@ -1155,8 +1211,10 @@
                                 .then(actorData => {
                                     // actorData를 사용하여 필요한 작업 수행
                                     console.log(actorData + " === actorData 체크");
-                                    // 각 배우 정보를 화면에 추가
+                                    // 각 배우 정보를 화면에 추가 (가로로 나열)
                                     const movieInfoDiv = document.getElementById('movie-info');
+                                    movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
+                                    movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
                                     const actorDiv = createPersonDiv(actorData.actorName, actorData.actorProfilePic);
                                     movieInfoDiv.appendChild(actorDiv);
                                 })

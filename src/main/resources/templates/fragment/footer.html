@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cinemacast</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="/assets/css/custom.css" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="/assets/css/nav.css" />
+  <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
 <th:block th:fragment="footer">
-  <head>
-    <meta charset="UTF-8">
-    <title>Cinemacast</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="/assets/css/custom.css" />
-    <link rel="stylesheet" href="/assets/css/main.css" />
-    <link rel="stylesheet" href="/assets/css/nav.css" />
-    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  </head>
-  <body>
 
 <!-- Footer -->
 <div id="footer">
@@ -49,6 +51,6 @@
     window.location.href = "/inquiry";
   }
 </script>
-  </body>
 </th:block>
+</body>
 </html>

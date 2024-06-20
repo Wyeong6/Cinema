@@ -152,12 +152,12 @@ public class MovieController {
             @RequestParam("overview") String movieOverview,
             @RequestParam("certifications") String certifications,
             @RequestParam("releaseDate") String movieReleaseDate,
-            @RequestParam("RegisteredPoster") MultipartFile registeredPoster,
-            @RequestParam("RegisteredBackdrop") MultipartFile registeredBackdrop,
+            @RequestParam(value = "RegisteredPoster", required = false) MultipartFile registeredPoster,
+            @RequestParam(value = "RegisteredBackdrop", required = false) MultipartFile registeredBackdrop,
             @RequestParam("runtime") String runtime,
             @RequestParam("video") String video,
             @RequestParam("genres") List<String> genres,
-            @RequestParam("RegisteredStillCut") List<MultipartFile> registeredStillCut,
+            @RequestParam(value = "RegisteredStillCut", required = false) List<MultipartFile> registeredStillCut,
             @RequestParam("actors") List<Long> actors,
             Model model
     ) throws IOException {
@@ -172,17 +172,31 @@ public class MovieController {
 
         // 실제 파일 시스템 경로를 설정합니다.
         String uploadDirectory = resourceLoader.getResource("classpath:/static").getFile().getAbsolutePath();
-
+        // 디렉토리 생성
         movieService2.createDirectories(uploadDirectory, stillCutRelativeUploadDir, backdropRelativeUploadDir, posterRelativeUploadDir);
 
-        List<String> stillCutFiles;
-        String posterRelativeFilePath;
-        String backdropRelativeFilePath;
+        List<String> stillCutFiles = null;
+        String posterRelativeFilePath = null;
+        String backdropRelativeFilePath = null;
+
+        System.out.println("stillCutFiles 체크 === " + stillCutFiles);
+        System.out.println("posterRelativeFilePath 체크 === " + posterRelativeFilePath);
+        System.out.println("backdropRelativeFilePath 체크 === " + backdropRelativeFilePath);
+        System.out.println("registeredStillCut 체크 === " + registeredStillCut);
+        System.out.println("registeredPoster 체크 === " + registeredPoster);
+        System.out.println("registeredBackdrop 체크 === " + registeredBackdrop);
+
 
         try {
-            stillCutFiles = movieService2.saveStillCutImages(registeredStillCut, uploadDirectory, stillCutRelativeUploadDir);
-            posterRelativeFilePath = movieService2.saveImage(registeredPoster, uploadDirectory, posterRelativeUploadDir);
-            backdropRelativeFilePath = movieService2.saveImage(registeredBackdrop, uploadDirectory, backdropRelativeUploadDir);
+            if (registeredStillCut != null) {
+                stillCutFiles = movieService2.saveStillCutImages(registeredStillCut, uploadDirectory, stillCutRelativeUploadDir);
+            }
+            if (registeredPoster != null) {
+                posterRelativeFilePath = movieService2.saveImage(registeredPoster, uploadDirectory, posterRelativeUploadDir);
+            }
+            if (registeredBackdrop != null) {
+                backdropRelativeFilePath = movieService2.saveImage(registeredBackdrop, uploadDirectory, backdropRelativeUploadDir);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("message", "파일 저장 중 오류가 발생했습니다.");

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
@@ -17,8 +18,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("SELECT s FROM Schedule s " +
             "WHERE (:theaterName IS NULL OR s.theaterNumber.theater.theaterName = :theaterName) " +
             "AND (:movieId IS NULL OR s.movie.movieId = :movieId) " +
-            "AND (:date IS NULL OR s.date = :date)")
+            "AND (:date IS NULL OR s.date = :date) " +
+            "AND s.startTime > :currentTime " +
+            "ORDER BY s.startTime")
     List<Schedule> findSchedulesByConditions(@Param("theaterName") String theaterName,
                                              @Param("movieId") Long movieId,
-                                             @Param("date") LocalDate date);
+                                             @Param("date") LocalDate date,
+                                             @Param("currentTime") LocalTime currentTime);
 }

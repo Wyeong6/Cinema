@@ -1,5 +1,6 @@
 package com.busanit.domain;
 
+import com.busanit.entity.Schedule;
 import com.busanit.entity.Seat;
 import com.busanit.entity.TheaterNumber;
 import lombok.Builder;
@@ -43,6 +44,7 @@ public class SeatDTO {
     }
 
     public Seat toEntity() {
+
         TheaterNumber theaterNumber = new TheaterNumber();
         theaterNumber.setId(this.theaterNumberId);
 
