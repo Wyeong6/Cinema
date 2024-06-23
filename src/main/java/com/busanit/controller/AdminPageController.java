@@ -620,23 +620,39 @@ public class AdminPageController {
     //채팅리스트
     @PostMapping("/getChatList")
     @ResponseBody
-    public Map<String, Object> pagingChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
-        System.out.println("Received page: " + page);
+    public Map<String, Object> ChatList(@RequestParam(defaultValue = "1") int activePage,
+                                        @RequestParam(defaultValue = "1") int inactivePage,
+                                        @RequestParam(defaultValue = "8") int size) {
+        System.out.println("Received activePage: " + activePage + ", inactivePage: " + inactivePage);
         String memberEmail = movieService.getUserEmail();
 
-        Page<ChatRoomDTO> chatRooms = chatService.getChatList(page - 1, size, memberEmail);
+        // 활성 채팅방 목록 가져오기
+        Page<ChatRoomDTO> activeChatRooms = chatService.getActiveChatList(activePage - 1, size, memberEmail);
+        Map<String, Object> activeChatResponse = addPagingChatList("active", activeChatRooms, activePage, memberEmail);
+        // 비활성 채팅방 목록 가져오기
+        Page<ChatRoomDTO> inactiveChatRooms = chatService.getInactiveChatList(inactivePage - 1, size, memberEmail);
+        Map<String, Object> inactiveChatResponse = addPagingChatList("inactive", inactiveChatRooms, inactivePage, memberEmail);
 
+        // 두 개의 목록을 합쳐서 반환
+        Map<String, Object> combinedResponse = new HashMap<>();
+        combinedResponse.putAll(activeChatResponse);
+        combinedResponse.putAll(inactiveChatResponse);
+
+        return combinedResponse;
+    }
+
+    private Map<String, Object> addPagingChatList(String type, Page<ChatRoomDTO> chatRooms, int page, String memberEmail) {
         int totalPages = chatRooms.getTotalPages();
         int startPage = Math.max(1, page - 5);
         int endPage = Math.min(totalPages, page + 4);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("chatRoom", chatRooms.getContent());
-        response.put("currentPage", page);
-        response.put("totalPages", totalPages);
-        response.put("startPage", startPage);
-        response.put("endPage", endPage);
-        response.put("memberEmail", memberEmail);
+        response.put(type + "ChatRoom", chatRooms.getContent());
+        response.put(type + "CurrentPage", page);
+        response.put(type + "TotalPages", totalPages);
+        response.put(type + "StartPage", startPage);
+        response.put(type + "EndPage", endPage);
+        response.put(type + "MemberEmail", memberEmail);
 
         return response;
     }
@@ -647,7 +663,6 @@ public class AdminPageController {
         return "admin/admin_inquiry_list";
     }
 
-
     //문의리스트 반환
     @GetMapping("/inquiryList")
     public String inquiryList(Model model, @RequestParam(defaultValue = "1") int page,
@@ -655,16 +670,17 @@ public class AdminPageController {
 
         // 미답변 문의 리스트와 페이지 정보
         Page<InquiryDTO> unansweredInquiries = inquiryService.getUnansweredInquiryList(page - 1, size);
-        addPagingAttributesToModel(model, "unanswered", unansweredInquiries, page, size);
+        addPaginginquiryList(model, "unanswered", unansweredInquiries, page);
 
         // 답변 완료된 문의 리스트와 페이지 정보
         Page<InquiryDTO> answeredInquiries = inquiryService.getAnsweredInquiryList(page - 1, size);
-        addPagingAttributesToModel(model, "answered", answeredInquiries, page, size);
+        addPaginginquiryList(model, "answered", answeredInquiries, page);
 
         return "admin/admin_inquiry_list";
     }
 
-    private void addPagingAttributesToModel(Model model, String type, Page<InquiryDTO> inquiries, int page, int size) {
+    // 페이징으로 변환
+    private void addPaginginquiryList(Model model, String type, Page<InquiryDTO> inquiries, int page) {
         int totalPages = inquiries.getTotalPages();
         int startPage = Math.max(1, page - 5);
         int endPage = Math.min(totalPages, page + 4);
@@ -675,105 +691,23 @@ public class AdminPageController {
         model.addAttribute("start" + type + "Page", startPage);
         model.addAttribute("end" + type + "Page", endPage);
     }
+    //해당 답변내용반환
     @GetMapping("/inquiryReplies/{inquiryId}")
     public ResponseEntity<InquiryReplyDTO> getInquiryDetails(@PathVariable Long inquiryId, Model model) {
         InquiryReplyDTO inquiryReply = inquiryService.findInquiryReplyByInquiryId(inquiryId);
         return ResponseEntity.ok(inquiryReply);
     }
 
-//
-//    //문의리스트 반환
-//    @GetMapping("/inquiryList")
-//    public String inquiryList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
-//        Page<InquiryDTO> inquiryDTO = inquiryService.getInquiryList(page - 1, size);
-//
-//
-//
-//        int totalPages = inquiryDTO.getTotalPages();
-//        int startPage = Math.max(1, page - 5);
-//        int endPage = Math.min(totalPages, page + 4);
-//
-//        model.addAttribute("inquiryList", inquiryDTO); //이벤트 게시글
-//        model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
-//        model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
-//        model.addAttribute("startPage", startPage);
-//        model.addAttribute("endPage", endPage);
-//
-//        return "admin/admin_inquiry_list";
-//    }
-
-
-
-
-//    @GetMapping("/noticeList")
-//    public String showNoticeList(Model model,
-//                                 @RequestParam(defaultValue = "1") int page,
-//                                 @RequestParam(defaultValue = "10") int size) {
-//        noticeService.prepareNoticeList(model, page, size);
-//        return "/cs/noticeAdmin";
-//    }
-//
-//    @GetMapping("/notice/{id}")
-//    public String showNoticeDetails(Model model,
-//                                    @PathVariable Long id,
-//                                    @RequestParam(value = "currentPage", required = false) Integer currentPage) {
-//        Notice notice = noticeService.getNoticeById(id);
-//        if (notice == null) {
-//            return "redirect:/admin/notice";
-//        }
-//        noticeService.incrementViewCount(notice);
-//
-//        model.addAttribute("currentPage", currentPage);
-//        model.addAttribute("notice", notice);
-//
-//        return "cs/noticeDetailAdmin";
-//    }
-//
-//    @DeleteMapping("/notice/{id}")
-//    public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
-//        return noticeService.deleteNoticeById(id)
-//                ? ResponseEntity.ok("삭제 완료")
-//                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제 실패");
-//    }
-//
-//    @GetMapping("/notice/add")
-//    public String addNotice() {
-//        return "/cs/noticeAddAdmin";
-//    }
-//
-//    @PostMapping("/notice/add")
-//    public String addNotice(Model model,
-//                            @RequestParam(value = "currentPage", required = false) Integer currentPage,
-//                            NoticeDTO noticeDTO, BindingResult result) {
-//        Long id = noticeDTO.getId();
-//        if (id == null) {
-//            noticeService.NoticeSave(noticeDTO);
-//            model.addAttribute("urlLoad", "/admin/notice");
-//        } else {
-//            noticeService.NoticeMod(id, noticeDTO);
-//            model.addAttribute("urlLoad", "/admin/notice/" + id + "?page=" + currentPage);
-//            model.addAttribute("currentPage", currentPage);
-//            System.out.println("수정 완료해서 보낼 때: " + currentPage);
-//        }
-//
-//        return "admin/admin_layout";
-//    }
-//
-//    @GetMapping("/notice/mod/{id}")
-//    public String modNotice(@PathVariable Long id, Model model,
-//                            @RequestParam(value = "currentPage", required = false) Integer currentPage ) {
-//        NoticeDTO noticeDTO = noticeService.findById(id);
-//
-//        model.addAttribute("id", id);
-//        model.addAttribute("title", noticeDTO.getTitle());
-//        model.addAttribute("content", noticeDTO.getContent());
-//        model.addAttribute("pinned", noticeDTO.isPinned());
-//        model.addAttribute("currentPage", currentPage);
-//        System.out.println("수정 페이지로 들어갔을 때 " + currentPage);
-//
-//        return "cs/noticeAddAdmin";
-//    }
-
-
+    // 미답변 문의의 갯수를 조회하여 ResponseEntity로 반환
+    @GetMapping("/unansweredInquiryCount")
+    @ResponseBody
+    public ResponseEntity<Integer> getUnansweredInquiryCount() {
+        try {
+            int count = inquiryService.getUnansweredInquiryCount();
+            return ResponseEntity.ok(count);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

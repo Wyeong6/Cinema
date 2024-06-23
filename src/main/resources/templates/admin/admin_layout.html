@@ -67,12 +67,14 @@
         }
     </style>
     <script type="module">
-        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatMessageCount.js';
+        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
+        import { fetchUnansweredInquiryCount } from '/modules/inquiryCount.js';
 
         // 페이지 로드 시 안읽은 메세지 불러오기
         document.addEventListener('DOMContentLoaded', function () {
-            loadChatList(1, 8, true);
+            loadChatList(1, 1, 8, true);
             setupWebSocketConnection(); // WebSocket 연결 설정
+            fetchUnansweredInquiryCount();
         });
 
         async function setupWebSocketConnection() {
@@ -221,12 +223,13 @@
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link chat_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form interface">1:1 채팅 <span id="unreadCount">0</span></div>                    </a>
+                        <div data-i18n="Form interface">1:1 채팅 <span id="unreadCount"></span></div>
+                    </a>
                 </li>
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link inquiry_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form interface">이메일 문의 </div>
+                        <div data-i18n="Form interface">이메일 문의 <span id="activeCount">0</span></div>
                     </a>
                 </li>
 
@@ -365,21 +368,39 @@
         });
     });
 
-    function goPage(page, size) {
-        $('.container-xxl').load('/admin/notice?page=' + page + '&size=' + size);
-    }
+    // $(document).ready(function() {
+    //     // 페이지 로드 시 미답변 문의 갯수를 가져와서 표시
+    //     fetchUnansweredInquiryCount();
+    //
+    //     // 이벤트 핸들러 설정
+    //     $(document).on('updateUnansweredCount', function() {
+    //         fetchUnansweredInquiryCount();
+    //     });
+    // });
 
-    /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
-    $(document).ready(function () {
-        var urlLoad = [[${urlLoad}]];
-        if (urlLoad != null) {
-            // 페이지가 로드될 때 실행되는 코드
-            $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
-        }
-    });
+    // // 미답변 문의 갯수를 가져와서 표시하는 함수
+    // function fetchUnansweredInquiryCount() {
+    //     $.ajax({
+    //         type: "GET",
+    //         url: "/admin/unansweredInquiryCount",
+    //         success: function(response) {
+    //             console.log("Response received:", response);
+    //             var count = response; // 서버에서 받은 미답변 문의 갯수
+    //             console.log("count:", count);
+    //             updateUnansweredCount(count); // 미답변 문의 갯수 업데이트 함수 호출
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error("AJAX 요청 실패:", error);
+    //         }
+    //     });
+    // }
+    //
+    // // 미답변 문의 갯수를 업데이트하는 함수
+    // function updateUnansweredCount(count) {
+    //     var formattedCount = '(' + count + ')';
+    //     $('#activeCount').text(formattedCount);
+    // }
 </script>
-
-
 <!-- Place this tag in your head or just before your close body tag. -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>

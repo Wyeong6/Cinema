@@ -71,7 +71,9 @@
                         <td th:text="${inquiry.id}"></td>
                         <td th:text="${inquiry.name}"></td>
                         <td th:text="${inquiry.subject}"></td>
-                        <td th:text="${inquiry.message}"></td>
+                        <td>
+                            <span th:text="${#strings.length(inquiry.message) > 10 ? #strings.substring(inquiry.message, 0, 10) + '...' : inquiry.message}"></span>
+                        </td>
                         <td th:text="${inquiry.email}"></td>
                         <td th:text="${inquiry.type}"></td>
                         <td th:data-createdat="${inquiry.createdAt}">
@@ -116,7 +118,9 @@
                         <td th:text="${inquiry.id}"></td>
                         <td th:text="${inquiry.name}"></td>
                         <td th:text="${inquiry.subject}"></td>
-                        <td th:text="${inquiry.message}"></td>
+                        <td>
+                            <span th:text="${#strings.length(inquiry.message) > 10 ? #strings.substring(inquiry.message, 0, 10) + '...' : inquiry.message}"></span>
+                        </td>
                         <td th:text="${inquiry.email}"></td>
                         <td th:text="${inquiry.type}"></td>
                         <td th:data-createdat="${inquiry.createdAt}">
@@ -233,10 +237,12 @@
 <script type="module">
 
     import {updateTimeSinceCreated} from '/modules/timeSinceCreated.js'; //시간 경과 모듈
+    import { fetchUnansweredInquiryCount } from '/modules/inquiryCount.js';
 
     $(document).ready(function () {
 
         updateTimeSinceCreated();
+
 
         $('tr[data-toggle="modal"]').on('click', function () {
             var inquiryId = $(this).data('id');
@@ -308,8 +314,9 @@
                 if (response === 'success') {
                     $('#inquiryModal').modal('hide');
                     alert('답변이 성공적으로 전송되었습니다.');
+                    fetchUnansweredInquiryCount();
                     console.log(response);
-
+                    location.reload();
                 } else {
                     alert('답변 전송 중 오류가 발생했습니다.');
                 }

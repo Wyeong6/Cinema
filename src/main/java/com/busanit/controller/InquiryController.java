@@ -30,7 +30,7 @@ public class InquiryController {
     public String showInquiryForm(Model model) {
         System.out.println("inquiry진입");
         model.addAttribute("Inquiry", new InquiryDTO());
-        return "notice/service_center"; // inquiryForm.html과 같은 템플릿 파일을 사용하여 폼을 렌더링
+        return "cs/service_center"; // inquiryForm.html과 같은 템플릿 파일을 사용하여 폼을 렌더링
     }
 
     //문의 등록

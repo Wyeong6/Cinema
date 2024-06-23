@@ -89,16 +89,6 @@ public class InquiryService {
         return InquiryReplyDTO.toDTO(inquiryReply);
     }
 
-//    //문의리스트 반환
-//    public Page<InquiryDTO> getInquiryList(int page, int size) {
-//        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-//        Page<Inquiry> inquiryPage = inquiryRepository.findAll(pageable);
-//        List<InquiryDTO> inquiryDTOList = inquiryPage.getContent().stream()
-//                .map(InquiryDTO::toDTO)
-//                .collect(Collectors.toList());
-//        return new PageImpl<>(inquiryDTOList, pageable, inquiryPage.getTotalElements());
-//    }
-
     public Page<InquiryDTO> getUnansweredInquiryList(int page, int size) {
         return getInquiriesByType("미답변", page, size);
     }
@@ -117,8 +107,10 @@ public class InquiryService {
         return new PageImpl<>(inquiryDTOList, pageable, inquiryPage.getTotalElements());
     }
 
-
-
+    // 미답변 문의의 갯수 조회 메서드
+    public int getUnansweredInquiryCount() {
+        return inquiryRepository.countByType("미답변");
+    }
 
     //문의하기 이메일전송
     public void sendInquiry(String userName, String recipientEmail, String subject, String message) throws MessagingException, jakarta.mail.MessagingException {

@@ -86,20 +86,24 @@ public class ChatController {
 
     @PostMapping("/chat/updateLastReadTimestamp/{chatRoomId}")
     @ResponseBody
-    public ResponseEntity<String> updateLastReadTimestamp(@PathVariable Long chatRoomId) {
-        try {
+    public ResponseEntity<Page<ChatRoomDTO>> updateLastReadTimestamp(@PathVariable Long chatRoomId) {
+
             System.out.println("오픈모달창중 읽기");
             chatService.updateLastReadTimestamp(chatRoomId);
-            return ResponseEntity.ok("Last read timestamp updated successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating last read timestamp: " + e.getMessage());
-        }
+
+            String userEmail = chatService.getAuthenticatedUserEmail();
+
+            // 전체 채팅방 정보 가져오기
+            Page<ChatRoomDTO> chatRooms = chatService.getChatList(1, 1, userEmail); // 이 메서드는 전체 채팅방 정보를 가져오는 것으로 가정합니다.
+
+            return ResponseEntity.ok(chatRooms);
     }
 
     //로그인한 유저와 채팅중인 상대방이메일 반환
     @GetMapping("/chat/getRecipientEmail")
     @ResponseBody
     public List<String> getRecipient() {
+
         return chatService.findCHatRoomByRecipient();
     }
 
@@ -110,26 +114,62 @@ public class ChatController {
         messagingTemplate.convertAndSendToUser(typingIndicatorDTO.getRecipient(), "/queue/private/" + typingIndicatorDTO.getChatRoomId(), typingIndicatorDTO);
     }
 
+
     public void updateChatList(String sender, String recipient, int page, int size) {
 
+        Page<ChatRoomDTO> activeChatRooms = chatService.getActiveChatList(page - 1, size, recipient);
+        Map<String, Object> activeChatResponse = addPagingChatList("active", activeChatRooms, page, sender);
+        // 비활성 채팅방 목록 가져오기
+        Page<ChatRoomDTO> inactiveChatRooms = chatService.getInactiveChatList(page - 1, size, recipient);
+        Map<String, Object> inactiveChatResponse = addPagingChatList("inactive", inactiveChatRooms, page, sender);
 
-        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, recipient);
+//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, recipient);
+        // 두 개의 목록을 합쳐서 반환
+        Map<String, Object> combinedResponse = new HashMap<>();
+        combinedResponse.putAll(activeChatResponse);
+        combinedResponse.putAll(inactiveChatResponse);
 
-        int totalPages = chatRoom.getTotalPages();
+        // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
+        messagingTemplate.convertAndSendToUser(recipient, "/queue/chatList", combinedResponse);
+
+    }
+
+    private Map<String, Object> addPagingChatList(String type, Page<ChatRoomDTO> chatRooms, int page, String memberEmail) {
+        int totalPages = chatRooms.getTotalPages();
         int startPage = Math.max(1, page - 5);
         int endPage = Math.min(totalPages, page + 4);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("chatRoom", chatRoom.getContent());
-        response.put("currentPage", page);
-        response.put("totalPages", totalPages);
-        response.put("startPage", startPage);
-        response.put("endPage", endPage);
-        response.put("memberEmail", sender);
+        response.put(type + "ChatRoom", chatRooms.getContent());
+        response.put(type + "CurrentPage", page);
+        response.put(type + "TotalPages", totalPages);
+        response.put(type + "StartPage", startPage);
+        response.put(type + "EndPage", endPage);
+        response.put(type + "MemberEmail", memberEmail);
 
-        // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
-        messagingTemplate.convertAndSendToUser(recipient, "/queue/chatList", response);
-
+        return response;
     }
+
+//    public void updateChatList(String sender, String recipient, int page, int size) {
+//
+//
+//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, recipient);
+//
+//        int totalPages = chatRoom.getTotalPages();
+//        int startPage = Math.max(1, page - 5);
+//        int endPage = Math.min(totalPages, page + 4);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("chatRoom", chatRoom.getContent());
+//        response.put("currentPage", page);
+//        response.put("totalPages", totalPages);
+//        response.put("startPage", startPage);
+//        response.put("endPage", endPage);
+//        response.put("memberEmail", sender);
+//
+//        // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
+//        messagingTemplate.convertAndSendToUser(recipient, "/queue/chatList", response);
+//
+//    }
 
 }

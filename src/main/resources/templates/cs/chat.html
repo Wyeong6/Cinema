@@ -71,11 +71,11 @@
             showMessage(parsedMessage.content);
             showMessage('다른 문의가 있으면 카테고리를 선택해주세요.');
             updateCategoryButtonsDisplay('block');
-        //타이핑 중이면
+            //타이핑 중이면
         } else if (parsedMessage.typing === "typing") {
             console.log("상대방이 타이핑 중입니다.");
             updateTypingIndicatorDisplay('block');
-        //타이핑 안할 때
+            //타이핑 안할 때
         } else if (parsedMessage.typing === "not_typing") {
             console.log("채팅안함");
             updateTypingIndicatorDisplay('none');
@@ -141,10 +141,10 @@
             status: "active"
         };
 
-            console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
-            stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
-            showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
-            document.getElementById('message').value = ''; // 입력 필드를 비움
+        console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
+        stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
+        showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
+        document.getElementById('message').value = ''; // 입력 필드를 비움
 
         // 메시지 전송 후 타이핑 상태 초기화
         clearTimeout(typingTimeout);
@@ -232,6 +232,20 @@
             .catch(error => console.error('Error creating chat room:', error));
     }
 
+    // window.onload = async function () {
+    //
+    //     recipient = await fetchRecipientEmail();
+    //     console.log("로드된 recipient" + recipient)
+    //     console.log("로드시 로그인된 이메일" + sender)
+    //
+    //     if (recipient) {
+    //         await fetchMessages(recipient);
+    //         if (chatRoomId) {
+    //             connect(); // chatRoomId가 있는 경우에만 커넥션 설정
+    //         }
+    //     }
+    // };
+
     //유저이메일로 현재 채팅중인 관리자 이메일 찾기
     async function fetchRecipientEmail() {
         try {
@@ -263,7 +277,7 @@
             console.log('chatRoomId:', chatRoomId);
             let messageExist = false;
 
-            // 각 메시지 객체를 순회합니다.
+            // 각 메시지 객체를 순회
             data.forEach(item => {
                 // 여기서 'messages' 필드가 실제 메시지 배열을 가지고 있음
                 if (Array.isArray(item.messages) && item.messages.length > 0) {
@@ -278,7 +292,7 @@
                 }
             });
 
-            // 메시지가 없을 경우에만 카테고리 메시지를 표시합니다.
+            // 메시지가 없을 경우에만 카테고리 메시지를 표시
             if (!messageExist) {
                 showMessage('안녕하세요 고객님 카테고리를 선택해주세요');
             } else if (chatRoomTitle === '상담이 완료되었습니다.') {
@@ -290,13 +304,15 @@
     }
 </script>
 <script type="module">
-    import {connectWebSocket, updateUnreadCount} from '/module/chatMessageCount.js';
+    import {connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
 
     document.addEventListener('DOMContentLoaded', function () {
+        console.log("모달연결")
         // WebSocket 연결 설정
         setupWebSocketConnection();
     });
 
+    //웹소켓 옵션
     async function setupWebSocketConnection() {
         const options = {
             subscribeCallback: handleWebSocketMessage
@@ -306,6 +322,7 @@
         connectWebSocket(options);
     }
 
+    //안읽은 메세지수 업데이트
     function handleWebSocketMessage(response) {
         updateUnreadCount(response);
     }

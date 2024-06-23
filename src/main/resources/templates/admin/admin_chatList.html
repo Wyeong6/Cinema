@@ -1,5 +1,30 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Navbar -->
+
+<nav
+        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+        id="layout-navbar" style="margin-bottom: 10px;"
+>
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <input
+                        aria-label="Search..."
+                        class="form-control border-0 shadow-none"
+                        placeholder="Search..."
+                        type="text"
+                />
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,8 +35,6 @@
     <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
-    <!-- chatMessageCount.js 파일 추가 -->
-    <!--    <script src="/modules/chatMessageCount.js" type="module"></script>-->
     <title>Event List</title>
     <style>
         .modal {
@@ -58,27 +81,56 @@
 </head>
 <body>
 <!-- Navbar 생략 -->
-<div class="card">
-    <h5 class="card-header">Event List</h5>
-    <div class="table-responsive text-nowrap">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th>방 번호</th>
-                <th>카테고리</th>
-                <th>메세지</th>
-                <th>회원 이메일</th>
-                <th>회원 이름</th>
-            </tr>
-            </thead>
-            <tbody class="chat-table">
-            <!-- 데이터는 자바스크립트로 동적으로 추가됩니다 -->
-            </tbody>
-        </table>
-        <!-- 페이지네이션 -->
-        <div id="pagination"></div>
+
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <h5 class="card-header">Active Chat Rooms</h5>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>방 번호</th>
+                            <th>카테고리</th>
+                            <th>메세지</th>
+                            <th>회원 이메일</th>
+                            <th>회원 이름</th>
+                        </tr>
+                        </thead>
+                        <tbody class="active-chat-table">
+                        <!-- 활성 채팅방 데이터는 자바스크립트로 동적으로 추가됩니다 -->
+                        </tbody>
+                    </table>
+                    <!-- 활성 채팅방 페이지네이션 -->
+                    <div id="active-pagination"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <h5 class="card-header">Inactive Chat Rooms</h5>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>방 번호</th>
+                            <th>카테고리</th>
+                            <th>메세지</th>
+                            <th>회원 이메일</th>
+                            <th>회원 이름</th>
+                        </tr>
+                        </thead>
+                        <tbody class="inactive-chat-table">
+                        <!-- 비활성 채팅방 데이터는 자바스크립트로 동적으로 추가됩니다 -->
+                        </tbody>
+                    </table>
+                    <!-- 비활성 채팅방 페이지네이션 -->
+                    <div id="inactive-pagination"></div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -92,7 +144,7 @@
         </div>
     </div>
 </div>
-<!-- 모달 -->
+<!-- 모듈 -->
 <script type="module">
 
     import { updateTimeSinceCreated } from '/modules/timeSinceCreated.js'; //시간 경과 모듈
@@ -103,23 +155,29 @@
         displayChatList,
         updateUnreadCount,
         adminEmail,
-    } from '/modules/chatMessageCount.js';
+        updateLastReadTimestamp,
+
+    } from '/modules/chatModule.js';
+
+    // 전역 변수로 페이징 번호 저장
 
     $(document).ready(async function () {
-        memberEmail = adminEmail;
+        memberEmail = adminEmail //관리자 이메일
+        console.log("로드할때의 샌더이메일 "+ memberEmail)
         let stompClient = null; // 전역 변수로 선언
+
         // 옵션 객체 정의
         const options2 = {
             subscribeCallback: handleWebSocketMessage, // 메시지를 받았을 때 호출할 콜백 함수 지정
             displayChatListCallback: displayChatList, // 채팅 목록을 화면에 표시할 콜백 함수로 displayChatList 함수를 지정
-            loadInitialData: loadInitialChatList, // 초기 데이터 로드 함수로 loadInitialChatList 지정
-            initialDataParams: [1, 8, false] // 초기 데이터 로드 파라미터
+            // loadInitialData: loadChatList, // 초기 데이터 로드 함수로 loadInitialChatList 지정
+            initialDataParams: [1, 1, 8, false] // 초기 데이터 로드 파라미터
         };
 
         // 웹소켓 연결
         stompClient = await connectWebSocket(options2);
-
-        updateTimeSinceCreated(); // 웹소켓 연결 후 updateTimeSinceCreated() 호출
+        // 웹소켓 연결 후 경과시간모듈 호출
+        updateTimeSinceCreated();
 
         // 페이지를 떠날 때 웹소켓 연결 해제
         $(window).on('beforeunload', function () {
@@ -129,10 +187,9 @@
         });
 
         // 최초 데이터 로드 함수 정의
-        async function loadInitialChatList(page, size, isUpdateUnreadCountOnly) {
-            await loadChatList(page, size, isUpdateUnreadCountOnly);
-        }
-
+        // async function loadInitialChatList(activePage, inactivePage, size, isUpdateUnreadCountOnly) {
+        //     await loadChatList(activePage, inactivePage, size, isUpdateUnreadCountOnly);
+        // }
         console.log("준비끝남")
     });
 
@@ -142,27 +199,37 @@
         updateUnreadCount(response); //않은 메시지 수를 업데이트
     }
 
-    // 클릭된 페이지에 대한 채팅 목록 로드
-    $(document).on('click', '.paging-btn', function (e) {
-        e.preventDefault();
-
-        const currentPage = $(this).data('page');
-        console.log("클릭한 페이지 " + currentPage)
-        loadChatList(currentPage, 8, false); // 페이지 크기는 8로 설정
-    });
+    // // 클릭된 페이지에 대한 채팅 목록 로드
+    // $(document).on('click', '.paging-btn', function (e) {
+    //     e.preventDefault();
+    //
+    //     const currentPage = $(this).data('page');
+    //     const type = $(this).data('type');
+    //
+    //     if (type === 'active') {
+    //         activePage = currentPage;
+    //         loadChatList(currentPage, 1, 8, false); // activePage, inactivePage, size, isUpdateUnreadCountOnly 순서로 인자 전달
+    //     } else {
+    //         inactivePage = currentPage;
+    //         loadChatList(1, currentPage, 8, false); // activePage, inactivePage, size, isUpdateUnreadCountOnly 순서로 인자 전달
+    //     }
+    // });
 </script>
 
 <script>
     var memberEmail = '';
     var currentRecipient = ''; // 전역 변수로 선언
-    var chatRoomTitle = '';
-    var chatRoomId = '';
-    var isConnected = false;
+    var chatRoomTitle = ''; //카테고리
+    var chatRoomId = ''; //채팅룸번호
+    var isConnected = false; //웹소켓 연결확인
     var stompClient = null; // STOMP 클라이언트 변수 선언
-    var typingTimeout = null;
+    var typingTimeout = null; //타이핑 타이머
     var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
     var typingIndicatorSent = false;  // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
-    var status = null;
+    var status = null; //채팅방 상태
+    var activePage = 1;
+    var inactivePage =1;
+
 
     // DOM 요소를 가져오는 함수
     function getElement(id) {
@@ -177,6 +244,9 @@
         messageElement.textContent = message;
         messages.appendChild(messageElement);
         document.getElementById('typingIndicatorDTO').style.display = 'none';
+        activePage = window.chatUtils.activePage;
+        inactivePage = window.chatUtils.inactivePage;
+        window.chatUtils.updateLastReadTimestamp(chatRoomId, activePage, inactivePage); // 페이징 번호 전달
     }
 
     // Stomp 연결 함수
@@ -184,6 +254,7 @@
         if (isConnected) return;
         console.log("currentchatRoomTitle" + currentRecipient);
 
+        // window.chatUtils.updateLastReadTimestamp(chatRoomId)
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
@@ -199,6 +270,8 @@
     // 수신자 구독
     function subscribeToRecipient() {
         stompClient.subscribe('/user/queue/private/' + chatRoomId, function (message) {
+
+
             console.log("Private Message: " + message.body);
 
             document.getElementById('message').disabled = false;
@@ -209,12 +282,11 @@
             console.log("chatRoomTitle" + chatRoomTitle);
             currentRecipient = parsedMessage.sender;
 
-            if (parsedMessage.typing === "typing") {
-                // 상대방이 타이핑 중임을 표시하는 UI 업데이트 등을 수행
+            if (parsedMessage.typing === "typing") {  //상대방이 타이핑 중일때
                 showTypingIndicator();
-            } else if (parsedMessage.typing === "not_typing") {
+            } else if (parsedMessage.typing === "not_typing") { //상대방이 타이핑 안할때
                 hideTypingIndicator();
-            } else {
+            } else {  //일반 메세지일때
                 showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
             }
         });
@@ -337,25 +409,6 @@
             .catch(error => console.error('Error fetching messages:', error));
     }
 
-    // function updateLastReadTimestamp(chatRoomId) {
-    //     return fetch(`/chat/updateLastReadTimestamp/${chatRoomId}`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     })
-    //         .then(response => {
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok ' + response.statusText);
-    //             }
-    //             console.log("Last read timestamp updated successfully.");
-    //         })
-    //         .catch(error => {
-    //             console.error('Error updating last read timestamp:', error);
-    //             throw error; // Promise 체인을 끊어 에러를 상위로 전파
-    //         });
-    // }
-
     // 타이핑 인디케이터를 보여주는 함수
     function showTypingIndicator() {
         document.getElementById('typingIndicatorDTO').style.display = 'block'; // 타이핑 인디케이터 표시
@@ -373,46 +426,32 @@
         chatRoomId = row.getAttribute('data-room-id');
         currentRecipient = row.querySelector('td:nth-child(4)').innerText; // 현재 수신자 업데이트
         getElement('messages').innerHTML = ''; // 메시지 요소 초기화
-
-        // if (isConnected) {
-        //     disconnect(); // 이미 연결된 경우, 연결 해제
-        // }
-
-        fetchMessages(chatRoomId);
-        connect();
+        fetchMessages(chatRoomId); //해당 채팅방메세지 가져오기
+        connect(); //웹소켓 연결
         const modal = getElement('myModal');
         getElement('userEmail').innerText = currentRecipient;
         modal.style.display = 'block';
+        console.log("window.chatUtils.activePage" + window.chatUtils.activePage)
+        console.log("window.chatUtils.inactivePage" + window.chatUtils.inactivePage)
+
     }
 
     // 채팅 모달 닫기 함수
     function closeModal() {
-        //모달창 열었을 때도 사이브바에 있는 1:1문의 갯수도 업데이트되도록해야함
-        //updateLastReadTimestamp 실행 후 리스트업데이트
-        window.chatUtils.updateLastReadTimestamp(chatRoomId)
-            .then(() => {
-                window.chatUtils.loadChatList(1, 8, false);
-            })
-            .catch(error => {
-                console.error('Error updating last read timestamp:', error);
-            });
-
-
         // 비동기 작업 외에 필요한 동기적인 작업들
         currentRecipient = '';
         const modal = getElement('myModal');
         modal.style.display = 'none';
-        disconnect();
+        disconnect(); //웹소켓 연결 해제
 
-        console.log('loadChatList 함수 호출됨');
-
+        // activePage = window.chatUtils.activePage;
+        // inactivePage = window.chatUtils.inactivePage;
+        window.chatUtils.loadChatList(activePage, inactivePage, 8, false);
     }
 
     window.closeModal = closeModal;
     window.openChatModal = openChatModal;
 
-
 </script>
-
 </body>
 </html>

@@ -15,7 +15,7 @@ export function connectWebSocket(options) {
     const {
         subscribeCallback,
         displayChatListCallback,
-        loadInitialData = null,
+        // loadInitialData = null,
         initialDataParams
     } = options;
 
@@ -32,6 +32,12 @@ export function connectWebSocket(options) {
             const response = JSON.parse(message.body);
             console.log("Received message:", response);
 
+            // 클라이언트가 가지고 있는 페이징 번호를 사용하여 업데이트
+            // response.activeCurrentPage = activePage;
+            // response.inactiveCurrentPage = inactivePage;
+
+            console.log("response.inactiveCurrentPage" + response.inactiveCurrentPage)
+
             // displayChatListCallback 함수를 호출하여 채팅 목록 화면에 업데이트
             if (displayChatListCallback) {
                 displayChatListCallback(response);
@@ -42,20 +48,23 @@ export function connectWebSocket(options) {
         });
 
         // loadInitialData가 함수인 경우 최초 데이터 로드 수행
-        if (loadInitialData) {
+
             if (initialDataParams) {
                 await loadChatList(...initialDataParams); // 파라미터 전달하여 초기 데이터 로드
-            } else {
-                await loadChatList(); // 파라미터 없이 초기 데이터 로드
             }
-        }
+
     });
 
     return stompClient; // Stomp 클라이언트 객체 반환
 }
 
+// 멤버 이메일 변수 선언
+export let adminEmail = '';
+export let activePage = 1;
+export let inactivePage = 1;
 
-export function updateLastReadTimestamp(chatRoomId) {
+//모달창 열려있을 때 메세지가 오면 해당 메세지 읽은 시간 업데이트
+export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
     return fetch(`/chat/updateLastReadTimestamp/${chatRoomId}`, {
         method: 'POST',
         headers: {
@@ -67,6 +76,13 @@ export function updateLastReadTimestamp(chatRoomId) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
             console.log("Last read timestamp updated successfully.");
+
+            console.log("모달창열려있을 때 activePage"+ activePage + inactivePage)
+            // loadChatList를 호출하고 그 결과 프로미스를 반환
+            return loadChatList(activePage, inactivePage, 8, true);
+        })
+        .then(() => {
+            console.log("Chat list and unread count updated successfully.");
         })
         .catch(error => {
             console.error('Error updating last read timestamp:', error);
@@ -74,34 +90,37 @@ export function updateLastReadTimestamp(chatRoomId) {
         });
 }
 
-// 멤버 이메일 변수 선언
-export let adminEmail = '';
 
 /**
  * 채팅 목록을 가져오는 함수
- * @param {number} page - 페이지 번호
+ * @param {number} page1 - 채팅중인 채팅방 페이지
+ * @param {number} page2 - 채팅끝난 채팅방 페이지
  * @param {number} size - 페이지당 아이템 수
  * @param {boolean} isUpdateUnreadCountOnly - true면 읽지 않은 메시지 카운트만 업데이트, false면 채팅 목록을 표시하고 카운트 업데이트
  * @returns {Promise} - AJAX 요청의 Promise 객체 반환
  */
-export function loadChatList(page, size, isUpdateUnreadCountOnly) {
-    console.log("모듈의 page" + page)
+export function loadChatList(page1, page2, size, isUpdateUnreadCountOnly) {
+
+    activePage = page1;
+    inactivePage = page2;
+    console.log("모듈의 activePage: " + activePage + ", inactivePage: " + inactivePage);
     console.log("모달창닫은 후 loadChatList");
     $.ajax({
         url: "/admin/getChatList",
         data: {
-            page: page,
+            activePage: activePage,
+            inactivePage: inactivePage,
             size: size
         },
         type: "POST",
         contentType: "application/x-www-form-urlencoded",
         success: function (response) {
             console.log("응답 데이터:", response);
-            adminEmail = response.memberEmail;
+            adminEmail = response.activeMemberEmail || response.inactiveMemberEmail;
             console.log("응답 memberEmail:", adminEmail);
 
-            response.currentPage = page;
-            console.log("currentPage" + response.currentPage)
+            // response.currentPage = page;
+            // console.log("currentPage" + response.currentPage)
 
             if (isUpdateUnreadCountOnly) {
                 updateUnreadCount(response);
@@ -121,7 +140,9 @@ export function loadChatList(page, size, isUpdateUnreadCountOnly) {
  * @param {object} response - 서버에서 받은 응답 객체
  */
 export function updateUnreadCount(response) {
-    var totalUnreadCount = response.chatRoom.reduce((sum, chatRoom) => sum + chatRoom.unreadMessageCount, 0);
+    var activeChatRoomList = response.activeChatRoom || [];
+
+    var totalUnreadCount = activeChatRoomList.reduce((sum, activeChatRoom) => sum + activeChatRoom.unreadMessageCount, 0);
     var unreadMessagesDiv = document.getElementById('unreadMessages');
     var unreadCountSpan = document.getElementById('unreadCount');
 
@@ -142,13 +163,34 @@ export function updateUnreadCount(response) {
  */
 export function displayChatList(response) {
     console.log("모달창닫은 후 displayChatList");
-    var chatList = response.chatRoom;
-    var $chatListContainer = $(".chat-table");
+
+    console.log("active 의 할당후 리스트뿌리기" + response.inactiveCurrentPage )
+
+    // HTML에서 요소를 찾음
+    var $activeChatListContainer = $(".active-chat-table");
+    var $inactiveChatListContainer = $(".inactive-chat-table");
 
     // 기존 목록을 비우고 새로운 목록 생성
-    $chatListContainer.empty();
+    $activeChatListContainer.empty();
+    $inactiveChatListContainer.empty();
 
-    chatList.forEach(function (chatRoom) {
+    // 활성 채팅 목록을 표시
+    displayRoomList(response.activeChatRoom || [], $activeChatListContainer);
+
+    // 비활성 채팅 목록을 표시
+    displayRoomList(response.inactiveChatRoom || [], $inactiveChatListContainer);
+
+    // 경과시간 업데이트
+    updateTimeSinceCreated();
+
+    // 페이징 정보 업데이트
+    updatePagination(response, 'active');
+    updatePagination(response, 'inactive');
+}
+
+// 채팅 방 목록을 화면에 표시하는 함수
+function displayRoomList(roomList, $container) {
+    roomList.forEach(function (chatRoom) {
         var lastMessageContent = "";
         var lastMessageCreatedAt = "";
 
@@ -158,43 +200,70 @@ export function displayChatList(response) {
             if (lastMessage) {
                 lastMessageContent = lastMessage.content;
                 lastMessageCreatedAt = lastMessage.createAt;
-                console.log("lastMessageCreatedAt" + lastMessageCreatedAt)
+                console.log("lastMessageCreatedAt" + lastMessageCreatedAt);
             }
         }
 
+        // 최대 길이 제한 설정
+        var maxLength = 10;
+        var truncatedContent = lastMessageContent.length > maxLength ? lastMessageContent.substring(0, maxLength) + '...' : lastMessageContent;
+
+        // 채팅 목록 행 생성
         var chatRoomRow =
             `<tr data-room-id='${chatRoom.id}' onclick='openChatModal(this)'>
-        <td>${chatRoom.id}</td>
-        <td>${chatRoom.chatRoomTitle}(${chatRoom.type})</td>
-        <td>${lastMessageContent} (${chatRoom.unreadMessageCount}개 메시지)</td>
-        <td>${chatRoom.userEmail}</td>
-        <td>${chatRoom.userName}</td>
-        <td data-createdat='${lastMessageCreatedAt}'> <span class="time-since-created"></span></td>
-    </tr>`;
-        $chatListContainer.append(chatRoomRow);
+                <td>${chatRoom.id}</td>
+                <td>${chatRoom.chatRoomTitle}(${chatRoom.type})</td>
+                <td>${truncatedContent} (${chatRoom.unreadMessageCount}개 메시지)</td>
+                <td>${chatRoom.userEmail}</td>
+                <td>${chatRoom.userName}</td>
+                <td data-createdat='${lastMessageCreatedAt}'> <span class="time-since-created"></span></td>
+            </tr>`;
+
+        // 생성한 행을 채팅 목록에 추가
+        $container.append(chatRoomRow);
     });
+}
 
-    //경과시간
-    updateTimeSinceCreated();
-
-    // 페이징 정보 업데이트
-    var $pagination = $("#pagination");
+function updatePagination(response, type) {
+    var $pagination = $("#" + type + "-pagination");
     $pagination.empty();
 
+    var currentPage = response[type + "CurrentPage"];
+    var startPage = response[type + "StartPage"];
+    var endPage = response[type + "EndPage"];
+
     var paginationHtml = '<div style="text-align: center;">';
-    for (var i = response.startPage; i <= response.endPage; i++) {
-        paginationHtml += '<a href="#" data-page="' + i + '" class="paging-btn">[' + i + ']</a>';
+    for (var i = startPage; i <= endPage; i++) {
+        paginationHtml += '<a href="#" data-page="' + i + '" class="paging-btn" data-type="' + type + '">[' + i + ']</a>';
     }
     paginationHtml += '</div>';
 
     $pagination.html(paginationHtml);
+
+    // 페이징 버튼 클릭 이벤트 처리
+    $pagination.find(".paging-btn").on("click", function (event) {
+        event.preventDefault();
+        var page = $(this).data("page");
+        var type = $(this).data("type");
+        if (type === 'active') {
+            activePage = page;
+            loadChatList(page, inactivePage, 8, false);
+        } else {
+            inactivePage = page; // 전역 변수 업데이트
+            loadChatList(activePage, page, 8, false);
+        }
+    });
 }
-
-
-
 
 // 전역 객체에 loadChatList 함수 추가
 window.chatUtils = {
     loadChatList: loadChatList,
-    updateLastReadTimestamp: updateLastReadTimestamp
+    updateLastReadTimestamp: updateLastReadTimestamp,
+    updateUnreadCount: updateUnreadCount,
+    get activePage() {
+        return activePage;
+    },
+    get inactivePage() {
+        return inactivePage;
+    }
 };
