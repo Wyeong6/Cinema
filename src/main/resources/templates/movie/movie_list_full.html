@@ -18,6 +18,12 @@
 			text-align: center;
 			margin-top: 20px;
 		}
+		.current-page {
+			pointer-events: none;
+			cursor: default;
+			color: #000; /* 기본 글자 색상 */
+			font-weight: bold; /* 강조 */
+		}
 	</style>
 </head>
 <body class="no-sidebar is-preload">
@@ -36,9 +42,9 @@
 			<div class="container">
 				<article id="main" class="special">
 					<header>
-						<h2><a href="#">상영 예정작</a></h2>
+						<h2><a href="#">전체 영화</a></h2>
 						<p>
-							화제의 신작 영화들을 주목하세요!
+							CINEMACAST의 모든 영화를 만나보세요!
 						</p>
 					</header>
 				</article>
@@ -63,9 +69,11 @@
 					<a href="#" th:if="${moviePage.hasPrevious()}"
 					   th:href="@{/allMovies(page=${moviePage.number - 1})}">이전</a>
 					<span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
-                    <a th:href="@{/allMovies(page=${pageNum})}" th:text="${pageNum + 1}"
-					   th:classappend="${pageNum == moviePage.number} ? 'active' : ''"></a>
-                    </span>
+        <a th:href="@{/allMovies(page=${pageNum})}"
+		   th:classappend="${pageNum == moviePage.number} ? ' current-page' : ''"
+		   th:text="'[' + (${pageNum + 1}) + ']'" th:if="${pageNum != moviePage.number}"></a>
+        <span th:if="${pageNum == moviePage.number}" th:text="'[' + (${pageNum + 1}) + ']'" class="current-page"></span>
+    </span>
 					<a href="#" th:if="${moviePage.hasNext()}"
 					   th:href="@{/allMovies(page=${moviePage.number + 1})}">다음</a>
 				</div>

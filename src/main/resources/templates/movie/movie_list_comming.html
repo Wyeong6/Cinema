@@ -18,6 +18,13 @@
             text-align: center;
             margin-top: 20px;
         }
+
+        .current-page {
+            pointer-events: none;
+            cursor: default;
+            color: #000; /* 기본 글자 색상 */
+            font-weight: bold; /* 강조 */
+        }
     </style>
 </head>
 <body class="no-sidebar is-preload">
@@ -60,13 +67,18 @@
                 </div>
 
                 <!-- 페이지네이션 -->
+                <!-- 페이지네이션 -->
                 <div class="pagination">
                     <a href="#" th:if="${moviePage.hasPrevious()}"
                        th:href="@{/comingMovies(page=${moviePage.number - 1})}">이전</a>
                     <span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
-                    <a th:href="@{/comingMovies(page=${pageNum})}" th:text="'[' + (${pageNum + 1}) + ']'"
-                       th:classappend="${pageNum == moviePage.number} ? 'active' : ''"></a>
-                    </span>
+        <a th:href="@{/comingMovies(page=${pageNum})}"
+           th:text="'[' + (${pageNum + 1}) + ']'"
+           th:if="${pageNum != moviePage.number}"></a>
+        <span th:if="${pageNum == moviePage.number}"
+              th:text="'[' + (${pageNum + 1}) + ']'"
+              class="current-page"></span>
+    </span>
                     <a href="#" th:if="${moviePage.hasNext()}"
                        th:href="@{/comingMovies(page=${moviePage.number + 1})}">다음</a>
                 </div>
