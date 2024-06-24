@@ -92,6 +92,15 @@ public class MovieController {
         return "movie/movie_list_comming";
     }
 
+    @GetMapping("/allMovies")
+    public String allMovies(Model model,
+                            @RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "12") int size) {
+        Page<MovieDTO> allMoviesPage = movieService2.getAllMoviesPagingAndSorting(page, size);
+        model.addAttribute("moviePage", allMoviesPage);
+        return "movie/movie_list_full";
+    }
+
     //디테일페이지
     @GetMapping("/movies/{movieId}")
     public String movieDetailinfo(@PathVariable("movieId") Long movieId, Model model) {

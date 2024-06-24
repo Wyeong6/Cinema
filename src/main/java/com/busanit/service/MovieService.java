@@ -72,8 +72,8 @@ public class MovieService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-//    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
-    @Scheduled(fixedRate = 120000) // 2분
+    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
+    //@Scheduled(fixedRate = 120000) // 2분
     public void fetchAndStoreMovies() throws IOException {
         fetchAndStoreMoviesNowPlaying();
         fetchAndStoreMoviesUpcoming();
@@ -506,12 +506,20 @@ public class MovieService {
         }
     }
 
-    //상영 중인 전체 영화
+    //전체 영화
     public List<MovieDTO> getAll() {
         List<Movie> movieList = movieRepository.findAll();
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // 영화 전체보기
+    public Page<MovieDTO> getAllMoviesPagingAndSorting(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Movie> movieList = movieRepository.findAll(pageable);
+        return movieList.map(MovieDTO::convertToDTO);
+    }
+
 
     // 상영중 영화 목록 더보기 화면 페이징 및 정렬
     public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size, boolean isUpcoming) {
