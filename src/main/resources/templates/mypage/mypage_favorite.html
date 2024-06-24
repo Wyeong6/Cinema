@@ -6,6 +6,7 @@
     }
 
     .movie-item {
+        width: 100%;
         text-align: center;
     }
 
@@ -13,18 +14,26 @@
         max-width: 100%;
         height: auto;
     }
+
 </style>
 
 <article id="mypage_favorite">
     <header>찜한 영화 전체보기</header>
     <section>
-        <div class="movie-grid">
-            <div class="movie-item" th:each="movie : ${favoriteMovies}">
-                <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.moviePosterUrl}}" alt="포스터" />
-                <p th:text="${movie.movieTitle}"></p>
-                <p th:text="${#temporals.format(movie.favoritedAt, 'yyyy-MM-dd')}"></p>
-                <img src="/images/delete.png" alt="삭제 버튼" />
+        <div th:if="${hasFavorites}">
+            <div class="movie-grid">
+                <div class="movie-item" th:each="movie : ${favoriteMovies}">
+                    <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.moviePosterUrl}}" alt="포스터" />
+<!--                    <p class="movie-title" th:text="${movie.movieTitle}"></p>-->
+<!--                    <div class="movie-details">-->
+<!--                        <p th:text="${#temporals.format(movie.favoritedAt, 'yyyy-MM-dd')}"></p>-->
+<!--                        <img class="delete-btn" src="/images/delete.png" alt="삭제 버튼" />-->
+<!--                    </div>-->
+                </div>
             </div>
+        </div>
+        <div th:unless="${hasFavorites}">
+            <p>찜한 영화가 없습니다.</p>
         </div>
     </section>
 </article>

@@ -33,7 +33,7 @@
                     <header>
                         <h2><a href="#">이벤트</a></h2>
                         <p>
-                            Morbi convallis lectus malesuada sed fermentum dolore amet
+                            영화와 함께하는 즐거운 시간
                         </p>
                     </header>
                 </article>
@@ -43,7 +43,7 @@
                         <input type="hidden" th:value="${event.id}"/>
                         <a th:href="@{'/event_get/' + ${event.id}}" class="image featured">
                             <img th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지"
-                                 style="width: 100px; height: auto;"/>
+                                 style="width: 300px; height: auto;"/>
                         </a>
                         <header>
                             <h3>

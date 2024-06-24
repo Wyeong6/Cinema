@@ -8,7 +8,7 @@
         data-template="vertical-menu-template-free"
 >
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
@@ -16,30 +16,30 @@
 
     <title>Cinemacast</title>
 
-    <meta name="description" content="" />
+    <meta name="description" content=""/>
 
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link
             href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
             rel="stylesheet"
     />
 
     <!-- Core CSS -->
-    <link rel="stylesheet" href="/assets/vendor/css/core.css" class="template-customizer-core-css" />
-    <link rel="stylesheet" href="/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
-    <link rel="stylesheet" href="/assets/css/demo.css" />
-    <link rel="stylesheet" href="/assets/css/custom_player.css" />
+    <link rel="stylesheet" href="/assets/vendor/css/core.css" class="template-customizer-core-css"/>
+    <link rel="stylesheet" href="/assets/vendor/css/theme-default.css" class="template-customizer-theme-css"/>
+    <link rel="stylesheet" href="/assets/css/demo.css"/>
+    <link rel="stylesheet" href="/assets/css/custom_player.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
 
     <!-- Vendors CSS -->
-    <link rel="stylesheet" href="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css"/>
 
     <!-- Page CSS -->
 
@@ -49,14 +49,42 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="/assets/js/config.js"></script>
+    <style>
+        /*안읽은 메세지 고정*/
+        .fixed-bottom-right {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            display: none; /* 초기에는 숨김 */
+        }
+        .fixed-bottom-right img {
+            width: 40px; /* 이미지 크기에 맞게 조정 */
+            height: 40px;
+            cursor: pointer; /* 클릭 가능하도록 설정 */
+        }
+    </style>
+    <script type="module">
+        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatMessageCount.js';
 
-    <script>
-        // 메시지 이벤트를 통해 unreadMessageCount를 업데이트하는 함수
-        window.addEventListener('message', function (event) {
-            if (event.data.unreadCount !== undefined) {
-                document.getElementById('unreadCount').textContent = event.data.unreadCount;
-            }
+        // 페이지 로드 시 안읽은 메세지 불러오기
+        document.addEventListener('DOMContentLoaded', function () {
+            loadChatList(1, 8, true);
+            setupWebSocketConnection(); // WebSocket 연결 설정
         });
+
+        async function setupWebSocketConnection() {
+            const options = {
+                subscribeCallback: handleWebSocketMessage
+            };
+            connectWebSocket(options);// WebSocket 연결 함수 호출
+        }
+
+        function handleWebSocketMessage(response) {
+            updateUnreadCount(response);
+        }
     </script>
 </head>
 
@@ -77,7 +105,7 @@
             <div class="menu-inner-shadow"></div>
 
             <ul class="menu-inner py-1" style="margin-bottom: 5em">
-            <!-- Members -->
+                <!-- Members -->
                 <li class="menu-header small text-uppercase">
                     <span class="menu-header-text">회원관리</span>
                 </li>
@@ -193,11 +221,16 @@
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link chat_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form interface">1:1 문의 <span id="unreadCount">0</span></div>
+                        <div data-i18n="Form interface">1:1 채팅 <span id="unreadCount">0</span></div>                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link inquiry_btn">
+                        <i class="menu-icon tf-icons bx bx-detail"></i>
+                        <div data-i18n="Form interface">이메일 문의 </div>
                     </a>
                 </li>
 
-<!--                Main Page -->
+                <!--                Main Page -->
                 <li class=" small text-uppercase"><span class="menu-header-text"></span></li>
                 <li class="menu-item">
                     <a href="/" class="menu-link">
@@ -208,6 +241,13 @@
             </ul>
 
         </aside>
+
+        <!-- 안읽은 메세지 표시 -->
+        <div class="fixed-bottom-right" id="unreadMessages">
+            <img src="/images/funny.png" alt="Unread Messages"> <!-- 안 읽은 메세지 아이콘 이미지 경로에 맞게 수정 -->
+<!--            <span id="unreadCount"></span> &lt;!&ndash; 안 읽은 메시지 수를 표시할 요소 &ndash;&gt;-->
+        </div>
+
         <!-- / Menu -->
 
         <!-- Layout container -->
@@ -247,15 +287,15 @@
 <!-- Page JS -->
 
 <script th:inline="javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         // 멤버 관리
         $('.member_btn').on('click', function () {
-            $('.container-xxl').load('/admin/memberList', { type : 'POST' });
+            $('.container-xxl').load('/admin/memberList', {type: 'POST'});
         });
         // 영화 관리
         $('.movie_btn').on('click', function () {
-            $('.container-xxl').load('/admin/movieList', { type : 'POST' });
+            $('.container-xxl').load('/admin/movieList', {type: 'POST'});
         });
         $('.movie_register_btn').on('click', function () {
             $('.container-xxl').load('/admin/movieRegister', { type : 'POST' });
@@ -271,10 +311,10 @@
             $.ajax({
                 type: "GET",
                 url: "/admin/seatRegister",
-                success: function(data) {
+                success: function (data) {
                     $('.container-xxl').html(data);
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error("AJAX 요청 실패:", error);
                 }
             });
@@ -307,17 +347,21 @@
             $('.container-xxl').load('/admin/eventList');
         });
         //공지사항 추가
-        $('.notice_reg_btn').on('click', function(e) {
+        $('.notice_reg_btn').on('click', function (e) {
             e.preventDefault()
             $('.container-xxl').load('/admin/noticeRegister');
         });
         //공지사항 목록
-        $('.notice_btn').on('click', function() {
+        $('.notice_btn').on('click', function () {
             $('.container-xxl').load('/admin/noticeList');
         });
         //채팅 관리
-        $('.chat_btn').on('click', function() {
+        $('.chat_btn').on('click', function () {
             $('.container-xxl').load('/admin/chatList');
+        });
+        //이메일 문의 관리
+        $('.inquiry_btn').on('click', function () {
+            $('.container-xxl').load('/admin/inquiryList');
         });
     });
 
@@ -326,15 +370,14 @@
     }
 
     /* post로 폼 제출 후 event - model에 urlLoad에 값 담아오기 예시) model.addAttribute("urlLoad", "/admin/snackRegister"); */
-    $(document).ready(function() {
+    $(document).ready(function () {
         var urlLoad = [[${urlLoad}]];
-        if(urlLoad != null) {
+        if (urlLoad != null) {
             // 페이지가 로드될 때 실행되는 코드
             $('.container-xxl').load(urlLoad); // model에 값이 있으면 페이지가 로드될 때 지정된 URL에서 데이터를 가져와서 .container-xxl 요소에 적재
         }
     });
 </script>
-
 
 
 <!-- Place this tag in your head or just before your close body tag. -->

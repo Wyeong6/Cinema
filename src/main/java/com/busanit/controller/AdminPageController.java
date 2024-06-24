@@ -62,8 +62,7 @@ public class AdminPageController {
     private final ChatService chatService;
     private final MemberService memberService;
     private final MovieService movieService;
-    private final SimpMessagingTemplate messagingTemplate;
-
+    private final InquiryService inquiryService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -617,55 +616,12 @@ public class AdminPageController {
         return "admin/admin_chatList";
     }
 
-//    //채팅리스트
-//    @RequestMapping(value = "/getChatList", method = {RequestMethod.GET, RequestMethod.POST})
-//    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
-//
-//        System.out.println(" 채팅리스트 발아아앙동");
-//        String memberEmail = movieService.getUserEmail();
-//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
-//
-//        int totalPages = chatRoom.getTotalPages();
-//        int startPage = Math.max(1, page - 5);
-//        int endPage = Math.min(totalPages, page + 4);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("chatRoom", chatRoom.getContent());
-//        response.put("currentPage", page);
-//        response.put("totalPages", totalPages);
-//        response.put("startPage", startPage);
-//        response.put("endPage", endPage);
-//        response.put("memberEmail", memberEmail);
-//
-//        return response;
-//    }
-
-//    //채팅리스트
-//    @GetMapping("/chatList")
-//    @ResponseBody
-//    public Map<String, Object> chatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
-//        String memberEmail = "admin@example.com"; // 예시용 이메일
-//        Page<ChatRoomDTO> chatRooms = chatService.getChatList(page - 1, size, memberEmail);
-//
-//        int totalPages = chatRooms.getTotalPages();
-//        int startPage = Math.max(1, page - 5);
-//        int endPage = Math.min(totalPages, page + 4);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("chatRooms", chatRooms.getContent());
-//        response.put("currentPage", page);
-//        response.put("totalPages", totalPages);
-//        response.put("startPage", startPage);
-//        response.put("endPage", endPage);
-//        response.put("memberEmail", memberEmail);
-//
-//        return response;
-//    }
-
+    //채팅리스트
     @PostMapping("/getChatList")
     @ResponseBody
     public Map<String, Object> pagingChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
-        String memberEmail =  movieService.getUserEmail();
+        System.out.println("Received page: " + page);
+        String memberEmail = movieService.getUserEmail();
 
         Page<ChatRoomDTO> chatRooms = chatService.getChatList(page - 1, size, memberEmail);
 
@@ -684,60 +640,32 @@ public class AdminPageController {
         return response;
     }
 
-//    @MessageMapping("/updateChatList") // 클라이언트에서 메시지 보낼 때 사용할 주제
-//    @SendTo("/queue/chatList") // 클라이언트가 구독할 주제
-//    public Map<String, Object> updateChatList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
-//        System.out.println("리스트업데이트시작");
-//        String memberEmail = movieService.getUserEmail();
-//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
-//
-//        int totalPages = chatRoom.getTotalPages();
-//        int startPage = Math.max(1, page - 5);
-//        int endPage = Math.min(totalPages, page + 4);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("chatRoom", chatRoom.getContent());
-//        response.put("currentPage", page);
-//        response.put("totalPages", totalPages);
-//        response.put("startPage", startPage);
-//        response.put("endPage", endPage);
-//        response.put("memberEmail", memberEmail);
-//
-//        // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
-////        messagingTemplate.convertAndSend("/queue/chatList", response);
-//
-//        System.out.println("리스트업데이트돼라얍");
-//        return response;
-//    }
-
-//    @PostMapping("/admin/chatList") // POST 방식으로 요청 처리
-//    @ResponseBody
-//    public Map<String, Object> chatListApi(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size) {
-//        String memberEmail = movieService.getUserEmail();
-//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, memberEmail);
-//
-//        int totalPages = chatRoom.getTotalPages();
-//        int startPage = Math.max(1, page - 5);
-//        int endPage = Math.min(totalPages, page + 4);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("chatRoom", chatRoom.getContent());
-//        response.put("currentPage", page);
-//        response.put("totalPages", totalPages);
-//        response.put("startPage", startPage);
-//        response.put("endPage", endPage);
-//        response.put("memberEmail", memberEmail);
-//
-//        return response;
-//    }
-
-
-
-    //채팅 모달창
-    @GetMapping("/chatModal")
-    public String chatModal() {
-        return "admin/admin_chatModal";
+    //문의리스트 페이지 이동
+    @GetMapping("/inquiry")
+    public String inquiryList() {
+        return "admin/admin_inquiry_list";
     }
+
+    //문의리스트 반환
+    @GetMapping("/inquiryList")
+    public String inquiryList(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "8") int size) {
+        Page<InquiryDTO> inquiryDTO = inquiryService.getInquiryList(page - 1, size);
+
+        int totalPages = inquiryDTO.getTotalPages();
+        int startPage = Math.max(1, page - 5);
+        int endPage = Math.min(totalPages, page + 4);
+
+        model.addAttribute("inquiryList", inquiryDTO); //이벤트 게시글
+        model.addAttribute("currentPage", page); // 현재 페이지 번호 추가
+        model.addAttribute("totalPages", totalPages); // 총 페이지 수 추가
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/admin_inquiry_list";
+    }
+
+
+
 
 //    @GetMapping("/noticeList")
 //    public String showNoticeList(Model model,

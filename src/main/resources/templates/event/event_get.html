@@ -26,6 +26,28 @@
 		<link href="/assets/css/noscript.css" rel="stylesheet"/>
 	</noscript>
 	<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+
+	<style>
+		.container {
+			text-align: center; /* 부모 요소의 텍스트 및 인라인 블록 요소들을 중앙 정렬 */
+		}
+
+		.btn_box {
+			display: flex;
+			justify-content: center; /* 플렉스 컨테이너 내의 아이템들을 중앙 정렬 */
+			gap: 10px; /* 버튼들 사이의 간격 조정 */
+			margin-top: 20px; /* 위쪽에 약간의 여백 추가 */
+		}
+
+		.btn_box button, .btn_box .kakao_btn {
+			margin: 0 5px; /* 버튼들 사이의 여백 추가 */
+		}
+
+		#input-file {
+			display: block; /* 이미지를 블록 요소로 변환 */
+			margin: 0 auto; /* 자동 여백을 사용하여 중앙 정렬 */
+		}
+	</style>
 </head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
@@ -39,21 +61,13 @@
 				<article id="main" class="special">
 					<header>
 						<h2 th:text="${event.eventName}">이벤트 제목</h2>
-						<p th:text="${event.regDate}">이벤트 등록 날짜</p>
+<!--						<p th:text="${event.regDate}">이벤트 등록 날짜</p>-->
 					</header>
 					<section>
-						<img id="input-file" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="width: 500px; height: auto;"/>
-						<p class="event-detail" th:text="${event.eventDetail}">
-							이벤트 상세 내용
-						</p>
-						<div class="btn_box">
-							<a href="javascript:shareMessage()">
-								<button type="button" class="kakao_btn">
-									<img src="/img/front/icon/kakao_sh.png" alt="카카오톡 공유">
-								</button>
-							</a>
-							<span>카카오톡 공유</span>
-						</div>
+						<img id="input-file" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="width: 1000px; height: auto;"/>
+<!--						<p class="event-detail" th:text="${event.eventDetail}">-->
+<!--							이벤트 상세 내용-->
+<!--						</p>-->
 					</section>
 					<table class="default">
 						<tr>
@@ -71,10 +85,15 @@
 							<td th:if="${previousEvent == null}">이전글이 없습니다.</td>
 						</tr>
 					</table>
-					<button class="button" onclick="window.location.href='/event/eventList'">목록</button>
+					<div class="btn_box">
+						<a href="javascript:shareMessage()">
+							<button class="button" onclick="window.location.href='/event/eventList'">목록</button>
+							<button type="button" class="kakao_btn">
+								<img src="/img/front/icon/kakao_sh.png" alt="카카오톡 공유">
+							</button>
+						</a>
+					</div>
 				</article>
-				</article>
-
 			</div>
 		</div>
 

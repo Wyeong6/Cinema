@@ -24,6 +24,10 @@ public class Movie {
     @Column(length = 1024)
     private String overview;
 
+    //수정 여부
+    @Column(name = "modified")
+    private boolean modified;
+
     //장르 관계
     @ManyToMany
     @JoinTable(name = "movie_genre",
@@ -104,7 +108,6 @@ public class Movie {
         this.images.add(image);
         image.setMovie(this);
     }
-
 
 
 }

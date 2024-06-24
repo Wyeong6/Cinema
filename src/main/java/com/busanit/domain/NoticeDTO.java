@@ -24,7 +24,6 @@ public class NoticeDTO {
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
 
-
     public static NoticeDTO toDTO(Notice notice) {
         return NoticeDTO.builder()
                 .noticeId(notice.getNoticeId())

@@ -37,9 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.busanit.domain.movie.ActorDTO.convertToDto;
@@ -73,7 +71,9 @@ public class MovieService {
     // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
+
+//    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
+    @Scheduled(fixedRate = 120000) // 2분
     public void fetchAndStoreMovies() throws IOException {
         fetchAndStoreMoviesNowPlaying();
         fetchAndStoreMoviesUpcoming();
@@ -98,8 +98,14 @@ public class MovieService {
                 .map(MovieBlacklist::getMovieId)
                 .collect(Collectors.toList());
     }
-
-
+    public List<Movie> getModifiedMovies() {
+        return movieRepository.findByModifiedTrue();
+    }
+    // 수정된 영화인지 확인하는 메소드
+    private boolean isModifiedMovie(Long movieId, List<Movie> modifiedMovies) {
+        return modifiedMovies.stream()
+                .anyMatch(movie -> movie.getMovieId().equals(movieId) && movie.isModified());
+    }
 
     /* 영화 현재상영목록 리스트 가져오는 API 및 저장 시작 */
 
@@ -107,12 +113,12 @@ public class MovieService {
     // (나중에 다른 api 데이터들도 영화id를 기준으로 데이터를가져오기때문에 씀)
     public List<Long> getAllMovieIds() {
         List<Movie> movies = movieRepository.findAll();
-
         // movieId가 10자리인 id를 필터링하는 이유는
         // 데이터베이스에 영화를 직접 등록할때 id를 10자리로 등록하기때문이다.
         // api 링크를 요청할때 직접 등록한 영화의 id로 api 링크를 요청하면 오류가 나기때문에 (api 서버에 등록된 movieId가아니라 어드민이 직접등록한 movieId라서 오류가뜬다)
         // 그걸 방지하기위해 어드민에게 movieId를 직접 입력받을때 숫자 10자리로 입력받게하고(벨리데이션) api링크 요청함수에서 movieId가 10자리인 movieId를 필터링해줘 오류를 방지한다!
         return movies.stream()
+                .filter(movie -> !movie.isModified())
                 .map(Movie::getMovieId)
                 .filter(movieId -> String.valueOf(movieId).length() != 10)
                 .collect(Collectors.toList());
@@ -120,7 +126,9 @@ public class MovieService {
 
     public void fetchAndStoreMoviesNowPlaying() throws IOException {
 
-        List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
+        List<Long> blacklistedMovieIds = getBlacklistedMovieIds(); // 삭제된 영화 ID 목록 가져오기
+        List<Movie> modifiedMovies = getModifiedMovies();
+
 
         int totalPages = fetchTotalPages();
         for (int page = 1; page <= totalPages; page++) {
@@ -128,7 +136,7 @@ public class MovieService {
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody, blacklistedMovieIds);
+                processResponse(responseBody, blacklistedMovieIds, modifiedMovies );
             }
         }
     }
@@ -138,13 +146,14 @@ public class MovieService {
     public void fetchAndStoreMoviesUpcoming() throws IOException {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
+        List<Movie> modifiedMovies = getModifiedMovies();
 
         for (int page = 1; page <= 8; page++) {
             String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                processResponse(responseBody, blacklistedMovieIds);
+                processResponse(responseBody, blacklistedMovieIds, modifiedMovies);
             }
         }
     }
@@ -193,15 +202,25 @@ public class MovieService {
         return null;
     }
 
-    private void processResponse(String responseBody, List<Long> blacklistedMovieIds) throws IOException {
+    private void processResponse(String responseBody, List<Long> blacklistedMovieIds, List<Movie> modifiedMovies) throws IOException {
         JsonNode results = getResultsFromResponse(responseBody);
 
         if (results.isArray()) {
             for (JsonNode node : results) {
                 Long movieId = node.get("id").asLong();
-                if (!blacklistedMovieIds.contains(movieId)) {
-                    processMovieData(node);
+                System.out.println("현재 movieId: " + movieId);
+
+                if (isModifiedMovie(movieId, modifiedMovies)) {
+                    System.out.println("수정된 영화입니다. 덮어씌우지 않습니다.");
+                    continue;
                 }
+
+                if (blacklistedMovieIds.contains(movieId)) {
+                    continue;
+                }
+
+                System.out.println("movieId 체크 === " + movieId);
+                processMovieData(node);
             }
         }
     }
@@ -467,7 +486,7 @@ public class MovieService {
                 .orElse(null);
 
         if ("".equals(certification)) {
-            certification = "-";
+            certification = "정보없음";
         } else if ("18".equals(certification)) {
             certification = "18세 이상 관람가";
         } else if ("15".equals(certification)) {
@@ -623,14 +642,14 @@ public class MovieService {
     //어드민 페이지 영화 등록
     public void saveMovie(
             Long movieId, String movieTitle, String movieOverview, String movieReleaseDate, String certifications,
-            String registeredPoster, String registeredBackdrop, List<String> stillCut, List<String> genres, String video, String runtime, List<Long> actors) {
+            String registeredPoster, String registeredBackdrop, List<String> registeredStillCut, List<String> genres, String video, String runtime, List<Long> actors) {
 
-        Optional<Movie> optionalMovie = movieRepository.findById(movieId);
         Movie movie;
 
-        if (optionalMovie.isPresent()) {
+        if (movieRepository.existsById(movieId)) {
             // 기존 영화를 수정하는 경우
-            movie = optionalMovie.get();
+            movie = movieRepository.findById(movieId).orElseThrow(() -> new NoSuchElementException("Movie not found"));
+            movie.setModified(true);
         } else {
             // 새로운 영화를 등록하는 경우
             movie = new Movie();
@@ -641,12 +660,22 @@ public class MovieService {
         movie.setOverview(movieOverview);
 
         MovieDetail movieDetail = movie.getMovieDetail();
+
+        // movieDetail이 null인 경우 초기화
         if (movieDetail == null) {
             movieDetail = new MovieDetail();
+            movie.setMovieDetail(movieDetail);
         }
+
+
         movieDetail.setCertification(certifications);
         movieDetail.setReleaseDate(movieReleaseDate);
-        movieDetail.setVideo(video);
+        System.out.println("video 체크 === " + video);
+        if (video != null && !video.isEmpty()) {
+            movieDetail.setVideo(video);
+        } else {
+        }
+
         movieDetail.setRuntime(runtime);
         movie.setMovieDetail(movieDetail);
 
@@ -657,7 +686,8 @@ public class MovieService {
                     .orElseThrow(() -> new IllegalArgumentException("Invalid actor ID: " + actorId));
             updatedActors.add(actor);
         }
-        movie.setActors(updatedActors);
+        movie.getActors().clear();
+        updatedActors.forEach(movie::addActor);
 
         movie.getGenres().clear();
         // 장르 업데이트
@@ -675,22 +705,39 @@ public class MovieService {
         // 영화에 새로운 장르 목록을 설정합니다.
         movie.setGenres(updatedGenres);
 
-            // 스틸컷 업데이트
-        List<MovieStillCut> updatedStillCuts = new ArrayList<>();
-        for (String stillCutPath : stillCut) {
-            MovieStillCut stillCutEntity = new MovieStillCut(); // 새로운 스틸컷 엔티티 생성
-            stillCutEntity.setStillCuts(stillCutPath); // 스틸컷 경로 설정
-            movieStillCutRepository.save(stillCutEntity);
-            updatedStillCuts.add(stillCutEntity);
+        // 스틸컷 업데이트
+        if (registeredStillCut != null && !registeredStillCut.isEmpty()) {
+
+            // 기존 스틸컷 삭제
+            movieStillCutRepository.deleteAllByMoviesIn(Collections.singleton(movie));
+            movie.getStillCuts().clear();
+
+            // 새로운 스틸컷 추가
+            for (String stillCutPath : registeredStillCut) {
+                MovieStillCut stillCutEntity = new MovieStillCut();
+                stillCutEntity.setStillCuts(stillCutPath);
+                movie.addStillCut(stillCutEntity);
+            }
+        } else {
+            // 만약 새로운 스틸컷이 제공되지 않으면 기존 목록을 유지합니다.
+            movie.setStillCuts(movie.getStillCuts());
         }
-        movie.setStillCuts(updatedStillCuts);
 
         // 포스터 이미지와 백드롭 이미지 업데이트
         MovieImage movieImage = new MovieImage();
-        movieImage.setPosterPath(registeredPoster);
-        movieImage.setBackdropPath(registeredBackdrop);
-        movieImageRepository.save(movieImage);
-        movie.addImage(movieImage);
+
+        if(registeredPoster != null && registeredBackdrop != null) {
+            movieImage.setPosterPath(registeredPoster);
+            movieImage.setBackdropPath(registeredBackdrop);
+        } else {}
+
+        if (registeredPoster != null && registeredBackdrop != null) {
+            movieImageRepository.save(movieImage);
+            movie.addImage(movieImage);
+        }
+
+//        movieImage.setPosterPath(registeredPoster != null ? registeredPoster : "");
+//        movieImage.setBackdropPath(registeredBackdrop != null ? registeredBackdrop : "");
 
         movieRepository.save(movie); // 변경 감지에 의해 자동으로 데이터베이스에 저장됨
     }
@@ -698,6 +745,12 @@ public class MovieService {
     // 영화 등록 관련 로직
 
     public List<String> saveStillCutImages(List<MultipartFile> registeredStillCut, String uploadDirectory, String stillCutRelativeUploadDir) throws IOException {
+
+        if (registeredStillCut == null) {
+            System.out.println("registeredStillCut is null. Exiting method.");
+            return null;
+        }
+
         List<String> stillCutFiles = new ArrayList<>();
         for (MultipartFile file : registeredStillCut) {
             String fileName = file.getOriginalFilename();

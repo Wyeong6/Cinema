@@ -130,8 +130,11 @@ public class MemberController {
         if(findPassword) { // 해당 정보값을 가진 사용자가 존재
             String newPwd = RandomStringUtils.randomAlphanumeric(10);
             memberService.updatePassword(passwordEncoder.encode(newPwd), email);
-            model.addAttribute("findInfo", newPwd);
+            model.addAttribute("findInfo", "true");
             model.addAttribute("newPassword", "true");
+
+            // 비밀번호 찾기로 발급 받은 패스워드 메일로 보내기
+            memberService.sendEmailToMember(email, "CINECAST에서 새로 발급된 비밀번호 입니다.", "새로 발급된 비밀번호 : " + newPwd);
         } else { // 해당 정보값을 가진 사용자가 존재하지 않음
             model.addAttribute("findInfo", null);
         }
