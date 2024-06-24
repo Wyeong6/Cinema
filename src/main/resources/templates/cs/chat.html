@@ -42,6 +42,10 @@
     var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
     var status = null; //채팅방 상태
 
+    // 초기 페이징 값 설정
+    var activePage = 1;
+    var inactivePage = 1;
+
     // WebSocket 연결 함수
     function connect() {
         var socket = new SockJS('/ws');
@@ -59,6 +63,17 @@
 
                 handleMessage(parsedMessage);
             })
+            // 전체 메시지를 받기 위해 토픽 구독
+            stompClient.subscribe('/Topic/paging', function (message) {
+                var parsedMessage = JSON.parse(message.body);
+                console.log("Broadcast Message " + JSON.stringify(parsedMessage));
+
+                // 메시지 받을 때마다 페이징 값 업데이트
+                activePage = parsedMessage.activePage;
+                inactivePage = parsedMessage.inactivePage;
+
+                handleMessage(parsedMessage);
+            });
         });
     }
 
@@ -119,7 +134,7 @@
             chatRoomId: chatRoomId,
             sender: sender,
             recipient: recipient,
-            typing: type
+            typing: type,
         };
         stompClient.send("/app/chat/typing", {}, JSON.stringify(typingIndicatorDTO));
     }
@@ -138,7 +153,11 @@
             recipient: recipient,
             content: messageContent,
             chatRoomTitle: chatRoomTitle,
-            status: "active"
+            status: "active",
+            paging: {
+                activePage: activePage,
+                inactivePage: inactivePage
+            }
         };
 
         console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력

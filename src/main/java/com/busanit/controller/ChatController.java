@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.web.util.WebUtils.getSessionAttribute;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,13 +43,17 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/updatePage")
-    public void updateAdminPage(@Payload PageUpdateDTO pageUpdateDTO, Model model) {
+    public void updatePage(@Payload PageUpdateDTO pageUpdateDTO) {
+        // 클라이언트로부터 받은 페이징 정보 처리
+        System.out.println("Received paging data: " + pageUpdateDTO);
 
+        // 여기서 필요한 로직 수행 (예: 페이징 정보를 데이터베이스에 저장하거나, 다른 클라이언트에게 브로드캐스팅)
 
-        System.out.println("Received PageUpdateDTO: " + pageUpdateDTO);
-        model.addAttribute("activePage", pageUpdateDTO.getActivePage());
-        model.addAttribute("inactivePage", pageUpdateDTO.getInactivePage());
+        // 다른 클라이언트에게 브로드캐스팅
+        messagingTemplate.convertAndSend("/Topic/paging", pageUpdateDTO);
+        System.out.println("브로드캐스팅 완료!");
     }
+
 
     //로그인 여부확인 후 페이지이동
     @GetMapping("/chatUser")
@@ -62,7 +69,8 @@ public class ChatController {
 
     //메세지 처리
     @MessageMapping("/chat/private")
-    public void sendPrivateMessage(@Payload MessageDTO messageDTO, @SessionAttribute("activePage") int activePage, @SessionAttribute("inactivePage") int inactivePage) {
+    public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
+
         // 채팅 종료할 경우
         if ("inactive".equals(messageDTO.getStatus())) {
             chatService.updateChatRoomStatus(messageDTO.getChatRoomId(), "inactive");
@@ -70,8 +78,10 @@ public class ChatController {
             chatService.saveMessage(messageDTO);
         }
 
+
         // 메시지 처리 후, 채팅 리스트 업데이트 요청
-        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), activePage, inactivePage, 8);
+        PageUpdateDTO pageUpdateDTO = messageDTO.getPaging();
+        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
 
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
     }

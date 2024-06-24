@@ -42,7 +42,7 @@ public class InquiryController {
 
         return "redirect:/inquiry"; // 폼 제출 후 보여줄 페이지로 리다이렉트
     }
-
+    //문의 답변하기 전송, 저장
     @PostMapping("/admin/sendReply")
     public ResponseEntity<String> sendReply(
                             @RequestParam("inquiryId") Long inquiryId,
@@ -65,12 +65,12 @@ public class InquiryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failure");
         }
     }
-
+    //답변안한 문의 갯수 반환
     @GetMapping("/checkLoginStatus")
     @ResponseBody
     public Map<String, Boolean> checkLoginStatus() {
         Map<String, Boolean> response = new HashMap<>();
-        response.put("loggedIn", chatService.isAuthenticated()); // Check if user is authenticated
+        response.put("loggedIn", chatService.isAuthenticated());
         return response;
     }
 }

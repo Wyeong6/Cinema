@@ -258,14 +258,20 @@ function updatePagination(response, type) {
 
 
             var paging = {
-                activePage: activePage || 1, // activePage가 값이 없을 경우 기본값 1 사용
-                inactivePage: inactivePage || 1 // inactivePage가 값이 없을 경우 기본값 1 사용
+                activePage: activePage ,
+                inactivePage: inactivePage
             };
 
 
             // paging 값을 콘솔에 출력하여 확인
-            console.log("Sending paging data:", paging);
             stompClient.send("/app/chat/updatePage", {}, JSON.stringify(paging));
+            console.log("Sending paging data:", paging);
+
+            // WebSocket 연결 해제
+            stompClient.disconnect(function() {
+                console.log('웹소켓 연결 해제');
+            });
+
 
             loadChatList(activePage, inactivePage, 8, false);
         });

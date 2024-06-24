@@ -85,10 +85,11 @@
                 </table>
                 <div style="text-align: center;" th:if="${!#lists.isEmpty(unansweredInquiryList.content)}"
                      th:with="startUnanswered = ${startUnansweredPage != null ? startUnansweredPage : 1},
-                                  endUnanswered = ${endUnansweredPage != null ? endUnansweredPage : 1}">
+                  endUnanswered = ${endUnansweredPage != null ? endUnansweredPage : 1}">
                     <a href="#" th:each="i : ${#numbers.sequence(startUnanswered, endUnanswered)}"
-                       th:data-page="${i}" th:text="${i}" class="paging-btn"></a>
+                       th:href="@{/inquiryList(page=${i})}" th:data-page="${i}" th:text="${i}" class="paging-btn"></a>
                 </div>
+
             </div>
         </div>
     </div>
@@ -132,9 +133,9 @@
                 </table>
                 <div style="text-align: center;" th:if="${!#lists.isEmpty(answeredInquiryList.content)}"
                      th:with="startAnswered = ${startAnsweredPage != null ? startAnsweredPage : 1},
-                                  endAnswered = ${endAnsweredPage != null ? endAnsweredPage : 1}">
+                  endAnswered = ${endAnsweredPage != null ? endAnsweredPage : 1}">
                     <a href="#" th:each="i : ${#numbers.sequence(startAnswered, endAnswered)}"
-                       th:data-page="${i}" th:text="${i}" class="paging-btn"></a>
+                       th:href="@{/inquiryList(page=${i})}" th:data-page="${i}" th:text="${i}" class="paging-btn"></a>
                 </div>
             </div>
         </div>
