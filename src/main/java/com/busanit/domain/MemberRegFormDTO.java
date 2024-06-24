@@ -28,6 +28,7 @@ public class MemberRegFormDTO {
 //    @Min(6)
 //    @Max(6)
     @NotEmpty(message = "필수 입력 값입니다.")
+    @Pattern(regexp = "\\d{6}", message = "생년월일을 입력하세요. ex) 240101")
     private String age;
 
     private boolean social;
