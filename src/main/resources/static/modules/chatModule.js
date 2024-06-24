@@ -11,7 +11,7 @@ import { updateTimeSinceCreated } from './timeSinceCreated.js';
  *                           }
  * @returns {Stomp.Client} - Stomp 클라이언트 객체 반환
  */
-export function connectWebSocket(options) {
+export async function connectWebSocket(options) {
     const {
         subscribeCallback,
         displayChatListCallback,
@@ -28,31 +28,26 @@ export function connectWebSocket(options) {
         console.log('Connected to WebSocket: ' + frame);
 
         // '/user/queue/chatList' 주제를 구독하여 메시지 처리
-        stompClient.subscribe('/user/queue/chatList', function (message) {
+        await stompClient.subscribe('/user/queue/chatList', async function (message) {
             const response = JSON.parse(message.body);
             console.log("Received message:", response);
 
             // 클라이언트가 가지고 있는 페이징 번호를 사용하여 업데이트
-            // response.activeCurrentPage = activePage;
-            // response.inactiveCurrentPage = inactivePage;
-
-            console.log("response.inactiveCurrentPage" + response.inactiveCurrentPage)
+            console.log("response.inactiveCurrentPage" + response.inactiveCurrentPage);
 
             // displayChatListCallback 함수를 호출하여 채팅 목록 화면에 업데이트
             if (displayChatListCallback) {
-                displayChatListCallback(response);
+                await displayChatListCallback(response);
             }
 
             // subscribeCallback 함수를 호출하여 구독된 메시지 처리
-            subscribeCallback(response);
+            await subscribeCallback(response);
         });
 
         // loadInitialData가 함수인 경우 최초 데이터 로드 수행
-
-            if (initialDataParams) {
-                await loadChatList(...initialDataParams); // 파라미터 전달하여 초기 데이터 로드
-            }
-
+        if (initialDataParams) {
+            await loadChatList(...initialDataParams); // 파라미터 전달하여 초기 데이터 로드
+        }
     });
 
     return stompClient; // Stomp 클라이언트 객체 반환
@@ -62,6 +57,7 @@ export function connectWebSocket(options) {
 export let adminEmail = '';
 export let activePage = 1;
 export let inactivePage = 1;
+
 
 //모달창 열려있을 때 메세지가 오면 해당 메세지 읽은 시간 업데이트
 export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
@@ -243,15 +239,36 @@ function updatePagination(response, type) {
     // 페이징 버튼 클릭 이벤트 처리
     $pagination.find(".paging-btn").on("click", function (event) {
         event.preventDefault();
-        var page = $(this).data("page");
+        var page = parseInt($(this).data("page"), 10);
         var type = $(this).data("type");
         if (type === 'active') {
             activePage = page;
-            loadChatList(page, inactivePage, 8, false);
         } else {
             inactivePage = page; // 전역 변수 업데이트
-            loadChatList(activePage, page, 8, false);
         }
+
+        var socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log(' 페이징 웹소켓 연결햇따!!!!! ' + frame);
+            // 현재 페이지 정보를 서버에 전송
+
+            console.log("activePage" + activePage)
+            console.log("inactivePage" + inactivePage)
+
+
+            var paging = {
+                activePage: activePage || 1, // activePage가 값이 없을 경우 기본값 1 사용
+                inactivePage: inactivePage || 1 // inactivePage가 값이 없을 경우 기본값 1 사용
+            };
+
+
+            // paging 값을 콘솔에 출력하여 확인
+            console.log("Sending paging data:", paging);
+            stompClient.send("/app/chat/updatePage", {}, JSON.stringify(paging));
+
+            loadChatList(activePage, inactivePage, 8, false);
+        });
     });
 }
 

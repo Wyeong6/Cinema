@@ -2,6 +2,7 @@ package com.busanit.controller;
 
 import com.busanit.domain.chat.ChatRoomDTO;
 import com.busanit.domain.chat.MessageDTO;
+import com.busanit.domain.chat.PageUpdateDTO;
 import com.busanit.domain.chat.TypingIndicatorDTO;
 import com.busanit.entity.chat.ChatRoom;
 import com.busanit.service.ChatService;
@@ -22,18 +23,38 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
+@SessionAttributes({"activePage", "inactivePage"})
 public class ChatController {
 
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
 
+    @ModelAttribute("activePage")
+    public int activePage() {
+        return 1; // 기본 active 페이지 번호
+    }
+
+    @ModelAttribute("inactivePage")
+    public int inactivePage() {
+        return 1; // 기본 inactive 페이지 번호
+    }
+
+    @MessageMapping("/chat/updatePage")
+    public void updateAdminPage(@Payload PageUpdateDTO pageUpdateDTO, Model model) {
+
+
+        System.out.println("Received PageUpdateDTO: " + pageUpdateDTO);
+        model.addAttribute("activePage", pageUpdateDTO.getActivePage());
+        model.addAttribute("inactivePage", pageUpdateDTO.getInactivePage());
+    }
+
     //로그인 여부확인 후 페이지이동
     @GetMapping("/chatUser")
     public String chatUser(Model model) {
 //        if (chatService.isAuthenticated()) {
-            String userEmail = chatService.getAuthenticatedUserEmail();
-            model.addAttribute("userEmail", userEmail);
-            return "/cs/chat"; // templates 폴더의 chat.html 파일을 렌더링
+        String userEmail = chatService.getAuthenticatedUserEmail();
+        model.addAttribute("userEmail", userEmail);
+        return "/cs/chat"; // templates 폴더의 chat.html 파일을 렌더링
 //        } else {
 //            return "redirect:/login"; // 로그인 페이지로 리다이렉트
 //        }
@@ -41,8 +62,8 @@ public class ChatController {
 
     //메세지 처리
     @MessageMapping("/chat/private")
-    public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
-    // 채팅 종료할 경우
+    public void sendPrivateMessage(@Payload MessageDTO messageDTO, @SessionAttribute("activePage") int activePage, @SessionAttribute("inactivePage") int inactivePage) {
+        // 채팅 종료할 경우
         if ("inactive".equals(messageDTO.getStatus())) {
             chatService.updateChatRoomStatus(messageDTO.getChatRoomId(), "inactive");
         }else if("active".equals(messageDTO.getStatus())){
@@ -50,7 +71,7 @@ public class ChatController {
         }
 
         // 메시지 처리 후, 채팅 리스트 업데이트 요청
-        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), 1, 8);
+        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), activePage, inactivePage, 8);
 
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
     }
@@ -65,7 +86,6 @@ public class ChatController {
         response.put("chatRoomId", createChatRoom.getId());
 
         return ResponseEntity.ok().body(response);
-
     }
 
     //채팅중인 메세지 반환
@@ -88,15 +108,15 @@ public class ChatController {
     @ResponseBody
     public ResponseEntity<Page<ChatRoomDTO>> updateLastReadTimestamp(@PathVariable Long chatRoomId) {
 
-            System.out.println("오픈모달창중 읽기");
-            chatService.updateLastReadTimestamp(chatRoomId);
+        System.out.println("오픈모달창중 읽기");
+        chatService.updateLastReadTimestamp(chatRoomId);
 
-            String userEmail = chatService.getAuthenticatedUserEmail();
+        String userEmail = chatService.getAuthenticatedUserEmail();
 
-            // 전체 채팅방 정보 가져오기
-            Page<ChatRoomDTO> chatRooms = chatService.getChatList(1, 1, userEmail); // 이 메서드는 전체 채팅방 정보를 가져오는 것으로 가정합니다.
+        // 전체 채팅방 정보 가져오기
+        Page<ChatRoomDTO> chatRooms = chatService.getChatList(1, 1, userEmail); // 이 메서드는 전체 채팅방 정보를 가져오는 것으로 가정합니다.
 
-            return ResponseEntity.ok(chatRooms);
+        return ResponseEntity.ok(chatRooms);
     }
 
     //로그인한 유저와 채팅중인 상대방이메일 반환
@@ -114,14 +134,13 @@ public class ChatController {
         messagingTemplate.convertAndSendToUser(typingIndicatorDTO.getRecipient(), "/queue/private/" + typingIndicatorDTO.getChatRoomId(), typingIndicatorDTO);
     }
 
+    public void updateChatList(String sender, String recipient, int activePage, int inactivePage, int size) {
 
-    public void updateChatList(String sender, String recipient, int page, int size) {
-
-        Page<ChatRoomDTO> activeChatRooms = chatService.getActiveChatList(page - 1, size, recipient);
-        Map<String, Object> activeChatResponse = addPagingChatList("active", activeChatRooms, page, sender);
+        Page<ChatRoomDTO> activeChatRooms = chatService.getActiveChatList(activePage - 1, size, recipient);
+        Map<String, Object> activeChatResponse = addPagingChatList("active", activeChatRooms, activePage, sender);
         // 비활성 채팅방 목록 가져오기
-        Page<ChatRoomDTO> inactiveChatRooms = chatService.getInactiveChatList(page - 1, size, recipient);
-        Map<String, Object> inactiveChatResponse = addPagingChatList("inactive", inactiveChatRooms, page, sender);
+        Page<ChatRoomDTO> inactiveChatRooms = chatService.getInactiveChatList(inactivePage - 1, size, recipient);
+        Map<String, Object> inactiveChatResponse = addPagingChatList("inactive", inactiveChatRooms, inactivePage, sender);
 
 //        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, recipient);
         // 두 개의 목록을 합쳐서 반환
