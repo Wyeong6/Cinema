@@ -55,11 +55,12 @@
         </div>
         <div th:if="${findInfo != null && newPassword != null}">
             <h3>임시 비밀번호가 발급되었습니다.</h3>
-            <div class="password_flex">
-                <!--            <p>Password : </p>-->
-                <p id="password" style="margin-left: 1%" th:text="${findInfo}"></p>
-            </div>
-            <p style="text-align: center">안전을 위해 비밀번호를 변경해 주세요.</p>
+            <!--            <div class="password_flex">-->
+            <!--            <p>Password : </p>-->
+            <!--                <p id="password" style="margin-left: 1%" th:text="${findInfo}"></p>-->
+            <!--            </div>-->
+            <p style="text-align: center">등록된 이메일 주소로 새로운 비밀번호를 발송해 드렸습니다.</p>
+            <p style="text-align: center">보안을 위해 로그인 후 비밀번호를 변경해 주세요.</p>
             <button class="button btn2" onclick="location.href='/member/login'">로그인하기</button>
         </div>
     </div>

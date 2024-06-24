@@ -9,6 +9,8 @@ import com.busanit.repository.ChatRoomRepository;
 import com.busanit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class MemberService implements UserDetailsService { /* UserDetailsService 로그인을 위한 처리 */
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final JavaMailSender mailSender;
 
     public void saveMember(Member member) {
         // 회원 중복 체크
@@ -170,4 +173,14 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         memberRepository.updateGrade(userEditGrade, email);
     }
 
+    // 멤버에게 메일 보내기
+    public void sendEmailToMember(String toEmail, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject(subject);
+        message.setText(text);
+        message.setFrom(System.getenv("adminEmail")); // 환경 변수에서 발신자 이메일 가져오기
+
+        mailSender.send(message);
+    }
 }
