@@ -38,7 +38,7 @@
                     <header>
                         <h2><a href="#">상영 예정작</a></h2>
                         <p>
-                            화제의 신작 영화들을 주목하세요!
+                            다가오는 새로운 이야기, 상영 예정작을 만나보세요
                         </p>
                     </header>
                 </article>
@@ -46,7 +46,8 @@
                 <div class="row">
                     <article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${moviePage.content}">
                         <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                            <img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/>
+                            <img th:if="${movie.posterPath != 'null'}" th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/>
+                            <img th:if="${movie.posterPath == 'null'}" th:src="@{/images/img_not_ready2.png}" alt="준비중 이미지"/>
                         </a>
                         <header>
                             <h4>
@@ -63,7 +64,7 @@
                     <a href="#" th:if="${moviePage.hasPrevious()}"
                        th:href="@{/comingMovies(page=${moviePage.number - 1})}">이전</a>
                     <span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
-                    <a th:href="@{/comingMovies(page=${pageNum})}" th:text="${pageNum + 1}"
+                    <a th:href="@{/comingMovies(page=${pageNum})}" th:text="'[' + (${pageNum + 1}) + ']'"
                        th:classappend="${pageNum == moviePage.number} ? 'active' : ''"></a>
                     </span>
                     <a href="#" th:if="${moviePage.hasNext()}"

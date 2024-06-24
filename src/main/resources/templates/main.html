@@ -19,7 +19,11 @@
     }
     .custom-modal-xl {
         max-width: 85%; /* 또는 원하는 크기 */
-        z-index: 99999999;
+        z-index: 999999999999;
+    }
+
+    #movie_title {
+        z-index: -999999;
     }
     .modal-backdrop.show {
         opacity: 0.85 !important; /* 투명도 조절 */
@@ -40,11 +44,10 @@
     <!-- Header -->
     <div id="header">
         <div class="overlay"></div>
-        <h1 class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
+        <h1 id="logo" class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
         <!-- Inner -->
         <div class="inner">
             <header>
-
                 <h1><a id="movie_title">Movie Title</a></h1>
                 <hr />
                 <p>Another fine freebie by HTML5 UP</p>
@@ -277,12 +280,20 @@
 
             //모달 close버튼시  영상 정지
             $('.close').on('click', function() {
+                const info = document.getElementById('info');
+                const logo = document.getElementById('logo');
+                info.style.display = 'block';
+                logo.style.display = 'block';
                 $('#videoModal').modal('hide');
                 $('#videoFrame').attr('src', '');
             });
 
             //모달이 닫히면 영상중지
             $('#videoModal').on('hidden.bs.modal', function () {
+                const info = document.getElementById('info');
+                const logo = document.getElementById('logo');
+                info.style.display = 'block';
+                logo.style.display = 'block';
                 $('#videoFrame').attr('src', '');
             });
 
@@ -296,11 +307,16 @@
                 const header = document.getElementById('header');
                 const movieTitle = document.getElementById('movie_title');
                 const buttons = document.querySelectorAll('.btn');
+                const info = document.getElementById('info');
+                const logo = document.getElementById('logo');
+
 
                 $('#movie_title').off('click').on('click', function () {
                     const videoUrl = movieVideos[index];
                     console.log("videoUrl" + videoUrl)
                     $('#videoFrame').attr('src', videoUrl);
+                    info.style.display = 'none';
+                    logo.style.display = 'none';
                     $('#videoModal').modal('show');
                 });
 
