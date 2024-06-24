@@ -14,21 +14,21 @@ public class SeatDTO {
     private String id;
     private Long seatRow;
     private String seatColumn;
-    private boolean isReserved;
     private boolean isAvailable;
+    private boolean isReserved;
     private Long theaterNumberId;
 
     public SeatDTO() {}
 
-    public SeatDTO(String id, Long seatRow, String seatColumn, boolean isReserved, boolean isAvailable, Long theaterNumberId) {
+    public SeatDTO(String id, Long seatRow, String seatColumn, boolean isAvailable, boolean isReserved, Long theaterNumberId) {
         TheaterNumber theaterNumber = new TheaterNumber();
         theaterNumber.setId(this.theaterNumberId);
 
         this.id = id;
         this.seatRow = seatRow;
         this.seatColumn = seatColumn;
-        this.isReserved = isReserved;
         this.isAvailable = isAvailable;
+        this.isReserved = isReserved;
         this.theaterNumberId = theaterNumberId;
     }
 
@@ -37,8 +37,8 @@ public class SeatDTO {
                 .id(seat.getId())
                 .seatRow(seat.getSeatRow())
                 .seatColumn(seat.getSeatColumn())
-                .isReserved(seat.isReserved())
                 .isAvailable(seat.isAvailable())
+                .isReserved(false)
                 .theaterNumberId(seat.getTheaterNumber().getId())
                 .build();
     }
@@ -52,7 +52,6 @@ public class SeatDTO {
         seat.setId(this.id);
         seat.setSeatColumn(this.seatColumn);
         seat.setSeatRow(this.seatRow);
-        seat.setReserved(this.isReserved());
         seat.setAvailable(this.isAvailable());
         seat.setTheaterNumber(theaterNumber);
         return seat;

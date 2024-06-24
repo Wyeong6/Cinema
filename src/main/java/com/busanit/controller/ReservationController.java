@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +34,8 @@ public class ReservationController {
     private final TheaterService theaterService;
     private final TheaterNumberService theaterNumberService;
     private final ScheduleService scheduleService;
+    private final SeatService seatService;
+    private final SeatReservationService seatReservationService;
 
     @GetMapping("/screeningSchedule")
     public String screeningSchedule(Model model) {
@@ -76,8 +80,15 @@ public class ReservationController {
             List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(scheduleDTO.getMovieId());
             TheaterNumberDTO theaterNumberDTO = theaterNumberService.getTheaterNumberById(scheduleDTO.getTheaterNumberId());
 
-            Map<String, List<SeatDTO>> seatsByColumn = theaterNumberDTO.getSeats().stream()
-                    .sorted(Comparator.comparingLong(SeatDTO::getSeatRow)) // SeatDTO의 seatRow 필드를 기준으로 정렬
+            // 좌석 정보 가져오기
+            List<SeatDTO> seatDTOs = theaterNumberDTO.getSeats();
+
+            // 예약된 좌석 여부 설정
+            seatService.markSeatsAsReserved(scheduleId, seatDTOs);
+
+            // 좌석을 열과 행으로 그룹화하여 Map에 저장
+            Map<String, List<SeatDTO>> seatsByColumn = seatDTOs.stream()
+                    .sorted(Comparator.comparingLong(SeatDTO::getSeatRow))
                     .collect(Collectors.groupingBy(SeatDTO::getSeatColumn));
 
             model.addAttribute("scheduleDTO", scheduleDTO);
@@ -88,6 +99,34 @@ public class ReservationController {
         }
 
         return "reservation/seat_selection";
+    }
+
+    // 좌석 예약
+    @PostMapping("/reserveSeats")
+    @ResponseBody
+    public ResponseEntity<String> reserveSeats(@RequestBody Map<String, Object> request) {
+        try {
+            Long scheduleId = ((Number) request.get("scheduleId")).longValue();
+            String reservedBy = (String) request.get("reservedBy");
+            List<Map<String, Object>> selectedSeats = (List<Map<String, Object>>) request.get("selectedSeats");
+
+            if (scheduleId == null || reservedBy == null || selectedSeats == null) {
+                return ResponseEntity.badRequest().body("Invalid request data");
+            }
+
+            for (Map<String, Object> seatData : selectedSeats) {
+                String seatId = (String) seatData.get("seatId");
+                if (seatId == null) {
+                    return ResponseEntity.badRequest().body("Invalid seatId in selectedSeats");
+                }
+                seatReservationService.reserveSeat(scheduleId, seatId, reservedBy);
+            }
+            return ResponseEntity.ok("Seats reserved successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while reserving seats");
+        }
     }
 
 }

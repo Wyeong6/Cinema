@@ -8,8 +8,93 @@
 
         <!-- 메인 -->
         <div class="wrapper style1 payment bg-black-wrapper">
-            <div class="container">
+            <div class="container" th:each="movie, iterStat : ${movieDTOs}">
                 <article id="main" class="special">
+                    <input type="hidden" id="schedule-id" th:data-schedule-id="${scheduleDTO.id}" />
+                    <input type="hidden"
+                           id="movieId"
+                           th:value="${movie.id}"
+                           th:data-certification="${movie.certifications}"
+                           th:data-theaterNumber="${scheduleDTO.theaterNumberId}" />
+                    <table class="payment-table">
+                        <thead>
+                        <tr>
+                            <th>예매정보</th>
+                            <th>포인트</th>
+                            <th>결제확인</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="ticket-info">
+                                <img th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" />
+                                <div class="ticket-movie-title"><img src="" alt="연령등급 이미지" /><h4 th:text="${movie.title}">영화 제목</h4></div>
+                                    <table>
+                                        <tr>
+                                            <th>일시</th>
+                                            <td th:text="${scheduleDTO.date} + ' ' + ${scheduleDTO.startTime} + '~' + ${scheduleDTO.endTime}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>영화관</th>
+                                            <td th:text="${scheduleDTO.theaterName} + ' ' + ${scheduleDTO.theaterNumber} + '관'"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>인원</th>
+                                            <td>
+                                                <span id="adult-cnt" th:if="${adultCount > 0}"
+                                                      th:data-cnt="${adultCount}"
+                                                      th:text="'성인 ' + ${adultCount} + '인'"></span>
+                                                <span id="teenager-cnt" th:if="${teenagerCount > 0}"
+                                                      th:data-cnt="${teenagerCount}"
+                                                      th:text="', 청소년 ' + ${teenagerCount} + '인'"></span>
+                                                <span id="grand-cnt" th:if="${grandCount > 0}"
+                                                      th:data-cnt="${grandCount}"
+                                                      th:text="', 경로 ' + ${grandCount} + '인'"></span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div class="seats-info">
+                                        <span>선택 좌석</span>
+                                        <div id="selected-seats"></div>
+                                    </div>
+                                </td>
+                                <td class="point-info">
+                                    <label for="point">포인트 사용</label>
+                                    <input type="number" class="point-input" id="point">
+                                    <div><span>사용가능포인트</span><span></span></div>
+                                </td>
+                                <td class="payment-info">
+                                    <table>
+                                        <tr>
+                                            <th>상품 금액</th>
+                                            <td id="total-amount" th:data-total-amount="${totalAmount}" class="total-price" ></td>
+                                        </tr>
+                                        <tr>
+                                            <th>할인 금액</th>
+                                            <td><span>- </span>0원</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="result-price-td" colspan="2">
+                                                <h4>최종 결제금액</h4>
+                                                <div>
+                                                    <p>총 </p><h3 id="result-price">27000원</h3>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>적립예정 포인트</th>
+                                            <td id="add-point">270p</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="padding: 0">
+                                                <button class="pay-btn" type="button" onclick="moveToPayment()">결제하기</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </article>
             </div>
 
@@ -19,9 +104,99 @@
     <!-- 스크립트 -->
     <script src="/assets/js/jquery.min.js"></script>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            const certification = $('#movieId').data('certification');
 
+            let imageUrl;
+            switch (certification) {
+                case '12세 이상 관람가':
+                    imageUrl = '/images/ratings/12.png';
+                    break;
+                case '15세 이상 관람가':
+                    imageUrl = '/images/ratings/15.png';
+                    break;
+                case 19:
+                case '18세 이상 관람가':
+                    imageUrl = '/images/ratings/18.png';
+                    break;
+                default:
+                    imageUrl = '/images/ratings/all.svg';
+            }
+            $('.ticket-info .ticket-movie-title > img').attr('src', imageUrl);
+
+            var selectedSeats = /*[[ ${selectedSeats} ]]*/ '';
+            // JSON.parse()를 사용하여 JavaScript 객체로 변환
+            var seatsArray = JSON.parse(selectedSeats);
+
+            seatsArray.forEach(function(seat) {
+                const seatInfo = seat.seatColumn + seat.seatRow;
+                const seatDiv = $('<div>').text(seatInfo)
+                    .attr('data-seat-id', seat.seatId)
+                    .attr('data-seat-row', seat.seatRow)
+                    .attr('data-seat-column', seat.seatColumn)
+                    .addClass('seat-info');
+                $('#selected-seats').append(seatDiv);
+            });
+
+            const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
+            $('#total-amount').text(totalAmount + '원');
+
+            $('.point-input').on('input', function () {
+                const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
+                const pointInput = parseInt($(this).val(), 10) || 0;
+                const resultPrice = totalAmount - pointInput;
+                $('#result-price').text(resultPrice + '원');
+                $('#add-point').text(resultPrice * 0.01 + 'p');
+            });
+
+            // 초기 실행 (포인트 입력 값이 비어있을 경우 0으로 처리)
+            const pointInput = parseInt($('.point-input').val(), 10) || 0;
+            const resultPrice = totalAmount - pointInput;
+            $('#result-price').text(resultPrice + '원');
+            $('#add-point').text(resultPrice * 0.01 + 'p');
+        });
+        /*]]>*/
+
+        function moveToPayment() {
+            const adultCount = parseInt($('#adult-cnt').data('cnt')) || 0;
+            const teenagerCount = parseInt($('#teenager-cnt').data('cnt')) || 0;
+            const grandCount = parseInt($('#grand-cnt').data('cnt')) || 0;
+
+            const selectedSeats = [];
+            $('.seat-info').each(function() {
+                const seatId = $(this).data('seat-id');
+                const seatRow = $(this).data('seat-row');
+                const seatColumn = $(this).data('seat-column');
+
+                if (seatId && seatRow && seatColumn) {
+                    selectedSeats.push({
+                        seatId: seatId,
+                        seatRow: seatRow,
+                        seatColumn: seatColumn
+                    });
+                }
+            });
+
+            const scheduleId = $('#schedule-id').data('schedule-id');
+            const reservedBy = 'user'; // 실제로는 로그인된 사용자 정보로 대체
+
+            $.ajax({
+                type: 'POST',
+                url: '/reservation/reserveSeats',
+                contentType: 'application/json',
+                data: JSON.stringify({ scheduleId, reservedBy, selectedSeats }),
+                success: function(response) {
+                    console.log('Reserved seats successfully:', response);
+                },
+                error: function(error) {
+                    alert('Error reserving seats: ' + error.responseText);
+                }
+            });
+        }
     </script>
+
 
     <script src="/assets/js/jquery.dropotron.min.js"></script>
     <script src="/assets/js/jquery.scrolly.min.js"></script>

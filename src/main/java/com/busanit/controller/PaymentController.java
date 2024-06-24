@@ -1,8 +1,14 @@
 package com.busanit.controller;
 
+import com.busanit.domain.ScheduleDTO;
+import com.busanit.domain.SeatDTO;
 import com.busanit.domain.SnackDTO;
-import com.busanit.service.PaymentService;
-import com.busanit.service.SnackService;
+import com.busanit.domain.TheaterNumberDTO;
+import com.busanit.domain.movie.MovieDTO;
+import com.busanit.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -12,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/payment")
 @RequiredArgsConstructor
@@ -19,13 +27,35 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final SnackService snackService;
+    private final MovieService movieService;
+    private final SeatService seatService;
+    private final ScheduleService scheduleService;
+    private final TheaterNumberService theaterNumberService;
 
     @Value("${html5_inicis_key}")
     private String html5InicisKey;
 
-    @GetMapping("/")
-    public String payment() {
-        return "payment/payment_window";
+    @GetMapping("")
+    public String payment(
+            @RequestParam Long scheduleId,
+            @RequestParam String selectedSeats,
+            @RequestParam int adultCount,
+            @RequestParam int teenagerCount,
+            @RequestParam int grandCount,
+            @RequestParam double totalAmount,
+            Model model) {
+        ScheduleDTO scheduleDTO = scheduleService.getScheduleById(scheduleId);
+        List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(scheduleDTO.getMovieId());
+
+        model.addAttribute("scheduleDTO", scheduleDTO);
+        model.addAttribute("movieDTOs", movieDTOs);
+        model.addAttribute("selectedSeats", selectedSeats);
+        model.addAttribute("adultCount", adultCount);
+        model.addAttribute("teenagerCount", teenagerCount);
+        model.addAttribute("grandCount", grandCount);
+        model.addAttribute("totalAmount", totalAmount);
+
+        return "payment/payment_window"; // 뷰 이름 리턴
     }
 
     @PostMapping("/test") /*이름 수정예정*/

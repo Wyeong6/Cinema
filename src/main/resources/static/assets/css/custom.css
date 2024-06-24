@@ -80,6 +80,7 @@
     border-radius: 50px;
     font-size: 30px;
     background: rgba(229, 229, 229, 0.3);
+    padding: 0.65em 4em 0.65em 4em;
 }
 .contact button:hover {
     background: rgb(229, 229, 229);
@@ -1213,9 +1214,92 @@ td.theater-name.clicked {
     margin-right: 1em;
     line-height: 64px;
 }
-#pay-box button {
+button.pay-btn {
     margin: 0 1em 0 1em;
     padding: 1em 3em 1em 3em;
     font-size: 1em;
     font-weight: 400;
+}
+/* payment-window 결제 페이지 */
+.payment table.payment-table {
+    background: #F2F2F2;
+    border-radius: 15px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.payment table.payment-table thead {
+    background: #5155A6;
+}
+.payment table.payment-table tbody td {
+    padding: 0.5em 0;
+}
+.payment table.payment-table td:nth-child(2),
+.payment table.payment-table td:nth-child(3) {
+    text-align: left;
+}
+.payment table thead th {
+    color: #F2F2F2;
+    text-align: center;
+    padding: 1em 0;
+}
+.payment table tbody {
+    padding: 0 1em;
+}
+.payment table thead th:first-child {
+    border-top-left-radius: 15px;
+}
+.payment table thead th:last-child {
+    border-top-right-radius: 15px;
+}
+.payment table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 15px;
+    padding-left: 1em;
+}
+.payment table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 15px;
+    padding-right: 1em;
+}
+.payment .ticket-info > img {
+    margin: 1em;
+    width: 10em;
+}
+.payment .ticket-info .ticket-movie-title {
+    display: flex;
+    flex-direction: row;
+}
+.payment .ticket-info .ticket-movie-title > img {
+    width: 1.5em;
+}
+.payment .ticket-info .ticket-movie-title h4 {
+    line-height: 1.5em;
+    margin: 0 0 0 0.5em;
+}
+.payment .seats-info {
+    margin: 1em 3em;
+    padding: 0.5em 3em;
+    background: #FFFFFF;
+    border-radius: 10px;
+}
+.seat-info {
+    margin-left: 0.5em;
+}
+.payment .point-info input {
+    margin-left: 0.5em;
+    padding-left: 0.5em;
+    border: 1px solid #c4c3ca;
+    border-radius: 5px;
+}
+.payment .result-price-td div {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+}
+.payment .result-price-td p {
+    margin: 0;
+    margin-right: 10px;
+}
+.payment button.pay-btn {
+    margin: 0;
+    width: 100%;
+    border-radius: 0;
 }
