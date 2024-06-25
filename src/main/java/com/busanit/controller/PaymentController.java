@@ -1,9 +1,6 @@
 package com.busanit.controller;
 
-import com.busanit.domain.ScheduleDTO;
-import com.busanit.domain.SeatDTO;
-import com.busanit.domain.SnackDTO;
-import com.busanit.domain.TheaterNumberDTO;
+import com.busanit.domain.*;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +29,8 @@ public class PaymentController {
     private final SeatService seatService;
     private final ScheduleService scheduleService;
     private final TheaterNumberService theaterNumberService;
+    private final PointService pointService;
+    private final MemberService memberService;
 
     @Value("${html5_inicis_key}")
     private String html5InicisKey;
@@ -46,6 +46,22 @@ public class PaymentController {
             Model model) {
         ScheduleDTO scheduleDTO = scheduleService.getScheduleById(scheduleId);
         List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(scheduleDTO.getMovieId());
+
+        // 현재 로그인한 사용자의 이메일
+        String userEmail = memberService.currentLoggedInEmail();
+
+        // 사용자의 등급별 적립율 + 포인트 정보
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        long userGradeLong = memberService.userGrade();
+        double gradeRate = switch ((int)userGradeLong) {
+            case 1 -> 0.1;
+            case 2 -> 0.05;
+            default -> 0.03;
+        };
+        model.addAttribute("gradeInfo", gradeRate);
+        long currentPoints = 0;
+        currentPoints = pointService.getCurrentPoints(memberRegFormDTO.getId());
+        model.addAttribute("pointInfo", currentPoints);
 
         model.addAttribute("scheduleDTO", scheduleDTO);
         model.addAttribute("movieDTOs", movieDTOs);

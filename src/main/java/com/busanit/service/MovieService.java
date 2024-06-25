@@ -72,8 +72,8 @@ public class MovieService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-//    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
-    @Scheduled(fixedRate = 120000) // 2분
+    @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
+//    @Scheduled(fixedRate = 120000) // 2분
     public void fetchAndStoreMovies() throws IOException {
         fetchAndStoreMoviesNowPlaying();
         fetchAndStoreMoviesUpcoming();

@@ -61,7 +61,7 @@
                                 <td class="point-info">
                                     <label for="point">포인트 사용</label>
                                     <input type="number" class="point-input" id="point">
-                                    <div><span>사용가능포인트</span><span></span></div>
+                                    <div><span>사용가능포인트 </span><span th:text="${pointInfo}"></span></div>
                                 </td>
                                 <td class="payment-info">
                                     <table>
@@ -107,6 +107,7 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         $(document).ready(function () {
+            const gradeInfo = [[${gradeInfo}]];
             const certification = $('#movieId').data('certification');
 
             let imageUrl;
@@ -143,19 +144,25 @@
             const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
             $('#total-amount').text(totalAmount + '원');
 
+            // 포인트 입력이 사용자가 보유한 포인트를 넘지 않게 제한, 포인트는 1의자리 올림
+            const pointInfo = [[${pointInfo}]];
             $('.point-input').on('input', function () {
                 const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
-                const pointInput = parseInt($(this).val(), 10) || 0;
-                const resultPrice = totalAmount - pointInput;
+                let pointInput = parseInt($(this).val(), 10) || 0;
+                if (pointInput > pointInfo) {
+                    alert("보유 포인트 내에서만 포인트 사용이 가능합니다.");
+                    $(this).val(pointInfo); // Reset the value to the maximum allowed
+                }
+                const resultPrice = totalAmount - (parseInt($(this).val(), 10) || 0);
                 $('#result-price').text(resultPrice + '원');
-                $('#add-point').text(resultPrice * 0.01 + 'p');
+                $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
             });
 
             // 초기 실행 (포인트 입력 값이 비어있을 경우 0으로 처리)
             const pointInput = parseInt($('.point-input').val(), 10) || 0;
             const resultPrice = totalAmount - pointInput;
             $('#result-price').text(resultPrice + '원');
-            $('#add-point').text(resultPrice * 0.01 + 'p');
+            $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
         });
         /*]]>*/
 
