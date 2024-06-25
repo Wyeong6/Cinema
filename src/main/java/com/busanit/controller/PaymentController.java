@@ -63,6 +63,9 @@ public class PaymentController {
         currentPoints = pointService.getCurrentPoints(memberRegFormDTO.getId());
         model.addAttribute("pointInfo", currentPoints);
 
+        // 결제
+        model.addAttribute("html5InicisKey", html5InicisKey);
+
         model.addAttribute("scheduleDTO", scheduleDTO);
         model.addAttribute("movieDTOs", movieDTOs);
         model.addAttribute("selectedSeats", selectedSeats);
