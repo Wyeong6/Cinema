@@ -201,6 +201,8 @@
 
         <!-- 결제 프로그램 관련 시작 -->
         const html5InicisKey = [[${html5InicisKey}]];
+        const memberEmail = [[${memberInfo[0]}]];
+        const memberIdx = [[${memberInfo[1]}]];
         const snackName = [[${snack.snack_nm}]];
 
         function requestPay() { // 값 수정예정
@@ -215,11 +217,11 @@
             IMP.request_pay({
                 pg: "html5_inicis", //"{PG사 코드}.{상점 ID}",
                 pay_method: "card",
-                merchant_uid: `payment-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
+                merchant_uid: `SN-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
                 name: snackName, // 주문명
                 amount: currentPrice, // 결제 금액
-                buyer_email: "test@test.com",
-                buyer_name: "구매자",
+                buyer_email: memberEmail,
+                buyer_name: memberIdx,
                 buyer_tel: "010-0000-0000",
                 m_redirect_url: '/payment/complete'
             }, function(rsp) {

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -47,24 +48,27 @@ public class PaymentController {
         ScheduleDTO scheduleDTO = scheduleService.getScheduleById(scheduleId);
         List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(scheduleDTO.getMovieId());
 
-        // 현재 로그인한 사용자의 이메일
+        // 현재 로그인한 사용자의 정보 (이메일, idx)
+        List<String> memberInfo = new ArrayList<>();
         String userEmail = memberService.currentLoggedInEmail();
+        memberInfo.add(userEmail);
 
         // 사용자의 등급별 적립율 + 포인트 정보
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        memberInfo.add(memberRegFormDTO.getId().toString());
         long userGradeLong = memberService.userGrade();
         double gradeRate = switch ((int)userGradeLong) {
             case 1 -> 0.1;
             case 2 -> 0.05;
             default -> 0.03;
         };
-        model.addAttribute("gradeInfo", gradeRate);
         long currentPoints = 0;
         currentPoints = pointService.getCurrentPoints(memberRegFormDTO.getId());
-        model.addAttribute("pointInfo", currentPoints);
 
-        // 결제
-        model.addAttribute("html5InicisKey", html5InicisKey);
+        model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
+        model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
+        model.addAttribute("pointInfo", currentPoints); // 사용자 보유 포인트
+        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
 
         model.addAttribute("scheduleDTO", scheduleDTO);
         model.addAttribute("movieDTOs", movieDTOs);
@@ -102,6 +106,14 @@ public class PaymentController {
 
         // 결제
         model.addAttribute("html5InicisKey", html5InicisKey);
+
+        // 현재 로그인한 사용자의 정보 (이메일, idx)
+        List<String> memberInfo = new ArrayList<>();
+        String userEmail = memberService.currentLoggedInEmail();
+        memberInfo.add(userEmail);
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+        memberInfo.add(memberRegFormDTO.getId().toString());
+        model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
 
         return "payment/cart_list";
     }
