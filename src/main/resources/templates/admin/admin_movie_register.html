@@ -601,6 +601,12 @@
                     idError.textContent = '';
                     window.selectedActors = [];
                     updateSelectedActorsDisplay();
+
+                    if(window.isEditMode){
+                        window.isEditMode = false;
+                    }
+
+                    $('.container-xxl').load('/admin/movieList', { type: 'POST' });
                 }
             });
 
