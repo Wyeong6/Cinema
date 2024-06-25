@@ -20,7 +20,7 @@ public class PointService {
         pointRepository.save(point);
     }
 
-    // 포인트 내역
+    // 포인트 내역(리스트)
     public Slice<PointDTO> getPointInfo(Long member_id, Pageable pageable) {
         Slice<Point> pointList = pointRepository.findByMember_Id(member_id, pageable);
 
@@ -32,5 +32,10 @@ public class PointService {
         LocalDateTime endDate = LocalDateTime.now();
         LocalDateTime startDate = endDate.minusMonths(3);
         return pointRepository.countByMovieMembership(memberId, startDate, endDate);
+    }
+
+    // 결제시 사용 가능 포인트
+    public long getCurrentPoints(Long memberId) {
+        return pointRepository.currentPoints(memberId);
     }
 }

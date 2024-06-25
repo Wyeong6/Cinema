@@ -61,7 +61,7 @@
                                 <td class="point-info">
                                     <label for="point">포인트 사용</label>
                                     <input type="number" class="point-input" id="point">
-                                    <div><span>사용가능포인트</span><span></span></div>
+                                    <div><span>사용가능포인트 </span><span th:text="${pointInfo}"></span></div>
                                 </td>
                                 <td class="payment-info">
                                     <table>
@@ -104,9 +104,17 @@
     <!-- 스크립트 -->
     <script src="/assets/js/jquery.min.js"></script>
 
+    <!--결제 프로그램 쓰려면 jquery 필요-->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
     <script th:inline="javascript">
+        let currentPrice = null;
+
         /*<![CDATA[*/
         $(document).ready(function () {
+            const gradeInfo = [[${gradeInfo}]];
             const certification = $('#movieId').data('certification');
 
             let imageUrl;
@@ -143,23 +151,100 @@
             const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
             $('#total-amount').text(totalAmount + '원');
 
+            // 포인트 입력이 사용자가 보유한 포인트를 넘지 않게 제한, 포인트는 1의자리 올림
+            const pointInfo = [[${pointInfo}]];
             $('.point-input').on('input', function () {
                 const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
-                const pointInput = parseInt($(this).val(), 10) || 0;
-                const resultPrice = totalAmount - pointInput;
+                let pointInput = parseInt($(this).val(), 10) || 0;
+                if (pointInput > pointInfo) {
+                    alert("보유 포인트 내에서만 포인트 사용이 가능합니다.");
+                    $(this).val(pointInfo); // Reset the value to the maximum allowed
+                }
+                const resultPrice = totalAmount - (parseInt($(this).val(), 10) || 0);
+                currentPrice = resultPrice;
                 $('#result-price').text(resultPrice + '원');
-                $('#add-point').text(resultPrice * 0.01 + 'p');
+                $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
             });
 
             // 초기 실행 (포인트 입력 값이 비어있을 경우 0으로 처리)
             const pointInput = parseInt($('.point-input').val(), 10) || 0;
             const resultPrice = totalAmount - pointInput;
+            currentPrice = resultPrice;
             $('#result-price').text(resultPrice + '원');
-            $('#add-point').text(resultPrice * 0.01 + 'p');
+            $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
         });
         /*]]>*/
 
+        <!-- 결제 프로그램 관련 시작 -->
+        const html5InicisKey = [[${html5InicisKey}]];
+        const memberEmail = [[${memberInfo[0]}]];
+        const memberIdx = [[${memberInfo[1]}]];
+
         function moveToPayment() {
+            IMP.init(html5InicisKey); // 고객사 식별코드
+            IMP.request_pay({
+                pg: "html5_inicis", //"{PG사 코드}.{상점 ID}",
+                pay_method: "card",
+                merchant_uid: `MO-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
+                name: "예매 결제", // 주문명
+                amount: currentPrice, // 결제 금액
+                buyer_email: memberEmail,
+                buyer_name: memberIdx,
+                // buyer_tel: "010-0000-0000",
+                m_redirect_url: '/payment/complete'
+            }, function(rsp) {
+                // let result = "";
+                if(rsp.success) {
+                    var msg = "결제가 완료되었습니다.";
+                    msg += "고유ID : " + rsp.imp_uid;
+                    msg += "상점 거래ID : " + rsp.merchant_uid;
+                    msg += "결제 금액 : " + rsp.paid_amount;
+                    msg += "카드 승인번호 : " + rsp.apply_num;
+                    $.ajax({
+                        type: "GET",
+                        url: "payment/complete",
+                        data: {
+                            "amount": money
+                        },
+                    });
+
+                    // result = "0";
+                    //
+                    // const form = new FormData();
+                    // form.append("impuid", rsp.imp_uid)
+                    // form.append("merchantuid", rsp.merchant_uid)
+                    // form.append("paidamount", rsp.amount)
+                    // form.append("applynum", rsp.apply_num)
+                    // form.append("email", rsp.buyer_email)
+                    //
+                    // console.log(form)
+
+                    // self.$axios.post("http://localhost:8080/payment/complete" + rsp.email, form)
+                    //     .then(function(res) {
+                    //         if(res.status === 200) {
+                    //             console.log(res)
+                    //             self.close();
+                    //             window.location.reload(true);
+                    //         }
+                    //     });
+                } else {
+                    var msg = "결제에 실패하였습니다.";
+                    msg += "에러내용 : " + rsp.error_msg;
+                    // result = "1";
+                    // self.contractformcheck = false;
+                    // self.formattedPrice = "";
+                    // self.price = 0;
+                    // self.isPlaceholderVisible = true;
+                }
+                // if(result === "0") {
+                //     alert("성공")
+                // }
+                // self.contractformcheck = false
+                alert(msg);
+                // document.location.href = "/" // alert창 확인 후 이동할 url
+            });
+            <!--결제 프로그램 관련 끝-->
+
             const adultCount = parseInt($('#adult-cnt').data('cnt')) || 0;
             const teenagerCount = parseInt($('#teenager-cnt').data('cnt')) || 0;
             const grandCount = parseInt($('#grand-cnt').data('cnt')) || 0;
@@ -180,7 +265,7 @@
             });
 
             const scheduleId = $('#schedule-id').data('schedule-id');
-            const reservedBy = 'user'; // 실제로는 로그인된 사용자 정보로 대체
+            const reservedBy = memberIdx; // member_id값
 
             $.ajax({
                 type: 'POST',
@@ -196,6 +281,7 @@
             });
         }
     </script>
+
 
 
     <script src="/assets/js/jquery.dropotron.min.js"></script>

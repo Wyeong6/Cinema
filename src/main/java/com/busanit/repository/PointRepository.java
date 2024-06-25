@@ -20,4 +20,8 @@ public interface PointRepository extends JpaRepository<Point, Long> {
             @Param("endDate") LocalDateTime endDate
     );
 
+    // 결제시 사용 가능 포인트
+    @Query("SELECT p.currentPoints FROM Point p WHERE p.member.id = :memberId")
+    long currentPoints(@Param("memberId") Long memberId);
+
 }
