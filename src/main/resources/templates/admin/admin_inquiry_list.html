@@ -33,6 +33,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event List</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+
+    <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <style>
         td {
             padding: 15px; /* 좌우 간격을 조절할 값 */
@@ -60,7 +64,7 @@
                         <th>내용</th>
                         <th>작성자 이메일</th>
                         <th>문의 상태</th>
-                        <th></th>
+                        <th>ㅁㄴㅇㅁㄴㅇ</th>
                         <th style="display: none;">답변받을 이메일</th>
                     </tr>
                     </thead>
@@ -84,12 +88,11 @@
                     </tbody>
                 </table>
                 <div style="text-align: center;" th:if="${!#lists.isEmpty(unansweredInquiryList.content)}"
-                     th:with="startUnanswered = ${startUnansweredPage != null ? startUnansweredPage : 1},
-                  endUnanswered = ${endUnansweredPage != null ? endUnansweredPage : 1}">
-                    <a href="#" th:each="i : ${#numbers.sequence(startUnanswered, endUnanswered)}"
-                       th:href="@{/inquiryList(page=${i})}" th:data-page="${i}" th:text="${i}" class="paging-btn"></a>
+                     th:with="startunansweredPage=${startunansweredPage}, endunansweredPage=${endunansweredPage}">
+                    <a href="#" th:each="i : ${#numbers.sequence(startunansweredPage, endunansweredPage)}"
+                       th:data-page="${i}" th:text="${i}" class="paging-btn" data-type="unanswered"></a>
                 </div>
-
+                <input type="hidden" id="unansweredPage" th:value="${unansweredPage}" />
             </div>
         </div>
     </div>
@@ -132,11 +135,11 @@
                     </tbody>
                 </table>
                 <div style="text-align: center;" th:if="${!#lists.isEmpty(answeredInquiryList.content)}"
-                     th:with="startAnswered = ${startAnsweredPage != null ? startAnsweredPage : 1},
-                  endAnswered = ${endAnsweredPage != null ? endAnsweredPage : 1}">
-                    <a href="#" th:each="i : ${#numbers.sequence(startAnswered, endAnswered)}"
-                       th:href="@{/inquiryList(page=${i})}" th:data-page="${i}" th:text="${i}" class="paging-btn"></a>
+                     th:with="startansweredPage=${startansweredPage}, endansweredPage=${endansweredPage}">
+                    <a href="#" th:each="i : ${#numbers.sequence(startansweredPage, endansweredPage)}"
+                        th:data-page="${i}" th:text="${i}" class="paging-btn" data-type="answered"></a>
                 </div>
+                <input type="hidden" id="answeredPage" th:value="${answeredPage}" />
             </div>
         </div>
     </div>
@@ -231,18 +234,30 @@
         </div>
     </div>
 </div>
-
+<div id="pageVariables"
+     data-answered-page="/*[[${answeredPage}]]*/"
+     data-unanswered-page="/*[[${unansweredPage}]]*/"
+     hidden></div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    let pageVariablesElement = document.getElementById('pageVariables'); // 변수 이름을 변경함
+    let answeredPage = parseInt(pageVariablesElement.getAttribute('data-answered-page'));
+    let unansweredPage = parseInt(pageVariablesElement.getAttribute('data-unanswered-page'));
+
+
+    console.log("answeredPage: " + answeredPage);
+    console.log("unansweredPage: " + unansweredPage);
+</script>
 <script type="module">
 
     import {updateTimeSinceCreated} from '/modules/timeSinceCreated.js'; //시간 경과 모듈
     import { fetchUnansweredInquiryCount } from '/modules/inquiryCount.js';
-
     $(document).ready(function () {
-
         updateTimeSinceCreated();
+
 
 
         $('tr[data-toggle="modal"]').on('click', function () {
@@ -315,9 +330,9 @@
                 if (response === 'success') {
                     $('#inquiryModal').modal('hide');
                     alert('답변이 성공적으로 전송되었습니다.');
-                    fetchUnansweredInquiryCount();
+                    // fetchUnansweredInquiryCount();
                     console.log(response);
-                    location.reload();
+                    // location.reload();
                 } else {
                     alert('답변 전송 중 오류가 발생했습니다.');
                 }
@@ -341,32 +356,45 @@
         });
     }
 
-    // 페이지 번호를 세션 스토리지에 저장하거나 제거하는 함수
-    function setPageNumber(pageNumber, shouldRemove = false) {
-        if (shouldRemove) {
-            sessionStorage.removeItem('pageNumber');
-        } else {
-            sessionStorage.setItem('pageNumber', pageNumber);
-        }
-    }
+    // // 페이지 번호를 세션 스토리지에 저장하거나 제거하는 함수
+    // function setPageNumber(pageNumber, shouldRemove = false) {
+    //     if (shouldRemove) {
+    //         sessionStorage.removeItem('pageNumber');
+    //     } else {
+    //         sessionStorage.setItem('pageNumber', pageNumber);
+    //     }
+    // }
 
-    // 업데이트 버튼 클릭 이벤트 핸들러
-    $('.update-btn').click(function () {
-        var eventId = $(this).data('id');
-        var pageNumber = $(this).data('page');
-        setPageNumber(pageNumber);
-        sendRequest('GET', '/admin/eventUpdate', {eventId: eventId}, function (response) {
-            $('.container-xxl').html(response);
-        });
-    });
+    // // 업데이트 버튼 클릭 이벤트 핸들러
+    // $('.update-btn').click(function () {
+    //     var eventId = $(this).data('id');
+    //     var pageNumber = $(this).data('page');
+    //     setPageNumber(pageNumber);
+    //     sendRequest('GET', '/admin/eventUpdate', {eventId: eventId}, function (response) {
+    //         $('.container-xxl').html(response);
+    //     });
+    // });
+
+
 
     // 페이징 버튼 클릭 이벤트 핸들러
     $('.paging-btn').click(function (e) {
         e.preventDefault();
-        var pageNumber = $(this).data('page');
-        sendRequest('GET', '/admin/inquiryList?page=' + pageNumber, {}, function (response) {
+        var page = $(this).data('page');
+        var type = $(this).data("type");
+
+        if (type === 'unanswered') {
+            unansweredPage = page;
+        } else if (type === 'answered') {
+            answeredPage = page;
+        }
+
+        const url = '/admin/inquiryList?unansweredPage=' + unansweredPage + '&answeredPage=' + answeredPage;
+
+        sendRequest('GET', url, {}, function (response) {
             $('.container-xxl').html(response);
-            setPageNumber(pageNumber);
+            updateTimeSinceCreated();
+
         });
     });
     //

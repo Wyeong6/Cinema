@@ -49,6 +49,11 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="/assets/js/config.js"></script>
+    <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+
+    <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <style>
         /*안읽은 메세지 고정*/
         .fixed-bottom-right {
@@ -68,13 +73,13 @@
     </style>
     <script type="module">
         import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
-        import { fetchUnansweredInquiryCount } from '/modules/inquiryCount.js';
+        // import { fetchUnansweredInquiryCount } from '/modules/inquiryCount.js';
 
         // 페이지 로드 시 안읽은 메세지 불러오기
         document.addEventListener('DOMContentLoaded', function () {
             loadChatList(1, 1, 8, true);
             setupWebSocketConnection(); // WebSocket 연결 설정
-            fetchUnansweredInquiryCount();
+            // fetchUnansweredInquiryCount();
         });
 
         async function setupWebSocketConnection() {
@@ -368,33 +373,54 @@
         });
     });
 
+    connect();
+
+    fetchUnansweredInquiryCount();
+
+    function connect() {
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('문의리스트 갯수 소켓 ' + frame);
+            stompClient.subscribe("/Topic/unansweredCount", function (message) {
+                const count = JSON.parse(message.body); // 메시지 body에서 카운트 추출
+                console.log('Received count:', count);
+                updateUnansweredCount(count); // UI 업데이트 함수 호출
+            });
+        });
+    }
+
+    function updateUnansweredCount(count) {
+        var formattedCount = '(' + count + ')';
+        $('#activeCount').text(formattedCount);
+    }
     // $(document).ready(function() {
     //     // 페이지 로드 시 미답변 문의 갯수를 가져와서 표시
     //     fetchUnansweredInquiryCount();
     //
     //     // 이벤트 핸들러 설정
     //     $(document).on('updateUnansweredCount', function() {
-    //         fetchUnansweredInquiryCount();
+
     //     });
     // });
 
     // // 미답변 문의 갯수를 가져와서 표시하는 함수
-    // function fetchUnansweredInquiryCount() {
-    //     $.ajax({
-    //         type: "GET",
-    //         url: "/admin/unansweredInquiryCount",
-    //         success: function(response) {
-    //             console.log("Response received:", response);
-    //             var count = response; // 서버에서 받은 미답변 문의 갯수
-    //             console.log("count:", count);
-    //             updateUnansweredCount(count); // 미답변 문의 갯수 업데이트 함수 호출
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.error("AJAX 요청 실패:", error);
-    //         }
-    //     });
-    // }
-    //
+    function fetchUnansweredInquiryCount() {
+        $.ajax({
+            type: "GET",
+            url: "/admin/unansweredInquiryCount",
+            success: function(response) {
+                console.log("Response received:", response);
+                const count = response; // 서버에서 받은 미답변 문의 갯수
+                console.log("count:", count);
+                updateUnansweredCount(count); // 미답변 문의 갯수 업데이트 함수 호출
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX 요청 실패:", error);
+            }
+        });
+    }
+
     // // 미답변 문의 갯수를 업데이트하는 함수
     // function updateUnansweredCount(count) {
     //     var formattedCount = '(' + count + ')';

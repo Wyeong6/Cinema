@@ -35,6 +35,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,6 +65,7 @@ public class AdminPageController {
     private final MemberService memberService;
     private final MovieService movieService;
     private final InquiryService inquiryService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -80,7 +82,7 @@ public class AdminPageController {
     }
 
     @PostMapping("/memberList")
-    public String memberManagement(Model model){
+    public String memberManagement(Model model) {
         List<Member> memberList = memberService.getAllMembers();
         // 할일 - DTO로 바꿔서 담기
         model.addAttribute("memberList", memberList);
@@ -103,7 +105,7 @@ public class AdminPageController {
     }
 
     @PostMapping("/member")
-    public String memberManagement(){
+    public String memberManagement() {
         return "admin/adminMemberManagementPage";
     }
 
@@ -128,7 +130,7 @@ public class AdminPageController {
         theaterDTOList = theaterService.getTheaterAll(pageable);
         model.addAttribute("theaterDTOList", theaterDTOList);
 
-        int startPage= Math.max(1, theaterDTOList.getPageable().getPageNumber() - 5);
+        int startPage = Math.max(1, theaterDTOList.getPageable().getPageNumber() - 5);
         int endPage = Math.min(theaterDTOList.getTotalPages(), theaterDTOList.getPageable().getPageNumber() + 5);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
@@ -199,7 +201,8 @@ public class AdminPageController {
         ObjectMapper objectMapper = new ObjectMapper();
         List<SeatDTO> seatDTOList;
         try {
-            seatDTOList = objectMapper.readValue(seatData, new TypeReference<List<SeatDTO>>() {});
+            seatDTOList = objectMapper.readValue(seatData, new TypeReference<List<SeatDTO>>() {
+            });
             seatService.save(seatDTOList);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -267,7 +270,7 @@ public class AdminPageController {
         scheduleDTOList = scheduleService.getScheduleAll(pageable);
         model.addAttribute("scheduleDTOList", scheduleDTOList);
 
-        int startPage= Math.max(1, scheduleDTOList.getPageable().getPageNumber() - 5);
+        int startPage = Math.max(1, scheduleDTOList.getPageable().getPageNumber() - 5);
         int endPage = Math.min(scheduleDTOList.getTotalPages(), scheduleDTOList.getPageable().getPageNumber() + 5);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
@@ -285,7 +288,8 @@ public class AdminPageController {
             model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
         }
 
-        return "admin/admin_schedule_register"; }
+        return "admin/admin_schedule_register";
+    }
 
     @PostMapping("/scheduleRegister")
     public ResponseEntity<String> scheduleRegister(@RequestBody @Valid ScheduleDTO scheduleDTO, BindingResult bindingResult) {
@@ -310,7 +314,7 @@ public class AdminPageController {
     }
 
     @GetMapping("/scheduleEdit")
-    public String scheduleEdit(@RequestParam(name="scheduleId") long scheduleId, Model model) {
+    public String scheduleEdit(@RequestParam(name = "scheduleId") long scheduleId, Model model) {
 
         try {
             List<MovieDTO> allMovies = movieService.getAll();
@@ -353,7 +357,7 @@ public class AdminPageController {
 
     @PostMapping("/scheduleDelete")
     public String scheduleDelete(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "scheduleId") long scheduleId,
-                                Model model, @PageableDefault(size = 15) Pageable pageable, ScheduleDTO scheduleDTO) {
+                                 Model model, @PageableDefault(size = 15) Pageable pageable, ScheduleDTO scheduleDTO) {
         scheduleService.deleteScheduleById(scheduleId);
 
         Page<ScheduleDTO> scheduleDTOList = scheduleService.getScheduleAll(pageable);
@@ -410,12 +414,12 @@ public class AdminPageController {
     public String snackRegister(@Valid SnackDTO snackDTO, BindingResult bindingResult, Model model) {
 
         model.addAttribute("urlLoad", "/admin/snackRegister"); // javascript load function 에 필요함
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "admin/admin_snack_register";
         }
         try {
             snackService.saveSnack(Snack.toEntity(snackDTO));
-        } catch(IllegalStateException e) {
+        } catch (IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }
 
@@ -643,7 +647,7 @@ public class AdminPageController {
 
     private Map<String, Object> addPagingChatList(String type, Page<ChatRoomDTO> chatRooms, int page, String memberEmail) {
         int totalPages = chatRooms.getTotalPages();
-        int startPage = Math.max(1, page - 5);
+        int startPage = Math.max(1, page - 4);
         int endPage = Math.min(totalPages, page + 4);
 
         Map<String, Object> response = new HashMap<>();
@@ -665,32 +669,44 @@ public class AdminPageController {
 
     //문의리스트 반환
     @GetMapping("/inquiryList")
-    public String inquiryList(Model model, @RequestParam(defaultValue = "1") int page,
+    public String inquiryList(Model model, @RequestParam(defaultValue = "1") int unansweredPage,
+                              @RequestParam(defaultValue = "1") int answeredPage,
                               @RequestParam(defaultValue = "8") int size) {
 
         // 미답변 문의 리스트와 페이지 정보
-        Page<InquiryDTO> unansweredInquiries = inquiryService.getUnansweredInquiryList(page - 1, size);
-        addPaginginquiryList(model, "unanswered", unansweredInquiries, page);
+        Page<InquiryDTO> unansweredInquiries = inquiryService.getUnansweredInquiryList(unansweredPage - 1, size);
+        addPagingInquiryList(model, "unanswered", unansweredInquiries, unansweredPage);
 
         // 답변 완료된 문의 리스트와 페이지 정보
-        Page<InquiryDTO> answeredInquiries = inquiryService.getAnsweredInquiryList(page - 1, size);
-        addPaginginquiryList(model, "answered", answeredInquiries, page);
+        Page<InquiryDTO> answeredInquiries = inquiryService.getAnsweredInquiryList(answeredPage - 1, size);
+        addPagingInquiryList(model, "answered", answeredInquiries, answeredPage);
+
+        System.out.println("answeredPage" +answeredPage);
+        System.out.println("unansweredPage" +unansweredPage);
+
+
+        model.addAttribute("answeredPage", answeredPage);
+        model.addAttribute("unansweredPage", unansweredPage);
 
         return "admin/admin_inquiry_list";
     }
 
     // 페이징으로 변환
-    private void addPaginginquiryList(Model model, String type, Page<InquiryDTO> inquiries, int page) {
+    private void addPagingInquiryList(Model model, String type, Page<InquiryDTO> inquiries, int page) {
+        System.out.println("pageSize " + page);
         int totalPages = inquiries.getTotalPages();
-        int startPage = Math.max(1, page - 5);
+        System.out.println("totalPages " + totalPages);
+        int startPage = Math.max(1, page - 4);
+        System.out.println("startPage " + startPage);
         int endPage = Math.min(totalPages, page + 4);
-
+        System.out.println("endPage " + endPage);
         model.addAttribute(type + "InquiryList", inquiries);
         model.addAttribute("current" + type + "Page", page);
         model.addAttribute("total" + type + "Pages", totalPages);
         model.addAttribute("start" + type + "Page", startPage);
         model.addAttribute("end" + type + "Page", endPage);
     }
+
     //해당 답변내용반환
     @GetMapping("/inquiryReplies/{inquiryId}")
     public ResponseEntity<InquiryReplyDTO> getInquiryDetails(@PathVariable Long inquiryId, Model model) {
@@ -699,15 +715,19 @@ public class AdminPageController {
     }
 
     // 미답변 문의의 갯수를 조회하여 ResponseEntity로 반환
+    // 미답변 문의의 갯수를 조회하여 ResponseEntity로 반환
     @GetMapping("/unansweredInquiryCount")
     @ResponseBody
     public ResponseEntity<Integer> getUnansweredInquiryCount() {
         try {
-            int count = inquiryService.getUnansweredInquiryCount();
-            return ResponseEntity.ok(count);
+            int updatedCount = inquiryService.getUnansweredInquiryCount();
+            System.out.println("Updated unanswered count: " + updatedCount);
+            messagingTemplate.convertAndSend("/Topic/unansweredCount", updatedCount);
+            System.out.println("WebSocket 메시지 전송: " + updatedCount);
+            return ResponseEntity.ok(updatedCount);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
         }
     }
-
 }
