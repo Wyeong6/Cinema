@@ -36,7 +36,7 @@
             <div class="container">
                 <article id="main" class="special">
                     <header>
-                        <h2><a href="#">상영 예정작</a></h2>
+                        <h3>상영 예정작</h3>
                         <p>
                             Morbi convallis lectus malesuada sed fermentum dolore amet
                         </p>
@@ -46,7 +46,7 @@
                 <div class="row">
                     <article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${moviePage.content}">
                         <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                            <img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/>
+                            <img class="featured-img" th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/>
                         </a>
                         <header>
                             <h4>

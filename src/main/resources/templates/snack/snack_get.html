@@ -51,22 +51,20 @@
         <div class="wrapper style1 snack_get list">
 
             <div class="container">
-                <article class="special" id="main snack_get_main">
-                    <header>
-                        <h2>
-                            <a href="#" th:text="${snack.snack_nm}"></a>
-                        </h2>
-                        <p th:text="${snack.snack_detail}"></p>
-                    </header>
-                    <section id="snack_get_section">
-                        <div class="snack_image">
-                            <a class="image featured" href="#">
-                                <img th:alt="${snack.snack_alt}"
-                                     th:src="@{/images/menu/{image}(image=${snack.snack_image})}" class="snack_get_img"/>
-                            </a>
-                            <canvas class="canvas" style="display: none"></canvas>
-                        </div>
-
+                <article class="special" id="snack_get_main">
+                    <div class="snack_image">
+                        <a class="image featured">
+                            <img th:class="featured-img" th:alt="${snack.snack_alt}"
+                                 th:src="@{/images/menu/{image}(image=${snack.snack_image})}" class="snack_get_img"/>
+                        </a>
+                        <canvas class="canvas" style="display: none"></canvas>
+                    </div>
+                    <div id="snack_get_section">
+                        <header>
+                            <h3 th:text="${snack.snack_nm}">
+                            </h3>
+                            <p th:text="${snack.snack_detail}"></p>
+                        </header>
                         <table class="default">
                             <tr>
                                 <td>구성품</td>
@@ -102,21 +100,21 @@
                                 </td>
                             </tr>
                         </table>
-                    </section>
+                    </div>
                 </article>
                 <hr/>
                 <div>
-                    <h3 style="font-size: 40px; margin-bottom: 1em">추천 상품</h3>
-                    <div class="row">
-                        <article class="col-3 col-12-mobile special" th:each="snack : ${snackList}">
+                    <h3 style="margin-bottom: 0.8em">추천 상품</h3>
+                    <div class="custom-grid">
+                        <article class="custom-col special" th:each="snack : ${snackList}">
                             <a class="image featured" th:href="@{/snack/detail(id=${snack.id})}">
-                                <img th:alt="${snack.snack_alt}"
+                                <img class="featured-img" th:alt="${snack.snack_alt}"
                                      th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
                             </a>
                             <header>
-                                <h3>
+                                <h4>
                                     <a th:href="@{/snack/detail(id=${snack.id})}" th:text="${snack.snack_nm}"></a>
-                                </h3>
+                                </h4>
                             </header>
                         </article>
                     </div>
