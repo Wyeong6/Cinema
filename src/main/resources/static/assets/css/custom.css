@@ -2,22 +2,22 @@
     font-family: 'MyCustomFont';
     src: url('font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
-
 #header {
     background-size: cover;
     background-position: center;
     transition: background-image 0.5s ease-in-out;
 }
-
 .logo {
     position: absolute;
-    top: 0;
-    left: 0;
-    margin: 2% 0 0 42%;
-    font-family: 'MyCustomFont', sans-serif;
+    top: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0 auto;
     z-index: 9999999;
 }
-
+.logo a {
+    font-family: 'MyCustomFont', sans-serif !important;
+}
 #info {
     position: absolute;
     top: 0.5em;
@@ -26,32 +26,42 @@
     height: 37px;
     z-index: 9999;
 }
-
 #info ul {
     display: flex;
     justify-content: space-between;
     list-style-type: none;
 }
-
 #info ul li {
     font-size: 13px;
     margin-right: 10px;
 }
 #banner header {
-    width: 100%;
+    width: 90% !important;
+    margin: 0 auto;
+    padding: 2.5em 10em 2.5em 4em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius: 15px;
+    background: #262B2B;
 }
 #banner h3 {
     color: #fafafa;
 }
 #banner form {
-    margin: 0 auto;
-    padding: 2em 0 0;
-    width: 80%;
+    width: 70%;
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
 }
 #banner input {
-    width: 89%;
+    margin-right: 2em;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    border: none;
+    border-bottom: 2px solid #4C5051;
+}
+#banner .search-input::placeholder {
+    color: #fff !important;
 }
 #banner button {
     background: transparent;
@@ -78,7 +88,7 @@
 }
 .contact button {
     border-radius: 50px;
-    font-size: 30px;
+    font-size: 1.2em;
     background: rgba(229, 229, 229, 0.3);
     padding: 0.65em 4em 0.65em 4em;
 }
@@ -100,6 +110,8 @@
 #movie_title {
     padding: 0.5em;
     border-radius: 0.5em;
+    color: #fff;
+    font-weight: 700;
 }
 #movie_title:hover {
     background-color: #FAFAFA0A; /* 마우스 호버 시 배경색 변경 */
@@ -120,9 +132,9 @@ a#movie_title:not(:hover) {
     z-index: 999;
 }
 #img_btn .btn {
-    color: #fff;
+    color: rgba(255, 255, 255, 0.3);
     background: none;
-    font-size: 1em;
+    font-size: 0.8em;
     padding: 0.5em 1em 0.5em 1em;
     cursor: pointer;
     border: none;
@@ -130,8 +142,8 @@ a#movie_title:not(:hover) {
     font-family: 'MyCustomFont', sans-serif;
 }
 #img_btn .clicked {
-    color: #df7366;
-    font-size: 2em;
+    color: #730D15;
+    font-size: 1.2em;
 }
 .carousel .section_title {
     display: flex;
@@ -141,6 +153,7 @@ a#movie_title:not(:hover) {
 .carousel article {
     position: relative; /* <article> 요소에 상대 위치 지정 */
     display: inline-block; /* 요소들이 인라인으로 나타나도록 설정 */
+    border-radius: 15px;
 }
 .carousel .overlay-img {
     width: 5em;
@@ -151,35 +164,43 @@ a#movie_title:not(:hover) {
     margin-left: -5%;
     margin-top: -5%;
 }
-.carousel .ten {
-    width: 5em;
-    margin-top: 9em;
-    margin-left: 1em;
+.carousel header {
+    margin-bottom: 0.5em;
 }
 .carousel header > p {
-    font-size: 1em;
-    margin-bottom: 0;
+    font-size: 0.8em;
+    line-height: 1em;
+    margin: 0.8em 0 0 0;
 }
 .carousel header > p > img {
     width: 1em;
+    line-height: 1em;
 }
 .carousel .button_box {
     display: flex;
     justify-content: space-between;
-    padding: 0.5em 1.5em 0;
+    padding: 0.5em 0.5em 0;
     z-index: 99999;
 }
 .carousel .button_box .reservation_btn {
-    background: #df7366;
-    font-size: 1em;
+    font-size: 0.8em;
     color: #fff;
-    padding: 0.5em 1.4em 0.5em 1.4em;
+    padding: 0.5em 1em 0.5em 1em;
 }
 .carousel .button_box .get_btn {
-    font-size: 1em;
-    background: #555555;
+    font-size: 0.8em;
     z-index: 99999;
-    padding: 0.5em 1.4em 0.5em 1.4em;
+    padding: 0.5em 1em 0.5em 1em;
+    background: #fff;
+    border: 2px solid #566a7f;
+    color: #566a7f;
+}
+.carousel .button_box .get_btn:hover {
+    background: #566a7f;
+}
+.carousel .button_box .get_btn:hover a {
+    color: #fff;
+    font-weight: 400;
 }
 .comming_list .button_box {
     justify-content: center;
@@ -190,11 +211,47 @@ a#movie_title:not(:hover) {
     align-items: center;
 }
 #features header > p {
-    font-size: 1.2em;
-    margin-bottom: 1em;
+    font-size: 1em;
+    margin: 2em 0;
 }
 #features .more_btn {
     text-align: right;
+}
+.custom-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5개의 동일한 너비의 컬럼 생성 */
+    gap: 0.8em; /* 컬럼 간격 */
+}
+
+.custom-col {
+    margin-bottom: 20px; /* 하단 마진 추가 */
+}
+
+@media (max-width: 1200px) {
+    .custom-grid {
+        grid-template-columns: repeat(4, 1fr); /* 작은 화면에서는 4개의 컬럼 */
+    }
+}
+
+@media (max-width: 992px) {
+    .custom-grid {
+        grid-template-columns: repeat(3, 1fr); /* 더 작은 화면에서는 3개의 컬럼 */
+    }
+}
+
+@media (max-width: 768px) {
+    .custom-grid {
+        grid-template-columns: repeat(2, 1fr); /* 작은 화면에서는 2개의 컬럼 */
+    }
+}
+
+@media (max-width: 480px) {
+    .custom-grid {
+        grid-template-columns: 1fr; /* 모바일 화면에서는 1개의 컬럼 */
+    }
+}
+.featured-img {
+    border-radius: 10px;
 }
 
 /* 상세 페이지 */
@@ -408,17 +465,16 @@ a#movie_title:not(:hover) {
     text-align: center;
 }
 /* 스낵 상세 페이지 */
-#snack_get_section {
+#snack_get_main {
     width: 100%;
     display: flex;
     flex-direction: row;
 }
-#snack_get_section .image {
-    width: 95%;
+#snack_get_main .snack_image {
+    width: 30%;
 }
-#snack_get_section .snack_get_img {
-    width: 70%;
-    margin: 0 auto;
+#snack_get_section {
+    margin-left: 5em;
 }
 #snack_get_section table {
     width: 100%;
