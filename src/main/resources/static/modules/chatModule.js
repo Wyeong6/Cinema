@@ -28,7 +28,7 @@ export async function connectWebSocket(options) {
         console.log('Connected to WebSocket: ' + frame);
 
         // '/user/queue/chatList' 주제를 구독하여 메시지 처리
-        await stompClient.subscribe('/user/queue/chatList', async function (message) {
+        stompClient.subscribe('/user/queue/chatList', async function (message) {
             const response = JSON.parse(message.body);
             console.log("Received message:", response);
 
@@ -55,6 +55,7 @@ export async function connectWebSocket(options) {
 
 // 멤버 이메일 변수 선언
 export let adminEmail = '';
+//채팅방 페이징변수 선언
 export let activePage = 1;
 export let inactivePage = 1;
 
@@ -71,9 +72,6 @@ export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            console.log("Last read timestamp updated successfully.");
-
-            console.log("모달창열려있을 때 activePage"+ activePage + inactivePage)
             // loadChatList를 호출하고 그 결과 프로미스를 반환
             return loadChatList(activePage, inactivePage, 8, true);
         })
@@ -96,11 +94,8 @@ export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
  * @returns {Promise} - AJAX 요청의 Promise 객체 반환
  */
 export function loadChatList(page1, page2, size, isUpdateUnreadCountOnly) {
-
     activePage = page1;
     inactivePage = page2;
-    console.log("모듈의 activePage: " + activePage + ", inactivePage: " + inactivePage);
-    console.log("모달창닫은 후 loadChatList");
     $.ajax({
         url: "/admin/getChatList",
         data: {
@@ -111,12 +106,7 @@ export function loadChatList(page1, page2, size, isUpdateUnreadCountOnly) {
         type: "POST",
         contentType: "application/x-www-form-urlencoded",
         success: function (response) {
-            console.log("응답 데이터:", response);
             adminEmail = response.activeMemberEmail || response.inactiveMemberEmail;
-            console.log("응답 memberEmail:", adminEmail);
-
-            // response.currentPage = page;
-            // console.log("currentPage" + response.currentPage)
 
             if (isUpdateUnreadCountOnly) {
                 updateUnreadCount(response);
@@ -158,9 +148,6 @@ export function updateUnreadCount(response) {
  * @param {object} response - 서버에서 받은 응답 객체
  */
 export function displayChatList(response) {
-    console.log("모달창닫은 후 displayChatList");
-
-    console.log("active 의 할당후 리스트뿌리기" + response.inactiveCurrentPage )
 
     // HTML에서 요소를 찾음
     var $activeChatListContainer = $(".active-chat-table");
@@ -224,7 +211,6 @@ function updatePagination(response, type) {
     var $pagination = $("#" + type + "-pagination");
     $pagination.empty();
 
-    var currentPage = response[type + "CurrentPage"];
     var startPage = response[type + "StartPage"];
     var endPage = response[type + "EndPage"];
 
@@ -241,37 +227,30 @@ function updatePagination(response, type) {
         event.preventDefault();
         var page = parseInt($(this).data("page"), 10);
         var type = $(this).data("type");
+
+        // 전역 변수 업데이트
         if (type === 'active') {
             activePage = page;
         } else {
-            inactivePage = page; // 전역 변수 업데이트
+            inactivePage = page;
         }
 
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
-            console.log(' 페이징 웹소켓 연결햇따!!!!! ' + frame);
-            // 현재 페이지 정보를 서버에 전송
-
-            console.log("activePage" + activePage)
-            console.log("inactivePage" + inactivePage)
-
 
             var paging = {
                 activePage: activePage ,
                 inactivePage: inactivePage
             };
 
-
-            // paging 값을 콘솔에 출력하여 확인
+            // 현재 페이지 정보를 서버에 전송
             stompClient.send("/app/chat/updatePage", {}, JSON.stringify(paging));
-            console.log("Sending paging data:", paging);
 
             // WebSocket 연결 해제
             stompClient.disconnect(function() {
                 console.log('웹소켓 연결 해제');
             });
-
 
             loadChatList(activePage, inactivePage, 8, false);
         });

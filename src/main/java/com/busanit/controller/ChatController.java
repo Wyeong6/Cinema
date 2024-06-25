@@ -81,9 +81,11 @@ public class ChatController {
 
         // 메시지 처리 후, 채팅 리스트 업데이트 요청
         PageUpdateDTO pageUpdateDTO = messageDTO.getPaging();
-        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
+//        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
 
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
+        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
+
     }
     //카테고리 선택 시 채팅룸 생성
     @PostMapping("/chat/createChatRoom")

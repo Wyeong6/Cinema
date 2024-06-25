@@ -27,8 +27,6 @@
     <div id="typingIndicatorDTO" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
 </div>
 
-
-
 <script th:inline="javascript">
     /*<![CDATA[*/
     var sender = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
@@ -53,7 +51,6 @@
         stompClient.connect({}, function (frame) {
             // 연결 성공 시 콘솔에 로그 출력
             console.log('Connected: ' + frame);
-            console.log('커넥터 chatRoomId: ' + chatRoomId);
             // 타이핑 이벤트를 감지하여 서버로 전송
             document.getElementById('message').addEventListener('input', handleTypingEvent);
             // 특정 사용자 큐에 구독 (개인 메시지 수신)
@@ -220,8 +217,6 @@
             default:
                 recipient = 'admin@admin.com';
         }
-        console.log("선택한 category의 아이디 " + recipient)
-
         createChatRoomAndConnect(recipient, category);
     }
 
@@ -244,34 +239,17 @@
             })
             .then(data => {
                 chatRoomId = data.chatRoomId; // 서버 응답에서 채팅방 ID 추출
-                console.log("Created chat room ID:", chatRoomId);
                 // 채팅방 생성 후 연결
                 connect();
             })
             .catch(error => console.error('Error creating chat room:', error));
     }
 
-    // window.onload = async function () {
-    //
-    //     recipient = await fetchRecipientEmail();
-    //     console.log("로드된 recipient" + recipient)
-    //     console.log("로드시 로그인된 이메일" + sender)
-    //
-    //     if (recipient) {
-    //         await fetchMessages(recipient);
-    //         if (chatRoomId) {
-    //             connect(); // chatRoomId가 있는 경우에만 커넥션 설정
-    //         }
-    //     }
-    // };
-
     //유저이메일로 현재 채팅중인 관리자 이메일 찾기
     async function fetchRecipientEmail() {
         try {
             const response = await fetch('/chat/getRecipientEmail');
-            console.log("받는 이메일", response); // Response 객체를 그대로 로깅하지 않음
             const data = await response.json(); // JSON 형식으로 응답을 파싱
-            console.log("받는 이메일 data", data); // 파싱된 JSON 데이터 로깅
             return Array.isArray(data) ? data[0] : data || '이메일을 찾을 수 없습니다.';
         } catch (error) {
             console.error('오류:', error);
@@ -286,14 +264,10 @@
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            console.log("response:", response);
             const data = await response.json();
-            console.log('Data:', data);
-
             if (Array.isArray(data) && data.length > 0) {
                 chatRoomId = data[0].id;
             }
-            console.log('chatRoomId:', chatRoomId);
             let messageExist = false;
 
             // 각 메시지 객체를 순회

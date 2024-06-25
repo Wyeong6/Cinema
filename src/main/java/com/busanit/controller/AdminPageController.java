@@ -645,6 +645,7 @@ public class AdminPageController {
         return combinedResponse;
     }
 
+    //채팅방 페이징
     private Map<String, Object> addPagingChatList(String type, Page<ChatRoomDTO> chatRooms, int page, String memberEmail) {
         int totalPages = chatRooms.getTotalPages();
         int startPage = Math.max(1, page - 4);
@@ -681,8 +682,8 @@ public class AdminPageController {
         Page<InquiryDTO> answeredInquiries = inquiryService.getAnsweredInquiryList(answeredPage - 1, size);
         addPagingInquiryList(model, "answered", answeredInquiries, answeredPage);
 
-        System.out.println("answeredPage" +answeredPage);
-        System.out.println("unansweredPage" +unansweredPage);
+        System.out.println("컨트롤answeredPage" + answeredPage);
+        System.out.println("컨트롤unansweredPage" + unansweredPage);
 
 
         model.addAttribute("answeredPage", answeredPage);
@@ -714,7 +715,6 @@ public class AdminPageController {
         return ResponseEntity.ok(inquiryReply);
     }
 
-    // 미답변 문의의 갯수를 조회하여 ResponseEntity로 반환
     // 미답변 문의의 갯수를 조회하여 ResponseEntity로 반환
     @GetMapping("/unansweredInquiryCount")
     @ResponseBody
