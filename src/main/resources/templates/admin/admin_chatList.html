@@ -223,6 +223,7 @@
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             subscribeToRecipient();
+            sendAdminEnter();
             // 타이핑 이벤트를 감지하여 서버로 전송
             document.getElementById('message').addEventListener('input', handleTypingEvent);
         });
@@ -250,6 +251,15 @@
         });
     }
 
+    // 관리자가 채팅방에 입장했다는 알림을 전송
+    function sendAdminEnter() {
+        const EnterNotification = {
+            chatRoomId: chatRoomId,
+            recipient: currentRecipient,
+            type: 'enter'
+        };
+        stompClient.send("/app/chat/admin/enter", {}, JSON.stringify(EnterNotification));
+    }
     // 메시지 전송 함수
     function sendMessage() {
         var messageContent = getElement('message').value;

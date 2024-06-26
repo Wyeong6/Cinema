@@ -1,9 +1,6 @@
 package com.busanit.controller;
 
-import com.busanit.domain.chat.ChatRoomDTO;
-import com.busanit.domain.chat.MessageDTO;
-import com.busanit.domain.chat.PageUpdateDTO;
-import com.busanit.domain.chat.TypingIndicatorDTO;
+import com.busanit.domain.chat.*;
 import com.busanit.entity.chat.ChatRoom;
 import com.busanit.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -64,24 +61,36 @@ public class ChatController {
 //        }
     }
 
-    //메세지 처리
-    @MessageMapping("/chat/private")
-    public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
+    //관리자 채팅방입장 알림
+    @MessageMapping("/chat/admin/enter")
+    public void sendAdminEnter(@Payload EnterNotificationDTO enterNotificationDTO) {
 
-        // 채팅 종료할 경우
-        if ("inactive".equals(messageDTO.getStatus())) {
-            chatService.updateChatRoomStatus(messageDTO.getChatRoomId(), "inactive");
-        }else if("active".equals(messageDTO.getStatus())){
-            chatService.saveMessage(messageDTO);
-        }
 
-        // 메시지 처리 후, 채팅 리스트 업데이트 요청
-        PageUpdateDTO pageUpdateDTO = messageDTO.getPaging();
 
-        messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
-        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
-
+        messagingTemplate.convertAndSendToUser(enterNotificationDTO.getRecipient(), "/queue/private/" + enterNotificationDTO.getChatRoomId(), enterNotificationDTO);
     }
+
+        //메세지 처리
+        @MessageMapping("/chat/private")
+        public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
+
+            // 채팅 종료할 경우
+            if ("inactive".equals(messageDTO.getStatus())) {
+                chatService.updateChatRoomStatus(messageDTO.getChatRoomId(), "inactive");
+            }else if("active".equals(messageDTO.getStatus())){
+                chatService.saveMessage(messageDTO);
+            }
+    //        else if("enter".equals(messageDTO.getType())){
+    //            chatService.updateLastReadTimestamp(messageDTO.getChatRoomId());
+    //        }
+
+            // 메시지 처리 후, 채팅 리스트 업데이트 요청
+            PageUpdateDTO pageUpdateDTO = messageDTO.getPaging();
+
+            messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
+            updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
+
+        }
     //카테고리 선택 시 채팅룸 생성
     @PostMapping("/chat/createChatRoom")
     @ResponseBody

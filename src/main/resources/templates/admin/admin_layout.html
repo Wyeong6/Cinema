@@ -70,9 +70,37 @@
             height: 40px;
             cursor: pointer; /* 클릭 가능하도록 설정 */
         }
+        #unreadCount {
+            background-color: #f66952;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            text-align: center;
+            display: inline-block;
+            line-height: 20px; /* 수직으로 중앙에 위치 */
+            position: relative;
+            top: -2px; /* 중심 지점으로 조정 */
+            left: 10px; /* 중심 점에서 오프셋 */
+        }
+        #activeCount {
+            background-color: #f66952;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            text-align: center;
+            display: inline-block;
+            line-height: 20px; /* 수직으로 중앙에 위치 */
+            position: relative;
+            top: -2px; /* 중심 지점으로 조정 */
+            left: 10px; /* 중심 점에서 오프셋 */
+        }
     </style>
     <script type="module">
-        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
+        import {connectWebSocket, loadChatList, updateUnreadCount} from '/modules/chatModule.js';
         // import { fetchUnansweredInquiryCount } from '/modules/inquiryCount.js';
 
         // 페이지 로드 시 안읽은 메세지 불러오기
@@ -82,7 +110,7 @@
             // fetchUnansweredInquiryCount();
         });
 
-        async function setupWebSocketConnection() {
+        function setupWebSocketConnection() {
             const options = {
                 subscribeCallback: handleWebSocketMessage
             };
@@ -228,7 +256,7 @@
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link chat_btn">
                         <i class="menu-icon tf-icons bx bx-detail"></i>
-                        <div data-i18n="Form interface">1:1 채팅 <span id="unreadCount"></span></div>
+                        <div data-i18n="Form interface">1:1 채팅 <span id="unreadCount">0</span></div>
                     </a>
                 </li>
                 <li class="menu-item">
@@ -247,17 +275,11 @@
                     </a>
                 </li>
             </ul>
-
         </aside>
-
-        <!-- 안읽은 메세지 표시 -->
-        <div class="fixed-bottom-right" id="unreadMessages">
-            <img src="/images/funny.png" alt="Unread Messages"> <!-- 안 읽은 메세지 아이콘 이미지 경로에 맞게 수정 -->
-<!--            <span id="unreadCount"></span> &lt;!&ndash; 안 읽은 메시지 수를 표시할 요소 &ndash;&gt;-->
-        </div>
-
-        <!-- / Menu -->
-
+<!--        &lt;!&ndash; 안읽은 메세지 표시 &ndash;&gt;-->
+<!--        <div class="fixed-bottom-right" id="unreadMessages">-->
+<!--            <img src="/images/funny.png" alt="Unread Messages"> &lt;!&ndash; 안 읽은 메세지 아이콘 이미지 경로에 맞게 수정 &ndash;&gt;-->
+<!--        </div>-->
         <!-- Layout container -->
         <div class="layout-page">
             <!-- Content wrapper -->
@@ -391,18 +413,12 @@
     }
 
     function updateUnansweredCount(count) {
-        var formattedCount = '(' + count + ')';
-        $('#activeCount').text(formattedCount);
+        if (count > 0) {
+            $('#activeCount').text(count).show(); // 숫자를 표시하고 요소를 보이게 함
+        } else {
+            $('#activeCount').hide(); // 숫자가 0일 때 요소를 숨김
+        }
     }
-    // $(document).ready(function() {
-    //     // 페이지 로드 시 미답변 문의 갯수를 가져와서 표시
-    //     fetchUnansweredInquiryCount();
-    //
-    //     // 이벤트 핸들러 설정
-    //     $(document).on('updateUnansweredCount', function() {
-
-    //     });
-    // });
 
     // // 미답변 문의 갯수를 가져와서 표시하는 함수
     function fetchUnansweredInquiryCount() {
@@ -420,12 +436,6 @@
             }
         });
     }
-
-    // // 미답변 문의 갯수를 업데이트하는 함수
-    // function updateUnansweredCount(count) {
-    //     var formattedCount = '(' + count + ')';
-    //     $('#activeCount').text(formattedCount);
-    // }
 </script>
 <!-- Place this tag in your head or just before your close body tag. -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
