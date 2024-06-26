@@ -68,6 +68,12 @@
                 <li sec:authorize="isAuthenticated()">
                     <a href="/member/logout" id="logoutLink">로그아웃</a>
                 </li>
+                <li class="chat-alarm" sec:authorize="isAuthenticated()">
+                    <img class="chat-img" src="/images/message.png" alt="1:1채팅 메시지" />
+                    <div id="unreadCount">
+                        0
+                    </div>
+                </li>
                 <li sec:authorize="hasRole('USER')">
                     <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
                 </li>
@@ -244,6 +250,26 @@
     <script src="/assets/js/main.js"></script>
     <!-- Scripts -->
 
+    <script type="module">
+        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatMessageCount.js';
+        window.addEventListener('DOMContentLoaded', function () {
+            loadChatList(1, 8, true);
+            setupWebSocketConnection();
+        });
+
+        async function setupWebSocketConnection() {
+            console.log('Setting up WebSocket connection');
+            const options = {
+                subscribeCallback: handleWebSocketMessage
+            };
+            connectWebSocket(options); // WebSocket 연결 함수 호출
+        }
+
+        function handleWebSocketMessage(response) {
+            console.log('WebSocket message received:', response);
+            updateUnreadCount(response);
+        }
+    </script>
     <script th:inline="javascript">
         $(document).ready(function() {
             if ($.fn.modal) {

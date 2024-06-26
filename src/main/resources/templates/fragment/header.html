@@ -39,8 +39,11 @@
                 <li sec:authorize="isAuthenticated()">
                     <a href="/member/logout" id="logoutLink">로그아웃</a>
                 </li>
-                <li sec:authorize="isAuthenticated()">
-                    <span id="unreadCount">0</span>
+                <li class="chat-alarm" sec:authorize="isAuthenticated()">
+                    <img class="chat-img" src="/images/message.png" alt="1:1채팅 메시지" />
+                    <div id="unreadCount">
+                        0
+                    </div>
                 </li>
                 <li sec:authorize="hasRole('USER')">
                     <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>

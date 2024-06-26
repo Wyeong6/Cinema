@@ -49,7 +49,7 @@
 <!--        <header data-include-path="header.html"></header>-->
 
         <!-- Main -->
-        <div class="wrapper style1 snack_get list">
+        <div class="wrapper style1 snack_get">
 
             <div class="container">
                 <article class="special" id="snack_get_main">
@@ -62,34 +62,22 @@
                     </div>
                     <div id="snack_get_section">
                         <header>
-                            <h3 th:text="${snack.snack_nm}">
-                            </h3>
-                            <p th:text="${snack.snack_detail}"></p>
+                            <p>스낵 스토어</p>
+                            <h3 th:text="${snack.snack_nm}"></h3>
+                            <div id="snack-info">
+                                <p class="snack_detail" th:text="${snack.snack_detail}"></p>
+                                <p id="snackPrice" th:text="${snack.snack_price} + '원'"></p>
+                            </div>
                         </header>
-                        <table class="default">
+                        <table>
                             <tr>
-                                <td>구성품</td>
-                                <td th:text="${snack.snack_set}"></td>
-                            </tr>
-                            <tr>
-                                <td>남은 수량</td>
-                                <td th:text="${snack.snack_stock}"></td>
-                            </tr>
-                            <tr>
-                                <td>가격</td>
-                                <td id="snackPrice" th:text="${snack.snack_price}"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" id="td_count">
+                                <td id="td_count">
                                     <div class="count_box">
                                         <button id="discount">-</button>
                                         <p id="countValue">1</p>
                                         <button id="upcount">+</button>
                                     </div>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td>총 합계</td>
                                 <td id="total_price">10,000원</td>
                             </tr>
                             <tr id="tr_purchase">
@@ -108,7 +96,7 @@
                 </article>
                 <hr/>
                 <div>
-                    <h3 style="margin-bottom: 0.8em">추천 상품</h3>
+                    <h3 style="margin-bottom: 0.8em; font-size: 1.5em">추천 상품</h3>
                     <div class="custom-grid">
                         <article class="custom-col special" th:each="snack : ${snackList}">
                             <a class="image featured" th:href="@{/snack/detail(id=${snack.id})}">

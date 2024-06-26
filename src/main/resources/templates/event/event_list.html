@@ -31,7 +31,7 @@
             <div class="container">
                 <article id="main" class="special">
                     <header>
-                        <h2><a href="#">이벤트</a></h2>
+                        <h3>이벤트</h3>
                         <p>
                             영화와 함께하는 즐거운 시간
                         </p>
@@ -46,9 +46,9 @@
                                  style="width: 300px; height: auto;"/>
                         </a>
                         <header>
-                            <h3>
+                            <h4>
                                 <a th:href="@{'/event_get/' + ${event.id}}" th:text="${event.eventName}"></a>
-                            </h3>
+                            </h4>
                         </header>
                         <p>
                             <!-- 여기에 추가적인 설명이나 내용을 넣을 수 있습니다. 필요하지 않다면 비워둡니다. -->
@@ -56,7 +56,7 @@
                     </article>
                 </div>
                 <div style="text-align: center" th:unless="${eventList.totalElements > 0}">
-                    <h3>준비중 입니다.</h3>
+                    <h4>준비중 입니다.</h4>
                 </div>
             </div>
             <div style="text-align: center;" th:if="${!#lists.isEmpty(eventList.content)}">
