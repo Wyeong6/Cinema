@@ -35,7 +35,7 @@
     <!-- 미답변 문의 리스트 -->
     <div class="col-md-6">
         <div class="card">
-            <h5 class="card-header">미답변 문의 List</h5>
+            <h5 class="card-header">미답변 문의</h5>
             <div class="table-responsive text-nowrap">
                 <table class="table table-hover">
                     <thead>
@@ -53,12 +53,15 @@
                     <tbody>
                     <tr th:each="inquiry : ${unansweredInquiryList.content}" data-toggle="modal"
                         th:data-id="${inquiry.id}"
-                        data-target="#inquiryModal" th:data-type="${inquiry.type}">
-                        <td th:text="${inquiry.id}"></td>
+                        data-target="#inquiryModal" th:data-type="${inquiry.type}"
+                        th:data-original-subject="${inquiry.subject}" th:data-original-message="${inquiry.message}">
+                    <td th:text="${inquiry.id}"></td>
                         <td th:text="${inquiry.name}"></td>
-                        <td th:text="${inquiry.subject}"></td>
                         <td>
-                            <span th:text="${#strings.length(inquiry.message) > 10 ? #strings.substring(inquiry.message, 0, 10) + '...' : inquiry.message}"></span>
+                            <span th:text="${#strings.length(inquiry.subject) > 5 ? #strings.substring(inquiry.subject, 0, 5) + '..' : inquiry.subject}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#strings.length(inquiry.message) > 6 ? #strings.substring(inquiry.message, 0, 6) + '..' : inquiry.message}"></span>
                         </td>
                         <td th:text="${inquiry.email}"></td>
                         <td th:text="${inquiry.type}"></td>
@@ -82,7 +85,7 @@
     <!-- 답변 완료된 문의 리스트 -->
     <div class="col-md-6">
         <div class="card">
-            <h5 class="card-header">답변 완료된 문의 List</h5>
+            <h5 class="card-header">답변 완료 문의</h5>
             <div class="table-responsive text-nowrap">
                 <table class="table table-hover">
                     <thead>
@@ -100,12 +103,15 @@
                     <tbody>
                     <tr th:each="inquiry : ${answeredInquiryList.content}" data-toggle="modal"
                         th:data-id="${inquiry.id}"
-                        data-target="#answeredInquiryModal" th:data-type="${inquiry.type}">
-                        <td th:text="${inquiry.id}"></td>
+                        data-target="#answeredInquiryModal" th:data-type="${inquiry.type}"
+                        th:data-original-subject="${inquiry.subject}" th:data-original-message="${inquiry.message}">
+                    <td th:text="${inquiry.id}"></td>
                         <td th:text="${inquiry.name}"></td>
-                        <td th:text="${inquiry.subject}"></td>
                         <td>
-                            <span th:text="${#strings.length(inquiry.message) > 10 ? #strings.substring(inquiry.message, 0, 10) + '...' : inquiry.message}"></span>
+                            <span th:text="${#strings.length(inquiry.subject) > 5 ? #strings.substring(inquiry.subject, 0, 5) + '..' : inquiry.subject}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#strings.length(inquiry.message) > 6 ? #strings.substring(inquiry.message, 0, 6) + '..' : inquiry.message}"></span>
                         </td>
                         <td th:text="${inquiry.email}"></td>
                         <td th:text="${inquiry.type}"></td>
@@ -172,7 +178,9 @@
                         <textarea class="form-control" id="replyMessage" name="replyMessage" rows="5"
                                   required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Send Reply</button>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-primary">메일 답변하기</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -260,11 +268,15 @@
             var inquiryType = $(this).data('type');
             var inquiry = $(this).children('td');
 
+            // 원본 제목과 메시지 가져오기
+            var originalSubject = $(this).data('original-subject');
+            var originalMessage = $(this).data('original-message');
+
             if (inquiryType === '미답변') {  // 미답변 문의리스트
                 $('#modal-inquiry-id').text(inquiry.eq(0).text());
                 $('#modal-inquiry-name').text(inquiry.eq(1).text());
-                $('#modal-inquiry-subject').text(inquiry.eq(2).text());
-                $('#modal-inquiry-message').text(inquiry.eq(3).text());
+                $('#modal-inquiry-subject').text(originalSubject); // 원본 제목 사용
+                $('#modal-inquiry-message').text(originalMessage); // 원본 메시지 사용
                 $('#modal-inquiry-email').text(inquiry.eq(4).text());
                 $('#modal-inquiry-type').text(inquiry.eq(5).text());
                 $('#modal-recipient-email').text(inquiry.eq(7).text());
@@ -282,8 +294,8 @@
                 $('#answeredInquiryModalLabel').text('답변 완료된 문의 상세');
                 $('#modal-answered-inquiry-id').text(inquiry.eq(0).text());
                 $('#modal-answered-inquiry-name').text(inquiry.eq(1).text());
-                $('#modal-answered-inquiry-subject').text(inquiry.eq(2).text());
-                $('#modal-answered-inquiry-message').text(inquiry.eq(3).text());
+                $('#modal-answered-inquiry-subject').text(originalSubject); // 원본 제목 사용
+                $('#modal-answered-inquiry-message').text(originalMessage); // 원본 메시지 사용
                 $('#modal-answered-inquiry-email').text(inquiry.eq(4).text());
                 $('#modal-answered-inquiry-type').text(inquiry.eq(5).text());
                 $('#modal-answered-recipient-email').text(inquiry.eq(7).text());
@@ -363,7 +375,7 @@
         }
         return text;
     }
-
+wkfmsms
     //.truncate-text 요소에 대해 텍스트를 변환
     $('.truncate-row').each(function () {
         $(this).find('td').each(function () {

@@ -46,9 +46,6 @@ public class ChatController {
     public void updatePage(@Payload PageUpdateDTO pageUpdateDTO) {
         // 클라이언트로부터 받은 페이징 정보 처리
         System.out.println("Received paging data: " + pageUpdateDTO);
-
-        // 여기서 필요한 로직 수행 (예: 페이징 정보를 데이터베이스에 저장하거나, 다른 클라이언트에게 브로드캐스팅)
-
         // 다른 클라이언트에게 브로드캐스팅
         messagingTemplate.convertAndSend("/Topic/paging", pageUpdateDTO);
         System.out.println("브로드캐스팅 완료!");
@@ -78,10 +75,8 @@ public class ChatController {
             chatService.saveMessage(messageDTO);
         }
 
-
         // 메시지 처리 후, 채팅 리스트 업데이트 요청
         PageUpdateDTO pageUpdateDTO = messageDTO.getPaging();
-//        updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
 
         messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
         updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
@@ -154,7 +149,6 @@ public class ChatController {
         Page<ChatRoomDTO> inactiveChatRooms = chatService.getInactiveChatList(inactivePage - 1, size, recipient);
         Map<String, Object> inactiveChatResponse = addPagingChatList("inactive", inactiveChatRooms, inactivePage, sender);
 
-//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, recipient);
         // 두 개의 목록을 합쳐서 반환
         Map<String, Object> combinedResponse = new HashMap<>();
         combinedResponse.putAll(activeChatResponse);
@@ -180,27 +174,4 @@ public class ChatController {
 
         return response;
     }
-
-//    public void updateChatList(String sender, String recipient, int page, int size) {
-//
-//
-//        Page<ChatRoomDTO> chatRoom = chatService.getChatList(page - 1, size, recipient);
-//
-//        int totalPages = chatRoom.getTotalPages();
-//        int startPage = Math.max(1, page - 5);
-//        int endPage = Math.min(totalPages, page + 4);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("chatRoom", chatRoom.getContent());
-//        response.put("currentPage", page);
-//        response.put("totalPages", totalPages);
-//        response.put("startPage", startPage);
-//        response.put("endPage", endPage);
-//        response.put("memberEmail", sender);
-//
-//        // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
-//        messagingTemplate.convertAndSendToUser(recipient, "/queue/chatList", response);
-//
-//    }
-
 }
