@@ -2,10 +2,12 @@ package com.busanit.controller;
 
 import com.busanit.domain.*;
 import com.busanit.domain.chat.ChatRoomDTO;
+import com.busanit.domain.movie.CommentDTO;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
 import com.busanit.entity.*;
+import com.busanit.entity.movie.Comment;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.TheaterNumberRepository;
 import com.busanit.service.*;
@@ -63,6 +65,7 @@ public class AdminPageController {
     private final MemberService memberService;
     private final MovieService movieService;
     private final InquiryService inquiryService;
+    private final CommentService commentService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -117,6 +120,14 @@ public class AdminPageController {
         model.addAttribute("movieId", movieId);
 
         return "admin/admin_movie_register";
+    }
+
+    @PostMapping("/commentList")
+    public String commentList(Model model) {
+        List<CommentDTO> commentList = commentService.getAllComment();
+
+        model.addAttribute("commentList", commentList);
+        return "admin/admin_comment_list";
     }
 
     @GetMapping("/theaterList")

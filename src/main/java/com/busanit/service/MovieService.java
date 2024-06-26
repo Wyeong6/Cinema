@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import static com.busanit.domain.movie.ActorDTO.convertToDto;
 
@@ -46,7 +47,11 @@ import static com.busanit.domain.movie.ActorDTO.convertToDto;
 @Getter
 public class MovieService {
 
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .build();
     private final MovieRepository movieRepository;
     private final MovieDetailRepository movieDetailRepository;
     private final MovieStillCutRepository movieStillCutRepository;
@@ -138,13 +143,12 @@ public class MovieService {
     }
 
     // 상영예정작 DB에 넣기
-    @Async
     public void fetchAndStoreMoviesUpcoming() throws IOException {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
         List<Movie> modifiedMovies = getModifiedMovies();
 
-        for (int page = 1; page <= 8; page++) {
+        for (int page = 1; page <= 5; page++) {
             String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
@@ -615,6 +619,8 @@ public class MovieService {
         // 페이징 처리된 Movie 데이터를 List로 반환
         return movieList;
     }
+
+
 
     public long getTotalMovies() {
         // 전체 영화 개수 조회
