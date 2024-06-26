@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="side_nav">
+    <div id="side_nav">
+        <ul>
+            <li id="reservation-sidenav">
+                <i class="fas fa-ticket-alt fa-2x"></i>
+                <p>예매하기</p>
+            </li>
+            <li id="cart_list-sidenav">
+                <i class="fas fa-shopping-cart fa-2x"></i>
+                <p>장바구니</p>
+            </li>
+            <li id="mypage-sidenav">
+                <i class="fas fa-user fa-2x"></i>
+                <p>마이페이지</p>
+            </li>
+            <li id="center-sidenav">
+                <i class="fas fa-headset fa-2x"></i>
+                <p>고객센터</p>
+            </li>
+            <li id="home-sidenav">
+                <i class="fas fa-home fa-2x"></i>
+                <p>Home</p>
+            </li>
+        </ul>
+    </div>
+</th:block>
+</html>

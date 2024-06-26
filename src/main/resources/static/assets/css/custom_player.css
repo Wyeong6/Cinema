@@ -7,6 +7,13 @@
     align-items: center;
     margin: 10px;
 }
+.favorite-container {
+    display: flex;
+    justify-content: center;
+}
+.favorited {
+    filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-50deg) drop-shadow(0 0 3px rgba(255, 0, 0, 0.5)); /* 빨간색으로 변환 */
+}
 /* 공지사항 리스트 */
 .hide {
     display: none;

@@ -37,7 +37,7 @@
                         <p th:text="${snack.snack_price} + '원'"></p>
                     </article>
                 </div>
-                <div style="text-align: center" th:unless="${snackList.totalElements > 0}">
+                <div style="text-align: center;" th:unless="${snackList.totalElements > 0}">
                     <h4>상품을 준비중 입니다.</h4>
                 </div>
                 <div class="paging_btn">
@@ -58,11 +58,6 @@
                         </li>
                         <li th:classappend="${snackList.last} ? 'disabled'">
                             <a th:href="@{/snack/snackList(page=${snackList.totalPages - 1})}">Last</a>
-                        </li>
-                    </ul>
-                    <ul th:unless="${snackList.totalElements > 0}">
-                        <li>
-                            <a>1</a>
                         </li>
                     </ul>
                 </div>

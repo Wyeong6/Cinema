@@ -3,38 +3,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns="http://www.w3.org/1999/html"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <title>Cinemacast</title>
-    <!-- SweetAlert2 기본 스타일 추가 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        /* SweetAlert2 스타일 덮어쓰기 */
-        .swal2-popup {
-            font-size: 1.2rem; /* 예: 글꼴 크기를 변경 */
-            color: #333; /* 텍스트 색상 */
-            background: #fff; /* 배경 색상 */
-            border: 1px solid #ddd; /* 테두리 */
-            border-radius: 8px; /* 모서리 둥글기 */
-        }
-        .swal2-title {
-            font-size: 1.5em; /* 제목 크기 */
-            font-weight: bold; /* 제목 굵기 */
-        }
-        .swal2-content {
-            font-size: 1em; /* 본문 크기 */
-        }
-        .swal2-confirm {
-            background-color: #3085d6; /* 확인 버튼 배경 색상 */
-            color: #fff; /* 확인 버튼 텍스트 색상 */
-            border: none; /* 확인 버튼 테두리 */
-        }
-        .swal2-cancel {
-            background-color: #aaa; /* 취소 버튼 배경 색상 */
-            color: #fff; /* 취소 버튼 텍스트 색상 */
-            border: none; /* 취소 버튼 테두리 */
-        }
-    </style>
-</head>
 <!-- header -->
 <th:block th:replace="fragment/header::header"></th:block>
 <body class="left-sidebar is-preload">
@@ -117,7 +85,6 @@
     <!-- footer -->
     <th:block th:replace="fragment/footer::footer"></th:block>
 </div>
-
 <script th:inline="javascript">
     const memberId = [[${memberId}]];
 

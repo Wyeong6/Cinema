@@ -5,14 +5,34 @@
     <head>
         <meta charset="UTF-8">
         <title>Cinemacast</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-        <link rel="stylesheet" href="/assets/css/main.css" />
-        <link rel="stylesheet" href="/assets/css/custom.css" />
-        <link rel="stylesheet" href="/assets/css/custom_player.css" />
-        <link rel="stylesheet" href="/assets/css/nav.css" />
+        <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
+        <link href="/assets/css/main.css" rel="stylesheet"/>
+        <link href="/assets/css/custom.css" rel="stylesheet"/>
+        <link href="/assets/css/custom_player.css" rel="stylesheet"/>
+        <link href="/assets/css/nav.css" rel="stylesheet"/>
         <noscript>
-            <link rel="stylesheet" href="/assets/css/noscript.css"/>
+            <link href="/assets/css/noscript.css" rel="stylesheet"/>
         </noscript>
+        <!-- 스크립트 -->
+        <script src="/assets/js/jquery.min.js"></script>
+        <script src="/assets/js/jquery.dropotron.min.js"></script>
+        <script src="/assets/js/jquery.scrolly.min.js"></script>
+        <script src="/assets/js/jquery.scrollex.min.js"></script>
+        <script src="/assets/js/browser.min.js"></script>
+        <script src="/assets/js/breakpoints.min.js"></script>
+        <script src="/assets/js/util.js"></script>
+        <script src="/assets/js/main.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+
+        <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
+        <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
     </head>
     <body>
     <!-- Header -->
@@ -31,12 +51,6 @@
                 <li sec:authorize="isAuthenticated()">
                     <a href="/member/logout" id="logoutLink">로그아웃</a>
                 </li>
-                <li class="chat-alarm" sec:authorize="isAuthenticated()">
-                    <img class="chat-img" src="/images/message.png" alt="1:1채팅 메시지" />
-                    <div id="unreadCount">
-                        0
-                    </div>
-                </li>
                 <li sec:authorize="hasRole('USER')">
                     <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
                 </li>
@@ -44,6 +58,12 @@
                     <a th:href="@{/admin/adminMain}" th:text="'관리자페이지'"></a>
                 </li>
                 <li><a href="/payment/cartList">장바구니</a></li>
+                <li class="chat-alarm" sec:authorize="isAuthenticated()">
+                    <img class="chat-img" src="/images/alarm.png" alt="1:1채팅 메시지" />
+                    <div id="unreadCount">
+                        0
+                    </div>
+                </li>
             </ul>
         </div>
 

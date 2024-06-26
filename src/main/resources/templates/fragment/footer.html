@@ -26,7 +26,10 @@
           <h3>궁금하신 점 있으신가요 ?</h3>
         </header>
         <p>아래 버튼을 클릭하시면 FAQ, 1:1 채팅방, 문의하기로 이동하실 수 있습니다.</p>
-        <button class="button" onclick="redirectToServiceCenter()">Customer Service Center</button>
+        <button class="button" onclick="redirectToServiceCenter()">
+          <img src="/images/center.png" alt="센터 이미지"/>
+          <p>Customer Service Center</p>
+        </button>
       </section>
 
     </div>
@@ -47,25 +50,6 @@
     </div>
   </div>
 </div>
-  <!-- 스크립트 -->
-  <script src="/assets/js/jquery.min.js"></script>
-  <script src="/assets/js/jquery.scrolly.min.js"></script>
-  <script src="/assets/js/jquery.scrollex.min.js"></script>
-  <script src="/assets/js/browser.min.js"></script>
-  <script src="/assets/js/breakpoints.min.js"></script>
-  <script src="/assets/js/util.js"></script>
-  <script src="/assets/js/main.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
-  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
-
-  <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
-  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-
   <script>
   function redirectToServiceCenter() {
     window.location.href = "/inquiry";

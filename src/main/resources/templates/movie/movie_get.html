@@ -82,14 +82,7 @@
         /*    margin-top: 10px; !* 이미지와 텍스트 사이의 간격 *!*/
         /*}*/
 
-        .favorite-container {
-            display: flex;
-            justify-content: center;
-        }
 
-        .favorited {
-            filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-50deg) drop-shadow(0 0 3px rgba(255, 0, 0, 0.5)); /* 빨간색으로 변환 */
-        }
 
         /* 리액션 관련 css 시작 */
         .active {
@@ -261,10 +254,6 @@
 
 <th:block layout:fragment="content">
     <div id="page-wrapper">
-
-        <header data-include-path="./header.html"></header>
-
-        <!-- Main -->
         <div class="wrapper style1">
             <div class="container" th:each="movie, iterStat : ${movieInfos}">
                 <input type="hidden" id="movieId" th:value="${movie.id}">

@@ -4,15 +4,10 @@
       xmlns="http://www.w3.org/1999/html"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-
-
-<!--<th:block layout:fragment="css"></th:block>-->
-<!--<th:block layout:fragment="javascript"></th:block>-->
-<!--  header -->
-
 <th:block th:replace="fragment/header::header"></th:block>
 <body class="left-sidebar is-preload">
 <th:block layout:fragment="content"></th:block>
+<th:block th:replace="fragment/side_nav::side_nav"></th:block>
 <!-- chatbot -->
 <th:block th:replace="fragment/chatbot::chatbot"></th:block>
 <!-- /#page-content-wrapper -->
@@ -20,4 +15,18 @@
 <th:block th:replace="fragment/footer::footer"></th:block>
 
 </body>
+<script th:inline="javascript">
+    function navigateTo(selector, url) {
+        $('#side_nav').on('click', selector, function () {
+            window.location.href = url;
+        });
+    }
+    $(document).ready(function () {
+        navigateTo('#reservation-sidenav', '/reservation/screeningSchedule');
+        navigateTo('#cart_list-sidenav', '/payment/cartList');
+        navigateTo('#mypage-sidenav', '/mypage/');
+        navigateTo('#center-sidenav', '/inquiry');
+        navigateTo('#home-sidenav', '/');
+    });
+</script>
 </html>
