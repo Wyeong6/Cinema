@@ -1,27 +1,36 @@
 package com.busanit.controller;
 
+import com.busanit.domain.FormMemberDTO;
+import com.busanit.domain.MemberRegFormDTO;
+import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.domain.SnackDTO;
+import com.busanit.service.MemberService;
 import com.busanit.service.SnackService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequestMapping("/snack")
 @RequiredArgsConstructor
+@Slf4j
 public class SnackController {
 
     private final SnackService snackService;
-
-    @Value("${html5_inicis_key}")
-    private String html5InicisKey;
 
     @GetMapping("/snackList")
     public String snackList(Model model, @PageableDefault(size = 8, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
@@ -48,9 +57,6 @@ public class SnackController {
         Page<SnackDTO> snackDTOList = null;
         snackDTOList = snackService.getSnackListRandom(pageable);
         model.addAttribute("snackList", snackDTOList);
-
-        // 결제
-        model.addAttribute("html5InicisKey", html5InicisKey);
 
         return "snack/snack_get";
     }

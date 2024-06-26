@@ -31,7 +31,7 @@
             <div class="container">
                 <article id="main" class="special">
                     <header>
-                        <h2><a href="#">현재 상영작</a></h2>
+                        <h3>현재 상영작</h3>
                         <p>
                             현재 상영 중인 다양한 장르의 영화들을 한눈에 살펴보세요
                         </p>
@@ -42,7 +42,7 @@
 
                     <article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${moviePage}">
                         <a th:href="@{'/movies/' + ${movie.id}}" class="image featured"><img
-                                th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/></a>
+                                class="featured-img" th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/></a>
                         <header>
                             <h4><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a>
                             </h4>

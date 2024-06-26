@@ -3,13 +3,19 @@ package com.busanit.service;
 import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.domain.OAuth2MemberDTO;
+import com.busanit.domain.PointDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.chat.ChatRoom;
 import com.busanit.repository.ChatRoomRepository;
 import com.busanit.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Slice;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +33,8 @@ import java.util.stream.Collectors;
 public class MemberService implements UserDetailsService { /* UserDetailsService 로그인을 위한 처리 */
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final PointService pointService;
+    private final JavaMailSender mailSender;
 
     public void saveMember(Member member) {
         // 회원 중복 체크
@@ -165,9 +173,46 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         return memberRepository.findAll();
     }
 
+    // 현재 로그인한 사용자의 이메일
+    public String currentLoggedInEmail() {
+        String userEmail = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+        }
+        return userEmail;
+    }
+
+    // 현재 로그인한 사용자의 등급 확인(+저장)
+    public long userGrade() {
+        long userGradeCount = pointService.getPointMovieCount(findUserIdx(currentLoggedInEmail()));
+        long userGrade;
+        if(userGradeCount >= 10) {
+            userGrade = 1;
+        } else if(userGradeCount >= 5) {
+            userGrade = 2;
+        } else if(userGradeCount >= 3) {
+            userGrade = 3;
+        } else {
+            userGrade = 4;
+        }
+        updateGrade(userGrade, currentLoggedInEmail());
+        return userGrade;
+    }
+
     // 멤버십 등급 수정
     public void updateGrade(long userEditGrade, String email) {
         memberRepository.updateGrade(userEditGrade, email);
     }
 
+    // 멤버에게 메일 보내기
+    public void sendEmailToMember(String toEmail, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject(subject);
+        message.setText(text);
+        message.setFrom(System.getenv("adminEmail")); // 환경 변수에서 발신자 이메일 가져오기
+
+        mailSender.send(message);
+    }
 }

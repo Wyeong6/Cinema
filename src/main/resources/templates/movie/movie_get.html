@@ -237,7 +237,7 @@
     </style>
     <!--안 읽은 메세지-->
     <script type="module">
-        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatMessageCount.js';
+        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
         window.addEventListener('DOMContentLoaded', function () {
             loadChatList(1, 8, true);
             setupWebSocketConnection();

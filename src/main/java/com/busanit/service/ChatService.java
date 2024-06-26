@@ -64,7 +64,6 @@ public class ChatService {
         chatRoom.addReadStatus(receiverReadStatus);
 
         chatRoomRepository.save(chatRoom);
-
     }
 
     // 채팅방과 멤버에 대한 읽음 상태를 찾거나, 없으면 새로 생성하는 메서드
@@ -79,29 +78,45 @@ public class ChatService {
                 });
     }
 
-    // 채팅방 리스트 페이징 조회
-    public Page<ChatRoomDTO> getChatList(int page, int size, String memberEmail) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        Page<ChatRoom> chatRoomPage = chatRoomRepository.findByMemberEmail(memberEmail, pageable);
-        // chatRoomPage의 상태 확인
-        System.out.println("chatRoomPage: " + chatRoomPage);
-
+    // 채팅방 리스트 페이징 조회 (공통 메서드)
+    public Page<ChatRoomDTO> getPagedChatRoomList(String memberEmail, Page<ChatRoom> chatRoomPage) {
         List<ChatRoomDTO> chatRoomList = chatRoomPage.getContent().stream()
-                .peek(chatRoom -> System.out.println("Processing chatRoom: " + chatRoom)) // 각 chatRoom 상태 확인
+                .peek(chatRoom -> System.out.println("Processing chatRoom: " + chatRoom))
                 .map(this::convertToChatRoomDTO)
-                .peek(chatRoomDTO -> { // map 대신 peek을 사용하여 DTO 변환 후 처리
-                    System.out.println("Before calculateUnreadMessages - chatRoomDTO: " + chatRoomDTO); // convertToChatRoomDTO 결과 확인
-
-                    // 읽지 않은 메시지 수 계산
+                .peek(chatRoomDTO -> {
                     int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), memberEmail);
                     chatRoomDTO.setUnreadMessageCount(unreadMessages);
-                    System.out.println("After calculateUnreadMessages - unreadMessages: " + unreadMessages); // unreadMessages 값 확인
+                    System.out.println("After calculateUnreadMessages - unreadMessages: " + unreadMessages);
                 })
                 .collect(Collectors.toList());
 
-        System.out.println("chatRoomList: " + chatRoomList); // 최종 chatRoomList 상태 확인
+        System.out.println("ChatRoomList: " + chatRoomList);
 
-        return new PageImpl<>(chatRoomList, pageable, chatRoomPage.getTotalElements());
+        return new PageImpl<>(chatRoomList, chatRoomPage.getPageable(), chatRoomPage.getTotalElements());
+    }
+
+    // 활성 채팅방 리스트 페이징 조회
+    public Page<ChatRoomDTO> getActiveChatList(int page, int size, String memberEmail) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<ChatRoom> chatRoomPage = chatRoomRepository.findByMembersEmailAndType(memberEmail, "active", pageable);
+
+        return getPagedChatRoomList(memberEmail, chatRoomPage);
+    }
+
+    // 비활성 채팅방 리스트 페이징 조회
+    public Page<ChatRoomDTO> getInactiveChatList(int page, int size, String memberEmail) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<ChatRoom> chatRoomPage = chatRoomRepository.findByMembersEmailAndType(memberEmail, "inactive", pageable);
+
+        return getPagedChatRoomList(memberEmail, chatRoomPage);
+    }
+
+    // 전체 채팅방 리스트 페이징 조회
+    public Page<ChatRoomDTO> getChatList(int page, int size, String memberEmail) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<ChatRoom> chatRoomPage = chatRoomRepository.findByMemberEmail(memberEmail, pageable);
+
+        return getPagedChatRoomList(memberEmail, chatRoomPage);
     }
 
     // 사용자 이메일로 채팅방의 상태가 active인 메세지 조회
@@ -123,21 +138,13 @@ public class ChatService {
                 })
                 .collect(Collectors.toList());
     }
-//
-//    // 채팅방 생성 또는 조회
-//    public ChatRoom getOrCreateChatRoom(String chatRoomTitle, String senderEmail, String recipientEmail) {
-//        return handleUserMessage(chatRoomTitle, senderEmail, recipientEmail);
-//
-//    }
 
     //클릭한 채팅방 메세지 읽음 표시
     public List<ChatRoomDTO> findChatRoomByChatRoomId(Long chatRoomId) {
 
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId);
-
         //메세지 상태추가
         updateLastReadTimestamp(chatRoomId);
-
         return Collections.singletonList(convertToChatRoomDTO(chatRoom));
     }
 

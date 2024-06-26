@@ -10,7 +10,7 @@
                         <label for="name">이름 <b>*</b></label>
                     </td>
                     <td>
-                        <input id="name" th:value="${member.name}" type="text" name="name"/>
+                        <input id="name" name="name" th:value="${member.name}" type="text"/>
                     </td>
                 </tr>
                 <tr>
@@ -18,7 +18,7 @@
                         <label for="birth_date">생년월일 <b>*</b></label>
                     </td>
                     <td>
-                        <input id="birth_date" th:value="${member.age}" type="text" name="age"/>
+                        <input id="birth_date" maxlength="6" name="age" th:value="${member.age}" type="text"/>
                         <div>
                             <ul>
                                 <li>생일 쿠폰은 생일 당월 동안 사용 가능합니다.</li>
@@ -31,7 +31,7 @@
                     <td>
                         <label for="email">이메일 <b>*</b></label></td>
                     <td>
-                        <input id="email" th:value="${member.email}" type="text" name="email"/>
+                        <input id="email" name="email" th:value="${member.email}" type="text"/>
                         <button class="button" id="checkEmail">중복 확인</button>
                         <div>
                             <p id="email-available" style="color: #00C73C; display: none;">사용가능한 이메일 입니다.</p>
@@ -43,7 +43,7 @@
                     <td>
                         <label for="email2">이메일</label></td>
                     <td>
-                        <input id="email2" th:value="${member.email}" type="text" name="email" readonly disabled/>
+                        <input disabled id="email2" name="email" readonly th:value="${member.email}" type="text"/>
                     </td>
                 </tr>
                 <tr th:if="${formUser == 'formUser'}">
@@ -51,7 +51,7 @@
                         <label for="password_chk">패스워드 확인 <b>*</b></label>
                     </td>
                     <td>
-                        <input id="password_chk" type="password" name="password"/>
+                        <input id="password_chk" maxlength="16" name="password" type="password"/>
                     </td>
                 </tr>
             </table>
@@ -63,7 +63,7 @@
 
             <div class="info_submit_box">
                 <button class="button" type="reset">취소하기</button>
-                <button class="button" type="submit" id="submitButton">저장하기</button>
+                <button class="button" id="submitButton" type="submit">저장하기</button>
             </div>
         </form>
     </section>
@@ -108,47 +108,54 @@
 
             const userType = [[${formUser}]];
             const name = $('#name').val();
-            const birth_date = $('#birth_date').val();
+            let birth_date = $('#birth_date').val();
             const password_chk = $('#password_chk').val();
             const email = $('#email').val();
             const email2 = $('#email2').val();
             let finalEmail; // email(form 회원), email2(social 회원)를 한번에 관리하기 위해서
 
-            if (userType == 'formUser') {
+            if(userType == 'formUser') {
                 finalEmail = email;
             } else {
                 finalEmail = email2;
             }
 
-            if(member.email === finalEmail){
+            if(member.email === finalEmail) {
                 checkEmailButton = 1;
             }
 
-            if(checkEmailButton === 1) {
-                $.ajax({
-                    type: 'POST',
-                    url: '/mypage/infoEdit',
-                    data: {
-                        id: member.id,
-                        name: name,
-                        email: finalEmail,
-                        age: birth_date,
-                        password: member.password,
-                        social: member.social,
-                        grade_code: member.grade_code,
-                        checkedTermsE: member.checkedTermsE,
-                        checkedTermsS: member.checkedTermsS,
-                        basicPassword: password_chk // 비밀번호 확인용
-                    },
-                    success: function(response) {
-                        $('#content').html(response);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Update Info Error:', error);
-                    }
-                })
+            // Remove non-numeric characters
+            birth_date = birth_date.replace(/\D/g, '');
+
+            if(birth_date.length < 6) {
+                alert("생년월일을 다시 확인해주세요.");
             } else {
-                alert("이메일 중복 확인을 해주세요.")
+                if(checkEmailButton === 1) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/mypage/infoEdit',
+                        data: {
+                            id: member.id,
+                            name: name,
+                            email: finalEmail,
+                            age: birth_date,
+                            password: member.password,
+                            social: member.social,
+                            grade_code: member.grade_code,
+                            checkedTermsE: member.checkedTermsE,
+                            checkedTermsS: member.checkedTermsS,
+                            basicPassword: password_chk // 비밀번호 확인용
+                        },
+                        success: function(response) {
+                            $('#content').html(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Update Info Error:', error);
+                        }
+                    })
+                } else {
+                    alert("이메일 중복 확인을 해주세요.");
+                }
             }
         });
     });

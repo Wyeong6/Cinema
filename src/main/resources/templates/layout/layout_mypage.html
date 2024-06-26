@@ -44,11 +44,14 @@
     <!-- Main -->
     <div class="wrapper style1">
         <div class="container">
+            <header>
+                <h3 class="main_btn" style="cursor: pointer">마이페이지</h3>
+            </header>
             <div class="row gtr-200">
                 <div class="col-4 col-12-mobile" id="sidebar">
                     <section>
                         <header>
-                            <h2 class="main_btn" style="cursor: pointer">My Page</h2>
+                            <h2></h2>
                         </header>
                         <div class="mypage_nav">
                             <nav>
@@ -123,7 +126,7 @@
 
     $(document).ready(function() {
         // 마이페이지 메인
-        $('#sidebar').on('click', '.main_btn', function() {
+        $('.container').on('click', '.main_btn', function() {
             $('#content').load('/mypage/main');
         });
         // 예매내역 조회 버튼 클릭 이벤트 설정

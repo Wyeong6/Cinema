@@ -27,8 +27,10 @@ function updateTimeSinceCreated() {
             timeSinceCreated = hours + "시간 전";
         } else if (minutes > 0) {
             timeSinceCreated = minutes + "분 전";
-        } else {
+        } else if (seconds > 0) {
             timeSinceCreated = seconds + "초 전";
+        } else {
+            timeSinceCreated = "방금 전";
         }
 
         $(this).text(timeSinceCreated);

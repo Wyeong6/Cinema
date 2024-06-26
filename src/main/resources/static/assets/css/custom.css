@@ -2,22 +2,22 @@
     font-family: 'MyCustomFont';
     src: url('font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
-
 #header {
     background-size: cover;
     background-position: center;
     transition: background-image 0.5s ease-in-out;
 }
-
 .logo {
     position: absolute;
-    top: 0;
-    left: 0;
-    margin: 2% 0 0 42%;
-    font-family: 'MyCustomFont', sans-serif;
+    top: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0 auto;
     z-index: 9999999;
 }
-
+.logo a {
+    font-family: 'MyCustomFont', sans-serif !important;
+}
 #info {
     position: absolute;
     top: 0.5em;
@@ -26,32 +26,63 @@
     height: 37px;
     z-index: 9999;
 }
-
 #info ul {
     display: flex;
     justify-content: space-between;
     list-style-type: none;
 }
-
 #info ul li {
     font-size: 13px;
     margin-right: 10px;
 }
+#info .chat-alarm {
+    position: relative;
+}
+
+#info .chat-alarm .chat-img {
+    width: 20px; /* 이미지의 고정 너비를 설정 */
+    height: auto; /* 이미지의 높이를 자동으로 조절 */
+    display: inline-block; /* 이미지를 인라인 블록 요소로 설정 */
+    vertical-align: middle; /* 이미지를 수직 중앙에 정렬 */
+}
+
+#info .chat-alarm div {
+    position: absolute;
+    top: 25%; /* 부모 요소의 상단에서 50% 위치 */
+    left: 65%; /* 부모 요소의 왼쪽에서 70% 위치 (50% + 20% 오른쪽으로 이동) */
+    transform: translateX(-50%); /* 요소를 가운데로 이동 */
+    color: #1C0920;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 15px;
+}
 #banner header {
-    width: 100%;
+    width: 90% !important;
+    margin: 0 auto;
+    padding: 2.5em 10em 2.5em 4em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius: 15px;
+    background: #262B2B;
 }
 #banner h3 {
     color: #fafafa;
 }
 #banner form {
-    margin: 0 auto;
-    padding: 2em 0 0;
-    width: 80%;
+    width: 70%;
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
 }
 #banner input {
-    width: 89%;
+    margin-right: 2em;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    border: none;
+    border-bottom: 2px solid #4C5051;
+}
+#banner .search-input::placeholder {
+    color: #fff !important;
 }
 #banner button {
     background: transparent;
@@ -78,8 +109,9 @@
 }
 .contact button {
     border-radius: 50px;
-    font-size: 30px;
+    font-size: 1.2em;
     background: rgba(229, 229, 229, 0.3);
+    padding: 0.65em 4em 0.65em 4em;
 }
 .contact button:hover {
     background: rgb(229, 229, 229);
@@ -99,6 +131,8 @@
 #movie_title {
     padding: 0.5em;
     border-radius: 0.5em;
+    color: #fff;
+    font-weight: 700;
 }
 #movie_title:hover {
     background-color: #FAFAFA0A; /* 마우스 호버 시 배경색 변경 */
@@ -119,9 +153,9 @@ a#movie_title:not(:hover) {
     z-index: 999;
 }
 #img_btn .btn {
-    color: #fff;
+    color: rgba(255, 255, 255, 0.3);
     background: none;
-    font-size: 1em;
+    font-size: 0.8em;
     padding: 0.5em 1em 0.5em 1em;
     cursor: pointer;
     border: none;
@@ -129,8 +163,8 @@ a#movie_title:not(:hover) {
     font-family: 'MyCustomFont', sans-serif;
 }
 #img_btn .clicked {
-    color: #df7366;
-    font-size: 2em;
+    color: #730D15;
+    font-size: 1.2em;
 }
 .carousel .section_title {
     display: flex;
@@ -140,6 +174,7 @@ a#movie_title:not(:hover) {
 .carousel article {
     position: relative; /* <article> 요소에 상대 위치 지정 */
     display: inline-block; /* 요소들이 인라인으로 나타나도록 설정 */
+    border-radius: 15px;
 }
 .carousel .overlay-img {
     width: 5em;
@@ -150,35 +185,43 @@ a#movie_title:not(:hover) {
     margin-left: -5%;
     margin-top: -5%;
 }
-.carousel .ten {
-    width: 5em;
-    margin-top: 9em;
-    margin-left: 1em;
+.carousel header {
+    margin-bottom: 0.5em;
 }
 .carousel header > p {
-    font-size: 1em;
-    margin-bottom: 0;
+    font-size: 0.8em;
+    line-height: 1em;
+    margin: 0.8em 0 0 0;
 }
 .carousel header > p > img {
     width: 1em;
+    line-height: 1em;
 }
 .carousel .button_box {
     display: flex;
     justify-content: space-between;
-    padding: 0.5em 1.5em 0;
+    padding: 0.5em 0.5em 0;
     z-index: 99999;
 }
 .carousel .button_box .reservation_btn {
-    background: #df7366;
-    font-size: 1em;
+    font-size: 0.8em;
     color: #fff;
-    padding: 0.5em 1.4em 0.5em 1.4em;
+    padding: 0.5em 1em 0.5em 1em;
 }
 .carousel .button_box .get_btn {
-    font-size: 1em;
-    background: #555555;
+    font-size: 0.8em;
     z-index: 99999;
-    padding: 0.5em 1.4em 0.5em 1.4em;
+    padding: 0.5em 1em 0.5em 1em;
+    background: #fff;
+    border: 2px solid #566a7f;
+    color: #566a7f;
+}
+.carousel .button_box .get_btn:hover {
+    background: #566a7f;
+}
+.carousel .button_box .get_btn:hover a {
+    color: #fff;
+    font-weight: 400;
 }
 .comming_list .button_box {
     justify-content: center;
@@ -189,11 +232,47 @@ a#movie_title:not(:hover) {
     align-items: center;
 }
 #features header > p {
-    font-size: 1.2em;
-    margin-bottom: 1em;
+    font-size: 1em;
+    margin: 2em 0;
 }
 #features .more_btn {
     text-align: right;
+}
+.custom-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5개의 동일한 너비의 컬럼 생성 */
+    gap: 0.8em; /* 컬럼 간격 */
+}
+
+.custom-col {
+    margin-bottom: 20px; /* 하단 마진 추가 */
+}
+
+@media (max-width: 1200px) {
+    .custom-grid {
+        grid-template-columns: repeat(4, 1fr); /* 작은 화면에서는 4개의 컬럼 */
+    }
+}
+
+@media (max-width: 992px) {
+    .custom-grid {
+        grid-template-columns: repeat(3, 1fr); /* 더 작은 화면에서는 3개의 컬럼 */
+    }
+}
+
+@media (max-width: 768px) {
+    .custom-grid {
+        grid-template-columns: repeat(2, 1fr); /* 작은 화면에서는 2개의 컬럼 */
+    }
+}
+
+@media (max-width: 480px) {
+    .custom-grid {
+        grid-template-columns: 1fr; /* 모바일 화면에서는 1개의 컬럼 */
+    }
+}
+.featured-img {
+    border-radius: 10px;
 }
 
 /* 상세 페이지 */
@@ -407,48 +486,56 @@ a#movie_title:not(:hover) {
     text-align: center;
 }
 /* 스낵 상세 페이지 */
-#snack_get_section {
+#snack_get_main {
     width: 100%;
     display: flex;
     flex-direction: row;
 }
-#snack_get_section .image {
-    width: 95%;
+#snack_get_main .snack_image {
+    width: 27%;
 }
-#snack_get_section .snack_get_img {
-    width: 70%;
-    margin: 0 auto;
+#snack_get_section {
+    margin-left: 10em;
+}
+#snack_get_section #snack-info {
+    display: flex;
+    flex-direction: row;
+}
+.snack_detail {
+    white-space: pre-wrap; /* 긴문장 중간에 자르기 - 너비지정 해야함*/
+    word-break: keep-all; /* 긴단어 연결 */
+    width: 300px;
+}
+#snack_get_section > header p {
+    margin: 0 0 2em;
+}
+#snack_get_section > header #snack-info p {
+    margin: 3em 0;
+}
+#snack_get_section > header #snack-info p:last-child {
+    margin-left: 10em;
 }
 #snack_get_section table {
     width: 100%;
     height: auto;
+}
+#snack_get_section table td {
+    padding: 1.5em 0;
+    text-align: left;
 }
 #td_count {
     padding: 1em 0;
 }
 .count_box {
     position: relative; /* 부모 요소를 상대 위치로 설정 */
-    margin: 0 auto;
-    width: 100%;
+    width: 40%;
     display: flex;
     justify-content: space-between;
-    background: #e5e5e5;
-    border-radius: 15px;
 }
 .count_box button {
-    background: #c4c3caB3;
-    font-size: 30px;
-}
-.count_box button:hover {
-    background: #c4c3ca80;
-}
-#discount:disabled {
-    background-color: #e0e0e0;
-    color: #999;
-    cursor: not-allowed;
-}
-#discount:hover {
-    background-color: #c4c3ca80;
+    font-size: 1.2em;
+    color: #566a7f;
+    background: transparent;
 }
 .count_box p {
     position: absolute; /* 자식 요소를 절대 위치로 설정 */
@@ -458,8 +545,9 @@ a#movie_title:not(:hover) {
     margin: 0; /* 기본 마진 제거 */
 }
 #total_price {
-    font-size: 30px;
-    font-weight: 900;
+    font-size: 1.2em;
+    font-weight: 700;
+    text-align: right !important;
 }
 #tr_purchase {
     width: 100%;
@@ -471,17 +559,21 @@ a#movie_title:not(:hover) {
     padding: 1em 1em 1em 0;
 }
 #tr_purchase button {
-    font-size: 20px;
+    padding: 0.7em 3em;
+    font-size: 0.8em;
     width: 100%;
-    border: 5px solid #df7366;
-    color: #3B353C;
+    color: #fff;
 }
 #tr_purchase button.cart{
-    font-size: 20px;
     width: 100%;
     background: #fafafa;
-    border: 5px solid rgba(223, 115, 102, 0.3);
+    border: 2px solid rgba(223, 115, 102, 0.3);
+    box-sizing: border-box;
     color: #3B353C;
+}
+#tr_purchase button.cart:hover {
+    width: 100%;
+    background: rgba(223, 115, 102, 0.3);
 }
 /* notice_list*/
 .notice_list table.default tr th{
@@ -557,25 +649,27 @@ td p {
     text-align: center; /* 텍스트 내용을 중앙 정렬 */
 }
 #cart_list_section table tr th:nth-child(1) {
-    width: 20%;
+    width: 45%;
 }
 #cart_list_section table tr th:nth-child(2) {
-    width: 35%;
-}
-#cart_list_section table tr th:nth-child(3) {
-    width: 10%;
-}
-#cart_list_section table tr th:nth-child(4) {
     width: 20%;
 }
-#cart_list_section table tr th:nth-child(5) {
-    width: 10%;
+#cart_list_section table tr th:nth-child(3) {
+    width: 20%;
+}
+#cart_list_section table tr th:nth-child(4) {
+    width: 15%;
+}
+#cart_list_section table tr td:nth-child(1) {
+    width: 15%;
 }
 #cart_list_section table tr td:nth-child(1) img {
     width: 100%;
 }
 #cart_list_section table tr td:nth-child(2) {
-    width: 25%;
+    width: 30%;
+    padding: 0;
+    word-break: keep-all;
 }
 #cart_list_section table tr td:nth-child(3) {
     width: 20%;
@@ -599,13 +693,16 @@ td p {
 #cart_list_section table tr td:nth-child(4) .total_price {
     color: #3B353C;
     font-weight: 700;
-    font-size: 1.2em;
+    font-size: 1em;
 }
 #cart_list_section table tr td:nth-child(5) {
     width: 10%;
 }
-.wrapper .container #cart_list_section .delete_td img {
-    width: 30%;
+#cart_list_section table tr td:nth-child(5) img {
+    width: 30%; /* 부모 요소의 크기에 따라 결정 */
+    max-width: 100%; /* 최대 너비를 100%로 설정 */
+    height: auto; /* 높이를 자동으로 설정하여 비율 유지 */
+    cursor: pointer;
 }
 #main .button_box {
     margin-top: 3.5em;
@@ -615,15 +712,18 @@ td p {
 }
 #main .button_box .continue_btn {
     height: 70%;
+    padding: 0.5em 3em;
     background: none;
     color: #3B353C;
-    font-size: 20px;
-    border-radius: 15px;
-    border: 5px solid rgba(223, 115, 102, 0.3);
+    font-size: 0.9em;
+    border-radius: 5px;
+    box-shadow: 0 0 0 3px rgba(223, 115, 102, 0.3);
+    box-sizing: border-box;
+    transition: background 0.3s, box-shadow 0.3s; /* 부드러운 전환을 위해 추가 */
 }
 #main .button_box .continue_btn:hover {
     background: rgba(223, 115, 102, 0.3);
-    border: none;
+    box-shadow: 0 0 0 2px rgba(223, 115, 102, 0.3); /* 동일한 box-shadow 값 유지 */
 }
 #main .price_box {
     text-align: center;
@@ -634,11 +734,11 @@ td p {
     font-weight: 700;
 }
 article#pay {
-    width: 28%;
+    width: 27%;
     background: #fafafa;
     position: relative;
 }
-article#pay h2 {
+article#pay h3 {
     font-weight: 700;
     margin: 1.5em 0 0 0.5em;
 }
@@ -653,21 +753,32 @@ article#pay .row > #payment > button {
     padding: 0.65em 2em 0.65em 2em;
     font-size: 1em;
     background: none;
-    border: 3px solid rgba(223, 115, 102, 0.3);
+    box-shadow: 0 0 0 3px rgba(223, 115, 102, 0.3);
+    box-sizing: border-box;
     border-radius: 50px;
     color: #3B353C;
 }
 article#pay .row > #payment > button:hover {
     background: rgba(223, 115, 102, 0.3);
-    border: none;
+    box-shadow: 0 0 0 3px rgba(223, 115, 102, 0.3); /* 동일한 box-shadow 값 유지 */
+}
+article#pay .row > #payment > button.clicked {
+    background: rgba(223, 115, 102, 0.3);
+    box-shadow: 0 0 0 3px rgba(223, 115, 102, 0.3); /* 동일한 box-shadow 값 유지 */
 }
 article#pay > button {
     display: block;
     width: 100%;
+    padding: 0.5em 0;
     position: absolute;
     bottom: 0;
     border-radius: 0;
-    font-size: 30px;
+    font-size: 1.2em;
+}
+.col-2 header h4 {
+    /*white-space: pre-wrap;*/
+    word-break: keep-all;
+    width: 100%;
 }
 /* 개인정보수정 - edit_personal_info */
 .edit_info tr td:nth-child(1) {
@@ -717,19 +828,18 @@ article#pay > button {
 .mypage_nav {
     padding-left: 0;
     width: 80%;
-    background: #e5e5e5;
     cursor: pointer;
 }
 .mypage_nav ul, li {
     padding-left: 0;
     list-style-type: none;
 }
+.mypage_nav nav > ul li a {
+    font-size: 0.8em;
+}
 .mypage_nav nav > ul > li > a {
     font-weight: 700;
     text-decoration-color: #e5e5e5;
-}
-.mypage_nav ul, li > ul > li {
-    padding: 0.5em 1em;
 }
 .mypage_nav ul > li li {
     padding: 0;
@@ -737,22 +847,23 @@ article#pay > button {
 .mypage_nav li li:hover {
     font-weight: 700;
 }
+#mypage_main .user-info-box {
+    margin: 0.8em 0 2em;
+    border-radius: 1em;
+    background: #fcfdfd;
+}
 #mypage_main .user_info {
-    margin: 2em 0;
-    padding: 2em 2em;
+    padding: 1em 2em;
     display: flex;
     justify-content: space-between;
-    background: #fafafa;
-    border-radius: 1em;
 }
 #mypage_main .user_info img {
-    width: 5em;
+    width: 4em;
     height: auto;
     margin-right: 2em;
 }
-#mypage_main .user_info button {
-    background: #e5e5e5;
-    color: #3B353C;
+#mypage_main .user_info p {
+    margin: 0 0 0.5em 0;
 }
 #mypage_main .user_info > div {
     display: flex;
@@ -760,6 +871,15 @@ article#pay > button {
 }
 #mypage_main .user_info .point p {
     margin-right: 1em;
+}
+#mypage_main .user-info-box button {
+    background: #5155A6;
+    width: 100%;
+    font-size: 0.8em;
+    padding: 0.8em;
+    border-radius: 0;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
 }
 .history header {
     display: flex;
@@ -777,18 +897,35 @@ article#pay > button {
     margin-left: 10px;
     font-size: 16px;
 }
+.history_get {
+    border-radius: 10px;
+    background: #fcfdfd;
+}
+.history_get header {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    width: 100%;
+    height: 3em;
+    margin: 0;
+    padding: 0.5em 0 0 2em;
+    background: rgba(242, 225, 172, 0.5);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
 .history_data {
     display: flex;
     flex-direction: row;
-    border: 3px solid #e5e5e5;
     padding: 1em 2em;
-    border-radius: 1em;
+    background: #fcfdfd;
+    border-radius: 10px;
 }
 .history_data img {
-    width: 5em;
+    width: 4em;
     margin-right: 1em;
 }
 .history_data p {
+    font-size: 0.8em;
     margin-bottom: 0;
 }
 #mypage_main > section {
@@ -1213,9 +1350,92 @@ td.theater-name.clicked {
     margin-right: 1em;
     line-height: 64px;
 }
-#pay-box button {
+button.pay-btn {
     margin: 0 1em 0 1em;
     padding: 1em 3em 1em 3em;
     font-size: 1em;
     font-weight: 400;
+}
+/* payment-window 결제 페이지 */
+.payment table.payment-table {
+    background: #F2F2F2;
+    border-radius: 15px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.payment table.payment-table thead {
+    background: #5155A6;
+}
+.payment table.payment-table tbody td {
+    padding: 0.5em 0;
+}
+.payment table.payment-table td:nth-child(2),
+.payment table.payment-table td:nth-child(3) {
+    text-align: left;
+}
+.payment table thead th {
+    color: #F2F2F2;
+    text-align: center;
+    padding: 1em 0;
+}
+.payment table tbody {
+    padding: 0 1em;
+}
+.payment table thead th:first-child {
+    border-top-left-radius: 15px;
+}
+.payment table thead th:last-child {
+    border-top-right-radius: 15px;
+}
+.payment table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 15px;
+    padding-left: 1em;
+}
+.payment table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 15px;
+    padding-right: 1em;
+}
+.payment .ticket-info > img {
+    margin: 1em;
+    width: 10em;
+}
+.payment .ticket-info .ticket-movie-title {
+    display: flex;
+    flex-direction: row;
+}
+.payment .ticket-info .ticket-movie-title > img {
+    width: 1.5em;
+}
+.payment .ticket-info .ticket-movie-title h4 {
+    line-height: 1.5em;
+    margin: 0 0 0 0.5em;
+}
+.payment .seats-info {
+    margin: 1em 3em;
+    padding: 0.5em 3em;
+    background: #FFFFFF;
+    border-radius: 10px;
+}
+.seat-info {
+    margin-left: 0.5em;
+}
+.payment .point-info input {
+    margin-left: 0.5em;
+    padding-left: 0.5em;
+    border: 1px solid #c4c3ca;
+    border-radius: 5px;
+}
+.payment .result-price-td div {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+}
+.payment .result-price-td p {
+    margin: 0;
+    margin-right: 10px;
+}
+.payment button.pay-btn {
+    margin: 0;
+    width: 100%;
+    border-radius: 0;
 }
