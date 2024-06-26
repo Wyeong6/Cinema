@@ -25,7 +25,7 @@
     <body>
     <!-- Header -->
     <div id="header">
-        <h1 class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
+        <h1 class="logo" style="top:15%"><a href="/">CINEMACAST</a></h1>
 
         <!-- info -->
         <div id="info" th:data-username="${#authentication.name}">
@@ -64,11 +64,7 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#">예매</a>
-                    <ul>
-                        <li><a href="#">예매</a></li>
-                        <li><a th:href="@{/reservation/screeningSchedule}">상영 시간표</a></li>
-                    </ul>
+                    <a href="/reservation/screeningSchedule">예매</a>
                 </li>
                 <li><a href="/snack/snackList">스낵 스토어</a></li>
                 <li><a href="/event/eventList">이벤트</a></li>

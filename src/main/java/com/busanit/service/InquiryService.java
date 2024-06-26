@@ -117,8 +117,8 @@ public class InquiryService {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-        helper.setFrom("qudgns8882@naver.com");
-        helper.setTo("qudgns8882@naver.com");
+        helper.setFrom("qudgns8882@naver.com"); // 보내는 사람 이메일
+        helper.setTo("qudgns8882@naver.com"); // 받는 사람 이메일
         helper.setSubject(subject);
         // 메일 본문 설정
         String mailContent = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"

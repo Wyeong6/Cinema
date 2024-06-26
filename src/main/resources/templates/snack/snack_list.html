@@ -31,7 +31,7 @@
             <div class="container">
                 <article class="special" id="main">
                     <header>
-                        <h2><a href="#">스낵 스토어</a></h2>
+                        <h3>스낵 스토어</h3>
                         <p>
                             다양한 맛과 풍부한 선택지로 여러분의 입맛을 사로잡을 스낵들을 만나보세요.<br/>
                             지금 바로 주문하세요!
@@ -44,17 +44,17 @@
                              th:if="${snackList.totalElements > 0}">
                         <a class="image featured" th:href="@{/snack/detail(id=${snack.id})}">
                             <!-- locahost:8080/snack/detail?id=1 -->
-                            <img th:alt="${snack.snack_alt}"
+                            <img class="featured-img" th:alt="${snack.snack_alt}"
                                  th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
                         </a>
                         <header>
-                            <h3><a th:href="@{/snack/detail(id=${snack.id})}" th:text="${snack.snack_nm}"></a></h3>
+                            <h4><a th:href="@{/snack/detail(id=${snack.id})}" th:text="${snack.snack_nm}"></a></h4>
                         </header>
                         <p th:text="${snack.snack_price} + '원'"></p>
                     </article>
                 </div>
                 <div style="text-align: center" th:unless="${snackList.totalElements > 0}">
-                    <h3>상품을 준비중 입니다.</h3>
+                    <h4>상품을 준비중 입니다.</h4>
                 </div>
                 <div class="paging_btn">
                     <ul style="text-align: center" th:if="${snackList.totalElements > 0}">

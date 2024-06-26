@@ -51,22 +51,20 @@
         <div class="wrapper style1 snack_get list">
 
             <div class="container">
-                <article class="special" id="main snack_get_main">
-                    <header>
-                        <h2>
-                            <a href="#" th:text="${snack.snack_nm}"></a>
-                        </h2>
-                        <p th:text="${snack.snack_detail}"></p>
-                    </header>
-                    <section id="snack_get_section">
-                        <div class="snack_image">
-                            <a class="image featured" href="#">
-                                <img th:alt="${snack.snack_alt}"
-                                     th:src="@{/images/menu/{image}(image=${snack.snack_image})}" class="snack_get_img"/>
-                            </a>
-                            <canvas class="canvas" style="display: none"></canvas>
-                        </div>
-
+                <article class="special" id="snack_get_main">
+                    <div class="snack_image">
+                        <a class="image featured">
+                            <img th:class="featured-img" th:alt="${snack.snack_alt}"
+                                 th:src="@{/images/menu/{image}(image=${snack.snack_image})}" class="snack_get_img"/>
+                        </a>
+                        <canvas class="canvas" style="display: none"></canvas>
+                    </div>
+                    <div id="snack_get_section">
+                        <header>
+                            <h3 th:text="${snack.snack_nm}">
+                            </h3>
+                            <p th:text="${snack.snack_detail}"></p>
+                        </header>
                         <table class="default">
                             <tr>
                                 <td>구성품</td>
@@ -102,21 +100,21 @@
                                 </td>
                             </tr>
                         </table>
-                    </section>
+                    </div>
                 </article>
                 <hr/>
                 <div>
-                    <h3 style="font-size: 40px; margin-bottom: 1em">추천 상품</h3>
-                    <div class="row">
-                        <article class="col-3 col-12-mobile special" th:each="snack : ${snackList}">
+                    <h3 style="margin-bottom: 0.8em">추천 상품</h3>
+                    <div class="custom-grid">
+                        <article class="custom-col special" th:each="snack : ${snackList}">
                             <a class="image featured" th:href="@{/snack/detail(id=${snack.id})}">
-                                <img th:alt="${snack.snack_alt}"
+                                <img class="featured-img" th:alt="${snack.snack_alt}"
                                      th:src="@{/images/menu/{image}(image=${snack.snack_image})}"/>
                             </a>
                             <header>
-                                <h3>
+                                <h4>
                                     <a th:href="@{/snack/detail(id=${snack.id})}" th:text="${snack.snack_nm}"></a>
-                                </h3>
+                                </h4>
                             </header>
                         </article>
                     </div>
@@ -201,6 +199,8 @@
 
         <!-- 결제 프로그램 관련 시작 -->
         const html5InicisKey = [[${html5InicisKey}]];
+        const memberEmail = [[${memberInfo[0]}]];
+        const memberIdx = [[${memberInfo[1]}]];
         const snackName = [[${snack.snack_nm}]];
 
         function requestPay() { // 값 수정예정
@@ -215,12 +215,12 @@
             IMP.request_pay({
                 pg: "html5_inicis", //"{PG사 코드}.{상점 ID}",
                 pay_method: "card",
-                merchant_uid: `payment-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
+                merchant_uid: `SN-${crypto.randomUUID()}`, // 상점에서 생성한 주문 고유 번호
                 name: snackName, // 주문명
                 amount: currentPrice, // 결제 금액
-                buyer_email: "test@test.com",
-                buyer_name: "구매자",
-                buyer_tel: "010-0000-0000",
+                buyer_email: memberEmail,
+                buyer_name: memberIdx,
+                // buyer_tel: "010-0000-0000",
                 m_redirect_url: '/payment/complete'
             }, function(rsp) {
                 // let result = "";

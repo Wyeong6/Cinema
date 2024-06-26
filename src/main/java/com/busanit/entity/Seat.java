@@ -18,12 +18,14 @@ public class Seat {
 
     private Long seatRow;
     private String seatColumn;
-    private boolean isReserved = false;
     private boolean isAvailable = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theaterNumber_id")
     private TheaterNumber theaterNumber;
+
+    @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SeatReservation> seatReservations = new ArrayList<>();
 
     public Seat() {
     }
@@ -43,16 +45,9 @@ public class Seat {
                 "id='" + id + '\'' +
                 ", seatRow=" + seatRow +
                 ", seatColumn='" + seatColumn + '\'' +
-                ", isReserved=" + isReserved +
                 ", isAvailable=" + isAvailable +
                 ", theaterNumber=" + theaterNumber +
                 '}';
-    }
-
-    public void reserveSeat() {
-        if (!isReserved && isAvailable) {
-            isReserved = true;
-        }
     }
 
     public void setUnavailable() {
@@ -72,7 +67,6 @@ public class Seat {
             Seat newSeat = new Seat();
             newSeat.setSeatRow(seat.getSeatRow());
             newSeat.setSeatColumn(seat.getSeatColumn());
-            newSeat.setReserved(false); // 예약 여부 초기화
             newSeat.setAvailable(true); // 사용 가능 여부 초기화
             newSeat.setTheaterNumber(theaterNumber);
             newSeat.setId(Seat.generateId(seat.getSeatColumn(), seat.getSeatRow(), theaterNumber.getId()));

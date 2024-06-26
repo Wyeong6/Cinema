@@ -1,10 +1,7 @@
 package com.busanit.entity;
 
 import com.busanit.domain.ScheduleDTO;
-import com.busanit.domain.SeatDTO;
 import com.busanit.entity.movie.Movie;
-import com.busanit.repository.MovieRepository;
-import com.busanit.repository.TheaterNumberRepository;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +35,9 @@ public class Schedule {
     private Long totalSeats = 0L;
     private Long unavailableSeats = 0L;
     private Boolean status = true;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SeatReservation> seatReservations = new ArrayList<>();
 
     public static Schedule toEntity(ScheduleDTO scheduleDTO, TheaterNumber theaterNumber, Movie movie) {
         Schedule schedule = new Schedule();
