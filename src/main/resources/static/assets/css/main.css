@@ -2182,7 +2182,7 @@ input, select, textarea {
 		background-attachment: fixed;
 		color: #fff;
 		text-align: center;
-		padding: 7.5em 0 0 0;
+		padding: 10em 0 0 0;
 		cursor: default;
 	}
 
@@ -2284,7 +2284,7 @@ input, select, textarea {
 		left: 0;
 		width: 100%;
 		text-align: center;
-		padding: 4.5em 0 1.5em 0;
+		padding: 4.5em 0 2.5em 0;
 		z-index: 1;
 		overflow: hidden;
 	}
@@ -3045,7 +3045,6 @@ input, select, textarea {
 		/* Header */
 
 			#header {
-
 				background-attachment: scroll;
 				padding: 2.5em 0 0 0;
 			}

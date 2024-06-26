@@ -127,9 +127,6 @@
         </div>
     </div>
 
-    <!-- 스크립트 -->
-    <script src="/assets/js/jquery.min.js"></script>
-
     <script>
         $(document).ready(function() {
             const certification = $('#movieId').data('certification');
@@ -268,15 +265,6 @@
             window.location.href = `/payment?scheduleId=${scheduleId}&selectedSeats=${encodeURIComponent(JSON.stringify(selectedSeats))}&adultCount=${adultCount}&teenagerCount=${teenagerCount}&grandCount=${grandCount}&totalAmount=${totalAmount}`;
         }
     </script>
-
-    <script src="/assets/js/jquery.dropotron.min.js"></script>
-    <script src="/assets/js/jquery.scrolly.min.js"></script>
-    <script src="/assets/js/jquery.scrollex.min.js"></script>
-    <script src="/assets/js/browser.min.js"></script>
-    <script src="/assets/js/breakpoints.min.js"></script>
-    <script src="/assets/js/util.js"></script>
-    <script src="/assets/js/main.js"></script>
-
 </th:block>
 </body>
 </html>

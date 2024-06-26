@@ -35,12 +35,10 @@
         }
     </style>
 </head>
+<!-- header -->
+<th:block th:replace="fragment/header::header"></th:block>
 <body class="left-sidebar is-preload">
 <div id="page-wrapper">
-
-    <!-- header -->
-    <th:block th:replace="fragment/header::header"></th:block>
-
     <!-- Main -->
     <div class="wrapper style1">
         <div class="container">
@@ -120,7 +118,6 @@
     <th:block th:replace="fragment/footer::footer"></th:block>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
     const memberId = [[${memberId}]];
 

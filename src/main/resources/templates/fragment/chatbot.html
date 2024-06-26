@@ -10,37 +10,12 @@
                 margin: 0;
                 padding: 0;
             }
-
-            .chatbot-toggle {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background-color: #3f2b51;
-                color: #fff;
-                padding: 10px 20px;
-                border: none;
-                border-radius: 50px;
-                cursor: pointer;
-                z-index: 1000;
-                text-decoration: none; /* 링크 스타일 제거 */
-            }
-
-            #chatbot-iframe {
-                display: none;
-                position: fixed;
-                bottom: 80px;
-                right: 20px;
-                width: 350px;
-                height: 500px;
-                border: none;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                z-index: 999;
-            }
         </style>
     </head>
     <body>
-    <button class="chatbot-toggle">Chatbot</button>
+    <button class="chatbot-toggle">
+        <img src="/images/chatbot.png" alt="챗봇" />
+    </button>
     <iframe id="chatbot-iframe" src="http://localhost:5004/webhook/chat?token=secret"></iframe>
     <script>
         const chatbotToggle = document.querySelector('.chatbot-toggle');
