@@ -122,17 +122,6 @@ public class PaymentController {
         snackDTOList = snackService.getSnackListRandom(pageable);
         model.addAttribute("snackList", snackDTOList);
 
-        // 결제
-        model.addAttribute("html5InicisKey", html5InicisKey);
-
-        // 현재 로그인한 사용자의 정보 (이메일, idx)
-        List<String> memberInfo = new ArrayList<>();
-        String userEmail = memberService.currentLoggedInEmail();
-        memberInfo.add(userEmail);
-        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-        memberInfo.add(memberRegFormDTO.getId().toString());
-        model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
-
         return "payment/cart_list";
     }
 }
