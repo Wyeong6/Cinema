@@ -70,7 +70,7 @@ public class PaymentController {
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
         model.addAttribute("pointInfo", currentPoints); // 사용자 보유 포인트
-        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
+//        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
 
         model.addAttribute("scheduleDTO", scheduleDTO);
         model.addAttribute("movieDTOs", movieDTOs);
@@ -89,9 +89,9 @@ public class PaymentController {
         Map<String, String> response = new HashMap<>();
 
         response.put("html5InicisKey", html5InicisKey);
-        response.put("orderName", request.get("orderName"));
+        response.put("orderName", request.get("orderName")); // 제품명
         response.put("currentPrice", request.get("currentPrice"));
-        response.put("reqIDX", request.get("reqIDX"));
+        response.put("reqIDX", request.get("reqIDX")); // 결제를 요청한 페이지 IDX
 
         // 현재 로그인한 사용자의 정보 (이메일, idx)
 //        List<String> memberInfo = new ArrayList<>();
