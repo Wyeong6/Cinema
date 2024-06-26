@@ -24,12 +24,63 @@
     <!--    댓글-->
     <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
     <style>
+
+        .movie_data_box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .movie_data,
+        .btn_box {
+            display: flex;
+            align-items: center;
+        }
+
+        .favorite-container {
+            margin-right: 10px;
+        }
+
+        .kakao_btn {
+            margin-left: 10px;
+        }
+
+        .movie_data_averageRating {
+            flex-grow: 1;
+        }
+
+        h4 {
+            margin: 0 10px 0 0;
+        }
+
+
         .fav-icon {
             width: 33px !important;
             height: 30px !important;
             cursor: pointer;
             transition: background-color 0.3s; /* 부드러운 색상 전환 효과 */
         }
+
+        #kakao_btn {
+            width: 40px !important;
+            height: 40px !important;
+            cursor: pointer;
+        }
+
+        /*.btn_box {*/
+        /*    display: flex;*/
+        /*    flex-direction: column;*/
+        /*    align-items: center;*/
+        /*}*/
+
+        /*.btn_box .kakao_btn {*/
+        /*    max-width: 100%; !* 최대 가로 크기를 부모 요소의 100%로 설정 *!*/
+        /*    max-height: 40px; !* 최대 세로 크기를 40px로 설정 *!*/
+        /*    !* 다른 스타일 속성 추가 *!*/
+        /*}*/
+        /*.btn_box .text-container {*/
+        /*    margin-top: 10px; !* 이미지와 텍스트 사이의 간격 *!*/
+        /*}*/
 
         .favorite-container {
             display: flex;
@@ -228,10 +279,16 @@
                                              onclick="openModal(this.getAttribute('src'))"
                                              style="width: 400px; height: 600px;"
                                         />
-                                        <img th:unless="${#strings.length(movie.id) == 10}"
-                                             th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="영화포스터"
+                                        <img th:if="${movie.posterPath != 'null' && movie.posterPath != '' && #strings.length(movie.id) != 10}"
+                                             th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}"
+                                             alt="영화포스터"
                                              th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
                                              style="width: 400px; height: 600px;"
+                                        />
+                                        <img th:if="${movie.posterPath == null || movie.posterPath == '' || movie.posterPath == 'null'}"
+                                             th:src="@{/images/img_not_ready2.png}"
+                                             alt="준비중 이미지"
+                                             style="width: 400px; height: 600px; pointer-events: none;"
                                         />
                                     </a>
                                     <div class="movie_info">
@@ -292,17 +349,8 @@
 
 
                                         <div class="movie_data_box">
-                                            <div class="movie_data">
-                                                <h4>누적 관객수</h4>
-                                                <p>cnv</p>
-                                            </div>
-                                            <div class="movie_data">
-                                                <h4>인기도</h4>
-                                                <p th:text="${movie.popularity}">popularity (%)</p>
-                                            </div>
                                             <div class="movie_data_averageRating">
                                                 <h4>평점</h4>
-                                                <!--                                        <p th:text="${movie.voteAverage}">vote rating</p>-->
                                             </div>
                                             <!--찜하기 구현할것~ (컨트롤러에 연결만하면됨)-->
                                             <div class="movie_data">
@@ -311,6 +359,12 @@
                                                     <img id="favoriteButton" class="fav-icon"
                                                          src="/images/heart%20icon.png" alt="찜하기(좋아요)">
                                                 </div>
+                                            </div>
+                                            <div class="btn_box">
+                                                <h4>공유하기</h4>
+                                                    <img onclick="shareMessage()" src="/images/kakaoTalkShare.png"
+                                                         alt="카카오톡 공유" id="kakao_btn" class="kakao_btn"
+                                                    >
                                             </div>
                                         </div>
                                     </div>
@@ -376,14 +430,6 @@
                 <div id="myModal" class="modal">
                     <span class="close" onclick="closeModal()">&times;</span>
                     <img class="modal-content" id="modalImage">
-                </div>
-                <div class="btn_box">
-                    <a href="javascript:shareMessage()">
-                        <button type="button" class="kakao_btn">
-                            <img src="/img/front/icon/kakao_sh.png" alt="카카오톡 공유">
-                        </button>
-                    </a>
-                    <span>카카오톡 공유</span>
                 </div>
                 <!-- 안읽은 메세지 표시 -->
                 <div class="fixed-bottom-right" id="unreadMessages" onclick="redirectToChatRoom()">
@@ -516,6 +562,19 @@
         var visibleCount = 4; // 처음에 보이는 항목 수
         var increment = 8; // 한 번에 표시할 추가 항목 수
 
+        // 스틸컷이 있는지 확인하는 함수
+        function hasStillCuts() {
+            var stillCuts = document.querySelectorAll(".stillCut");
+            return stillCuts.length > 0;
+        }
+
+        // 초기에 "더보기" 버튼의 표시 여부를 결정
+        if (!hasStillCuts()) {
+            document.getElementById("showMore").style.display = 'none';
+        } else {
+            document.getElementById("showMore").style.display = 'block';
+        }
+
         document.getElementById("showMore").addEventListener("click", function () {
             var stillCuts = document.querySelectorAll(".stillCut");
             var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
@@ -537,6 +596,7 @@
                 // 아직 표시되지 않은 항목이 있다면 "더보기"를 계속 보여줌
                 this.style.display = 'block';
             }
+
         });
 
         document.getElementById("showLess").addEventListener("click", function () {
@@ -641,6 +701,7 @@
             var reviewsBtn = document.querySelector(".reviews_btn");
             var stillCutDiv = document.getElementById("stillcut");
             var reviewsDiv = document.getElementById("reviews");
+
 
             stillCutBtn.addEventListener("click", function () {
                 stillCutDiv.style.display = "block";
@@ -802,6 +863,7 @@
             const stars = generateStars(comment.grade);
             const emoji = emojiMap[comment.grade] || '';
             const isOwner = userEmail === comment.memberEmail;
+            // const adming =
             const reviewRow = `
 
         <tr>

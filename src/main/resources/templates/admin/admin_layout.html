@@ -140,6 +140,13 @@
                     </a>
                 </li>
 
+                <li class="menu-item">
+                    <a href="javascript:void(0)" class="menu-link movie_comment_btn">
+                        <i class="menu-icon tf-icons bx bx-box"></i>
+                        <div data-i18n="User interface">영화 리뷰 관리</div>
+                    </a>
+                </li>
+
                 <!-- Theaters -->
                 <li class="menu-header small text-uppercase"><span class="menu-header-text">상영관관리</span></li>
 
@@ -306,8 +313,11 @@
             $('.container-xxl').load('/admin/movieList', {type: 'POST'});
         });
         $('.movie_register_btn').on('click', function () {
-            $('.container-xxl').load('/admin/movieRegister', { type : 'POST' });
+            $('.container-xxl').load('/admin/movieRegister', {type : 'POST'});
             clearSelectedActors();
+        });
+        $('.movie_comment_btn').on('click', function (){
+            $('.container-xxl').load('/admin/commentList', {type : 'POST'});
         });
         // 상영관 관리
         $('.theater_reg_btn').on('click', function (e) {

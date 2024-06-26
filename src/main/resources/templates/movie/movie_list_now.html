@@ -4,19 +4,17 @@
       xmlns:sec="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Cinemacast</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" href="/assets/css/main.css"/>
-    <link rel="stylesheet" href="/assets/css/custom.css"/>
-    <link rel="stylesheet" href="/assets/css/nav.css"/>
-    <noscript>
-        <link rel="stylesheet" href="/assets/css/noscript.css"/>
-    </noscript>
     <style>
-        .pagination{
+        .pagination {
             text-align: center;
             margin-top: 20px;
+        }
+
+        .current-page {
+            pointer-events: none;
+            cursor: default;
+            color: #000; /* 기본 글자 색상 */
+            font-weight: bold; /* 강조 */
         }
     </style>
 </head>
@@ -25,7 +23,7 @@
     <div id="page-wrapper">
 
         <!-- Header -->
-        <header data-include-path="./header.html"></header>
+
 
         <!-- Main movie_list 한 페이지에 16개 정도되게 해주세요 -->
         <div class="wrapper style1 movie_list">
@@ -35,7 +33,7 @@
                     <header>
                         <h3>현재 상영작</h3>
                         <p>
-                            Morbi convallis lectus malesuada sed fermentum dolore amet
+                            현재 상영 중인 다양한 장르의 영화들을 한눈에 살펴보세요
                         </p>
                     </header>
                 </article>
@@ -57,9 +55,13 @@
                     <a href="#" th:if="${moviePage.hasPrevious()}"
                        th:href="@{/nowMovies(page=${moviePage.number - 1})}">이전</a>
                     <span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
-                    <a th:href="@{/nowMovies(page=${pageNum})}"  th:text="'[' + (${pageNum + 1}) + ']'"
-                       th:classappend="${pageNum == moviePage.number} ? 'active' : ''"></a>
-                    </span>
+        <a th:href="@{/nowMovies(page=${pageNum})}"
+           th:text="'[' + (${pageNum + 1}) + ']'"
+           th:if="${pageNum != moviePage.number}"></a>
+        <span th:if="${pageNum == moviePage.number}"
+              th:text="'[' + (${pageNum + 1}) + ']'"
+              class="current-page"></span>
+    </span>
                     <a href="#" th:if="${moviePage.hasNext()}"
                        th:href="@{/nowMovies(page=${moviePage.number + 1})}">다음</a>
                 </div>

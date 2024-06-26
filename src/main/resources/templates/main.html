@@ -17,7 +17,11 @@
     }
     .custom-modal-xl {
         max-width: 85%; /* 또는 원하는 크기 */
-        z-index: 99999999;
+        z-index: 999999999999;
+    }
+
+    #movie_title {
+        z-index: -999999;
     }
     .modal-backdrop.show {
         opacity: 0.85 !important; /* 투명도 조절 */
@@ -42,19 +46,14 @@
         <!-- Inner -->
         <div class="inner">
             <header>
-
                 <h2><a id="movie_title">Movie Title</a></h2>
                 <hr />
                 <p>Another fine freebie by HTML5 UP</p>
             </header>
             <footer>
                 <a href="#banner" class="button circled scrolly">예매</a>
-
-<!--                <a class="button circled scrolly" id="videoButton">비디오</a>-->
-
             </footer>
         </div>
-
         <!-- info -->
         <div id="info" th:data-username="${#authentication.name}">
             <ul>
@@ -89,9 +88,9 @@
                 <li>
                     <a href="#">영화</a>
                     <ul>
-                        <li><a href="movie_list_full.html">영화 전체보기</a></li>
-                        <li><a href="movie_list_now.html">현재 상영작</a></li>
-                        <li><a href="movie_list_coming.html">상영 예정작</a></li>
+                        <li><a href="/allMovies">영화 전체보기</a></li>
+                        <li><a href="/nowMovies">현재 상영작</a></li>
+                        <li><a href="/comingMovies">상영 예정작</a></li>
                     </ul>
                 </li>
                 <li>
@@ -301,12 +300,20 @@
 
             //모달 close버튼시  영상 정지
             $('.close').on('click', function() {
+                const info = document.getElementById('info');
+                const logo = document.getElementById('logo');
+                // info.style.display = 'block';
+                // logo.style.display = 'block';
                 $('#videoModal').modal('hide');
                 $('#videoFrame').attr('src', '');
             });
 
             //모달이 닫히면 영상중지
             $('#videoModal').on('hidden.bs.modal', function () {
+                const info = document.getElementById('info');
+                const logo = document.getElementById('logo');
+                // info.style.display = 'block';
+                // logo.style.display = 'block';
                 $('#videoFrame').attr('src', '');
             });
 
@@ -320,11 +327,16 @@
                 const header = document.getElementById('header');
                 const movieTitle = document.getElementById('movie_title');
                 const buttons = document.querySelectorAll('.btn');
+                const info = document.getElementById('info');
+                const logo = document.getElementById('logo');
+
 
                 $('#movie_title').off('click').on('click', function () {
                     const videoUrl = movieVideos[index];
                     console.log("videoUrl" + videoUrl)
                     $('#videoFrame').attr('src', videoUrl);
+                    // info.style.display = 'none';
+                    // logo.style.display = 'none';
                     $('#videoModal').modal('show');
                 });
 
