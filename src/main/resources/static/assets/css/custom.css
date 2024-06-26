@@ -612,6 +612,14 @@ a#movie_title:not(:hover) {
 .container {
     position: relative;
 }
+.notice_get article section p {
+    text-align: center;
+}
+.notice_get article footer p {
+    text-align: right;
+    font-size: 0.8em;
+    margin-bottom: 0;
+}
 .notice_get table {
     margin: 4em 0 2em;
 }
@@ -622,8 +630,8 @@ a#movie_title:not(:hover) {
 .notice_get button {
     margin: 0 auto;
     display: block; /* 버튼을 블록 요소로 설정 */
-    width: 18%;
-    font-size: 20px;
+    font-size: 1em;
+    padding: 0.2em 2em;
 }
 /* cart_list */
 .cart_list {
@@ -1448,11 +1456,12 @@ button.pay-btn {
 /* 챗봇 */
 .chatbot-toggle {
     position: fixed;
+    width: 4em;
+    height: 4em;
     bottom: 20px;
     right: 20px;
     background-color: #5155A6;
     color: #fff;
-    padding: 0.8em;
     border-radius: 50%;
     cursor: pointer;
     z-index: 1000;

@@ -14,7 +14,7 @@
     </head>
     <body>
     <button class="chatbot-toggle">
-        <img src="/images/chatbot.png" alt="챗봇" />
+        <img src="/images/chatbot.png" alt="챗봇 이미지" />
     </button>
     <iframe id="chatbot-iframe" src="http://localhost:5004/webhook/chat?token=secret"></iframe>
     <script>
@@ -30,7 +30,17 @@
                 chatbotToggle.textContent = 'close';
             } else {
                 iframe.style.display = 'none';
-                chatbotToggle.textContent = 'Chatbot';
+                chatbotToggle.textContent = ''; // 기존 텍스트 제거
+
+                // 이미지 생성
+                const img = document.createElement('img');
+                img.src = '/images/chatbot.png';
+                img.alt = '챗봇 이미지';
+                img.style.width = '40px';
+                img.style.height = 'auto';
+
+                // 버튼에 이미지 추가
+                chatbotToggle.appendChild(img);
             }
         });
     </script>
