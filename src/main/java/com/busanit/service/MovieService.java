@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.busanit.domain.movie.ActorDTO.convertToDto;
@@ -48,7 +49,11 @@ import static com.busanit.domain.movie.ActorDTO.convertToDto;
 @Getter
 public class MovieService {
 
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .build();
     private final MovieRepository movieRepository;
     private final MovieDetailRepository movieDetailRepository;
     private final MovieStillCutRepository movieStillCutRepository;
@@ -142,7 +147,6 @@ public class MovieService {
     }
 
     // 상영예정작 DB에 넣기
-    @Async
     public void fetchAndStoreMoviesUpcoming() throws IOException {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds();

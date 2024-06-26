@@ -1,14 +1,15 @@
 <article id="mypage_main">
     <header id="mypage_main_header">
-        <h2 style="font-size: 2em"><b th:text="${myPageMemberInfo.name}">user</b>님 반갑습니다.</h2>
-        <div class="user_info">
+        <h4><b th:text="${myPageMemberInfo.name}">user</b>님 반갑습니다.</h4>
+        <div class="user-info-box">
+            <div class="user_info">
             <div>
                 <img alt="멤버십 등급 이미지" th:src="@{/images/grade/{image}.png(image=${myPageGrade})}">
                 <div>
                     <p>
-                        <span th:text="${myPageMemberInfo.name}">user</span>님의 등급은 <b th:text="${myPageGrade}">green</b> 입니다.
+                        <span th:text="${myPageMemberInfo.name}">user</span>님
                     </p>
-                    <button class="button membership_btn" id="membership_btn">등급혜택 보기</button>
+                    <p><b th:text="${myPageGrade}"></b></p>
                 </div>
             </div>
             <div class="point">
@@ -19,6 +20,8 @@
                 <p style="color: #e45649; font-weight: 600" th:if="${pointInfo == null or pointInfo.isEmpty()}"
                    th:text="0p">0p</p>
             </div>
+            </div>
+            <button class="button membership_btn" id="membership_btn">등급혜택 보기</button>
         </div>
     </header>
     <!-- 예매내역 -->
@@ -26,7 +29,7 @@
         <div class="reservation history">
             <header style="margin-bottom: 0.5em">
                 <div>
-                    <h3>최근 영화 예매 내역</h3>
+                    <h4>최근 영화 예매 내역</h4>
                 </div>
                 <a>전체 예매 내역 조회 ></a>
             </header>
@@ -34,14 +37,15 @@
             <section>
                 <article class="history_get">
                     <header>
-                        <h3>2024-05-23</h3>
+                        <h4 class="reservation-idx">예매번호</h4>
+                        <p class="reservation-date">예매일자</p>
                     </header>
                     <div class="history_data">
-                        <img alt="영화 포스터" src="/images/movieposter.webp">
+                        <img class="featured-img" alt="영화 포스터" src="/images/movieposter.webp">
                         <div>
-                            <h4>예매번호 : </h4>
                             <p>범죄도시 4</p>
-                            <p>2024-05-23 | 10:30 | I12</p>
+                            <p><span class="history-data-date">상영일자</span><span class="history-data-time">시간</span></p>
+                            <p><span class="history-data-theater">상영관</span><span class="history-data-seats">좌석</span></p>
                         </div>
                     </div>
                 </article>
@@ -53,7 +57,7 @@
         <div class="order history">
             <header style="margin-bottom: 0.5em">
                 <div>
-                    <h3>최근 스낵 주문 내역</h3>
+                    <h4>최근 스낵 주문 내역</h4>
                 </div>
                 <a id="AllOrderInfo">전체 주문 내역 조회 ></a>
             </header>

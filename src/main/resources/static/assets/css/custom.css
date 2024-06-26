@@ -35,6 +35,27 @@
     font-size: 13px;
     margin-right: 10px;
 }
+#info .chat-alarm {
+    position: relative;
+}
+
+#info .chat-alarm .chat-img {
+    width: 20px; /* 이미지의 고정 너비를 설정 */
+    height: auto; /* 이미지의 높이를 자동으로 조절 */
+    display: inline-block; /* 이미지를 인라인 블록 요소로 설정 */
+    vertical-align: middle; /* 이미지를 수직 중앙에 정렬 */
+}
+
+#info .chat-alarm div {
+    position: absolute;
+    top: 25%; /* 부모 요소의 상단에서 50% 위치 */
+    left: 65%; /* 부모 요소의 왼쪽에서 70% 위치 (50% + 20% 오른쪽으로 이동) */
+    transform: translateX(-50%); /* 요소를 가운데로 이동 */
+    color: #1C0920;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 15px;
+}
 #banner header {
     width: 90% !important;
     margin: 0 auto;
@@ -471,41 +492,50 @@ a#movie_title:not(:hover) {
     flex-direction: row;
 }
 #snack_get_main .snack_image {
-    width: 30%;
+    width: 27%;
 }
 #snack_get_section {
-    margin-left: 5em;
+    margin-left: 10em;
+}
+#snack_get_section #snack-info {
+    display: flex;
+    flex-direction: row;
+}
+.snack_detail {
+    white-space: pre-wrap; /* 긴문장 중간에 자르기 - 너비지정 해야함*/
+    word-break: keep-all; /* 긴단어 연결 */
+    width: 300px;
+}
+#snack_get_section > header p {
+    margin: 0 0 2em;
+}
+#snack_get_section > header #snack-info p {
+    margin: 3em 0;
+}
+#snack_get_section > header #snack-info p:last-child {
+    margin-left: 10em;
 }
 #snack_get_section table {
     width: 100%;
     height: auto;
+}
+#snack_get_section table td {
+    padding: 1.5em 0;
+    text-align: left;
 }
 #td_count {
     padding: 1em 0;
 }
 .count_box {
     position: relative; /* 부모 요소를 상대 위치로 설정 */
-    margin: 0 auto;
-    width: 100%;
+    width: 40%;
     display: flex;
     justify-content: space-between;
-    background: #e5e5e5;
-    border-radius: 15px;
 }
 .count_box button {
-    background: #c4c3caB3;
-    font-size: 30px;
-}
-.count_box button:hover {
-    background: #c4c3ca80;
-}
-#discount:disabled {
-    background-color: #e0e0e0;
-    color: #999;
-    cursor: not-allowed;
-}
-#discount:hover {
-    background-color: #c4c3ca80;
+    font-size: 1.2em;
+    color: #566a7f;
+    background: transparent;
 }
 .count_box p {
     position: absolute; /* 자식 요소를 절대 위치로 설정 */
@@ -515,8 +545,9 @@ a#movie_title:not(:hover) {
     margin: 0; /* 기본 마진 제거 */
 }
 #total_price {
-    font-size: 30px;
-    font-weight: 900;
+    font-size: 1.2em;
+    font-weight: 700;
+    text-align: right !important;
 }
 #tr_purchase {
     width: 100%;
@@ -528,17 +559,21 @@ a#movie_title:not(:hover) {
     padding: 1em 1em 1em 0;
 }
 #tr_purchase button {
-    font-size: 20px;
+    padding: 0.7em 3em;
+    font-size: 0.8em;
     width: 100%;
-    border: 5px solid #df7366;
-    color: #3B353C;
+    color: #fff;
 }
 #tr_purchase button.cart{
-    font-size: 20px;
     width: 100%;
     background: #fafafa;
-    border: 5px solid rgba(223, 115, 102, 0.3);
+    border: 2px solid rgba(223, 115, 102, 0.3);
+    box-sizing: border-box;
     color: #3B353C;
+}
+#tr_purchase button.cart:hover {
+    width: 100%;
+    background: rgba(223, 115, 102, 0.3);
 }
 /* notice_list*/
 .notice_list table.default tr th{
@@ -614,25 +649,27 @@ td p {
     text-align: center; /* 텍스트 내용을 중앙 정렬 */
 }
 #cart_list_section table tr th:nth-child(1) {
-    width: 20%;
+    width: 45%;
 }
 #cart_list_section table tr th:nth-child(2) {
-    width: 35%;
-}
-#cart_list_section table tr th:nth-child(3) {
-    width: 10%;
-}
-#cart_list_section table tr th:nth-child(4) {
     width: 20%;
 }
-#cart_list_section table tr th:nth-child(5) {
-    width: 10%;
+#cart_list_section table tr th:nth-child(3) {
+    width: 20%;
+}
+#cart_list_section table tr th:nth-child(4) {
+    width: 15%;
+}
+#cart_list_section table tr td:nth-child(1) {
+    width: 15%;
 }
 #cart_list_section table tr td:nth-child(1) img {
     width: 100%;
 }
 #cart_list_section table tr td:nth-child(2) {
-    width: 25%;
+    width: 30%;
+    padding: 0;
+    word-break: keep-all;
 }
 #cart_list_section table tr td:nth-child(3) {
     width: 20%;
@@ -656,13 +693,16 @@ td p {
 #cart_list_section table tr td:nth-child(4) .total_price {
     color: #3B353C;
     font-weight: 700;
-    font-size: 1.2em;
+    font-size: 1em;
 }
 #cart_list_section table tr td:nth-child(5) {
     width: 10%;
 }
-.wrapper .container #cart_list_section .delete_td img {
-    width: 30%;
+#cart_list_section table tr td:nth-child(5) img {
+    width: 30%; /* 부모 요소의 크기에 따라 결정 */
+    max-width: 100%; /* 최대 너비를 100%로 설정 */
+    height: auto; /* 높이를 자동으로 설정하여 비율 유지 */
+    cursor: pointer;
 }
 #main .button_box {
     margin-top: 3.5em;
@@ -672,15 +712,18 @@ td p {
 }
 #main .button_box .continue_btn {
     height: 70%;
+    padding: 0.5em 3em;
     background: none;
     color: #3B353C;
-    font-size: 20px;
-    border-radius: 15px;
-    border: 5px solid rgba(223, 115, 102, 0.3);
+    font-size: 0.9em;
+    border-radius: 5px;
+    box-shadow: 0 0 0 3px rgba(223, 115, 102, 0.3);
+    box-sizing: border-box;
+    transition: background 0.3s, box-shadow 0.3s; /* 부드러운 전환을 위해 추가 */
 }
 #main .button_box .continue_btn:hover {
     background: rgba(223, 115, 102, 0.3);
-    border: none;
+    box-shadow: 0 0 0 2px rgba(223, 115, 102, 0.3); /* 동일한 box-shadow 값 유지 */
 }
 #main .price_box {
     text-align: center;
@@ -691,11 +734,11 @@ td p {
     font-weight: 700;
 }
 article#pay {
-    width: 28%;
+    width: 27%;
     background: #fafafa;
     position: relative;
 }
-article#pay h2 {
+article#pay h3 {
     font-weight: 700;
     margin: 1.5em 0 0 0.5em;
 }
@@ -710,21 +753,32 @@ article#pay .row > #payment > button {
     padding: 0.65em 2em 0.65em 2em;
     font-size: 1em;
     background: none;
-    border: 3px solid rgba(223, 115, 102, 0.3);
+    box-shadow: 0 0 0 3px rgba(223, 115, 102, 0.3);
+    box-sizing: border-box;
     border-radius: 50px;
     color: #3B353C;
 }
 article#pay .row > #payment > button:hover {
     background: rgba(223, 115, 102, 0.3);
-    border: none;
+    box-shadow: 0 0 0 3px rgba(223, 115, 102, 0.3); /* 동일한 box-shadow 값 유지 */
+}
+article#pay .row > #payment > button.clicked {
+    background: rgba(223, 115, 102, 0.3);
+    box-shadow: 0 0 0 3px rgba(223, 115, 102, 0.3); /* 동일한 box-shadow 값 유지 */
 }
 article#pay > button {
     display: block;
     width: 100%;
+    padding: 0.5em 0;
     position: absolute;
     bottom: 0;
     border-radius: 0;
-    font-size: 30px;
+    font-size: 1.2em;
+}
+.col-2 header h4 {
+    /*white-space: pre-wrap;*/
+    word-break: keep-all;
+    width: 100%;
 }
 /* 개인정보수정 - edit_personal_info */
 .edit_info tr td:nth-child(1) {
@@ -774,19 +828,18 @@ article#pay > button {
 .mypage_nav {
     padding-left: 0;
     width: 80%;
-    background: #e5e5e5;
     cursor: pointer;
 }
 .mypage_nav ul, li {
     padding-left: 0;
     list-style-type: none;
 }
+.mypage_nav nav > ul li a {
+    font-size: 0.8em;
+}
 .mypage_nav nav > ul > li > a {
     font-weight: 700;
     text-decoration-color: #e5e5e5;
-}
-.mypage_nav ul, li > ul > li {
-    padding: 0.5em 1em;
 }
 .mypage_nav ul > li li {
     padding: 0;
@@ -794,22 +847,23 @@ article#pay > button {
 .mypage_nav li li:hover {
     font-weight: 700;
 }
+#mypage_main .user-info-box {
+    margin: 0.8em 0 2em;
+    border-radius: 1em;
+    background: #fcfdfd;
+}
 #mypage_main .user_info {
-    margin: 2em 0;
-    padding: 2em 2em;
+    padding: 1em 2em;
     display: flex;
     justify-content: space-between;
-    background: #fafafa;
-    border-radius: 1em;
 }
 #mypage_main .user_info img {
-    width: 5em;
+    width: 4em;
     height: auto;
     margin-right: 2em;
 }
-#mypage_main .user_info button {
-    background: #e5e5e5;
-    color: #3B353C;
+#mypage_main .user_info p {
+    margin: 0 0 0.5em 0;
 }
 #mypage_main .user_info > div {
     display: flex;
@@ -817,6 +871,15 @@ article#pay > button {
 }
 #mypage_main .user_info .point p {
     margin-right: 1em;
+}
+#mypage_main .user-info-box button {
+    background: #5155A6;
+    width: 100%;
+    font-size: 0.8em;
+    padding: 0.8em;
+    border-radius: 0;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
 }
 .history header {
     display: flex;
@@ -834,18 +897,35 @@ article#pay > button {
     margin-left: 10px;
     font-size: 16px;
 }
+.history_get {
+    border-radius: 10px;
+    background: #fcfdfd;
+}
+.history_get header {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    width: 100%;
+    height: 3em;
+    margin: 0;
+    padding: 0.5em 0 0 2em;
+    background: rgba(242, 225, 172, 0.5);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
 .history_data {
     display: flex;
     flex-direction: row;
-    border: 3px solid #e5e5e5;
     padding: 1em 2em;
-    border-radius: 1em;
+    background: #fcfdfd;
+    border-radius: 10px;
 }
 .history_data img {
-    width: 5em;
+    width: 4em;
     margin-right: 1em;
 }
 .history_data p {
+    font-size: 0.8em;
     margin-bottom: 0;
 }
 #mypage_main > section {
