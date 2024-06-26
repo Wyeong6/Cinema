@@ -86,6 +86,8 @@ public class PaymentController {
     @PostMapping("/request")
     @ResponseBody
     public Map<String, String> paymentRequest(@RequestBody Map<String, String> request) {
+        /* html 파일에 결제 구동 스크립트 파일, 변수(3가지) 필요 */
+
         Map<String, String> response = new HashMap<>();
 
         response.put("html5InicisKey", html5InicisKey);
