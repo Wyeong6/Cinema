@@ -17,7 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/payment")
@@ -81,10 +83,26 @@ public class PaymentController {
         return "payment/payment_window"; // 뷰 이름 리턴
     }
 
-    @PostMapping("/test") /*이름 수정예정*/
-    public String payTest(Model model) {
-        model.addAttribute("html5InicisKey", html5InicisKey);
-        return "payment/test_pay";
+    @PostMapping("/request")
+    @ResponseBody
+    public Map<String, String> paymentRequest(@RequestBody Map<String, String> request) {
+        Map<String, String> response = new HashMap<>();
+
+        response.put("html5InicisKey", html5InicisKey);
+        response.put("orderName", request.get("orderName"));
+        response.put("currentPrice", request.get("currentPrice"));
+        response.put("reqIDX", request.get("reqIDX"));
+
+        // 현재 로그인한 사용자의 정보 (이메일, idx)
+//        List<String> memberInfo = new ArrayList<>();
+        String userEmail = memberService.currentLoggedInEmail();
+//        memberInfo.add(userEmail);
+        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+//        memberInfo.add(memberRegFormDTO.getId().toString());
+        response.put("memberEmail", userEmail);
+        response.put("memberIdx", memberRegFormDTO.getId().toString());
+
+        return response;
     }
 
     @GetMapping("/complete")
@@ -117,6 +135,4 @@ public class PaymentController {
 
         return "payment/cart_list";
     }
-
-
 }
