@@ -70,7 +70,7 @@ public class PaymentController {
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
         model.addAttribute("pointInfo", currentPoints); // 사용자 보유 포인트
-        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
+//        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
 
         model.addAttribute("scheduleDTO", scheduleDTO);
         model.addAttribute("movieDTOs", movieDTOs);
@@ -86,12 +86,14 @@ public class PaymentController {
     @PostMapping("/request")
     @ResponseBody
     public Map<String, String> paymentRequest(@RequestBody Map<String, String> request) {
+        /* html 파일에 결제 구동 스크립트 파일, 변수(3가지) 필요 */
+
         Map<String, String> response = new HashMap<>();
 
         response.put("html5InicisKey", html5InicisKey);
-        response.put("orderName", request.get("orderName"));
+        response.put("orderName", request.get("orderName")); // 제품명
         response.put("currentPrice", request.get("currentPrice"));
-        response.put("reqIDX", request.get("reqIDX"));
+        response.put("reqIDX", request.get("reqIDX")); // 결제를 요청한 페이지 IDX
 
         // 현재 로그인한 사용자의 정보 (이메일, idx)
 //        List<String> memberInfo = new ArrayList<>();
@@ -100,7 +102,7 @@ public class PaymentController {
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
 //        memberInfo.add(memberRegFormDTO.getId().toString());
         response.put("memberEmail", userEmail);
-        response.put("memberIdx", memberRegFormDTO.getId().toString());
+        response.put("memberName", memberRegFormDTO.getName());
 
         return response;
     }
@@ -121,17 +123,6 @@ public class PaymentController {
         Page<SnackDTO> snackDTOList = null;
         snackDTOList = snackService.getSnackListRandom(pageable);
         model.addAttribute("snackList", snackDTOList);
-
-        // 결제
-        model.addAttribute("html5InicisKey", html5InicisKey);
-
-        // 현재 로그인한 사용자의 정보 (이메일, idx)
-        List<String> memberInfo = new ArrayList<>();
-        String userEmail = memberService.currentLoggedInEmail();
-        memberInfo.add(userEmail);
-        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-        memberInfo.add(memberRegFormDTO.getId().toString());
-        model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
 
         return "payment/cart_list";
     }
