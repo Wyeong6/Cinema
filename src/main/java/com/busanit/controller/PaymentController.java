@@ -100,7 +100,7 @@ public class PaymentController {
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
 //        memberInfo.add(memberRegFormDTO.getId().toString());
         response.put("memberEmail", userEmail);
-        response.put("memberIdx", memberRegFormDTO.getId().toString());
+        response.put("memberName", memberRegFormDTO.getName());
 
         return response;
     }
