@@ -25,21 +25,34 @@ function requestPay() {
                 amount: response.currentPrice, // 결제 금액
                 buyer_email: response.memberEmail,
                 buyer_name: response.memberName,
-                m_redirect_url: '/payment/complete'
+                m_redirect_url: '/payment/complete' // 모바일이나 태블릿은 m_redirect_url 가 없으면 에러나는 경우가 있다고 함
             }, function(rsp) {
                 // let result = "";
                 if(rsp.success) {
-                    var msg = "결제가 완료되었습니다.";
-                    msg += "고유ID : " + rsp.imp_uid;
-                    msg += "상점 거래ID : " + rsp.merchant_uid;
-                    msg += "결제 금액 : " + rsp.paid_amount;
-                    msg += "카드 승인번호 : " + rsp.apply_num;
+                    // var msg = "결제가 완료되었습니다.";
+                    // msg += "고유ID : " + rsp.imp_uid;
+                    // msg += "상점 거래ID : " + rsp.merchant_uid;
+                    // msg += "결제 금액 : " + rsp.paid_amount;
+                    // msg += "카드 승인번호 : " + rsp.apply_num;
                     $.ajax({
-                        type: "GET",
-                        url: "payment/complete",
-                        data: {
-                            "amount": money
+                        type: "POST",
+                        url: "/payment/complete",
+                        data: $.param({
+                            "imp_uid": rsp.imp_uid,
+                            "merchant_uid": rsp.merchant_uid,
+                            "amount": rsp.paid_amount,
+                            "apply_num": rsp.apply_num,
+                            "payment_status": rsp.payment_status,
+                            "buyer_email": rsp.buyer_email
+                        }),
+                        success: function(response_complete) {
+                            alert(response_complete.merchant_uid);
+                            // 결제가 완료된 후 리디렉션할 페이지
+                            window.location.href = '/payment/paymentSuccessful';
                         },
+                        error: function() {
+                            alert("서버 통신에 실패했습니다.");
+                        }
                     });
 
                     // result = "0";
@@ -69,12 +82,29 @@ function requestPay() {
                     // self.formattedPrice = "";
                     // self.price = 0;
                     // self.isPlaceholderVisible = true;
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/payment/paymentFailed",
+                        data: JSON.stringify({
+                            err_msg: rsp.error_msg,
+                        }),
+                        contentType: 'application/json',
+                        success: function(response_failed) {
+                            alert(msg);
+                        },
+                        error: function() {
+                            alert('서버 통신에 실패했습니다.');
+                        }
+                    });
+
+                    // alert(msg);
                 }
                 // if(result === "0") {
                 //     alert("성공")
                 // }
                 // self.contractformcheck = false
-                alert(msg);
+                // alert(msg);
                 // document.location.href = "/" // alert창 확인 후 이동할 url
             });
         },

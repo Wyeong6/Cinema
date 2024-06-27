@@ -2,6 +2,7 @@ package com.busanit.controller;
 
 import com.busanit.domain.*;
 import com.busanit.domain.movie.MovieDTO;
+import com.busanit.entity.Payment;
 import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -87,7 +88,6 @@ public class PaymentController {
     @ResponseBody
     public Map<String, String> paymentRequest(@RequestBody Map<String, String> request) {
         /* html 파일에 결제 구동 스크립트 파일, 변수(3가지) 필요 */
-
         Map<String, String> response = new HashMap<>();
 
         response.put("html5InicisKey", html5InicisKey);
@@ -107,12 +107,57 @@ public class PaymentController {
         return response;
     }
 
-    @GetMapping("/complete")
-    public @ResponseBody void paymentComplete(Long amount) {
-        System.out.println(amount);
-//        int id = UserService.getIdFromAuth();
-//        paymentService.orderComplete(new PaymentDTO(amount), id);
-        // DB에 저장하는 로직 넣기
+    @PostMapping("/complete")
+    @ResponseBody
+    public Map<String, String> paymentComplete(@RequestParam String merchant_uid,
+                                               @RequestParam String amount,
+                                               @RequestParam String apply_num, // 카드 승인 번호
+                                               @RequestParam String payment_status,
+                                               @RequestParam String buyer_email, // 결제사에서 받아오는 메일이라 결제시 메일 주소 수정해서 보내면 로그인한 사람 메일과 다를 것 같아서 데이터 받아봄
+                                               PaymentDTO paymentDTO) {
+//    public Map<String, String> paymentComplete(@RequestBody Map<String, String> request, PaymentDTO paymentDTO) {
+
+        Map<String, String> response_complete = new HashMap<>();
+//        if(request != null) {
+//            response_complete.put("merchant_uid", request.get("merchant_uid"));
+//            response_complete.put("currentPrice", request.get("amount"));
+//            response_complete.put("apply_num", request.get("apply_num")); // 카드 승인 번호
+//            response_complete.put("payment_status", request.get("payment_status"));
+//            response_complete.put("buyer_email2", request.get("buyer_email")); // 결제사에서 받아오는 메일이라 결제시 메일 주소 수정해서 보내면 로그인한 사람 메일과 다를 것 같아서 데이터 받아봄
+//
+//            paymentDTO.setProductName("TEST 상품");
+//            paymentDTO.setMerchantUid(request.get("merchant_uid"));
+//            paymentDTO.setTotalPrice(Integer.parseInt(request.get("amount")));
+//            paymentDTO.setApplyNum(request.get("apply_num"));
+//            paymentDTO.setPaymentStatus(request.get("payment_status"));
+//            paymentDTO.setBuyerEmail(request.get("buyer_email"));
+
+        if(merchant_uid != null) {
+            paymentDTO.setProductName("TEST 상품");
+            paymentDTO.setMerchantUid(merchant_uid);
+            paymentDTO.setTotalPrice(Integer.parseInt(amount));
+            paymentDTO.setApplyNum(apply_num);
+            paymentDTO.setPaymentStatus(payment_status);
+            paymentDTO.setBuyerEmail(buyer_email);
+
+            paymentService.savePayment(Payment.toEntity(paymentDTO, memberService.findUserIdx(memberService.currentLoggedInEmail())));
+        }
+        return response_complete;
+    }
+
+    @GetMapping("/paymentSuccessful")
+    public String paymentSuccessful() {
+
+        return "payment/payment_complete";
+    }
+
+    @PostMapping("/paymentFailed")
+    @ResponseBody
+    public Map<String, String> paymentFailed(@RequestBody Map<String, String> request) {
+        Map<String, String> response_failed = new HashMap<>();
+        response_failed.put("response_failed", "response_failed");
+
+        return response_failed;
     }
 
     // 스낵 cart
