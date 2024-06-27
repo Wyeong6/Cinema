@@ -1,10 +1,10 @@
 <article id="mypage_private_info">
     <header>
-        <h3><a href="#">개인정보수정</a></h3>
+        <h4>개인정보수정</h4>
     </header>
     <section>
         <form action="/mypage/infoEdit" method="post">
-            <table class="default edit_info">
+            <table class="edit_info">
                 <tr>
                     <td>
                         <label for="name">이름 <b>*</b></label>
@@ -21,8 +21,8 @@
                         <input id="birth_date" maxlength="6" name="age" th:value="${member.age}" type="text"/>
                         <div>
                             <ul>
-                                <li>생일 쿠폰은 생일 당월 동안 사용 가능합니다.</li>
-                                <li>생일은 연 2회 수정 가능하며, 쿠폰 사용 전 수정한 경우 수정한 월을 기준으로 재발급 됩니다.</li>
+                                <li>생일 포인트는 생일 당월 동안 사용 가능합니다.</li>
+                                <li>생일은 연 2회 수정 가능하며, 포인트 사용 전 수정한 경우 수정한 월을 기준으로 재발급 됩니다.</li>
                             </ul>
                         </div>
                     </td>
@@ -31,8 +31,10 @@
                     <td>
                         <label for="email">이메일 <b>*</b></label></td>
                     <td>
-                        <input id="email" name="email" th:value="${member.email}" type="text"/>
-                        <button class="button" id="checkEmail">중복 확인</button>
+                        <div  id="input-email">
+                            <input id="email" name="email" th:value="${member.email}" type="text"/>
+                            <button class="button" id="checkEmail">중복 확인</button>
+                        </div>
                         <div>
                             <p id="email-available" style="color: #00C73C; display: none;">사용가능한 이메일 입니다.</p>
                             <p id="email-taken" style="color: #ff0000; display: none;">사용 중인 이메일 입니다.</p>

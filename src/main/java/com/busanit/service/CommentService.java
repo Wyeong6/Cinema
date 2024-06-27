@@ -64,6 +64,13 @@ public class CommentService {
         return CommentDTO.toDTOList(commentList);
     }
 
+    public List<CommentDTO> getAllComment() {
+        List<Comment> commentList = commentRepository.findAll();
+
+        return CommentDTO.toDTOList(commentList);
+
+    }
+
     //평균평점
     public Double getAverageRating(String movieId){
         return commentRepository.findAvgRatingByMovieId(Long.valueOf(movieId));
@@ -90,7 +97,9 @@ public class CommentService {
     }
     //댓글 삭제
     public void deleteComment(Long cno) {
-
         commentRepository.deleteById(cno);
     }
+
+
+
 }

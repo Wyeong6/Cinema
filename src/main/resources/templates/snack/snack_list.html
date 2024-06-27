@@ -8,28 +8,12 @@
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Cinemacast</title>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
-    <link href="/assets/css/main.css" rel="stylesheet"/>
-    <link href="/assets/css/custom.css" rel="stylesheet"/>
-    <link href="/assets/css/nav.css" rel="stylesheet"/>
-    <noscript>
-        <link href="/assets/css/noscript.css" rel="stylesheet"/>
-    </noscript>
-</head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
-
-        <!-- Header -->
-        <!--        <header data-include-path="header.html"></header>-->
-
         <div class="wrapper style1 snack_list list">
-
             <div class="container">
-                <article class="special" id="main">
+                <article id="main" class="special">
                     <header>
                         <h3>스낵 스토어</h3>
                         <p>
@@ -53,7 +37,7 @@
                         <p th:text="${snack.snack_price} + '원'"></p>
                     </article>
                 </div>
-                <div style="text-align: center" th:unless="${snackList.totalElements > 0}">
+                <div style="text-align: center;" th:unless="${snackList.totalElements > 0}">
                     <h4>상품을 준비중 입니다.</h4>
                 </div>
                 <div class="paging_btn">
@@ -76,27 +60,10 @@
                             <a th:href="@{/snack/snackList(page=${snackList.totalPages - 1})}">Last</a>
                         </li>
                     </ul>
-                    <ul th:unless="${snackList.totalElements > 0}">
-                        <li>
-                            <a>1</a>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>
     </div>
-
-    <!--    <footer data-include-path="footer.html"></footer>-->
-
-    <!-- Scripts -->
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/jquery.dropotron.min.js"></script>
-    <script src="/assets/js/jquery.scrolly.min.js"></script>
-    <script src="/assets/js/jquery.scrollex.min.js"></script>
-    <script src="/assets/js/browser.min.js"></script>
-    <script src="/assets/js/breakpoints.min.js"></script>
-    <script src="/assets/js/util.js"></script>
-    <script src="/assets/js/main.js"></script>
 
     <script>
         $(document).ready(function() {

@@ -1,10 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!-- Navbar -->
 
-</body>
-</html>
+<nav
+        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+        id="layout-navbar" style="margin-bottom: 10px;"
+>
+
+
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <input
+                        aria-label="Search..."
+                        class="form-control border-0 shadow-none"
+                        placeholder="Search..."
+                        type="text"
+                />
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+
+<!-- / Navbar -->
+
+<!-- Content -->
+
+<!-- Hoverable Table rows -->
+<div class="card">
+    <h5 class="card-header">Members List</h5>
+    <div class="table-responsive text-nowrap">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>리뷰 번호</th>
+                <th>영화 제목</th>
+                <th>내용</th>
+                <th>이메일</th>
+                <th>작성일자</th>
+                <th>평점</th>
+                <th>삭제</th>
+            </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+            <tr th:each="comment: ${commentList}">
+                <td><strong th:text="${comment.cno}">리뷰 번호</strong></td>
+                <td><a th:href="@{/movies/{id}(id=${comment.movieId})}" th:text="${comment.movieTitle}">영화 제목</a></td>                <td><strong th:text="${comment.comment}">댓글내용</strong></td>
+                <td th:text="${comment.memberEmail}">회원아이디(이메일)</td>
+                <td th:text="${comment.createDate}">작성일자</td>
+                <td th:text="${comment.grade}">평점</td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-movie-btn" th:data-cno-id="${comment.cno}">삭제</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.delete-movie-btn').on('click', function() {
+            const cno = $(this).attr('data-cno-id');
+            if (confirm('정말 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/movies/delete/' + cno,
+                    type: 'DELETE',
+                    success: function(result) {
+                        alert('리뷰가 삭제되었습니다.');
+                        location.reload();
+                    },
+                    error: function(err) {
+                        alert('삭제 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+        });
+    });
+</script>
+<!--/ Hoverable Table rows -->
+
+

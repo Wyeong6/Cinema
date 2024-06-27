@@ -1,39 +1,108 @@
-<style>
-    .movie-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        grid-gap: 20px;
-    }
-
-    .movie-item {
-        width: 100%;
-        text-align: center;
-    }
-
-    .movie-item img {
-        max-width: 100%;
-        height: auto;
-    }
-
-</style>
-
 <article id="mypage_favorite">
-    <header>찜한 영화 전체보기</header>
+    <header>
+        <h4>내가 찜한 영화</h4>
+    </header>
     <section>
-        <div th:if="${hasFavorites}">
-            <div class="movie-grid">
-                <div class="movie-item" th:each="movie : ${favoriteMovies}">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.moviePosterUrl}}" alt="포스터" />
-<!--                    <p class="movie-title" th:text="${movie.movieTitle}"></p>-->
-<!--                    <div class="movie-details">-->
-<!--                        <p th:text="${#temporals.format(movie.favoritedAt, 'yyyy-MM-dd')}"></p>-->
-<!--                        <img class="delete-btn" src="/images/delete.png" alt="삭제 버튼" />-->
+        <div class="row">
+            <div class="col-3" th:each="movie : ${favoriteMovies}">
+                <div class="movie-item-favorite">
+                    <input class="movie-id" type="hidden" th:value="${movie.movieId}" />
+                    <div class="favorite-container">
+                        <img id="favoriteButton" class="fav-icon favorited"
+                             src="/images/heart%20icon.png" alt="찜하기(좋아요)">
+                    </div>
+                    <a th:href="@{'/movies/' + ${movie.movieId}}">
+                        <img class="featured-img"
+                             th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.moviePosterUrl}}" alt="포스터" />
+                    </a>
+                    <!-- <p class="movie-title" th:text="${movie.movieTitle}"></p> -->
+<!--                    <div class="overlay">-->
+<!--                        <a href="#" class="details-button">상세보기</a>-->
 <!--                    </div>-->
                 </div>
             </div>
         </div>
         <div th:unless="${hasFavorites}">
-            <p>찜한 영화가 없습니다.</p>
+            <p style="margin-top: 2em">찜한 영화가 없습니다.</p>
         </div>
     </section>
 </article>
+<script th:inline="javascript">
+    // $(document).ready(function () {
+    //     $('#mypage_favorite').on('mouseenter', '.featured-img', function() {
+    //         $(this).closest('.movie-item-favorite').find('.overlay').show();
+    //     }).on('mouseleave', '.movie-item-favorite', function() {
+    //         $(this).closest('.movie-item-favorite').find('.overlay').hide();
+    //     });
+    // });
+
+    $(document).ready(function () {
+        const userEmail = /*[[${#authentication.name}]]*/ 'defaultEmail@example.com';
+
+        // "좋아요" 버튼 클릭 이벤트
+        $("#favoriteButton").click(function () {
+            const movieId = $('.movie-id').val();
+
+            // 현재 버튼의 상태 확인
+            const isFavorited = $('#favoriteButton').hasClass('favorited');
+
+            // "좋아요" 상태에 따라 AJAX 요청 처리
+            if (isFavorited) {
+                // 이미 "좋아요" 상태인 경우, 삭제 요청 보내기
+                $.ajax({
+                    url: '/favorites/' + userEmail + '/' + movieId,
+                    type: 'DELETE',
+                    success: function (response) {
+                        console.log("좋아요 삭제 성공");
+                        updateFavoriteButton(false); // 삭제 성공 시 버튼 UI 업데이트
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("좋아요 삭제 실패", error);
+                    }
+                });
+            } else {
+                // "좋아요" 등록 요청 보내기
+                $.ajax({
+                    url: '/favorites/' + userEmail + '/' + movieId,
+                    type: 'POST',
+                    success: function (response) {
+                        console.log("좋아요 등록 성공");
+                        updateFavoriteButton(true); // 등록 성공 시 버튼 UI 업데이트
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("좋아요 등록 실패", error);
+                    }
+                });
+            }
+        });
+
+        // 초기 "좋아요" 상태 설정
+        updateFavoriteState();
+
+        function updateFavoriteState() {
+            const movieId = $('.movie-id').val();
+
+            // API 호출을 통해 현재 "좋아요" 상태 가져오기
+            $.ajax({
+                url: '/favorites/check/' + userEmail + '/' + movieId,
+                type: 'GET',
+                data: {
+                    userEmail: userEmail,
+                    movieId: movieId
+                },
+                success: function (response) {
+                    const isFavorited = response.isFavorited;
+                    updateFavoriteButton(isFavorited); // 상태에 따라 버튼 UI 업데이트
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching current reaction:', status, error);
+                }
+            });
+        }
+
+        function updateFavoriteButton(isFavorited) {
+            const favoriteButton = $('#favoriteButton');
+            favoriteButton.toggleClass('favorited', isFavorited);
+        }
+    });
+</script>
