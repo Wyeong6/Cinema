@@ -1,11 +1,13 @@
 /* 상세 페이지 css 조정 */
 .still-cut-article {
-    width: 300px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 10px;
+}
+.still-cut-article img {
+    border-radius: 5px;
 }
 .favorite-container {
     display: flex;
@@ -53,52 +55,57 @@
 }
 /* 리액션 관련 css 시작 */
 .active {
-    width: 50px !important;
-    height: 50px !important;
-    filter: drop-shadow(0 0 3px #597aff) drop-shadow(0 0 4px #597aff) drop-shadow(0 0 5px #597aff); /* 이미지 부분만 그림자 적용가능하게함 (필터로) */
+    width: 30px !important;
+    height: 30px !important;
+    filter: drop-shadow(0 0 1px #F2E7AE) drop-shadow(0 0 2px #F2E7AE) drop-shadow(0 0 3px #F2E7AE); /* 이미지 부분만 그림자 적용가능하게함 (필터로) */
 }
 #likeButton {
-    width: 50px !important;
-    height: 50px !important;
+    width: 30px !important;
+    height: 30px !important;
 }
 #dislikeButton {
-    width: 50px !important;
-    height: 50px !important;
+    width: 30px !important;
+    height: 30px !important;
 }
 #sadButton {
-    width: 50px !important;
-    height: 50px !important;
+    width: 30px !important;
+    height: 30px !important;
 }
 #funnyButton {
-    width: 50px !important;
-    height: 50px !important;
+    width: 30px !important;
+    height: 30px !important;
 }
 #scaryButton {
-    width: 50px !important;
-    height: 50px !important;
+    width: 30px !important;
+    height: 30px !important;
 }
 .reaction-container {
+    width: 40%;
+    float: left;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 .reaction-item {
-    text-align: center;
-    margin: 0 20px; /* 각 항목 사이의 간격 조절 */
-    width: 95px;
+    padding: 0.2em 1em;
+    width: 19%;
+    box-shadow: 2px 2px 2px #dddddd;
+    background: #f0f2f4;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 .reaction-item img {
-    width: 50px; /* 이미지 너비 설정 */
-    height: 50px; /* 이미지 높이 설정 */
+    width: 30px; /* 이미지 너비 설정 */
+    height: 30px; /* 이미지 높이 설정 */
     cursor: pointer;
 }
-.reaction-item p {
-    text-align: center;
-    font-size: 13px;
+.reaction-item span {
+    font-weight: 400;
     margin: 0; /* 설명과 카운트 간격 조절 */
 }
 /* 리액션 관련 css 끝 */
-
 .hide {
     display: none;
 }
@@ -175,7 +182,6 @@
     height: 40px;
     cursor: pointer; /* 클릭 가능하도록 설정 */
 }
-/* 공지사항 리스트 */
 .hide {
     display: none;
 }
@@ -183,6 +189,7 @@
     max-width: 100%;
     max-height: 100%;
 }
+/* 공지사항 리스트 */
 .notice-table {
     width: 100%;
     border-collapse: collapse;

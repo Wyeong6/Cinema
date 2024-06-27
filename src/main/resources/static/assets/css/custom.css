@@ -2,6 +2,9 @@
     font-family: 'MyCustomFont';
     src: url('font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
+.cursor {
+    cursor: pointer;
+}
 .reservation_btn {
     font-size: 0.8em;
     color: #fff;
@@ -419,15 +422,13 @@ a#movie_title:not(:hover) {
     width: 1em;
     margin-left: 0;
 }
-#get_info .movie_info .certification-container h4 {
-    font-size: 0.8em;
-}
 #get_info .info_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 #get_info .info_header h3 {
+    margin-top: 0.5em;
     margin-right: auto; /* 제목을 왼쪽으로 정렬 */
 }
 #get_info .info_header .button_box {
@@ -437,10 +438,13 @@ a#movie_title:not(:hover) {
     margin-left: 1em; /* 버튼 사이의 여백 */
 }
 #get_info .movie_detail {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     margin-bottom: 0.5em;
 }
-#get_info .movie_detail span {
-    line-height: 0.8em;
+#get_info .movie_detail span b {
+    font-size: 1.2em;
 }
 #get_info .movie_info {
     margin-left: 5%;
@@ -531,41 +535,82 @@ a#movie_title:not(:hover) {
 }
 .movie_etc button {
     width: 50%;
-    height: 5%;
+    padding: 1em 0;
+    margin-bottom: 1em;
     font-size: 1em;
+    background: transparent;
+    color: #1e2c3c;
     border-radius: 0;
-    background: #fafafa;
-    color: #3B353C;
+    border-bottom: 2px solid #dddddd;
 }
 .movie_etc button:hover {
-    width: 50%;
-    height: 5%;
-    font-size: 1em;
-    border-radius: 0;
-    background: #e5e5e5;
-    color: #3B353C;
+    background: transparent;
+    color: #1e2c3c;
 }
 .movie_etc button.clicked {
-    background: #e5e5e5;
-    color: #3B353C;
+    font-weight: 400;
+    border-bottom: 2px solid #1e2c3c;
+}
+.still-cut {
+    padding-left: 40px !important;
+}
+.movie_get .more_btn {
+    width: 1em;
+}
+#reviews header {
+    display: block;
+    position: relative;
+}
+#reviews .modal_open {
+    margin-bottom: 1em;
+    float: right;
+    padding: 0.5em 0;
+    width: 15%;
+    font-size: 0.9em;
+    background-color: rgba(81, 85, 166, 0.8);
+}
+#reviews .modal_open:hover {
+    background: #5155A6;
 }
 #reviews .row {
+    display: block;
     margin: 0;
 }
 #reviews table {
-    margin-top: 2%;
+    margin-top: 3em;
     width: 100%;
+}
+#reviews table td {
+    padding-left: 0;
+    padding-right: 0;
 }
 #reviews table td p {
     text-align: left;
 }
-#reviews .modal_open {
-    margin-top: 2%;
-    width: 100%;
-    font-size: 1em;
-    border-radius: 0;
-    background: #483949;
-    color: #fff;
+.review {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.review-right {
+    margin-left: auto;
+}
+#reviews .review .review-user-email {
+    width: 20%;
+    text-align: left;
+}
+#reviews .review-emoji {
+    font-size: 2em;
+}
+#reviews .review-right {
+    float: right;
+}
+#reviews .review-right .delete-btn {
+    background: transparent;
+    color: #1e2c3c;
+    font-size: 0.8em;
 }
 /* 리뷰 모달 */
 #review_modal {
@@ -631,17 +676,16 @@ a#movie_title:not(:hover) {
 #review_modal button:first-child:hover {
     background: #e5e5e5;
 }
-#stillcut {
+#still-cut {
     padding-top: 2%;
 }
-#stillcut h3 {
+#still-cut h3 {
     padding-bottom: 2%;
     font-size: 40px;
 }
-#stillcut p, #reviews > #showMore_review, #reviews > #showLess_review {
+#still-cut p, #reviews > #showMore_review, #reviews > #showLess_review {
     text-align: center;
  }
-
 /* 현재 상영작 페이지*/
 .list {
     min-height: 600px;
