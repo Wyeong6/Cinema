@@ -3,36 +3,9 @@
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  xmlns:sec="http://www.w3.org/1999/xhtml"
 	  xmlns:th="http://www.thymeleaf.org">
-<head>
-	<title>Cinemacast</title>
-	<meta charset="utf-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-	<link rel="stylesheet" href="/assets/css/main.css"/>
-	<link rel="stylesheet" href="/assets/css/custom.css"/>
-	<link rel="stylesheet" href="/assets/css/nav.css"/>
-	<noscript>
-		<link rel="stylesheet" href="/assets/css/noscript.css"/>
-	</noscript>
-	<style>
-		.pagination{
-			text-align: center;
-			margin-top: 20px;
-		}
-		.current-page {
-			pointer-events: none;
-			cursor: default;
-			color: #000; /* 기본 글자 색상 */
-			font-weight: bold; /* 강조 */
-		}
-	</style>
-</head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
 	<div id="page-wrapper">
-
-		<!-- Header -->
-		<header data-include-path="header.html"></header>
-
 		<!-- Main movie_list 한 페이지에 16개 정도되게 해주세요 -->
 		<div class="wrapper style1 movie_list">
 
@@ -41,7 +14,7 @@
 			<div class="container">
 				<article id="main" class="special">
 					<header>
-						<h2><a href="#">전체 영화</a></h2>
+						<h3>전체 영화</h3>
 						<p>
 							CINEMACAST의 모든 영화를 만나보세요!
 						</p>
@@ -51,7 +24,7 @@
 				<div class="row">
 					<article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${moviePage.content}">
 						<a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-							<img th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/>
+							<img class="featured-img fixed-height-image" th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/>
 						</a>
 						<header>
 							<h4>
@@ -66,52 +39,24 @@
 				<!-- 페이지네이션 -->
 				<div class="pagination">
 					<a href="#" th:if="${moviePage.hasPrevious()}"
-					   th:href="@{/allMovies(page=${moviePage.number - 1})}">이전</a>
+					   th:href="@{/allMovies(page=${moviePage.number - 1})}">
+						<img class="movement-btn" src="/images/left-arrow.png" alt="다음페이지" />
+					</a>
 					<span th:each="pageNum : ${#numbers.sequence(0, moviePage.totalPages - 1)}">
         <a th:href="@{/allMovies(page=${pageNum})}"
+		   class="page"
 		   th:classappend="${pageNum == moviePage.number} ? ' current-page' : ''"
-		   th:text="'[' + (${pageNum + 1}) + ']'" th:if="${pageNum != moviePage.number}"></a>
-        <span th:if="${pageNum == moviePage.number}" th:text="'[' + (${pageNum + 1}) + ']'" class="current-page"></span>
+		   th:text="${pageNum + 1}" th:if="${pageNum != moviePage.number}"></a>
+        <span th:if="${pageNum == moviePage.number}" th:text="${pageNum + 1}" class="current-page"></span>
     </span>
 					<a href="#" th:if="${moviePage.hasNext()}"
-					   th:href="@{/allMovies(page=${moviePage.number + 1})}">다음</a>
+					   th:href="@{/allMovies(page=${moviePage.number + 1})}">
+						<img class="movement-btn" src="/images/right-arrow.png" alt="다음페이지" />
+					</a>
 				</div>
 			</div>
 		</div>
-
-		<footer data-include-path="footer.html"></footer>
-
 	</div>
-
-	<!-- Scripts -->
-	<script src="/assets/js/jquery.min.js"></script>
-	<script src="/assets/js/jquery.dropotron.min.js"></script>
-	<script src="/assets/js/jquery.scrolly.min.js"></script>
-	<script src="/assets/js/jquery.scrollex.min.js"></script>
-	<script src="/assets/js/browser.min.js"></script>
-	<script src="/assets/js/breakpoints.min.js"></script>
-	<script src="/assets/js/util.js"></script>
-	<script src="/assets/js/main.js"></script>
-
-	<script>
-		// include.js
-		window.addEventListener('load', function () {
-			var allElements = document.getElementsByTagName('*');
-			Array.prototype.forEach.call(allElements, function (el) {
-				var includePath = el.dataset.includePath;
-				if (includePath) {
-					var xhttp = new XMLHttpRequest();
-					xhttp.onreadystatechange = function () {
-						if (this.readyState == 4 && this.status == 200) {
-							el.outerHTML = this.responseText;
-						}
-					};
-					xhttp.open('GET', includePath, true);
-					xhttp.send();
-				}
-			});
-		}); // 이 부분을 추가하여 괄호를 닫습니다.
-	</script>
 </th:block>
 </body>
 </html>

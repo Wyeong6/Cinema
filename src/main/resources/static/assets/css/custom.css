@@ -2,6 +2,11 @@
     font-family: 'MyCustomFont';
     src: url('font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
+.reservation_btn {
+    font-size: 0.8em;
+    color: #fff;
+    padding: 0.5em 1em 0.5em 1em;
+}
 #header {
     background-size: cover;
     background-position: center;
@@ -40,20 +45,20 @@
     position: relative;
 }
 #info .chat-alarm .chat-img {
-    width: 30px; /* 이미지의 고정 너비를 설정 */
+    width: 20px; /* 이미지의 고정 너비를 설정 */
     height: auto; /* 이미지의 높이를 자동으로 조절 */
     display: inline-block; /* 이미지를 인라인 블록 요소로 설정 */
     vertical-align: middle; /* 이미지를 수직 중앙에 정렬 */
 }
 #info .chat-alarm div {
     position: absolute;
-    width: 20px;
-    height: 20px;
-    top: 0;
-    right: -20%; /* 부모 요소의 왼쪽에서 70% 위치 (50% + 20% 오른쪽으로 이동) */
+    width: 15px;
+    height: 15px;
+    top: 10%;
+    right: -10%; /* 부모 요소의 왼쪽에서 70% 위치 (50% + 20% 오른쪽으로 이동) */
     font-weight: 700;
-    font-size: 13px;
-    line-height: 20px;
+    font-size: 10px;
+    line-height: 14px;
     background: #e45649;
     border-radius: 50%;
 }
@@ -80,7 +85,7 @@
 .video-modal .modal-body {
     margin-top: 5%;
     text-align: center;
-    width: 80%;
+    width: 60%;
     position: absolute;
     top: 100%;
     left: 50%;
@@ -88,22 +93,21 @@
 }
 .video-frame {
     width: 100%; /* iframe이 부모 요소에 맞게 100% 너비를 가집니다. */
-    max-height: calc(100vh - 120px); /* 모달 창의 높이 제한 */
+    max-height: calc(100vh - 200px); /* 모달 창의 높이 제한 */
     border: none; /* 테두리 없음 */
 }
 .wrapper {
     margin-top: 1em;
 }
 #side_nav {
-    width: 7em;
+    width: 4em;
     position: fixed;
     top: 28%;
     right: 2%;
     background: #f0f4f4;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 0.8em;
     border-radius: 10px;
-    z-index: 999999999;
+    z-index: 999;
 }
 #side_nav ul {
     padding: 1em 0.5em;
@@ -115,8 +119,12 @@
     text-align: center;
     cursor: pointer;
 }
+#side_nav li .fa-1\.5x{
+    font-size: 1.5em;
+}
 #side_nav li p {
     text-align: center;
+    font-size: 0.6em;
 }
 #banner header {
     width: 90% !important;
@@ -280,11 +288,6 @@ a#movie_title:not(:hover) {
     padding: 0.5em 0.5em 0;
     z-index: 99999;
 }
-.carousel .button_box .reservation_btn {
-    font-size: 0.8em;
-    color: #fff;
-    padding: 0.5em 1em 0.5em 1em;
-}
 .carousel .button_box .get_btn {
     font-size: 0.8em;
     z-index: 99999;
@@ -320,29 +323,24 @@ a#movie_title:not(:hover) {
     grid-template-columns: repeat(5, 1fr); /* 5개의 동일한 너비의 컬럼 생성 */
     gap: 0.8em; /* 컬럼 간격 */
 }
-
 .custom-col {
     margin-bottom: 20px; /* 하단 마진 추가 */
 }
-
 @media (max-width: 1200px) {
     .custom-grid {
         grid-template-columns: repeat(4, 1fr); /* 작은 화면에서는 4개의 컬럼 */
     }
 }
-
 @media (max-width: 992px) {
     .custom-grid {
         grid-template-columns: repeat(3, 1fr); /* 더 작은 화면에서는 3개의 컬럼 */
     }
 }
-
 @media (max-width: 768px) {
     .custom-grid {
         grid-template-columns: repeat(2, 1fr); /* 작은 화면에서는 2개의 컬럼 */
     }
 }
-
 @media (max-width: 480px) {
     .custom-grid {
         grid-template-columns: 1fr; /* 모바일 화면에서는 1개의 컬럼 */
@@ -351,7 +349,30 @@ a#movie_title:not(:hover) {
 .featured-img {
     border-radius: 10px;
 }
-
+/* 무비 리스트 */
+.movie_list .fixed-height-image {
+    height: 400px;
+}
+.pagination {
+    margin-top: 3em;
+    text-align: center;
+}
+.pagination .page {
+    padding: 0 0.4em;
+    font-weight: 300;
+    color: #d9dee3;
+    cursor: pointer;
+}
+.pagination .current-page {
+    padding: 0 0.4em;
+    font-weight: 400;
+    color: #5155A6;
+    cursor: pointer;
+}
+.pagination .movement-btn {
+    width: 0.8em;
+    cursor: pointer;
+}
 /* 상세 페이지 */
 /*.wrapper .container #main img {*/
 /*    width: 100%*/
@@ -360,31 +381,77 @@ a#movie_title:not(:hover) {
     display: flex;
     justify-content: flex-start;
 }
+#get_info .image > img {
+    width: 350px;
+    height: 480px;
+}
+#get_info .image {
+    position: relative;
+    width: 350px;
+    height: 480px;
+    margin-bottom: 0;
+}
+#get_info .image > img {
+    z-index: 0;
+}
+.movie-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    border-radius: 10px;
+    display: none;
+}
+.movie-overlay img {
+    width: 2em !important;
+    height: auto;
+}
+#get_info .movie_info {
+    position: relative;
+}
+#get_info .movie_info .certification-container {
+    margin-bottom: 0.5em;
+}
+#get_info .movie_info .certification-container img {
+    width: 1em;
+    margin-left: 0;
+}
+#get_info .movie_info .certification-container h4 {
+    font-size: 0.8em;
+}
 #get_info .info_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-
-#get_info .info_header h2 {
+#get_info .info_header h3 {
     margin-right: auto; /* 제목을 왼쪽으로 정렬 */
 }
-
+#get_info .info_header .button_box {
+    margin-top: 0;
+}
 #get_info .info_header .button {
     margin-left: 1em; /* 버튼 사이의 여백 */
 }
-
+#get_info .movie_detail {
+    margin-bottom: 0.5em;
+}
+#get_info .movie_detail span {
+    line-height: 0.8em;
+}
 #get_info .movie_info {
     margin-left: 5%;
     vertical-align: center;
 }
 #get_info .movie_info div > span {
-    border-right: 1px solid #000;
     padding: 0 10px;
+    font-size: 0.8em;
 }
-#get_info .movie_info div > span.genres {
-    border-right: none;
-    padding: 0 5px;
+#get_info .movie_info > h4.genres {
+    font-size: 0.8em;
 }
 .last-genre {
     border-right: 1px solid #000 !important;
@@ -421,11 +488,37 @@ a#movie_title:not(:hover) {
 #get_info .movie_data {
     margin-right: 5%;
 }
+#get_info .button_box {
+    margin-top: 0 !important;
+}
+#get_info .movie_info > .button_box {
+    position: absolute;
+    bottom: 0;
+}
+#get_info .reservation_btn {
+    padding: 0.6em 5em;
+    font-size: 1em;
+    font-weight: 400;
+}
+#get_info .video_btn {
+    margin-left: 1em;
+}
+#get_info .video_btn img {
+    width: 100%;
+    height: auto;
+}
+#get_info
 .indicator-line {
     height: 4px;
     background-color: #333;
     width: 30%;
     transition: transform 0.1s ease-out;
+}
+.movie_get .cast {
+    margin: 6em 0;
+}
+.movie_get .cast h4 {
+    margin-bottom: 0.5em;
 }
 .movie_etc {
     margin-top: 5%;
@@ -699,6 +792,9 @@ a#movie_title:not(:hover) {
 .notice_get table {
     margin: 4em 0 2em;
 }
+.notice_get table tr td {
+    font-size: 0.8em;
+}
 .notice_get table tr td:first-child{
     text-align: center;
     width: 30%;
@@ -706,8 +802,12 @@ a#movie_title:not(:hover) {
 .notice_get button {
     margin: 0 auto;
     display: block; /* 버튼을 블록 요소로 설정 */
-    font-size: 1em;
-    padding: 0.2em 2em;
+    font-size: 0.8em;
+    padding: 0.5em 2em;
+    background: rgba(81, 85, 166, 0.8);
+}
+.notice_get button:hover {
+    background: #5155A6;
 }
 /* cart_list */
 .cart_list {
@@ -747,13 +847,13 @@ td p {
     width: 15%;
 }
 #cart_list_section table tr td:nth-child(1) {
-    width: 15%;
+    width: 13%;
 }
 #cart_list_section table tr td:nth-child(1) img {
     width: 100%;
 }
 #cart_list_section table tr td:nth-child(2) {
-    width: 30%;
+    width: 32%;
     padding: 0;
     word-break: keep-all;
 }
@@ -874,16 +974,19 @@ article#pay > button {
 #mypage_private_info td {
     padding: 0.8em 0 0.8em 0.5em;
     text-align: left;
+    font-size: 0.8em;
     border-bottom: 2px solid #efefef;
 }
 #mypage_private_info td input {
     padding: 0.5em 1em;
+    font-size: 1em;
 }
 #mypage_private_info ul li {
     list-style-type: disc;
 }
 #mypage_private_info .info_submit_box button {
     padding: 0.5em 2em;
+    font-size: 0.8em;
 }
 #input-email {
     display: flex;
@@ -905,9 +1008,9 @@ article#pay > button {
     border: 1px solid #aaaaaa;
 }
 .edit_info tr td:nth-child(2) button {
-    font-size: 0.8em;
+    font-size: 0.7em;
     margin-left: 10px;
-    padding: 0.3em 1.5em 0.3em 1.5em;
+    padding: 0.3em 1em 0.3em 1em;
     background: #e5e5e5;
     color: #3B353C;
 }
@@ -1107,6 +1210,9 @@ article#pay > button {
     display: flex;
     justify-content: space-between;
 }
+#mypage_point table td p {
+    font-size: 0.8em;
+}
 .plus-point {
     color: #007bff;
 }
@@ -1134,7 +1240,7 @@ article#pay > button {
     top: 5%;
     right: 5%;
     width: 1.5em;
-    z-index: 99;
+    z-index: 99999;
 }
 .movie-item-favorite img.featured-img {
     width: 100%;
