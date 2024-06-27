@@ -144,11 +144,12 @@
 
     // 메시지 전송 함수
     function sendMessage() {
-        var messageContent = document.getElementById('message').value; // 입력된 메시지 내용 가져오기
+        var messageContent = document.getElementById('message').value;
         console.log("메세지전송의 ChatRoomId" + chatRoomId)
         console.log("메세지전송의 recipient" + recipient)
 
-        if (!messageContent) return; // 메시지 내용이 없으면 함수 종료
+        // 메시지 내용이 없으면 함수 종료
+        if (!messageContent) return;
 
         var message = {
             chatRoomId: chatRoomId,
@@ -164,7 +165,6 @@
             }
         };
 
-        console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
         stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
         showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
         document.getElementById('message').value = ''; // 입력 필드를 비움
@@ -280,9 +280,8 @@
 
             // 각 메시지 객체를 순회
             data.forEach(item => {
-                // 여기서 'messages' 필드가 실제 메시지 배열을 가지고 있음
                 if (Array.isArray(item.messages) && item.messages.length > 0) {
-                    messageExist = true; // 메시지가 존재함을 표시
+                    messageExist = true;
                     item.messages.forEach(message => {
                         recipient = message.sender;
                         chatRoomTitle = message.chatRoomTitle;

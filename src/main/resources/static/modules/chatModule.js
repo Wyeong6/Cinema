@@ -198,7 +198,7 @@ function displayRoomList(roomList, $container) {
                 <td>${truncatedContent} (${chatRoom.unreadMessageCount}개 메시지)</td>
                 <td>${chatRoom.userEmail}</td>
                 <td>${chatRoom.userName}</td>
-                <td data-createdat='${lastMessageCreatedAt}'> <span class="time-since-created"></span></td>
+                <td data-createdAt='${lastMessageCreatedAt}'> <span class="time-since-created"></span></td>
             </tr>`;
 
         // 생성한 행을 채팅 목록에 추가

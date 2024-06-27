@@ -133,17 +133,8 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
     // mypage 회원탈퇴
     public void memberDelete(Long memberId) {
 
-        // 멤버가 속한 채팅룸들을 가져옵니다.
-        List<ChatRoom> chatRooms = chatRoomRepository.findByMembersId(memberId);
-
         memberRepository.deleteById(memberId);
 
-//        // 각 채팅룸에 남아있는 멤버 수를 확인하고, 필요한 경우 채팅룸을 삭제합니다.
-//        for (ChatRoom chatRoom : chatRooms) {
-//            if (chatRoom.getMembers().isEmpty()) {
-//                chatRoomRepository.delete(chatRoom);
-//            }
-//        }
     }
 
     // 개인정보(이메일(단수)) masking

@@ -48,17 +48,13 @@ public class ChatController {
         System.out.println("브로드캐스팅 완료!");
     }
 
-
     //로그인 여부확인 후 페이지이동
     @GetMapping("/chatUser")
     public String chatUser(Model model) {
-//        if (chatService.isAuthenticated()) {
         String userEmail = chatService.getAuthenticatedUserEmail();
         model.addAttribute("userEmail", userEmail);
-        return "/cs/chat"; // templates 폴더의 chat.html 파일을 렌더링
-//        } else {
-//            return "redirect:/login"; // 로그인 페이지로 리다이렉트
-//        }
+
+        return "/cs/chat";
     }
 
     //관리자 채팅방입장 알림
@@ -66,7 +62,7 @@ public class ChatController {
     public void sendAdminEnter(@Payload EnterNotificationDTO enterNotificationDTO) {
 
 
-
+        System.out.println("채팅방나감 컨트롤");
         messagingTemplate.convertAndSendToUser(enterNotificationDTO.getRecipient(), "/queue/private/" + enterNotificationDTO.getChatRoomId(), enterNotificationDTO);
     }
 
@@ -77,12 +73,17 @@ public class ChatController {
             // 채팅 종료할 경우
             if ("inactive".equals(messageDTO.getStatus())) {
                 chatService.updateChatRoomStatus(messageDTO.getChatRoomId(), "inactive");
-            }else if("active".equals(messageDTO.getStatus())){
-                chatService.saveMessage(messageDTO);
+            } else if ("active".equals(messageDTO.getStatus()) && "enter".equals(messageDTO.getType())) {
+                // "active" 상태이면서 "enter" 타입인 경우
+                chatService.saveMessage(messageDTO); // 메시지 저장
+            chatService.updateLastReadTimestamp(messageDTO.getChatRoomId(), messageDTO.getRecipient()); // 마지막 읽은 시간 업데이트
+                System.out.println("유저가 입장햇을때 ");
+
+            } else if ("active".equals(messageDTO.getStatus())) {
+                // "active" 상태인 경우
+                chatService.saveMessage(messageDTO); // 메시지 저장
+                System.out.println("유저가 입장안햇을때  ");
             }
-    //        else if("enter".equals(messageDTO.getType())){
-    //            chatService.updateLastReadTimestamp(messageDTO.getChatRoomId());
-    //        }
 
             // 메시지 처리 후, 채팅 리스트 업데이트 요청
             PageUpdateDTO pageUpdateDTO = messageDTO.getPaging();
@@ -116,20 +117,16 @@ public class ChatController {
     @GetMapping("/chat/clickChat/{chatRoomId}")
     @ResponseBody
     public List<ChatRoomDTO> getClickChat(@PathVariable Long chatRoomId) {
-        System.out.println("클릭한이전메세지가져옴");
         return chatService.findChatRoomByChatRoomId(chatRoomId);
     }
 
+    //모달창 열려있을 때 메세지 상태변경
     @PostMapping("/chat/updateLastReadTimestamp/{chatRoomId}")
     @ResponseBody
     public ResponseEntity<Page<ChatRoomDTO>> updateLastReadTimestamp(@PathVariable Long chatRoomId) {
 
-        System.out.println("오픈모달창중 읽기");
         chatService.updateLastReadTimestamp(chatRoomId);
-
         String userEmail = chatService.getAuthenticatedUserEmail();
-
-        // 전체 채팅방 정보 가져오기
         Page<ChatRoomDTO> chatRooms = chatService.getChatList(1, 1, userEmail); // 이 메서드는 전체 채팅방 정보를 가져오는 것으로 가정합니다.
 
         return ResponseEntity.ok(chatRooms);
@@ -139,7 +136,6 @@ public class ChatController {
     @GetMapping("/chat/getRecipientEmail")
     @ResponseBody
     public List<String> getRecipient() {
-
         return chatService.findCHatRoomByRecipient();
     }
 
@@ -150,6 +146,7 @@ public class ChatController {
         messagingTemplate.convertAndSendToUser(typingIndicatorDTO.getRecipient(), "/queue/private/" + typingIndicatorDTO.getChatRoomId(), typingIndicatorDTO);
     }
 
+    //메세지보낼 때 채팅리스트 업데이트
     public void updateChatList(String sender, String recipient, int activePage, int inactivePage, int size) {
 
         Page<ChatRoomDTO> activeChatRooms = chatService.getActiveChatList(activePage - 1, size, recipient);
@@ -167,7 +164,7 @@ public class ChatController {
         messagingTemplate.convertAndSendToUser(recipient, "/queue/chatList", combinedResponse);
 
     }
-
+    //페이징
     private Map<String, Object> addPagingChatList(String type, Page<ChatRoomDTO> chatRooms, int page, String memberEmail) {
         int totalPages = chatRooms.getTotalPages();
         int startPage = Math.max(1, page - 5);
