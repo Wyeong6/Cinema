@@ -30,7 +30,7 @@
                         <tr>
                             <td class="ticket-info">
                                 <img th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" />
-                                <div class="ticket-movie-title"><img src="" alt="연령등급 이미지" /><h4 th:text="${movie.title}">영화 제목</h4></div>
+                                <div class="ticket-movie-title"><img src="" alt="연령등급 이미지" /><h4 th:text="${movie.title}" id="movieTitle">영화 제목</h4></div>
                                     <table>
                                         <tr>
                                             <th>일시</th>
@@ -115,9 +115,15 @@
 
     <script th:inline="javascript">
         /* 결제 프로그램 사용시 필요한 변수 */
+        const productIdx = document.getElementById("movieId").value;
+        const content1 = [[${scheduleDTO.date}]]; // 상영일자
+        const content2 = [[${scheduleDTO.startTime}]]; // 시간
+        const content3 = [[${scheduleDTO.theaterName}]]; // 상영관
+        const content4 = [[${scheduleDTO.theaterNumber}]]; // 좌석
+        let productCount = null;
         let currentPrice = null;
-        const orderName = "예매하기"; // 결제시 사용할 이름(제품명)
-        const reqIDX = "MO" // 결제를 요청한 페이지 IDX
+        const orderName = document.getElementById("movieTitle").textContent; // 결제시 사용할 이름(제품명)
+        const reqIDX = "MO"; // 결제를 요청한 페이지 IDX
 
         /*<![CDATA[*/
         $(document).ready(function () {
@@ -186,6 +192,7 @@
             const adultCount = parseInt($('#adult-cnt').data('cnt')) || 0;
             const teenagerCount = parseInt($('#teenager-cnt').data('cnt')) || 0;
             const grandCount = parseInt($('#grand-cnt').data('cnt')) || 0;
+            productCount = "성인:"+adultCount+" 청소년:"+teenagerCount+" 경로:"+grandCount;
 
             const selectedSeats = [];
             $('.seat-info').each(function() {
@@ -221,7 +228,6 @@
             });
         }
     </script>
-
 
 
     <script src="/assets/js/jquery.dropotron.min.js"></script>

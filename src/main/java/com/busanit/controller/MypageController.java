@@ -194,6 +194,7 @@ public class MypageController {
         System.out.println("favoriteMovies === " + favoriteMovies.size());
         return "/mypage/mypage_favorite";
     }
+
     @GetMapping("/infoEdit")
     public String mypageEdit(@AuthenticationPrincipal Object principal, Model model) {
         String userEmail = null;
