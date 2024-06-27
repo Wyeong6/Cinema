@@ -25,7 +25,6 @@ function requestPay() {
                 amount: response.currentPrice, // 결제 금액
                 buyer_email: response.memberEmail,
                 buyer_name: response.memberName,
-                // buyer_tel: "010-0000-0000",
                 m_redirect_url: '/payment/complete'
             }, function(rsp) {
                 // let result = "";
