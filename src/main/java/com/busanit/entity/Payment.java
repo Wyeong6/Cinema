@@ -34,7 +34,7 @@ public class Payment extends BaseTimeEntity {
     private String content2; // 시간
     private String content3; // 상영관
     private String content4; // 좌석
-    private String productCount; // 개수 (영화 예시: 성인:1, 청소년:1, 경로:0)
+    private String productCount; // 개수 (영화 예시: 성인:1 청소년:1 경로:0)
     private Integer totalPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
