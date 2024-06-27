@@ -12,37 +12,196 @@
     justify-content: center;
 }
 .favorited {
-    filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-50deg) drop-shadow(0 0 3px rgba(255, 0, 0, 0.5)); /* 빨간색으로 변환 */
+    filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-30deg) drop-shadow(0 0 1.5px #F24949);
+}
+.movie_data_box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.movie_data,
+.btn_box {
+    display: flex;
+    align-items: center;
+}
+.movie-title-box {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
+.movie_data_averageRating {
+    flex: 1;
+    margin-left: 10px;
+}
+.movie_data_averageRating p {
+    margin-bottom: 0;
+}
+.fav-icon {
+    width: 1.5em !important;
+    height: auto !important;
+    cursor: pointer;
+    transition: background-color 0.3s; /* 부드러운 색상 전환 효과 */
+}
+#kakao_btn {
+    width: 1.5em !important;
+    height: auto !important;
+    cursor: pointer;
+}
+.movie_get .button_box {
+    flex-direction: row;
+    justify-content: left !important;
+}
+/* 리액션 관련 css 시작 */
+.active {
+    width: 50px !important;
+    height: 50px !important;
+    filter: drop-shadow(0 0 3px #597aff) drop-shadow(0 0 4px #597aff) drop-shadow(0 0 5px #597aff); /* 이미지 부분만 그림자 적용가능하게함 (필터로) */
+}
+#likeButton {
+    width: 50px !important;
+    height: 50px !important;
+}
+#dislikeButton {
+    width: 50px !important;
+    height: 50px !important;
+}
+#sadButton {
+    width: 50px !important;
+    height: 50px !important;
+}
+#funnyButton {
+    width: 50px !important;
+    height: 50px !important;
+}
+#scaryButton {
+    width: 50px !important;
+    height: 50px !important;
+}
+.reaction-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.reaction-item {
+    text-align: center;
+    margin: 0 20px; /* 각 항목 사이의 간격 조절 */
+    width: 95px;
+}
+.reaction-item img {
+    width: 50px; /* 이미지 너비 설정 */
+    height: 50px; /* 이미지 높이 설정 */
+    cursor: pointer;
+}
+.reaction-item p {
+    text-align: center;
+    font-size: 13px;
+    margin: 0; /* 설명과 카운트 간격 조절 */
+}
+/* 리액션 관련 css 끝 */
+
+.hide {
+    display: none;
+}
+.still-cut-article img {
+    max-width: 100%;
+    max-height: 100%;
+}
+/* 이미지클릭시 띄우는 모달 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999999;
+    padding-top: 60px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.9);
+}
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 100%;
+    max-width: 1200px;
+}
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+/* 비디오 모달 관련 CSS */
+.video-modal-content {
+    width: 80%; /* 모달 너비, 필요에 따라 조정 */
+    max-width: 640px; /* 최대 너비, 필요에 따라 조정 */
+}
+#videoFrame {
+    width: 100%; /* iframe의 너비를 부모 요소에 맞춤 */
+    height: 720px; /* 높이, 필요에 따라 조정 */
+}
+.video-modal-content {
+    width: 100%; /* 영상 크기 조정 */
+    max-width: 1280px; /* 최대 크기 설정 */
+    margin: auto; /* 수평 중앙 정렬 */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 화면 중앙 정렬 */
+    z-index: 1000; /* 필요에 따라 조정 */
+}
+/*안읽은 메세지 고정*/
+.fixed-bottom-right {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: none; /* 초기에는 숨김 */
+}
+.fixed-bottom-right img {
+    width: 40px; /* 이미지 크기에 맞게 조정 */
+    height: 40px;
+    cursor: pointer; /* 클릭 가능하도록 설정 */
 }
 /* 공지사항 리스트 */
 .hide {
     display: none;
 }
-
 .still-cut-article img {
     max-width: 100%;
     max-height: 100%;
 }
-
 .notice-table {
     width: 100%;
     border-collapse: collapse;
 }
-
 .notice-table th, .notice-table td {
     padding: 10px;
     text-align: center;
-    border: none; /* 테두리 선 없애기 */
+    border: none;
 }
-
 .notice-table th {
     background-color: #f2f2f2; /* 헤더 배경색 설정 */
 }
-
 .notice-table tbody tr {
     border-bottom: 1px solid #ddd; /* 각 행 사이에 회색 선 추가 */
 }
-
+.notice_get header p img {
+    width: 1em;
+    margin-right: 0.5em;
+}
 /* 관리자 페이지 - 상영관관리 */
 .container-xxl h4 {
     margin-top: 0.7em;
@@ -156,7 +315,6 @@ div.mb-3 {
  }
 .paging_btn ul {
     margin: 0 auto;
-    width: 20%;
     display: flex;
     justify-content: space-between;
 }

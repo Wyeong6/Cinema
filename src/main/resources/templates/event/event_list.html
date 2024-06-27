@@ -10,10 +10,7 @@
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
-
-        <!-- Main movie_list 한 페이지에 16개 정도되게 해주세요 -->
         <div class="wrapper style1 movie_list list">
-
             <div class="container">
                 <article id="main" class="special">
                     <header>
@@ -45,9 +42,9 @@
                     <h4>준비중 입니다.</h4>
                 </div>
             </div>
-            <div style="text-align: center;" th:if="${!#lists.isEmpty(eventList.content)}">
+            <div class="pagination" th:if="${!#lists.isEmpty(eventList.content)}">
                 <a th:href="@{'/event/eventList?page=' + ${i}}" th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                   class="paging-btn" th:text="'[' + ${i} + ']'"></a>
+                   class="page" th:text="${i}"></a>
             </div>
         </div>
 
