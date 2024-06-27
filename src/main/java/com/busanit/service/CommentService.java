@@ -9,6 +9,9 @@ import com.busanit.repository.MemberRepository;
 import com.busanit.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -26,6 +30,11 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final MovieRepository movieRepository;
     private final MemberRepository memberRepository;
+
+
+    public long getTotalComments() {
+        return commentRepository.count();
+    };
 
     //댓글쓰기
     public void register(CommentDTO commentDTO) {
@@ -64,12 +73,16 @@ public class CommentService {
         return CommentDTO.toDTOList(commentList);
     }
 
-    public List<CommentDTO> getAllComment() {
-        List<Comment> commentList = commentRepository.findAll();
+    public List<CommentDTO> getCommentsWithPaging(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
 
-        return CommentDTO.toDTOList(commentList);
+        Page<Comment> commentPage = commentRepository.findAll(pageable);
 
+        List<CommentDTO> commentList = commentPage.getContent().stream().map(CommentDTO::convertToDTO).collect(Collectors.toList());
+
+        return commentList;
     }
+
 
     //평균평점
     public Double getAverageRating(String movieId){
@@ -100,6 +113,8 @@ public class CommentService {
         commentRepository.deleteById(cno);
     }
 
-
+    public Page<CommentDTO> getAllComments(Pageable pageable) {
+        return commentRepository.findAll(pageable).map(comment -> new CommentDTO(comment));
+    }
 
 }

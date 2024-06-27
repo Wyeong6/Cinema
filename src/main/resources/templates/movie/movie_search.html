@@ -18,6 +18,11 @@
             text-align: center;
             margin-top: 20px;
         }
+
+        .row {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body class="no-sidebar is-preload">
@@ -31,11 +36,16 @@
             <div class="container">
                 <article id="main" class="special">
                     <header>
-                        <h2><a href="#">검색 결과</a></h2>
+                        <h2>검색 결과</h2>
                     </header>
                 </article>
                 <hr/>
-                <div class="row">
+
+                <div class="row" th:if="${searchResults.empty}">
+                    <p class="no-results-message">검색 결과가 없습니다.</p>
+                </div>
+
+                <div class="row" th:unless="${searchResults.empty}">
                     <article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${searchResults}">
                         <a th:href="@{'/movies/' + ${movie.id}}" class="image featured"><img
                                 th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/></a>

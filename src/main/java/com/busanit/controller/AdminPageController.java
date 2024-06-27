@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -104,8 +105,22 @@ public class AdminPageController {
         model.addAttribute("totalPages", totalPages);
 
         return "admin/admin_movie_list";
-
     }
+
+    @PostMapping("/commentList")
+    public String commentList(Model model,
+                              @RequestParam(defaultValue = "0") int page) {
+        int pageSize = 5;
+        List<CommentDTO> commentList = commentService.getCommentsWithPaging(page, pageSize);
+        int totalPages = (int) Math.ceil(commentService.getTotalComments() / (double) pageSize);
+
+        model.addAttribute("commentList", commentList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
+        return "admin/admin_comment_list";
+    }
+
 
     @PostMapping("/member")
     public String memberManagement() {
@@ -123,14 +138,6 @@ public class AdminPageController {
         model.addAttribute("movieId", movieId);
 
         return "admin/admin_movie_register";
-    }
-
-    @PostMapping("/commentList")
-    public String commentList(Model model) {
-        List<CommentDTO> commentList = commentService.getAllComment();
-
-        model.addAttribute("commentList", commentList);
-        return "admin/admin_comment_list";
     }
 
     @GetMapping("/theaterList")
