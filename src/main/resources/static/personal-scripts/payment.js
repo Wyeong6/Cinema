@@ -54,22 +54,54 @@ function requestPay() {
                     var msg = "결제에 실패하였습니다.";
                     msg += "에러내용 : " + rsp.error_msg;
 
+                    // $.ajax({
+                    //     type: "POST",
+                    //     url: "/payment/paymentFailed",
+                    //     data: JSON.stringify({
+                    //         err_msg: rsp.error_msg,
+                    //     }),
+                    //     contentType: 'application/json',
+                    //     success: function(response_failed) {
+                    //         alert(msg);
+                    //     },
+                    //     error: function() {
+                    //         alert('서버 통신에 실패했습니다.');
+                    //     }
+                    // });
+                    // alert(msg);
+
+
+                    /* 테스트용 */
                     $.ajax({
                         type: "POST",
-                        url: "/payment/paymentFailed",
-                        data: JSON.stringify({
-                            err_msg: rsp.error_msg,
+                        url: "/payment/complete",
+                        data: $.param({
+                            "merchant_uid": rsp.merchant_uid,
+                            "imp_uid": rsp.imp_uid,
+                            "apply_num": rsp.apply_num,
+                            "buyer_email": rsp.buyer_email,
+                            "payment_status": rsp.payment_status,
+                            "product_name": orderName,
+                            "product_idx": productIdx,
+                            "product_type": reqIDX,
+                            "content1": content1,
+                            "content2": content2,
+                            "content3": content3,
+                            "content4": content4,
+                            "product_count": productCount,
+                            "amount": currentPrice
                         }),
-                        contentType: 'application/json',
-                        success: function(response_failed) {
-                            alert(msg);
+                        success: function(response_complete) {
+                            alert("DB 저장 완료");
+                            // 결제가 완료된 후 리디렉션할 페이지
+                            window.location.href = '/payment/paymentSuccessful';
                         },
                         error: function() {
-                            alert('서버 통신에 실패했습니다.');
+                            alert("서버 통신에 실패했습니다.");
                         }
                     });
+                    /* 테스트용 끝*/
 
-                    alert(msg);
                 }
             });
         },
