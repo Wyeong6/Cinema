@@ -25,6 +25,7 @@ public class PaymentDTO {
     private Integer totalPrice;
     private String paymentType;
     private String merchantUid;
+    private String impUid;
     private String applyNum;
     private String paymentStatus;
     private LocalDateTime regDate;

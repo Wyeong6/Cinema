@@ -20,30 +20,22 @@ public class Payment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String merchantUid;
+    private String impUid;
+    private String applyNum; // 카드 승인 번호
     private String buyerEmail; // 결제사에서 받아오는 메일
+    private String paymentType;
+    private String paymentStatus; // 결제사에서 값을 못 받아오는 것 같음
 
     private String productName;
-
     private String productIdx;
-
     private String productType; // 영화 or 스낵
-
     private String content1; // 상영일자
     private String content2; // 시간
     private String content3; // 상영관
     private String content4; // 좌석
-
-    private String productCount; // 개수 (영화 예시: 성인-1, 청소년-1)
-
+    private String productCount; // 개수 (영화 예시: 성인:1, 청소년:1, 경로:0)
     private Integer totalPrice;
-
-    private String paymentType;
-
-    private String merchantUid;
-
-    private String applyNum; // 카드 승인 번호
-
-    private String paymentStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -64,8 +56,9 @@ public class Payment extends BaseTimeEntity {
                 .content4(paymentDTO.getContent4())
                 .productCount(paymentDTO.getProductCount())
                 .totalPrice(paymentDTO.getTotalPrice())
-                .paymentType(paymentDTO.getPaymentType())
+                .productType(paymentDTO.getProductType())
                 .merchantUid(paymentDTO.getMerchantUid())
+                .impUid(paymentDTO.getImpUid())
                 .applyNum(paymentDTO.getApplyNum())
                 .paymentStatus(paymentDTO.getPaymentStatus())
                 .member(member)

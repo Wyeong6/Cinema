@@ -110,12 +110,20 @@ public class PaymentController {
     @PostMapping("/complete")
     @ResponseBody
     public Map<String, String> paymentComplete(@RequestParam String merchant_uid,
-                                               @RequestParam String amount,
+                                               @RequestParam String imp_uid,
                                                @RequestParam String apply_num, // 카드 승인 번호
-                                               @RequestParam String payment_status,
                                                @RequestParam String buyer_email, // 결제사에서 받아오는 메일이라 결제시 메일 주소 수정해서 보내면 로그인한 사람 메일과 다를 것 같아서 데이터 받아봄
+                                               @RequestParam String payment_status,
+                                               @RequestParam String product_idx,
+                                               @RequestParam String product_name,
+                                               @RequestParam String product_type,
+                                               @RequestParam String content1,
+                                               @RequestParam String content2,
+                                               @RequestParam String content3,
+                                               @RequestParam String content4,
+                                               @RequestParam String product_count,
+                                               @RequestParam Integer amount,
                                                PaymentDTO paymentDTO) {
-//    public Map<String, String> paymentComplete(@RequestBody Map<String, String> request, PaymentDTO paymentDTO) {
 
         Map<String, String> response_complete = new HashMap<>();
 //        if(request != null) {
@@ -123,22 +131,24 @@ public class PaymentController {
 //            response_complete.put("currentPrice", request.get("amount"));
 //            response_complete.put("apply_num", request.get("apply_num")); // 카드 승인 번호
 //            response_complete.put("payment_status", request.get("payment_status"));
-//            response_complete.put("buyer_email2", request.get("buyer_email")); // 결제사에서 받아오는 메일이라 결제시 메일 주소 수정해서 보내면 로그인한 사람 메일과 다를 것 같아서 데이터 받아봄
-//
-//            paymentDTO.setProductName("TEST 상품");
-//            paymentDTO.setMerchantUid(request.get("merchant_uid"));
-//            paymentDTO.setTotalPrice(Integer.parseInt(request.get("amount")));
-//            paymentDTO.setApplyNum(request.get("apply_num"));
-//            paymentDTO.setPaymentStatus(request.get("payment_status"));
-//            paymentDTO.setBuyerEmail(request.get("buyer_email"));
+//            response_complete.put("buyer_email2", request.get("buyer_email")); // 결제사에서 받아오는 메일
 
         if(merchant_uid != null) {
-            paymentDTO.setProductName("TEST 상품");
             paymentDTO.setMerchantUid(merchant_uid);
-            paymentDTO.setTotalPrice(Integer.parseInt(amount));
+            paymentDTO.setImpUid(imp_uid);
             paymentDTO.setApplyNum(apply_num);
-            paymentDTO.setPaymentStatus(payment_status);
             paymentDTO.setBuyerEmail(buyer_email);
+            paymentDTO.setPaymentType("CARD");
+            paymentDTO.setPaymentStatus(payment_status);
+            paymentDTO.setProductIdx(product_idx);
+            paymentDTO.setProductName(product_name);
+            paymentDTO.setProductType(product_type);
+            paymentDTO.setContent1(content1);
+            paymentDTO.setContent2(content2);
+            paymentDTO.setContent3(content3);
+            paymentDTO.setContent4(content4);
+            paymentDTO.setProductCount(product_count);
+            paymentDTO.setTotalPrice(amount);
 
             paymentService.savePayment(Payment.toEntity(paymentDTO, memberService.findUserIdx(memberService.currentLoggedInEmail())));
         }
