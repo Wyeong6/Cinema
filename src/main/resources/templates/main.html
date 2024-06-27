@@ -229,7 +229,16 @@
         document.addEventListener('DOMContentLoaded', function () {
             loadChatList(1, 1, 8, true);
             setupWebSocketConnection();
+
+            // unreadCount 요소가 존재하는지 확인
+            const unreadCount = document.getElementById("unreadCount");
+            if (unreadCount) {
+                unreadCount.addEventListener("click", function() {
+                    window.location.href = "/inquiry#work";
+                });
+            }
         });
+
         //웹소켓 연결 후 콜백함수
         function setupWebSocketConnection() {
             console.log('Setting up WebSocket connection');
@@ -359,10 +368,10 @@
             window.location.href = "/member/logout";
         });
 
-        //안읽은 메세지수 클릭시
-        document.getElementById("unreadCount").addEventListener("click", function() {
-            window.location.href = "/inquiry#work";
-        });
+        // //안읽은 메세지수 클릭시
+        // document.getElementById("unreadCount").addEventListener("click", function() {
+        //     window.location.href = "/inquiry#work";
+        // });
     </script>
 
 <!--    <p>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;인기순 &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</p>-->

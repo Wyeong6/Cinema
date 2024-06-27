@@ -64,9 +64,9 @@
 					</header>
 					<section>
 						<img id="input-file" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="width: 1000px; height: auto;"/>
-<!--						<p class="event-detail" th:text="${event.eventDetail}">-->
-<!--							이벤트 상세 내용-->
-<!--						</p>-->
+						<p class="event-detail" th:text="${event.eventDetail}" style="display: none;">
+							이벤트 상세 내용
+						</p>
 					</section>
 					<table class="default">
 						<tr>
@@ -87,25 +87,24 @@
 					<div class="btn_box">
 						<a href="javascript:shareMessage()">
 							<button class="button" onclick="window.location.href='/event/eventList'">목록</button>
-							<button type="button" class="kakao_btn">
-								<img src="/img/front/icon/kakao_sh.png" alt="카카오톡 공유">
-							</button>
+							<div class="btn_box">
+								<img onclick="shareMessage()" src="/images/share.png"
+									 alt="카카오톡 공유" id="kakao_btn" class="kakao_btn" />
+							</div>
 						</a>
 					</div>
 				</article>
 			</div>
 		</div>
-
 		<footer data-include-path="footer.html"></footer>
-
 	</div>
-
 
 	<script>
 		// include.js
-		window.addEventListener('load', function() {
+		document.addEventListener('DOMContentLoaded', function() {
 			// Kakao SDK 초기화
-			Kakao.init('3d074cbbda365535b831c90baead22c2'); // 여기에 실제 Kakao 앱 키를 입력하세요.
+			Kakao.init('3d074cbbda365535b831c90baead22c2');
+			console.log('Kakao SDK initialized');
 		});
 
 		// Kakao 공유 함수

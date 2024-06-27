@@ -29,6 +29,14 @@
 
     <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        .no-rooms-message {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            padding: 20px 0;
+        }
+    </style>
 </head>
 <body>
 <div class="row">
@@ -72,6 +80,9 @@
                     </tr>
                     </tbody>
                 </table>
+                <div th:if="${#lists.isEmpty(unansweredInquiryList.content)}">
+                    <div class="no-rooms-message" style="text-align: center;">문의가 없습니다</div>
+                </div>
                 <div style="text-align: center;" th:if="${!#lists.isEmpty(unansweredInquiryList.content)}"
                      th:with="startunansweredPage=${startunansweredPage}, endunansweredPage=${endunansweredPage}">
                     <a href="#" th:each="i : ${#numbers.sequence(startunansweredPage, endunansweredPage)}"
@@ -122,6 +133,9 @@
                     </tr>
                     </tbody>
                 </table>
+                <div th:if="${#lists.isEmpty(answeredInquiryList.content)}">
+                    <div class="no-rooms-message" style="text-align: center;">문의가 없습니다</div>
+                </div>
                 <div style="text-align: center;" th:if="${!#lists.isEmpty(answeredInquiryList.content)}"
                      th:with="startansweredPage=${startansweredPage}, endansweredPage=${endansweredPage}">
                     <a href="#" th:each="i : ${#numbers.sequence(startansweredPage, endansweredPage)}"

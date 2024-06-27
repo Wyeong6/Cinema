@@ -70,6 +70,12 @@
         td, th {
             padding: 15px;
         }
+        .no-rooms-message {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            padding: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -93,6 +99,7 @@
                     <!-- 활성 채팅방은 동적으로 추가 -->
                     </tbody>
                 </table>
+                <div id="active-no-rooms" class="no-rooms-message" style="display: none;">상담문의가 없습니다</div>
                 <!-- 활성 채팅방 페이지네이션 -->
                 <div id="active-pagination"></div>
             </div>
@@ -116,6 +123,7 @@
                     <!-- 비활성 채팅방은 동적으로 추가됩니다 -->
                     </tbody>
                 </table>
+                <div id="inactive-no-rooms" class="no-rooms-message" style="display: none;">상담문의가 없습니다</div>
                 <!-- 비활성 채팅방 페이지네이션 -->
                 <div id="inactive-pagination"></div>
             </div>
