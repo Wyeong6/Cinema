@@ -1,9 +1,4 @@
 <!DOCTYPE HTML>
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html lang="en"
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -65,7 +60,7 @@
                             <a th:href="@{/snack/snackList(page=${snackList.totalPages - 1})}">마지막</a>
                         </li>
                     </ul>
-                    <ul style="text-align: center" th:unless="${snackList.totalElements > 1}">
+                    <ul style="text-align: center" th:if="${snackList.totalElements == 1}">
                         <li th:classappend="${page == snackList.pageable.pageNumber + 1} ? 'disabled'"
                             th:each="page : ${#numbers.sequence(startPage, endPage)}">
                             <a class="page" th:href="@{/snack/snackList(page=${page} - 1)}" th:text="${page}"

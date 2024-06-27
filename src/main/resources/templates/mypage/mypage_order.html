@@ -3,14 +3,15 @@
     <section>
         <div class="order history">
             <header style="margin-bottom: 1em">
-                <h4>스낵 주문 내역</h4>
+                <h5>스낵 주문 내역</h5>
             </header>
             <hr style="top:0; margin-bottom: 1em">
             <section>
-                <article class="history_get" th:each="snackPayment : ${snackPaymentInfo}"
+                <article class="history_item" th:each="snackPayment : ${snackPaymentInfo}"
                          th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
                     <header>
                         <h3 th:text="${#temporals.format(snackPayment.getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
+                        <p class="order_detail_btn">상세보기 <img src="/images/right-arrow.png" alt="오른쪽 화살표"/></p>
                     </header>
                     <div class="history_data">
                         <img th:alt="${snackPayment.getSnack().snack_alt}"
@@ -23,9 +24,13 @@
                             <p th:text="${snackPayment.getPrice()}+원">36,000원 </p>
                         </div>
                     </div>
+                    <div class="button_box">
+                        <button type="button" class="cancel_btn">주문취소</button>
+                        <button type="button" class="detail_btn">구매상세</button>
+                    </div>
                 </article>
                 <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
-                    <div class="history_data">
+                    <div class="history_none">
                         <p class="snack_nm">구매하신 스낵이 없습니다.</p>
                     </div>
                 </article>
@@ -78,6 +83,10 @@
                                 }
                             });
                         }
+
+                        $('.container').on('click', '.order_detail_btn', function() {
+                            $('#content').load('/mypage/order/detail');
+                        });
                     });
                 </script>
             </section>

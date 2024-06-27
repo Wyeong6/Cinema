@@ -8,13 +8,11 @@
 <body class="left-sidebar is-preload">
 <div id="page-wrapper">
     <!-- Main -->
-    <div class="wrapper style1">
+    <div class="wrapper style1 mypage-wrapper">
         <div class="container">
-            <header>
-                <h3 class="main_btn" style="cursor: pointer">마이페이지</h3>
-            </header>
+            <h3 class="main_btn" style="cursor: pointer">마이페이지</h3>
             <div class="row gtr-200">
-                <div class="col-4 col-12-mobile" id="sidebar">
+                <div class="col-3 col-12-mobile" id="sidebar">
                     <section>
                         <header>
                             <h2></h2>
@@ -73,7 +71,7 @@
                         </div>
                     </section>
                 </div>
-                <div class="col-8 col-12-mobile imp-mobile" id="content">
+                <div class="col-9 col-12-mobile imp-mobile" id="content">
                     <!-- This is where the loaded content will appear -->
                 </div>
             </div>
@@ -89,44 +87,68 @@
     const memberId = [[${memberId}]];
 
     $(document).ready(function() {
+        function setActiveClass(selector) {
+            $('.mypage_nav li li a').removeClass('clicked');
+            $(selector).addClass('clicked');
+        }
+
         // 마이페이지 메인
-        $('.container').on('click', '.main_btn', function() {
+        $('.main_btn').on('click', function() {
             $('#content').load('/mypage/main');
+            setActiveClass(this);
         });
+
         // 예매내역 조회 버튼 클릭 이벤트 설정
-        $('#sidebar').on('click', '.reservation_btn', function() {
+        $('.reservation_btn').on('click', function() {
             $('#content').load('/mypage/reservation');
+            setActiveClass(this);
         });
+
         // 주문내역조회 버튼 클릭 이벤트 설정
-        $('#sidebar').on('click', '.order_btn', function() {
+        $('.order_btn').on('click', function() {
             $('#content').load('/mypage/order');
+            setActiveClass(this);
         });
+
         // 회원등급안내 버튼 클릭 이벤트 설정
-        $('#sidebar').on('click', '.membership_btn', function() {
+        $('.membership_btn').on('click', function() {
             $('#content').load('/mypage/membership');
+            setActiveClass(this);
         });
+
         // 포인트 현황 버튼 클릭 이벤트 설정
-        $('#sidebar').on('click', '.point_btn', function() {
+        $('.point_btn').on('click', function() {
             $('#content').load('/mypage/point');
+            setActiveClass(this);
         });
+
         // 나의리뷰 버튼 클릭 이벤트 설정
-        $('#sidebar').on('click', '.review_btn', function() {
+        $('.review_btn').on('click', function() {
             $('#content').load('/mypage/review');
+            setActiveClass(this);
         });
+
         // 나의찜목록 버튼 클릭 이벤트 설정
-        $('#sidebar').on('click', '.favorite_btn', function() {
+        $('.favorite_btn').on('click', function() {
             $('#content').load('/mypage/favorite');
+            setActiveClass(this);
         });
+
         // 개인정보수정 버튼 클릭 이벤트 설정
-        $('#sidebar').on('click', '.info_edit_btn', function() {
+        $('.info_edit_btn').on('click', function() {
             $('#content').load('/mypage/infoEdit');
+            setActiveClass(this);
         });
-        // 비밀번호수정 버튼 클릭 이벤트
-        $('#sidebar').on('click', '.password_edit_btn', function() {
+
+        // 비밀번호수정 버튼 클릭 이벤트 설정
+        $('.password_edit_btn').on('click', function() {
             $('#content').load('/mypage/passwordEdit');
+            setActiveClass(this);
         });
+
         // 회원탈퇴 버튼 클릭 이벤트 설정
-        $('#sidebar').on('click', '.cancel_btn', function() {
+        $('.cancel_btn').on('click', function() {
+            setActiveClass(this);
             Swal.fire({
                 title: "정말로 탈퇴하시겠습니까?",
                 text: "기존의 정보는 모두 복구불가합니다.",
