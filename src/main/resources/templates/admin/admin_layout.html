@@ -101,13 +101,11 @@
     </style>
     <script type="module">
         import {connectWebSocket, loadChatList, updateUnreadCount} from '/modules/chatModule.js';
-        // import { fetchUnansweredInquiryCount } from '/modules/inquiryCount.js';
 
         // 페이지 로드 시 안읽은 메세지 불러오기
         document.addEventListener('DOMContentLoaded', function () {
             loadChatList(1, 1, 8, true);
             setupWebSocketConnection(); // WebSocket 연결 설정
-            // fetchUnansweredInquiryCount();
         });
 
         function setupWebSocketConnection() {

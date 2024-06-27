@@ -26,7 +26,7 @@ export function connectWebSocket(options) {
     // 웹소켓 연결
     stompClient.connect({},function (frame) {
         console.log('Connected to WebSocket: ' + frame);
-
+        console.log('Connected to WebSocket: ' + frame);
         // '/user/queue/chatList' 주제를 구독하여 메시지 처리
         stompClient.subscribe('/user/queue/chatList', function (message) {
             const response = JSON.parse(message.body);
@@ -39,11 +39,9 @@ export function connectWebSocket(options) {
             if (displayChatListCallback) {
                  displayChatListCallback(response);
             }
-
             // subscribeCallback 함수를 호출하여 구독된 메시지 처리
              subscribeCallback(response);
         });
-
         // loadInitialData가 함수인 경우 최초 데이터 로드 수행
         if (initialDataParams) {
              loadChatList(...initialDataParams); // 파라미터 전달하여 초기 데이터 로드
@@ -131,7 +129,7 @@ export function updateUnreadCount(response) {
     var $unreadCount = $('#unreadCount');
 
     console.log("activeChatRoomList" + activeChatRoomList)
-
+    console.log("totalUnreadCount" + totalUnreadCount)
     // 안 읽은 메시지 수 업데이트
     $unreadCount.text(totalUnreadCount);
 
@@ -265,6 +263,6 @@ window.chatUtils = {
         return activePage;
     },
     get inactivePage() {
-        return inactivePage;
+        return inactivePage;1
     }
 };

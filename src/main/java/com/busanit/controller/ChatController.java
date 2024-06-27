@@ -85,9 +85,9 @@ public class ChatController {
                 System.out.println("유저가 입장안햇을때  ");
             }
 
+            System.out.println("유저가 입장안했을때 메세지 보내기");
             // 메시지 처리 후, 채팅 리스트 업데이트 요청
             PageUpdateDTO pageUpdateDTO = messageDTO.getPaging();
-
             messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
             updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
 
@@ -159,6 +159,10 @@ public class ChatController {
         Map<String, Object> combinedResponse = new HashMap<>();
         combinedResponse.putAll(activeChatResponse);
         combinedResponse.putAll(inactiveChatResponse);
+
+        // 메시지 전송 로그 추가
+        System.out.println("Sending message to user: " + recipient);
+        System.out.println("Message content: " + combinedResponse);
 
         // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
         messagingTemplate.convertAndSendToUser(recipient, "/queue/chatList", combinedResponse);

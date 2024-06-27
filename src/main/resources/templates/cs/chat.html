@@ -158,7 +158,6 @@
             content: messageContent,
             chatRoomTitle: chatRoomTitle,
             status: "active",
-            type: entranceStatus,
             paging: {
                 activePage: activePage,
                 inactivePage: inactivePage
@@ -189,6 +188,16 @@
         messageElement.appendChild(document.createTextNode(message));
         messages.appendChild(messageElement);
         document.getElementById('typingIndicatorDTO').style.display = 'none';
+    }
+
+    //이전 메세지 문구
+    function addPreviousMessagesIndicator() {
+        const messages = document.getElementById('messages');
+        const previousMessagesIndicator = document.createElement('p');
+        previousMessagesIndicator.id = 'previousMessagesIndicator';
+        previousMessagesIndicator.className = 'message-style';
+        previousMessagesIndicator.textContent = '----------- 이전 메시지입니다 -----------';
+        messages.appendChild(previousMessagesIndicator);
     }
 
     //카테고리를 선택한 후
@@ -287,8 +296,11 @@
                         chatRoomTitle = message.chatRoomTitle;
                         document.getElementById('categoryButtons').style.display = 'none';
                         let displayMessage = message.sender === sender ? `나 : ${message.content}` : `관리자 : ${message.content}`;
+
                         showMessage(displayMessage);
                     });
+                    //이전 메세지 문구
+                    // addPreviousMessagesIndicator();
                 }
             });
 

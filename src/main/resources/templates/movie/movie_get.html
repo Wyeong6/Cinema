@@ -228,27 +228,6 @@
             cursor: pointer; /* 클릭 가능하도록 설정 */
         }
     </style>
-    <!--안 읽은 메세지-->
-    <script type="module">
-        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
-        window.addEventListener('DOMContentLoaded', function () {
-            loadChatList(1, 8, true);
-            setupWebSocketConnection();
-        });
-
-        async function setupWebSocketConnection() {
-            console.log('Setting up WebSocket connection');
-            const options = {
-                subscribeCallback: handleWebSocketMessage
-            };
-            connectWebSocket(options); // WebSocket 연결 함수 호출
-        }
-
-        function handleWebSocketMessage(response) {
-            console.log('WebSocket message received:', response);
-            updateUnreadCount(response);
-        }
-    </script>
 </head>
 <body class="right-sidebar is-preload">
 

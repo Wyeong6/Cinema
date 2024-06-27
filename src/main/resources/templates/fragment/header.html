@@ -27,7 +27,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
         <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
-        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js" async></script>
 
         <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
         <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
@@ -90,22 +90,21 @@
     <script type="module">
         import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
         //웹소켓 연결
-        window.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             loadChatList(1, 1, 8, true);
             setupWebSocketConnection();
         });
         //웹소켓 연결 후 콜백함수
-        async function setupWebSocketConnection() {
+        function setupWebSocketConnection() {
             console.log('Setting up WebSocket connection');
             const options = {
-                subscribeCallback: handleWebSocketMessage
+                subscribeCallback: handleWebSocketMessage,
             };
             connectWebSocket(options); // WebSocket 연결 함수 호출
         }
 
-        function handleWebSocketMessage(response) {
-            console.log('WebSocket message received:', response);
-            updateUnreadCount(response);
+        function handleWebSocketMessage(message) {
+            updateUnreadCount(message);
         }
     </script>
     <script th:inline="javascript">
@@ -119,7 +118,7 @@
 
         //안읽은 메세지수 클릭시
         document.getElementById("unreadCount").addEventListener("click", function() {
-            window.location.href = "/inquiry#work"; // 원하는 URL로 설정
+            window.location.href = "/inquiry#work";
         });
     </script>
     </body>
