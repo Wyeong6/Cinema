@@ -787,6 +787,7 @@ public class MovieService {
     // 영화 삭제 (어드민 페이지)
     public void deleteMovie(Long movieId) {
         movieRepository.deleteById(movieId);
+        updateCachedMovies();
     }
 
     //영화 수정 (어드민 페이지)
