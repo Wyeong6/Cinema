@@ -18,24 +18,31 @@ import java.util.List;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
+    //로그인한 멤버이베일로 채팅방 반환
     @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m WHERE m.email = :memberEmail")
     Page<ChatRoom> findByMemberEmail(@Param("memberEmail") String memberEmail, Pageable pageable);
 
+    // 두명의 유저가 들어있는 활성중인 채팅방 반환
     @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m1 JOIN cr.members m2 WHERE m1.email = :recipient AND m2.email = :readEmail AND cr.type = 'active'")
     List<ChatRoom> findByRecipientAndSender(@Param("recipient") String recipient, @Param("readEmail") String readEmail);
 
+    //로그인한 유저의 활성중인 채팅방 반환
     @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m WHERE m.email = :loginUser AND cr.type = 'active'")
     List<ChatRoom> findActiveChatRoomsByMemberEmail(@Param("loginUser") String loginUser);
 
-    @Query("SELECT cr FROM ChatRoom cr JOIN cr.members m WHERE m.id = :memberId")
-    List<ChatRoom> findByMembersId(@Param("memberId") Long memberId);
-
+    //chatRoomId로 채팅방 반환
     @Query("SELECT cr FROM ChatRoom cr WHERE cr.id = :chatRoomId")
     ChatRoom findByChatRoomId(@Param("chatRoomId") Long chatRoomId);
 
-    //타입에 따라 채팅방 조회
-    Page<ChatRoom> findByMembersEmailAndType(String memberEmail, String type, Pageable pageable);
 
-
-
+//    Page<ChatRoom> findByMembersEmailAndType(String memberEmail, String type, Pageable pageable);
+    //타입별로 메세지생성시간에 따라 채팅방반환
+    @Query("SELECT DISTINCT c " +
+            "FROM ChatRoom c " +
+            "JOIN FETCH c.messages m " +
+            "JOIN c.readStatuses rs " +
+            "WHERE rs.member.email = :memberEmail " +
+            "AND c.type = :type " +
+            "ORDER BY m.regDate DESC")
+    Page<ChatRoom> findByMembersEmailAndType(@Param("memberEmail") String memberEmail, @Param("type") String type, Pageable pageable);
 }

@@ -129,6 +129,11 @@ public class MypageController {
         return snackPaymentService.getSnackPaymentInfo(memberRegFormDTO.getId(), pageable);
     }
 
+    @GetMapping("/order/detail")
+    public String mypageOrderDetail() {
+        return "/mypage/mypage_order_detail";
+    }
+
     @GetMapping("/membership")
     public String mypageMembership(Model model) {
         // 현재 로그인한 사용자의 이메일
@@ -194,6 +199,7 @@ public class MypageController {
         System.out.println("favoriteMovies === " + favoriteMovies.size());
         return "/mypage/mypage_favorite";
     }
+
     @GetMapping("/infoEdit")
     public String mypageEdit(@AuthenticationPrincipal Object principal, Model model) {
         String userEmail = null;

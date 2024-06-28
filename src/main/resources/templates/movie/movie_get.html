@@ -1,271 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" layout:decorate="~{layout/layout_total}"
+<html lang="en" layout:decorate="~{layout/layout_movie_get}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Cinemacast</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" href="/assets/css/main.css"/>
-    <link rel="stylesheet" href="/assets/css/custom.css"/>
-    <link rel="stylesheet" href="/assets/css/custom_player.css"/>
-    <link rel="stylesheet" href="/assets/css/nav.css"/>
-    <meta property="og:title" content="${movie.title}">
-    <meta property="og:description" id="og-description" content="">
-    <meta property="og:url" content="http://localhost:8080/movies/${movieId}">
-    <meta property="og:image" content="https://image.tmdb.org/t/p/original' + ${movie.posterPath}}">
-    <noscript>
-        <link rel="stylesheet" href="/assets/css/noscript.css"/>
-    </noscript>
-    <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
-    <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-    <!--    댓글-->
-    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
-    <style>
-
-        .movie_data_box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .movie_data,
-        .btn_box {
-            display: flex;
-            align-items: center;
-        }
-
-        .favorite-container {
-            margin-right: 10px;
-        }
-
-        .kakao_btn {
-            margin-left: 10px;
-        }
-
-        .movie_data_averageRating {
-            flex-grow: 1;
-        }
-
-        h4 {
-            margin: 0 10px 0 0;
-        }
-
-
-        .fav-icon {
-            width: 33px !important;
-            height: 30px !important;
-            cursor: pointer;
-            transition: background-color 0.3s; /* 부드러운 색상 전환 효과 */
-        }
-
-        #kakao_btn {
-            width: 40px !important;
-            height: 40px !important;
-            cursor: pointer;
-        }
-
-        /*.btn_box {*/
-        /*    display: flex;*/
-        /*    flex-direction: column;*/
-        /*    align-items: center;*/
-        /*}*/
-
-        /*.btn_box .kakao_btn {*/
-        /*    max-width: 100%; !* 최대 가로 크기를 부모 요소의 100%로 설정 *!*/
-        /*    max-height: 40px; !* 최대 세로 크기를 40px로 설정 *!*/
-        /*    !* 다른 스타일 속성 추가 *!*/
-        /*}*/
-        /*.btn_box .text-container {*/
-        /*    margin-top: 10px; !* 이미지와 텍스트 사이의 간격 *!*/
-        /*}*/
-
-        .favorite-container {
-            display: flex;
-            justify-content: center;
-        }
-
-        .favorited {
-            filter: grayscale(0%) sepia(100%) saturate(1000%) hue-rotate(-50deg) drop-shadow(0 0 3px rgba(255, 0, 0, 0.5)); /* 빨간색으로 변환 */
-        }
-
-        /* 리액션 관련 css 시작 */
-        .active {
-            width: 50px !important;
-            height: 50px !important;
-            filter: drop-shadow(0 0 3px #597aff) drop-shadow(0 0 4px #597aff) drop-shadow(0 0 5px #597aff); /* 이미지 부분만 그림자 적용가능하게함 (필터로) */
-        }
-
-        #likeButton {
-            width: 50px !important;
-            height: 50px !important;
-        }
-
-        #dislikeButton {
-            width: 50px !important;
-            height: 50px !important;
-        }
-
-        #sadButton {
-            width: 50px !important;
-            height: 50px !important;
-        }
-
-        #funnyButton {
-            width: 50px !important;
-            height: 50px !important;
-        }
-
-        #scaryButton {
-            width: 50px !important;
-            height: 50px !important;
-        }
-
-        .reaction-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .reaction-item {
-            text-align: center;
-            margin: 0 20px; /* 각 항목 사이의 간격 조절 */
-            width: 95px;
-        }
-
-        .reaction-item img {
-            width: 50px; /* 이미지 너비 설정 */
-            height: 50px; /* 이미지 높이 설정 */
-            cursor: pointer;
-        }
-
-        .reaction-item p {
-            text-align: center;
-            font-size: 13px;
-            margin: 0; /* 설명과 카운트 간격 조절 */
-        }
-
-        /* 리액션 관련 css 끝 */
-
-        .hide {
-            display: none;
-        }
-
-        .still-cut-article img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        /* 이미지클릭시 띄우는 모달 */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999999;
-            padding-top: 60px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.9);
-        }
-
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #fff;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        /* 비디오 모달 관련 CSS */
-        .video-modal-content {
-            width: 80%; /* 모달 너비, 필요에 따라 조정 */
-            max-width: 640px; /* 최대 너비, 필요에 따라 조정 */
-        }
-
-        #videoFrame {
-            width: 100%; /* iframe의 너비를 부모 요소에 맞춤 */
-            height: 720px; /* 높이, 필요에 따라 조정 */
-        }
-
-
-        .video-modal-content {
-            width: 100%; /* 영상 크기 조정 */
-            max-width: 1280px; /* 최대 크기 설정 */
-            margin: auto; /* 수평 중앙 정렬 */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* 화면 중앙 정렬 */
-            z-index: 1000; /* 필요에 따라 조정 */
-        }
-        /*안읽은 메세지 고정*/
-        .fixed-bottom-right {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            display: none; /* 초기에는 숨김 */
-        }
-        .fixed-bottom-right img {
-            width: 40px; /* 이미지 크기에 맞게 조정 */
-            height: 40px;
-            cursor: pointer; /* 클릭 가능하도록 설정 */
-        }
-    </style>
-    <!--안 읽은 메세지-->
-    <script type="module">
-        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
-        window.addEventListener('DOMContentLoaded', function () {
-            loadChatList(1, 8, true);
-            setupWebSocketConnection();
-        });
-
-        async function setupWebSocketConnection() {
-            console.log('Setting up WebSocket connection');
-            const options = {
-                subscribeCallback: handleWebSocketMessage
-            };
-            connectWebSocket(options); // WebSocket 연결 함수 호출
-        }
-
-        function handleWebSocketMessage(response) {
-            console.log('WebSocket message received:', response);
-            updateUnreadCount(response);
-        }
-    </script>
-</head>
 <body class="right-sidebar is-preload">
-
 <th:block layout:fragment="content">
     <div id="page-wrapper">
-
-        <header data-include-path="./header.html"></header>
-
-        <!-- Main -->
-        <div class="wrapper style1">
+        <div class="wrapper style1 movie_get">
             <div class="container" th:each="movie, iterStat : ${movieInfos}">
                 <input type="hidden" id="movieId" th:value="${movie.id}">
                 <div class="row">
@@ -273,105 +13,77 @@
                         <article id="main">
                             <div class="movie_info_background">
                                 <header id="get_info">
-                                    <a href="#" class="image featured">
+                                    <a href="#" class="image featured" onclick="toggleOverlay(this)">
                                         <img th:if="${#strings.length(movie.id) == 10}"
-                                             th:src="@{|/${movie.posterPath}|}" alt="영화포스터"
-                                             onclick="openModal(this.getAttribute('src'))"
-                                             style="width: 400px; height: 600px;"
+                                             th:src="@{|/${movie.posterPath}|}"
+                                             class="featured-img"
+                                             alt="영화포스터"
                                         />
                                         <img th:if="${movie.posterPath != 'null' && movie.posterPath != '' && #strings.length(movie.id) != 10}"
+                                             class="featured-img"
                                              th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}"
                                              alt="영화포스터"
-                                             th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
-                                             style="width: 400px; height: 600px;"
                                         />
                                         <img th:if="${movie.posterPath == null || movie.posterPath == '' || movie.posterPath == 'null'}"
+                                             class="featured-img"
                                              th:src="@{/images/img_not_ready2.png}"
                                              alt="준비중 이미지"
-                                             style="width: 400px; height: 600px; pointer-events: none;"
                                         />
+                                        <div class="movie-overlay">
+                                            <img th:if="${#strings.length(movie.id) == 10}"
+                                                 src="/images/poster-show.png"
+                                                 onclick="openModal(this.getAttribute('src'))"
+                                                 alt="돋보기" />
+                                            <img th:if="${movie.posterPath != 'null' && movie.posterPath != '' && #strings.length(movie.id) != 10}"
+                                                 src="/images/poster-show.png"
+                                                 th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
+                                                 alt="돋보기" />
+                                            <img src="/images/play.png" id="videoModalBtn" th:data-video-id="${movie.video}" href="#"
+                                                 class="video_btn" alt="트레일러 재생" />
+                                        </div>
                                     </a>
+
                                     <div class="movie_info">
+                                        <span class="genres" th:text="${#strings.arrayJoin(movie.genres, ', ')}"></span>
                                         <header class="info_header">
-                                            <h2 th:text="${movie.title}" class="movie_title"></h2>
-                                            <a href="#" class="button" style="height: 3em;">예매하기</a>
-                                            <a id="videoModalBtn" th:data-video-id="${movie.video}" href="#"
-                                               class="button" style="height: 3em;">트레일러 보기</a>
-                                        </header>
-                                        <br>
-                                        <div class="movie_detail">
-                                            <span th:text="${movie.releaseDate}">releasedate</span>
-                                            <span th:text="${#strings.arrayJoin(movie.genres, ', ')}"></span>
-                                            <span th:text="${movie.runtime} + '분'">runtime</span>
-                                            <img id="certification-image" src="" alt="영화심의등급 이미지">
-                                            <span id="certification"
-                                                  th:text="${movie.certifications}">certification</span>
-                                        </div>
-
-
-                                        <p th:text="${movie.overview}">
-                                            ~ overview ~
-                                        </p>
-
-
-                                        <div class="reaction-container">
-                                            <div class="reaction-item">
-                                                <img id="likeButton" src="/images/like.png" alt="재밌어요"
-                                                     onclick="react('LIKE')">
-                                                <p>재미있어요</p>
-                                                <span class="count like-count">0</span>
+                                            <div class="movie-title-box">
+                                                <h3 th:text="${movie.title}" class="movie_title"></h3>
                                             </div>
-                                            <div class="reaction-item">
-                                                <img id="dislikeButton" src="/images/dislike.png" alt="재미없어요"
-                                                     onclick="react('DISLIKE')">
-                                                <p>재미없어요</p>
-                                                <span class="count dislike-count">0</span>
-                                            </div>
-                                            <div class="reaction-item">
-                                                <img id="sadButton" src="/images/sad.png" alt="슬퍼요"
-                                                     onclick="react('SAD')">
-                                                <p>슬퍼요</p>
-                                                <span class="count sad-count">0</span>
-                                            </div>
-                                            <div class="reaction-item">
-                                                <img id="funnyButton" src="/images/funny.png" alt="웃겨요"
-                                                     onclick="react('FUNNY')">
-                                                <p>웃겨요</p>
-                                                <span class="count funny-count">0</span>
-                                            </div>
-                                            <div class="reaction-item">
-                                                <img id="scaryButton" src="/images/scary.png" alt="무서워요"
-                                                     onclick="react('SCARY')">
-                                                <p>무서워요</p>
-                                                <span class="count scary-count">0</span>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="movie_data_box">
-                                            <div class="movie_data_averageRating">
-                                                <h4>평점</h4>
-                                            </div>
-                                            <!--찜하기 구현할것~ (컨트롤러에 연결만하면됨)-->
-                                            <div class="movie_data">
-                                                <h4>찜하기</h4>
+                                            <div class="button_box">
                                                 <div class="favorite-container">
                                                     <img id="favoriteButton" class="fav-icon"
                                                          src="/images/heart%20icon.png" alt="찜하기(좋아요)">
                                                 </div>
+                                                <div class="btn_box">
+                                                    <img onclick="shareMessage()" src="/images/share.png"
+                                                         alt="카카오톡 공유" id="kakao_btn" class="kakao_btn" />
+                                                </div>
                                             </div>
-                                            <div class="btn_box">
-                                                <h4>공유하기</h4>
-                                                    <img onclick="shareMessage()" src="/images/kakaoTalkShare.png"
-                                                         alt="카카오톡 공유" id="kakao_btn" class="kakao_btn"
-                                                    >
-                                            </div>
+                                        </header>
+
+                                        <br>
+                                        <div class="movie_detail">
+                                            <span><b th:text="${movie.releaseDate}">releasedate</b></span>
+                                            <span><b th:text="${movie.runtime} + '분'">runtime</b></span>
+                                            <img id="certification-image" src="" alt="영화심의등급 이미지">
+                                            <span id="certification"
+                                                    ><b id="certificationB" th:text="${movie.certifications}">certification</b></span>
+                                            <span><b class="movie_data_averageRating"></b></span>
+                                        </div>
+
+                                        <p th:text="${movie.overview}">
+                                            ~ overview ~
+                                        </p>
+                                        <div class="button_box">
+                                            <button href="#" class="reservation_btn">예매하기</button>
                                         </div>
                                     </div>
                                 </header>
                             </div>
-                            <h3>출연진</h3>
-                            <div id="movie-info">
+                            <div class="cast">
+                                <h4>출연진</h4>
+                                <div id="cast-members">
+                                </div>
                             </div>
                         </article>
                     </div>
@@ -381,7 +93,7 @@
                     <div class="etc_btn">
                         <button type="button" class="button stillcut_btn clicked">스틸컷</button>
                         <!-- 수정 컨펌 필요 -->
-                        <button type="button" class="button reviews_btn">리뷰</button>
+                        <button type="button" class="button reviews_btn"></button>
                     </div>
                 </section>
 
@@ -395,11 +107,12 @@
                 </div>
 
                 <!-- 스틸컷 for each (반복) -->
-                <div id="stillcut" th:each="movie, iterStat : ${movieInfos}">
+                <div id="still-cut" th:each="movie, iterStat : ${movieInfos}">
                     <div class="row">
                         <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}"
-                             th:class="${iterStat.count > 4} ? 'hide stillCut' : 'stillCut'">
-                            <article class="col-4 col-12-mobile special still-cut-article">
+                             th:classappend="${iterStat.count > 6} ? 'hide still-cut' : 'still-cut'"
+                             class="col-4 col-12-mobile special">
+                            <article class="still-cut-article">
                                 <a href="#" class="image featured">
                                     <img th:if="${#strings.length(movie.id) == 10}"
                                          th:src="@{|/${stillCutPath}|}" alt="스틸컷"
@@ -413,18 +126,47 @@
                             </article>
                         </div>
                     </div>
-                    <p id="showMore" style="cursor: pointer;"><a>more</a></p>
-                    <p id="showLess" style="cursor: pointer; display:none;"><a>접기</a></p>
+                    <p id="showMore" class="cursor"><a><img class="more_btn" src="/images/under-arrow.png" alt="더보기"/></a></p>
+                    <p id="showLess" class="cursor" style="display: none;"><a>접기</a></p>
                 </div>
                 <div id="reviews" style="display: none">
-                    <button onclick="openReviewModal()" class="modal_open">관람평 작성하기</button>
+                    <header>
+                         <div class="reaction-container">
+                                                                    <div class="reaction-item">
+                                                                        <img id="likeButton" src="/images/like.png" alt="재밌어요"
+                                                                             onclick="react('LIKE')">
+                                                                        <span class="count like-count">0</span>
+                                                                    </div>
+                                                                    <div class="reaction-item">
+                                                                        <img id="dislikeButton" src="/images/dislike.png" alt="재미없어요"
+                                                                             onclick="react('DISLIKE')">
+                                                                        <span class="count dislike-count">0</span>
+                                                                    </div>
+                                                                    <div class="reaction-item">
+                                                                        <img id="sadButton" src="/images/sad.png" alt="슬퍼요"
+                                                                             onclick="react('SAD')">
+                                                                        <span class="count sad-count">0</span>
+                                                                    </div>
+                                                                    <div class="reaction-item">
+                                                                        <img id="funnyButton" src="/images/funny.png" alt="웃겨요"
+                                                                             onclick="react('FUNNY')">
+                                                                        <span class="count funny-count">0</span>
+                                                                    </div>
+                                                                    <div class="reaction-item">
+                                                                        <img id="scaryButton" src="/images/scary.png" alt="무서워요"
+                                                                             onclick="react('SCARY')">
+                                                                        <span class="count scary-count">0</span>
+                                                                    </div>
+                                                                </div>
+                        <button onclick="openReviewModal()" class="modal_open">관람평 작성하기</button>
+                    </header>
                     <div class="row">
                         <table class="default" id="reviews-table">
                             <!-- 댓글이 여기에 추가될 것입니다 -->
                         </table>
                     </div>
-                    <p id="showMore_review" style="cursor: pointer;"><a>more</a></p>
-                    <p id="showLess_review" style="cursor: pointer; display:none;"><a>접기</a></p>
+                    <p id="showMore_review" class="cursor"><a><img class="more_btn" src="/images/under-arrow.png" alt="더보기"/></a></p>
+                    <p id="showLess_review" class="cursor" style="display: none;"><a>접기</a></p>
                 </div>
                 <!-- 이미지 상세보기 모달 -->
                 <div id="myModal" class="modal">
@@ -444,17 +186,36 @@
 
     <!-- Scripts -->
     <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/jquery.dropotron.min.js"></script>
-    <script src="/assets/js/jquery.scrolly.min.js"></script>
-    <script src="/assets/js/jquery.scrollex.min.js"></script>
-    <script src="/assets/js/browser.min.js"></script>
-    <script src="/assets/js/breakpoints.min.js"></script>
-    <script src="/assets/js/util.js"></script>
-    <script src="/assets/js/main.js"></script>
 
     <!--              댓글         ------------------             -->
 
     <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var featuredImages = document.querySelectorAll('.image.featured');
+
+            featuredImages.forEach(function(image) {
+                image.addEventListener('mouseenter', function() {
+                    toggleOverlay(this, true);
+                });
+
+                image.addEventListener('mouseleave', function() {
+                    toggleOverlay(this, false);
+                });
+            });
+
+            function toggleOverlay(element, show) {
+                var overlay = element.querySelector('.movie-overlay');
+                if (show) {
+                    overlay.style.display = 'block';
+                    overlay.style.display = 'flex';
+                    overlay.style.flexDirection = 'row';
+                    overlay.style.justifyContent = 'center';
+                    overlay.style.alignItems = 'center';
+                } else {
+                    overlay.style.display = 'none';
+                }
+            }
+        });
 
         const movieId = $('#movieId').val();
 
@@ -480,44 +241,50 @@
                 const data = await response.json();
 
                 // 영화 정보를 담을 요소 생성
-                const movieInfoDiv = document.getElementById('movie-info');
-                movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
-                movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
+                const castMembersDiv = document.getElementById('cast-members');
+                castMembersDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
+                castMembersDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
 
                 // 영화 관람 등급
                 const certificationElement = document.getElementById('certification');
+                const certificationBElement = document.getElementById('certificationB');
                 const certificationValue = certificationElement.textContent;
                 const imgElement = document.getElementById('certification-image');
 
                 switch (certificationValue) {
                     case '12세 이상 관람가':
                         imgElement.src = '/images/ratings/12.png';
+                        certificationBElement.style.color = '#EFC53C';
                         break;
                     case '15세 이상 관람가':
                         imgElement.src = '/images/ratings/15.png';
+                        certificationBElement.style.color = '#D98E04';
                         break;
                     case '18세 이상 관람가':
                         imgElement.src = '/images/ratings/18.png';
+                        certificationBElement.style.color = '#FF0000';
                         break;
                     case '19':
                         certificationElement.textContent = '청소년 관람불가';
                         imgElement.src = '/images/ratings/18.png';
+                        certificationBElement.style.color = '#FF0000';
                         break;
                     default:
                         imgElement.src = '/images/ratings/all.svg';
+                        certificationBElement.style.color = '#237042';
                 }
 
                 // 감독 정보 출력 (이미지 포함)
                 const director = data.crew.find(person => person.job === 'Director');
                 if (director) {
                     const directorDiv = createPersonDiv(director.name, director.profile_path, true);
-                    movieInfoDiv.appendChild(directorDiv); // directorDiv를 movieInfoDiv에 추가
+                    castMembersDiv.appendChild(directorDiv); // directorDiv를 movieInfoDiv에 추가
                 }
 
                 // 출연진 정보 출력 (이미지 포함)
                 data.cast.slice(0, 5).forEach(cast => {
                     const castDiv = createPersonDiv(cast.name, cast.profile_path);
-                    movieInfoDiv.appendChild(castDiv); // castDiv를 movieInfoDiv에 추가
+                    castMembersDiv.appendChild(castDiv); // castDiv를 movieInfoDiv에 추가
                 });
             } catch (error) {
                 console.error('Error:', error);
@@ -529,19 +296,19 @@
         // 인물 정보와 이미지를 담은 div 생성 함수
         function createPersonDiv(name, profilePath, isDirector = false) {
             const personDiv = document.createElement('div'); // 새로운 div 생성
-            personDiv.style.margin = '8px'; // 간격 설정
-            personDiv.style.width = '200px';
-            personDiv.style.height = '300px';
+            personDiv.style.marginRight = '13px'; // 간격 설정
+            personDiv.style.width = '7em';
+            personDiv.style.height = 'auto';
 
             const p = document.createElement('p');
             p.innerHTML = isDirector ? `<p>감독 : ${name}</p>` : `<p>${name}</p>`;
-            p.style.fontSize = '1em'; // 글자 크기 작게 설정
+            p.style.fontSize = '0.8em'; // 글자 크기 작게 설정
+            p.style.textAlign = 'center';
 
             const img = document.createElement('img');
             img.src = profilePath ? `https://image.tmdb.org/t/p/w200${profilePath}` : '/images/img_not_ready2.png';
             img.alt = `${name}'s profile image`;
-            img.style.width = '100%';
-            img.style.height = 'auto'; // 높이를 자동으로 설정
+            img.setAttribute('style', 'width: 100%; height: auto; border-radius: 10px;');
 
             personDiv.appendChild(img);
             personDiv.appendChild(p);
@@ -559,12 +326,12 @@
 
         // 스틸컷 더보기(more), 접기 클릭 함수
         // 현재 표시된 항목의 수를 추적하는 변수
-        var visibleCount = 4; // 처음에 보이는 항목 수
+        var visibleCount = 6; // 처음에 보이는 항목 수
         var increment = 8; // 한 번에 표시할 추가 항목 수
 
         // 스틸컷이 있는지 확인하는 함수
         function hasStillCuts() {
-            var stillCuts = document.querySelectorAll(".stillCut");
+            var stillCuts = document.querySelectorAll(".still-cut");
             return stillCuts.length > 0;
         }
 
@@ -576,13 +343,12 @@
         }
 
         document.getElementById("showMore").addEventListener("click", function () {
-            var stillCuts = document.querySelectorAll(".stillCut");
+            var stillCuts = document.querySelectorAll(".still-cut");
             var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
 
             for (var i = visibleCount; i < newVisibleCount; i++) {
                 stillCuts[i].classList.remove("hide");
             }
-
             visibleCount = newVisibleCount; // 업데이트된 표시된 항목의 수
 
             // "접기" 버튼을 항상 보여줌
@@ -600,9 +366,9 @@
         });
 
         document.getElementById("showLess").addEventListener("click", function () {
-            var stillCuts = document.querySelectorAll(".stillCut");
+            var stillCuts = document.querySelectorAll(".still-cut");
             for (var i = 0; i < stillCuts.length; i++) {
-                if (i > 3) { // 처음 4개를 제외한 나머지를 숨깁니다.
+                if (i > 5) { // 처음 6개를 제외한 나머지를 숨깁니다.
                     stillCuts[i].classList.add("hide");
                 }
             }
@@ -635,8 +401,8 @@
             document.body.style.overflow = '';
             // 자꾸 모달 닫을때 포스터 이미지 크기가 바껴서
             // 걍 모달 함수에서 닫을때 포스터이미지 크기를 강제로 설정해서 크기변동이 없는것처럼 보이게함.
-            document.querySelector('.image.featured img').style.width = '400px';
-            document.querySelector('.image.featured img').style.height = '600px';
+            document.querySelector('.image.featured img').style.width = '350px';
+            document.querySelector('.image.featured img').style.height = '480px';
 
             window.scrollTo(0, currentScrollPosition);
         }
@@ -691,17 +457,16 @@
 
         // 버튼 클릭 시 스틸컷 또는 리뷰 테이블
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('img').forEach(function (img) {
-                img.addEventListener('click', function () {
-                    this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
-                });
-            });
+            // document.querySelectorAll('img').forEach(function (img) {
+            //     img.addEventListener('click', function () {
+            //         this.style.width = (this.style.width === '100%') ? 'auto' : '100%';
+            //     });
+            // });
 
             var stillCutBtn = document.querySelector(".stillcut_btn");
             var reviewsBtn = document.querySelector(".reviews_btn");
-            var stillCutDiv = document.getElementById("stillcut");
+            var stillCutDiv = document.getElementById("still-cut");
             var reviewsDiv = document.getElementById("reviews");
-
 
             stillCutBtn.addEventListener("click", function () {
                 stillCutDiv.style.display = "block";
@@ -777,7 +542,10 @@
 
                     //평점
                     const movieDataSection = $('.movie_data_averageRating');
-                    movieDataSection.html(`<h4>평점</h4><p>${data.averageRating !== null ? data.averageRating : 0}</p>`);
+                    movieDataSection.text(`${data.averageRating !== null ? data.averageRating : 0}`);
+
+                    const reviewsBtn = $('.reviews_btn');
+                    reviewsBtn.text('관람평 (' + data.comments.length + ')');
 
                     //댓글정보
                     const reviewsSection = $('#reviews-table');
@@ -787,7 +555,6 @@
                             appendReviewRow(reviewsSection, comment, emojiMap);
                         }
                     });
-
 
                     if (remainingCommentCount > 0) {
                         $('#showMore_review').show(); // "more" 버튼 표시
@@ -868,14 +635,15 @@
 
         <tr>
             <td>
-                <div>
-                    <span>${emoji}</span>${stars}
-                    <input type="radio" id="${comment.grade}-stars" value="${comment.grade}" checked="checked" />
-                    <span>${new Date().toISOString().slice(0, 10)}</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <h4>${maskedEmail}</h4><span style="margin-left: 40px">${comment.comment}</span>
-                      ${isOwner ? `<button class="delete-btn" data-comment-id="${comment.cno}" style="margin-left: 20px;">삭제</button>` : ''}
+                <div class="review">
+                    <h4 class="review-user-email">${maskedEmail}</h4>
+                    <span class="review-emoji">${emoji}</span>
+                    <input class="review-stars" type="radio" id="${comment.grade}-stars" value="${comment.grade}" checked="checked" />
+                    <span class="review-comment" style="margin-left: 40px">${comment.comment}</span>
+                    <div class="review-right">
+                        <span class="review-date">${new Date().toISOString().slice(0, 10)}</span>
+                          ${isOwner ? `<button class="delete-btn" data-comment-id="${comment.cno}" style="margin-left: 20px;">삭제</button>` : ''}
+                    </div>
                 </div>
             </td>
         </tr>
@@ -889,7 +657,6 @@
         $(document).ready(function () {
 
             var isFavorited = false; // 현재 사용자의 찜하기(좋아요) 상태를 저장할 변수임
-
 
             // 현재 찜하기 상태를 가져오기 위해 API 호출
             $.ajax({
@@ -955,8 +722,6 @@
                     favoriteButton.removeClass('favorited'); // 찜한 상태 클래스 제거
                 }
             }
-
-
         });
 
 
@@ -1203,7 +968,6 @@
         });
 
         $(document).on('click', '.delete-btn', function () {
-
             const cno = $(this).data('comment-id');
             console.log(cno);
             deleteComment(cno);
@@ -1274,11 +1038,11 @@
                                     // actorData를 사용하여 필요한 작업 수행
                                     console.log(actorData + " === actorData 체크");
                                     // 각 배우 정보를 화면에 추가 (가로로 나열)
-                                    const movieInfoDiv = document.getElementById('movie-info');
-                                    movieInfoDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
-                                    movieInfoDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
+                                    const castMembersDiv = document.getElementById('cast-members');
+                                    castMembersDiv.style.display = 'flex'; // Flexbox 레이아웃 적용
+                                    castMembersDiv.style.flexWrap = 'wrap'; // 요소들이 넘치면 다음 줄로 넘김
                                     const actorDiv = createPersonDiv(actorData.actorName, actorData.actorProfilePic);
-                                    movieInfoDiv.appendChild(actorDiv);
+                                    castMembersDiv.appendChild(actorDiv);
                                 })
                                 .catch(error => {
                                     console.error('Error fetching actor data:', error);
@@ -1293,19 +1057,20 @@
             // 인물 정보와 이미지를 담은 div 생성 함수
             function createPersonDiv(name, profilePath) {
                 const personDiv = document.createElement('div'); // 새로운 div 생성
-                personDiv.style.margin = '8px'; // 간격 설정
-                personDiv.style.width = '200px';
-                personDiv.style.height = '300px';
+                personDiv.style.margin = '13px'; // 간격 설정
+                personDiv.style.width = '7em';
+                personDiv.style.height = 'auto';
+                personDiv.style.borderRadius = '10px';
 
                 const p = document.createElement('p');
                 p.innerHTML = `<p>${name}</p>`;
-                p.style.fontSize = '1em'; // 글자 크기 작게 설정
+                p.style.fontSize = '0.8em'; // 글자 크기 작게 설정
+                p.style.textAlign = 'center';
 
                 const img = document.createElement('img');
                 img.src = profilePath ? `https://image.tmdb.org/t/p/w200${profilePath}` : '/images/img_not_ready2.png';
                 img.alt = `${name}'s profile image`;
-                img.style.width = '100%';
-                img.style.height = 'auto'; // 높이를 자동으로 설정
+                img.setAttribute('style', 'width: 100%; height: auto; border-radius: 10px;');
 
                 personDiv.appendChild(img);
                 personDiv.appendChild(p);

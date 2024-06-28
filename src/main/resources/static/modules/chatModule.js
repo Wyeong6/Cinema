@@ -11,7 +11,7 @@ import { updateTimeSinceCreated } from './timeSinceCreated.js';
  *                           }
  * @returns {Stomp.Client} - Stomp 클라이언트 객체 반환
  */
-export async function connectWebSocket(options) {
+export function connectWebSocket(options) {
     const {
         subscribeCallback,
         displayChatListCallback,
@@ -24,29 +24,27 @@ export async function connectWebSocket(options) {
     const stompClient = Stomp.over(socket); // Stomp 클라이언트 객체 생성
 
     // 웹소켓 연결
-    stompClient.connect({}, async function (frame) {
+    stompClient.connect({},function (frame) {
         console.log('Connected to WebSocket: ' + frame);
-
+        console.log('Connected to WebSocket: ' + frame);
         // '/user/queue/chatList' 주제를 구독하여 메시지 처리
-        stompClient.subscribe('/user/queue/chatList', async function (message) {
+        stompClient.subscribe('/user/queue/chatList', function (message) {
             const response = JSON.parse(message.body);
             console.log("Received message:", response);
 
             // 클라이언트가 가지고 있는 페이징 번호를 사용하여 업데이트
             console.log("response.inactiveCurrentPage" + response.inactiveCurrentPage);
 
-            // displayChatListCallback 함수를 호출하여 채팅 목록 화면에 업데이트
+            // displayChatListCallback 함수를 호출하여 채팅 목록을 화면에 업데이트
             if (displayChatListCallback) {
-                await displayChatListCallback(response);
+                 displayChatListCallback(response);
             }
-
             // subscribeCallback 함수를 호출하여 구독된 메시지 처리
-            await subscribeCallback(response);
+             subscribeCallback(response);
         });
-
         // loadInitialData가 함수인 경우 최초 데이터 로드 수행
         if (initialDataParams) {
-            await loadChatList(...initialDataParams); // 파라미터 전달하여 초기 데이터 로드
+             loadChatList(...initialDataParams); // 파라미터 전달하여 초기 데이터 로드
         }
     });
 
@@ -60,7 +58,7 @@ export let activePage = 1;
 export let inactivePage = 1;
 
 
-//모달창 열려있을 때 메세지가 오면 해당 메세지 읽은 시간 업데이트
+//모달창 열려있을 때 메세지가 오면 해당 메세지 읽은 시간 업데이트 후 리스트반환
 export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
     return fetch(`/chat/updateLastReadTimestamp/${chatRoomId}`, {
         method: 'POST',
@@ -72,6 +70,7 @@ export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
+            console.log("updateLastReadTimestamp의 response" + response)
             // loadChatList를 호출하고 그 결과 프로미스를 반환
             return loadChatList(activePage, inactivePage, 8, true);
         })
@@ -107,7 +106,6 @@ export function loadChatList(page1, page2, size, isUpdateUnreadCountOnly) {
         contentType: "application/x-www-form-urlencoded",
         success: function (response) {
             adminEmail = response.activeMemberEmail || response.inactiveMemberEmail;
-
             if (isUpdateUnreadCountOnly) {
                 updateUnreadCount(response);
             } else {
@@ -127,19 +125,19 @@ export function loadChatList(page1, page2, size, isUpdateUnreadCountOnly) {
  */
 export function updateUnreadCount(response) {
     var activeChatRoomList = response.activeChatRoom || [];
-
     var totalUnreadCount = activeChatRoomList.reduce((sum, activeChatRoom) => sum + activeChatRoom.unreadMessageCount, 0);
-    var unreadMessagesDiv = document.getElementById('unreadMessages');
-    var unreadCountSpan = document.getElementById('unreadCount');
+    var $unreadCount = $('#unreadCount');
 
+    console.log("activeChatRoomList" + activeChatRoomList)
+    console.log("totalUnreadCount" + totalUnreadCount)
     // 안 읽은 메시지 수 업데이트
-    unreadCountSpan.textContent = `(${totalUnreadCount})`;
+    $unreadCount.text(totalUnreadCount);
 
     // 안 읽은 메시지가 있는 경우 표시
     if (totalUnreadCount > 0) {
-        unreadMessagesDiv.style.display = 'block';
+        $unreadCount.show();
     } else {
-        unreadMessagesDiv.style.display = 'none';
+        $unreadCount.hide();
     }
 }
 
@@ -183,7 +181,6 @@ function displayRoomList(roomList, $container) {
             if (lastMessage) {
                 lastMessageContent = lastMessage.content;
                 lastMessageCreatedAt = lastMessage.createAt;
-                console.log("lastMessageCreatedAt" + lastMessageCreatedAt);
             }
         }
 
@@ -199,14 +196,14 @@ function displayRoomList(roomList, $container) {
                 <td>${truncatedContent} (${chatRoom.unreadMessageCount}개 메시지)</td>
                 <td>${chatRoom.userEmail}</td>
                 <td>${chatRoom.userName}</td>
-                <td data-createdat='${lastMessageCreatedAt}'> <span class="time-since-created"></span></td>
+                <td data-createdAt='${lastMessageCreatedAt}'> <span class="time-since-created"></span></td>
             </tr>`;
 
         // 생성한 행을 채팅 목록에 추가
         $container.append(chatRoomRow);
     });
 }
-
+//페이징 기능
 function updatePagination(response, type) {
     var $pagination = $("#" + type + "-pagination");
     $pagination.empty();
@@ -266,6 +263,6 @@ window.chatUtils = {
         return activePage;
     },
     get inactivePage() {
-        return inactivePage;
+        return inactivePage;1
     }
 };

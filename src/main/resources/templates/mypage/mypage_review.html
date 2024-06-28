@@ -1,8 +1,10 @@
 <article id="mypage_review">
-    <header>작성한 관람평 보기</header>
+    <header>
+        <h5>내가 작성한 리뷰</h5>
+    </header>
     <!-- 댓글 목록 테이블 -->
     <section th:unless="${#lists.isEmpty(comments)}">
-        <table class="default">
+        <table>
             <tr>
                 <th>날짜</th>
                 <th>영화명</th>

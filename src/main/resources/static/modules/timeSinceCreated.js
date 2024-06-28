@@ -2,7 +2,6 @@
 function updateTimeSinceCreated() {
     $('.time-since-created').each(function () {
         var createdAtText = $(this).closest('td').data('createdat').trim(); // 데이터 속성에서 텍스트 가져오기 (공백 제거)
-        console.log("createdAtText" + createdAtText)
         var createdAt = new Date(Date.parse(createdAtText));
 
         if (isNaN(createdAt.getTime())) {
@@ -14,7 +13,7 @@ function updateTimeSinceCreated() {
         var now = new Date(); // 현재 시간
         var elapsedTime = now - createdAt; // 경과 시간(밀리초 단위)
 
-        // 밀리초를 시간으로 변환 (예: 시간 단위로 나누기)
+        // 밀리초를 시간으로 변환
         var seconds = Math.floor(elapsedTime / 1000);
         var minutes = Math.floor(seconds / 60);
         var hours = Math.floor(minutes / 60);

@@ -2,6 +2,7 @@ package com.busanit.controller;
 
 import com.busanit.domain.*;
 import com.busanit.domain.movie.MovieDTO;
+import com.busanit.entity.Payment;
 import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -70,7 +71,7 @@ public class PaymentController {
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
         model.addAttribute("pointInfo", currentPoints); // 사용자 보유 포인트
-        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
+//        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
 
         model.addAttribute("scheduleDTO", scheduleDTO);
         model.addAttribute("movieDTOs", movieDTOs);
@@ -86,12 +87,13 @@ public class PaymentController {
     @PostMapping("/request")
     @ResponseBody
     public Map<String, String> paymentRequest(@RequestBody Map<String, String> request) {
+        /* html 파일에 결제 구동 스크립트 파일, 변수(3가지) 필요 */
         Map<String, String> response = new HashMap<>();
 
         response.put("html5InicisKey", html5InicisKey);
-        response.put("orderName", request.get("orderName"));
+        response.put("orderName", request.get("orderName")); // 제품명
         response.put("currentPrice", request.get("currentPrice"));
-        response.put("reqIDX", request.get("reqIDX"));
+        response.put("reqIDX", request.get("reqIDX")); // 결제를 요청한 페이지 IDX
 
         // 현재 로그인한 사용자의 정보 (이메일, idx)
 //        List<String> memberInfo = new ArrayList<>();
@@ -100,17 +102,72 @@ public class PaymentController {
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
 //        memberInfo.add(memberRegFormDTO.getId().toString());
         response.put("memberEmail", userEmail);
-        response.put("memberIdx", memberRegFormDTO.getId().toString());
+        response.put("memberName", memberRegFormDTO.getName());
 
         return response;
     }
 
-    @GetMapping("/complete")
-    public @ResponseBody void paymentComplete(Long amount) {
-        System.out.println(amount);
-//        int id = UserService.getIdFromAuth();
-//        paymentService.orderComplete(new PaymentDTO(amount), id);
-        // DB에 저장하는 로직 넣기
+    @PostMapping("/complete")
+    @ResponseBody
+    public Map<String, String> paymentComplete(@RequestParam String merchant_uid,
+                                               @RequestParam String imp_uid,
+                                               @RequestParam String apply_num, // 카드 승인 번호
+                                               @RequestParam String buyer_email, // 결제사에서 받아오는 메일이라 결제시 메일 주소 수정해서 보내면 로그인한 사람 메일과 다를 것 같아서 데이터 받아봄
+                                               @RequestParam String payment_status,
+                                               @RequestParam String product_idx,
+                                               @RequestParam String product_name,
+                                               @RequestParam String product_type,
+                                               @RequestParam String content1,
+                                               @RequestParam String content2,
+                                               @RequestParam String content3,
+                                               @RequestParam String content4,
+                                               @RequestParam String product_count,
+                                               @RequestParam Integer amount,
+                                               PaymentDTO paymentDTO) {
+
+        Map<String, String> response_complete = new HashMap<>();
+//        if(request != null) {
+//            response_complete.put("merchant_uid", request.get("merchant_uid"));
+//            response_complete.put("currentPrice", request.get("amount"));
+//            response_complete.put("apply_num", request.get("apply_num")); // 카드 승인 번호
+//            response_complete.put("payment_status", request.get("payment_status"));
+//            response_complete.put("buyer_email2", request.get("buyer_email")); // 결제사에서 받아오는 메일
+
+        if(merchant_uid != null) {
+            paymentDTO.setMerchantUid(merchant_uid);
+            paymentDTO.setImpUid(imp_uid);
+            paymentDTO.setApplyNum(apply_num);
+            paymentDTO.setBuyerEmail(buyer_email);
+            paymentDTO.setPaymentType("CARD");
+            paymentDTO.setPaymentStatus(payment_status);
+            paymentDTO.setProductIdx(product_idx);
+            paymentDTO.setProductName(product_name);
+            paymentDTO.setProductType(product_type);
+            paymentDTO.setContent1(content1);
+            paymentDTO.setContent2(content2);
+            paymentDTO.setContent3(content3);
+            paymentDTO.setContent4(content4);
+            paymentDTO.setProductCount(product_count);
+            paymentDTO.setTotalPrice(amount);
+
+            paymentService.savePayment(Payment.toEntity(paymentDTO, memberService.findUserIdx(memberService.currentLoggedInEmail())));
+        }
+        return response_complete;
+    }
+
+    @GetMapping("/paymentSuccessful")
+    public String paymentSuccessful() {
+
+        return "payment/payment_complete";
+    }
+
+    @PostMapping("/paymentFailed")
+    @ResponseBody
+    public Map<String, String> paymentFailed(@RequestBody Map<String, String> request) {
+        Map<String, String> response_failed = new HashMap<>();
+        response_failed.put("response_failed", "response_failed");
+
+        return response_failed;
     }
 
     // 스낵 cart
@@ -121,17 +178,6 @@ public class PaymentController {
         Page<SnackDTO> snackDTOList = null;
         snackDTOList = snackService.getSnackListRandom(pageable);
         model.addAttribute("snackList", snackDTOList);
-
-        // 결제
-        model.addAttribute("html5InicisKey", html5InicisKey);
-
-        // 현재 로그인한 사용자의 정보 (이메일, idx)
-        List<String> memberInfo = new ArrayList<>();
-        String userEmail = memberService.currentLoggedInEmail();
-        memberInfo.add(userEmail);
-        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-        memberInfo.add(memberRegFormDTO.getId().toString());
-        model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
 
         return "payment/cart_list";
     }

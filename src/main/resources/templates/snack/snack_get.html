@@ -4,44 +4,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <title>Cinemacast</title>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
-    <link href="/assets/css/main.css" rel="stylesheet"/>
-    <link href="/assets/css/custom.css" rel="stylesheet"/>
-    <link href="/assets/css/nav.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <noscript>
-        <link href="/assets/css/noscript.css" rel="stylesheet"/>
-    </noscript>
-    <style>
-        .swal2-popup {
-            font-size: 1.2rem;
-            color: #333;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .swal2-title {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .swal2-content {
-            font-size: 1em;
-        }
-        .swal2-confirm {
-            background-color: #3085d6;
-            color: #fff;
-            border: none;
-        }
-        .swal2-cancel {
-            background-color: #aaa;
-            color: #fff;
-            border: none;
-        }
-    </style>
-</head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
@@ -118,18 +80,7 @@
 
     </div>
 
-    <!-- Scripts -->
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/jquery.dropotron.min.js"></script>
-    <script src="/assets/js/jquery.scrolly.min.js"></script>
-    <script src="/assets/js/jquery.scrollex.min.js"></script>
-    <script src="/assets/js/browser.min.js"></script>
-    <script src="/assets/js/breakpoints.min.js"></script>
-    <script src="/assets/js/util.js"></script>
-    <script src="/assets/js/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!--결제 프로그램 관련 script 시작-->
+    <!--결제 프로그램 쓰려면 jquery 필요-->
     <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
     <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" type="text/javascript"></script>
     <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
@@ -140,7 +91,13 @@
     <script th:inline="javascript">
         let currentCount = 1; // 장바구니 저장값
 
-        /* 결제 프로그램 사용시 필요한 변수 시작 */
+        /* 결제 프로그램 사용시 필요한 변수 */
+        const productIdx = [[${snack.id}]];
+        const content1 = null; // 상영일자 (영화관련 변수)
+        const content2 = null; // 시간 (영화관련 변수)
+        const content3 = null; // 상영관 (영화관련 변수)
+        const content4 = null; // 좌석 (영화관련 변수)
+        let productCount = null;
         let currentPrice = 0; // 결제시 사용할 변수
         const orderName = [[${snack.snack_nm}]]; // 결제시 사용할 이름
         const reqIDX = "SN" // 결제를 요청한 페이지 IDX
@@ -162,6 +119,7 @@
                 totalPriceElement.textContent = totalPrice.toLocaleString() + '원';
                 currentPrice = totalPrice; // 현재 Price를 전역 변수에 저장
                 currentCount = count; // 현재 count를 전역 변수에 저장
+                productCount = currentCount;
             }
 
             function updateDiscountButtonState() {
