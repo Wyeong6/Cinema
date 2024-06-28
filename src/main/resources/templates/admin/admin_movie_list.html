@@ -1,15 +1,16 @@
 <!-- Navbar -->
 
 <div id="movie-list-container">
-
     <!-- / Navbar -->
-
     <!-- Content -->
-
     <!-- Hoverable Table rows -->
     <div class="card">
         <div class="movie-list-container">
             <h5 class="card-header">Movies List</h5>
+            <div id="search-container" class="mt-3 mb-3 d-flex align-items-center">
+                <input type="text" id="search-query" name="query" class="form-control form-control-sm me-1" placeholder="검색어를 입력하세요">
+                <button id="search-button" class="btn btn-primary btn-sm">검색</button>
+            </div>
             <div class="table-responsive text-nowrap">
                 <table class="table table-hover" style="table-layout: fixed;">
                     <thead>
@@ -68,13 +69,97 @@
 <div class="movie-edit-container" style="display: none;">
     <!--수정폼 자리-->
 </div>
+<div id="movie-search-list-container">
+    <!-- 검색 결과가 표시될 영역 -->
+</div>
 <!--/ Hoverable Table rows -->
 
+<style>
+    .pagination {
+        margin-top: 20px;
+    }
+
+    .pagination .page-item {
+        cursor: pointer;
+    }
+
+    .pagination .page-link {
+        color: #007bff;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+    }
+
+    .pagination .page-link:hover {
+        color: #0056b3;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+
+    .pagination .page-item.active .page-link {
+        z-index: 1;
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+
+    }
+
+    #search-container {
+        height: 38px; /* 원하는 높이로 조정 */
+    }
+
+    #search-query,
+    #search-button {
+        height: 100%;
+    }
+</style>
 <script>
 
-    $(document).ready(function () {
-        // 영화 수정 버튼 클릭 시
 
+
+    $(document).ready(function () {
+
+        // 엔터키 눌렀을때 (keypress)
+        $('#search-query').keypress(function (e) {
+            if (e.which === 13) { // 13은 엔터 키의 keyCode입니다.
+                searchMovies();
+            }
+        });
+
+        // 검색 버튼 클릭시 검색
+        $('#search-button').click(function () {
+            searchMovies();
+        });
+
+        function searchMovies() {
+            var query = $('#search-query').val();
+            $.ajax({
+                url: '/listSearch',
+                type: 'GET',
+                data: { query: query },
+                success: function (data) {
+                    $('.movie-list-container').hide();
+                    $('.movie-edit-container').remove();
+                    $('#movie-search-list-container').html(data);
+                },
+                error: function (xhr, status, error) {
+                    alert('검색 중 오류가 발생했습니다.');
+                    console.error('검색 중 오류가 발생했습니다.');
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    console.error('Response:', xhr.responseText);
+                    alert('검색 중 오류가 발생했습니다.');
+                }
+            });
+        }
+
+        // 영화 수정 버튼 클릭 시
         $(document).off('click', '.edit-movie-btn').on('click', '.edit-movie-btn', function () {
             var movieId = $(this).data('movie-id');
             var data = {

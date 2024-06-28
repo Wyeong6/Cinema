@@ -129,7 +129,6 @@ public class AdminPageController {
 
     @PostMapping("/movieRegister")
     public String movieRegister() {
-        System.out.println("페이징 이동후 수정눌렀을때 뜨는거 체크");
         return "admin/admin_movie_register";
     }
 

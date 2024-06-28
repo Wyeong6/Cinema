@@ -1,0 +1,159 @@
+<!-- movie_search_results.html -->
+<style>
+    .pagination {
+        margin-top: 20px;
+    }
+
+    .pagination .page-item {
+        cursor: pointer;
+    }
+
+    .pagination .page-link {
+        color: #007bff;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+    }
+
+    .pagination .page-link:hover {
+        color: #0056b3;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+
+    .pagination .page-item.active .page-link {
+        z-index: 1;
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+</style>
+<!-- Navbar -->
+<div id="movie-list-container">
+    <!-- Content -->
+    <!-- Hoverable Table rows -->
+    <div class="card">
+        <div class="movie-list-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-header m-0">검색 결과</h5>
+                <button class="btn btn-secondary" type="button" id="formCancel" onclick="cancelForm()"
+                        style="margin-right: 300px; margin-top: 20px">뒤로가기</button>
+            </div>
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover" style="table-layout: fixed;">
+                    <thead>
+                    <tr>
+                        <th style="width: 10%;">영화 번호</th>
+                        <th style="width: 30%;">제목</th>
+                        <th style="width: 5%;">상영시간</th>
+                        <th style="width: 10%;">개봉일자</th>
+                        <th style="width: 10%;">수정</th>
+                        <th style="width: 20%;">삭제</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                    <tr th:each="movie : ${searchResults}">
+                        <td><i class="fab fa-angular fa-lg text-danger me-3"></i><strong th:text="${movie.id}">영화ID</strong></td>
+                        <td><i class="fab fa-angular fa-lg text-danger me-3"></i><a th:href="@{/movies/{id}(id=${movie.id})}" th:text="${movie.title}">영화제목</a></td>
+                        <td th:text="${movie.runtime}">영화런타임</td>
+                        <td th:text="${movie.releaseDate}">영화개봉일자</td>
+                        <td><a href="#" class="btn btn-primary btn-sm edit-movie-btn" th:data-movie-id="${movie.id}">수정</a></td>
+                        <td><button class="btn btn-danger btn-sm delete-movie-btn" th:data-movie-id="${movie.id}">삭제</button></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="movie-edit-container" style="display: none;">
+    <!-- 수정폼 자리 -->
+</div>
+<!--/ Hoverable Table rows -->
+
+<!-- jQuery 및 Ajax 스크립트 -->
+<script>
+    $(document).ready(function () {
+
+
+        // 영화 수정 버튼 클릭 시
+        $(document).off('click', '.edit-movie-btn').on('click', '.edit-movie-btn', function () {
+            var movieId = $(this).data('movie-id');
+            var data = {
+                type: 'POST',
+                movieId: movieId
+            };
+
+            // 기존의 폼이 있으면 제거
+            $('.movie-edit-container').empty();
+            // 목록 컨테이너 숨기기
+            $('.movie-list-container').hide();
+            // 새로운 폼 로드
+            $('.movie-edit-container').load('/admin/movieRegister', data, function () {
+                initializeEditMode(movieId); // 수정 모드 활성화
+                clearSelectedActors(); // 배우 검색 초기화
+                console.log("data 체크 === ", data);
+                // 수정 폼 컨테이너 표시
+                $('.movie-edit-container').show();
+            });
+        });
+
+        // 영화 삭제 버튼 클릭 시
+        $(document).off('click', '.delete-movie-btn').on('click', '.delete-movie-btn', function () {
+            var movieId = $(this).data('movie-id');
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/movies/delete/' + movieId,
+                    type: 'POST', // DELETE 메서드를 사용할 경우, type: 'DELETE'로 변경
+                    success: function (data) {
+                        // 삭제 성공 시 메시지 표시 또는 영화 목록 갱신 등의 작업 수행
+                        alert('영화가 성공적으로 삭제되었습니다.');
+                        $('.container-xxl').load('/admin/movieList', { type: 'POST' });
+                    },
+                    error: function () {
+                        alert('영화 삭제 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+            // confirm 창에서 '취소'를 클릭한 경우 이벤트 전파를 막기 위해 return false; 추가
+            return false;
+        });
+    });
+
+    // 영화 목록 로드 함수
+    function loadSearchResults(page) {
+        $.ajax({
+            url: '/listSearch', // 검색 결과를 가져오는 URL로 변경 필요
+            type: 'POST',
+            data: { page: page },
+            success: function (data) {
+                // 결과 HTML을 컨테이너에 삽입
+                $('.movie-edit-container').remove();
+                $('#movie-list-container').html(data);
+            },
+            error: function () {
+                alert('영화 목록 로드 중 오류가 발생했습니다.');
+            }
+        });
+    };
+
+    function cancelForm() {
+        fetch('/admin/movieList', {
+            method: 'POST'
+        }).then(response => {
+            if (response.ok) {
+                $('.container-xxl').load('/admin/movieList', { type : 'POST' });
+            } else {
+                console.error('POST request failed');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    };
+</script>
