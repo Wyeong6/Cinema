@@ -3,6 +3,7 @@ package com.busanit.controller;
 import com.busanit.domain.*;
 import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Payment;
+import com.busanit.entity.Point;
 import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,6 +48,7 @@ public class PaymentController {
             @RequestParam int teenagerCount,
             @RequestParam int grandCount,
             @RequestParam double totalAmount,
+            @PageableDefault(size = 1, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
         ScheduleDTO scheduleDTO = scheduleService.getScheduleById(scheduleId);
         List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(scheduleDTO.getMovieId());
@@ -65,7 +68,7 @@ public class PaymentController {
             default -> 0.03;
         };
         long currentPoints = 0;
-        currentPoints = pointService.getCurrentPoints(memberRegFormDTO.getId());
+        currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
 
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
@@ -122,7 +125,11 @@ public class PaymentController {
                                                @RequestParam String content4,
                                                @RequestParam String product_count,
                                                @RequestParam Integer amount,
-                                               PaymentDTO paymentDTO) {
+                                               @RequestParam Integer plusPoint,
+                                               @RequestParam Integer minusPoint,
+                                               @PageableDefault(size = 1, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                               PaymentDTO paymentDTO,
+                                               PointDTO pointDTO) {
 
         Map<String, String> response_complete = new HashMap<>();
 
@@ -144,8 +151,46 @@ public class PaymentController {
             paymentDTO.setContent4(content4);
             paymentDTO.setProductCount(product_count);
             paymentDTO.setTotalPrice(amount);
-
             paymentService.savePayment(Payment.toEntity(paymentDTO, memberService.findUserIdx(memberService.currentLoggedInEmail())));
+
+            pointDTO.setContent("["+product_name+"] 구매");
+            pointDTO.setImpUid(imp_uid);
+            // 현재 포인트
+            int currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
+            // 누적 포인트
+            int totalPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getTotalPoints();
+            pointDTO.setTotalPoints(totalPoints);
+
+            if((product_type).equals("MO")) { // 영화
+                pointDTO.setContentType(true);
+            } else { // 스낵
+                pointDTO.setContentType(false);
+            }
+
+            // 포인트타입
+            if(minusPoint > 0) { // 사용
+                pointDTO.setPointType("-");
+                pointDTO.setPoints(minusPoint);
+                currentPoints -= minusPoint;
+                pointDTO.setCurrentPoints(currentPoints);
+                pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+            }
+
+            if(plusPoint > 0) { // 적립
+                pointDTO.setPointType("+");
+                pointDTO.setPoints(plusPoint);
+                currentPoints += plusPoint;
+                pointDTO.setCurrentPoints(currentPoints);
+                totalPoints += plusPoint;
+                pointDTO.setTotalPoints(totalPoints);
+                pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+            }
+
+//            if(minusPoint == 0 && plusPoint == 0 ) {
+//
+//            }
+
+
         }
         return response_complete;
     }
