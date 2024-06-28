@@ -124,6 +124,8 @@
         let currentPrice = null;
         const orderName = document.getElementById("movieTitle").textContent; // 결제시 사용할 이름(제품명)
         const reqIDX = "MO"; // 결제를 요청한 페이지 IDX
+        let plusPoint = 0;
+        let minusPoint = 0;
 
         /*<![CDATA[*/
         $(document).ready(function () {
@@ -164,7 +166,7 @@
             const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
             $('#total-amount').text(totalAmount + '원');
 
-            // 포인트 입력이 사용자가 보유한 포인트를 넘지 않게 제한, 포인트는 1의자리 올림
+            // 포인트 입력시 사용자가 보유한 포인트를 넘지 않게 제한, 포인트는 1의자리 올림
             const pointInfo = [[${pointInfo}]];
             $('.point-input').on('input', function () {
                 const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
@@ -177,6 +179,8 @@
                 currentPrice = resultPrice;
                 $('#result-price').text(resultPrice + '원');
                 $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
+                plusPoint = Math.ceil(resultPrice * gradeInfo);
+                minusPoint = parseInt($("#point").val(), 10);
             });
 
             // 초기 실행 (포인트 입력 값이 비어있을 경우 0으로 처리)
@@ -185,6 +189,7 @@
             currentPrice = resultPrice;
             $('#result-price').text(resultPrice + '원');
             $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
+            plusPoint = Math.ceil(resultPrice * gradeInfo);
         });
         /*]]>*/
 

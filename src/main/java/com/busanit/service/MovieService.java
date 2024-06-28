@@ -92,6 +92,7 @@ public class MovieService {
         lastFetchDate = LocalDate.now();
     }
 
+
     // 어드민페이지에서 영화를 삭제했을때 만약 API에서 주기적으로 받아와 서버에 저장하고있는 영화라면
     //
     private List<Long> getBlacklistedMovieIds() {
@@ -723,6 +724,17 @@ public class MovieService {
             movie.addImage(movieImage);
         }
         movieRepository.save(movie); // 변경 감지에 의해 자동으로 데이터베이스에 저장됨
+
+        updateCachedMovies();
+    }
+
+    // 캐시 업데이트 메서드
+    private void updateCachedMovies() {
+        // 데이터 로컬 캐시 전략 업데이트
+        cachedVideoMovies = getVideoMovies();
+        cachedAllMovies = getAll();
+        cachedHotMovies = getHotMovies();
+        cachedActors = getActors();
     }
 
     // 영화 등록 관련 로직
@@ -775,6 +787,7 @@ public class MovieService {
     // 영화 삭제 (어드민 페이지)
     public void deleteMovie(Long movieId) {
         movieRepository.deleteById(movieId);
+        updateCachedMovies();
     }
 
     //영화 수정 (어드민 페이지)

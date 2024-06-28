@@ -129,6 +129,11 @@ public class MypageController {
         return snackPaymentService.getSnackPaymentInfo(memberRegFormDTO.getId(), pageable);
     }
 
+    @GetMapping("/order/detail")
+    public String mypageOrderDetail() {
+        return "/mypage/mypage_order_detail";
+    }
+
     @GetMapping("/membership")
     public String mypageMembership(Model model) {
         // 현재 로그인한 사용자의 이메일
