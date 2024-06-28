@@ -156,7 +156,7 @@
         // 옵션 객체 정의
         const options2 = {
             subscribeCallback: handleWebSocketMessage, // 메시지를 받았을 때 호출할 콜백 함수 지정
-            displayChatListCallback: displayChatList, // 채팅 목록을 화면에 표시할 콜백 함수로 displayChatList 함수를 지정
+            // displayChatListCallback: displayChatList, // 채팅 목록을 화면에 표시할 콜백 함수로 displayChatList 함수를 지정
             initialDataParams: [1, 1, 8, false] // 초기 데이터 로드 파라미터
         };
 
@@ -213,6 +213,15 @@
         inactivePage = window.chatUtils.inactivePage;
         window.chatUtils.updateLastReadTimestamp(chatRoomId, activePage, inactivePage); // 페이징 번호 전달
     }
+    //이전 메세지 문구
+    function addPreviousMessagesIndicator() {
+        const messages = getElement('messages');
+        const previousMessagesIndicator = document.createElement('p');
+        previousMessagesIndicator.id = 'previousMessagesIndicator';
+        previousMessagesIndicator.className = 'message-style';
+        previousMessagesIndicator.textContent = '----------- 이전 메시지입니다 -----------';
+        messages.appendChild(previousMessagesIndicator);
+    }
 
     // Stomp 연결 함수
     function connect() {
@@ -223,6 +232,7 @@
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             subscribeToRecipient();
+            sendAdminEnter();
             // 타이핑 이벤트를 감지하여 서버로 전송
             document.getElementById('message').addEventListener('input', handleTypingEvent);
         });
@@ -249,7 +259,26 @@
             }
         });
     }
+    // 관리자가 채팅방에 입장했다는 알림을 전송
+    function sendAdminExit() {
+        console.log("채팅방나감")
+        const EnterNotification = {
+            chatRoomId: chatRoomId,
+            recipient: currentRecipient,
+            type: 'exit'
+        };
+        stompClient.send("/app/chat/admin/enter", {}, JSON.stringify(EnterNotification));
+    }
 
+    // 관리자가 채팅방에 입장했다는 알림을 전송
+    function sendAdminEnter() {
+        const EnterNotification = {
+            chatRoomId: chatRoomId,
+            recipient: currentRecipient,
+            type: 'enter'
+        };
+        stompClient.send("/app/chat/admin/enter", {}, JSON.stringify(EnterNotification));
+    }
     // 메시지 전송 함수
     function sendMessage() {
         var messageContent = getElement('message').value;
@@ -259,7 +288,11 @@
                 sender: memberEmail,
                 recipient: currentRecipient,
                 content: messageContent,
-                status: "active"
+                status: "active",
+                paging: {
+                    activePage: activePage,
+                    inactivePage: inactivePage
+                }
             };
             console.log("Sending message:", message);
             stompClient.send("/app/chat/private", {}, JSON.stringify(message));
@@ -331,7 +364,6 @@
         //입력필드 비활성화
         document.getElementById('message').disabled = true;
     }
-
     // 메시지 가져오기 함수
     function fetchMessages(chatRoomId) {
 
@@ -341,15 +373,29 @@
                 return response.json();
             })
             .then(data => {
+                console.log("Fetch response:", data);
                 data.forEach(item => {
+                    let hasUnreadMessages = false; // 안 읽은 메시지 여부를 판단하는 변수
+
+
                     item.messages.forEach(message => {
-                        // chatRoomTitle이 "endChat"이 아닌 메시지만 화면에 표시
                         if (message.chatRoomTitle !== "endChat") {
                             let displayMessage = message.recipient === currentRecipient ? `관리자 : ${message.content}` : `${message.sender} : ${message.content}`;
                             showMessage(displayMessage);
+
+                            // // 안 읽은 메시지가 있으면 플래그를 설정
+                            // if (!message.read) {
+                            //     hasUnreadMessages = true;
+                            // }
                         }
                     });
+
+                    // 첫 번째 안 읽은 메시지 섹션을 출력
+                    // if (hasUnreadMessages) {
+                    //     showMessage('---------- 안 읽은 메시지입니다 ----------');
+                    // }
                 });
+
 
                 // 상태가 "active"일 때 입력창 활성화
                 document.getElementById('message').disabled = !data.some(item => item.type === "active");
@@ -381,9 +427,10 @@
 
     // 채팅 모달 닫기 함수
     function closeModal() {
-        currentRecipient = '';
         getElement('myModal').style.display = 'none';
+        sendAdminExit();
         disconnect(); //웹소켓 연결 해제
+        currentRecipient = '';
         window.chatUtils.loadChatList(activePage, inactivePage, 8, false);
     }
 

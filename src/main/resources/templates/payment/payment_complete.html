@@ -1,10 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <h2>결제 완료 페이지 입니다</h2>
+<!DOCTYPE HTML>
+<html lang="en"
+      layout:decorate="~{layout/layout_total}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body class="no-sidebar is-preload">
+<th:block layout:fragment="content">
+    <div id="page-wrapper">
+        <!-- Main -->
+        <div class="wrapper style1">
+            <div class="container payment_successful">
+                <article class="special" id="main">
+                    <header>
+                        <h4>결제가 완료되었습니다.</h4>
+                    </header>
+                    <section>
+                        <div class="order-header">
+                            <div class="row order-date">
+                                <span>2024.06.28</span><span>11:30:08</span>
+                            </div>
+                            <div class="row order-number">
+                                <h4>주문번호</h4><h4>20240628-10009896</h4>
+                            </div>
+                        </div>
+                        <h4>주문상품</h4>
+                        <div class="order-info">
+                            <header>
+                                <h4>결제완료</h4>
+                            </header>
+                            <div class="order-info-section">
+                                <img src="" alt="제품이미지" />
+                                <div>
+                                    <span>제품명</span>
+                                    <p>수량</p>
+                                    <p>총 금액</p>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>결제정보</h4>
+                        <div class="payment-info">
+                            <header>
+                                <p class="big-span"><span>총 금액</span><span>11,000원</span></p>
+                                <p class="light-span"><span>상품금액</span><span>11,000원</span></p>
+                            </header>
+                            <p><span>시네마캐스트 포인트 사용</span><span>1000p</span></p>
+                            <p><span>시네마캐스트 포인트 적립</span><span>50p</span></p>
+                        </div>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+</th:block>
 </body>
 </html>

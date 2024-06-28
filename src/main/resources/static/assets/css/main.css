@@ -144,6 +144,10 @@ input, select, textarea {
 		margin: 0 0 0.25em 0;
 	}
 
+	h5 {
+		font-size: 1.2em;
+	}
+
 	strong, b {
 		font-weight: 400;
 		color: #483949;
@@ -193,6 +197,7 @@ input, select, textarea {
 
 	p {
 		text-align: justify;
+		font-size: 1em;
 	}
 
 	br.clear {
@@ -203,7 +208,6 @@ input, select, textarea {
 		position: relative;
 		display: block;
 		border: 0;
-		margin-bottom: 4em;
 		height: 6px;
 	}
 
@@ -2761,7 +2765,6 @@ input, select, textarea {
 
 			hr {
 				top: 3em;
-				margin-bottom: 6em;
 			}
 
 		/* Section/Article */
@@ -3065,7 +3068,6 @@ input, select, textarea {
 
 				#header hr {
 					top: 1em;
-					margin-bottom: 2.5em;
 				}
 
 			body.homepage #header {

@@ -1,6 +1,6 @@
 <article id="mypage_main">
     <header id="mypage_main_header">
-        <h4><b th:text="${myPageMemberInfo.name}">user</b>님 반갑습니다.</h4>
+        <h5><b th:text="${myPageMemberInfo.name}">user</b>님 반갑습니다.</h5>
         <div class="user-info-box">
             <div class="user_info">
             <div>
@@ -35,18 +35,22 @@
             </header>
             <hr style="top:0; margin-bottom: 0.5em">
             <section>
-                <article class="history_get">
+                <article class="history_item">
                     <header>
-                        <h4 class="reservation-idx">예매번호</h4>
-                        <p class="reservation-date">예매일자</p>
+                        <h4 class="reservation-status">결제완료</h4>
                     </header>
                     <div class="history_data">
                         <img class="featured-img" alt="영화 포스터" src="/images/movieposter.webp">
                         <div>
+                            <p>예매번호</p>
                             <p>범죄도시 4</p>
                             <p><span class="history-data-date">상영일자</span><span class="history-data-time">시간</span></p>
                             <p><span class="history-data-theater">상영관</span><span class="history-data-seats">좌석</span></p>
                         </div>
+                    </div>
+                    <div class="button_box">
+                        <button type="button" class="cancel_btn">예매취소</button>
+                        <button type="button" class="detail_btn">예매상세</button>
                     </div>
                 </article>
             </section>
@@ -63,7 +67,7 @@
             </header>
             <hr style="top:0; margin-bottom: 0.5em">
             <section>
-                <article class="history_get" th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
+                <article class="history_item" th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
                     <header>
                         <h3 th:text="${#temporals.format(snackPaymentInfo.getContent().get(0).getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
                     </header>
@@ -78,9 +82,13 @@
                             <p th:text="${snackPaymentInfo.getContent().get(0).getPrice()}+원">36,000원 </p>
                         </div>
                     </div>
+                    <div class="button_box">
+                        <button type="button" class="cancel_btn">주문취소</button>
+                        <button type="button" class="detail_btn">구매상세</button>
+                    </div>
                 </article>
                 <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
-                    <div class="history_data">
+                    <div class="history_none">
                         <p class="snack_nm">구매하신 스낵이 없습니다.</p>
                     </div>
                 </article>
@@ -107,6 +115,10 @@
         // 주문내역조회 버튼 클릭 이벤트 설정
         $('#AllOrderInfo').click(function() {
             $('#content').load('/mypage/order');
+        });
+
+        $('.container').on('click', '.detail_btn', function() {
+            $('#content').load('/mypage/order/detail');
         });
     });
 </script>

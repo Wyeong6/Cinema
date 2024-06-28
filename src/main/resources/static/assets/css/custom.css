@@ -2,6 +2,14 @@
     font-family: 'MyCustomFont';
     src: url('font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
 }
+.cursor {
+    cursor: pointer;
+}
+.reservation_btn {
+    font-size: 0.8em;
+    color: #fff;
+    padding: 0.5em 1em 0.5em 1em;
+}
 #header {
     background-size: cover;
     background-position: center;
@@ -40,20 +48,20 @@
     position: relative;
 }
 #info .chat-alarm .chat-img {
-    width: 30px; /* 이미지의 고정 너비를 설정 */
+    width: 20px; /* 이미지의 고정 너비를 설정 */
     height: auto; /* 이미지의 높이를 자동으로 조절 */
     display: inline-block; /* 이미지를 인라인 블록 요소로 설정 */
     vertical-align: middle; /* 이미지를 수직 중앙에 정렬 */
 }
 #info .chat-alarm div {
     position: absolute;
-    width: 20px;
-    height: 20px;
-    top: 0;
-    right: -20%; /* 부모 요소의 왼쪽에서 70% 위치 (50% + 20% 오른쪽으로 이동) */
+    width: 15px;
+    height: 15px;
+    top: 10%;
+    right: -10%; /* 부모 요소의 왼쪽에서 70% 위치 (50% + 20% 오른쪽으로 이동) */
     font-weight: 700;
-    font-size: 13px;
-    line-height: 20px;
+    font-size: 10px;
+    line-height: 14px;
     background: #e45649;
     border-radius: 50%;
 }
@@ -80,7 +88,7 @@
 .video-modal .modal-body {
     margin-top: 5%;
     text-align: center;
-    width: 80%;
+    width: 60%;
     position: absolute;
     top: 100%;
     left: 50%;
@@ -88,22 +96,21 @@
 }
 .video-frame {
     width: 100%; /* iframe이 부모 요소에 맞게 100% 너비를 가집니다. */
-    max-height: calc(100vh - 120px); /* 모달 창의 높이 제한 */
+    max-height: calc(100vh - 200px); /* 모달 창의 높이 제한 */
     border: none; /* 테두리 없음 */
 }
 .wrapper {
     margin-top: 1em;
 }
 #side_nav {
-    width: 7em;
+    width: 4em;
     position: fixed;
     top: 28%;
     right: 2%;
     background: #f0f4f4;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 0.8em;
     border-radius: 10px;
-    z-index: 999999999;
+    z-index: 999;
 }
 #side_nav ul {
     padding: 1em 0.5em;
@@ -115,8 +122,12 @@
     text-align: center;
     cursor: pointer;
 }
+#side_nav li .fa-1\.5x{
+    font-size: 1.5em;
+}
 #side_nav li p {
     text-align: center;
+    font-size: 0.6em;
 }
 #banner header {
     width: 90% !important;
@@ -280,11 +291,6 @@ a#movie_title:not(:hover) {
     padding: 0.5em 0.5em 0;
     z-index: 99999;
 }
-.carousel .button_box .reservation_btn {
-    font-size: 0.8em;
-    color: #fff;
-    padding: 0.5em 1em 0.5em 1em;
-}
 .carousel .button_box .get_btn {
     font-size: 0.8em;
     z-index: 99999;
@@ -320,29 +326,24 @@ a#movie_title:not(:hover) {
     grid-template-columns: repeat(5, 1fr); /* 5개의 동일한 너비의 컬럼 생성 */
     gap: 0.8em; /* 컬럼 간격 */
 }
-
 .custom-col {
     margin-bottom: 20px; /* 하단 마진 추가 */
 }
-
 @media (max-width: 1200px) {
     .custom-grid {
         grid-template-columns: repeat(4, 1fr); /* 작은 화면에서는 4개의 컬럼 */
     }
 }
-
 @media (max-width: 992px) {
     .custom-grid {
         grid-template-columns: repeat(3, 1fr); /* 더 작은 화면에서는 3개의 컬럼 */
     }
 }
-
 @media (max-width: 768px) {
     .custom-grid {
         grid-template-columns: repeat(2, 1fr); /* 작은 화면에서는 2개의 컬럼 */
     }
 }
-
 @media (max-width: 480px) {
     .custom-grid {
         grid-template-columns: 1fr; /* 모바일 화면에서는 1개의 컬럼 */
@@ -351,7 +352,30 @@ a#movie_title:not(:hover) {
 .featured-img {
     border-radius: 10px;
 }
-
+/* 무비 리스트 */
+.movie_list .fixed-height-image {
+    height: 400px;
+}
+.pagination {
+    margin-top: 3em;
+    text-align: center;
+}
+.pagination .page {
+    padding: 0 0.4em;
+    font-weight: 300;
+    color: #d9dee3;
+    cursor: pointer;
+}
+.pagination .current-page {
+    padding: 0 0.4em;
+    font-weight: 400;
+    color: #5155A6;
+    cursor: pointer;
+}
+.pagination .movement-btn {
+    width: 0.8em;
+    cursor: pointer;
+}
 /* 상세 페이지 */
 /*.wrapper .container #main img {*/
 /*    width: 100%*/
@@ -360,31 +384,78 @@ a#movie_title:not(:hover) {
     display: flex;
     justify-content: flex-start;
 }
+#get_info .image > img {
+    width: 350px;
+    height: 480px;
+}
+#get_info .image {
+    position: relative;
+    width: 350px;
+    height: 480px;
+    margin-bottom: 0;
+}
+#get_info .image > img {
+    z-index: 0;
+}
+.movie-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    border-radius: 10px;
+    display: none;
+}
+.movie-overlay img {
+    width: 2em !important;
+    height: auto;
+}
+#get_info .movie_info {
+    position: relative;
+}
+#get_info .movie_info .certification-container {
+    margin-bottom: 0.5em;
+}
+#get_info .movie_info .certification-container img {
+    width: 1em;
+    margin-left: 0;
+}
 #get_info .info_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-
-#get_info .info_header h2 {
+#get_info .info_header h3 {
+    margin-top: 0.5em;
     margin-right: auto; /* 제목을 왼쪽으로 정렬 */
 }
-
+#get_info .info_header .button_box {
+    margin-top: 0;
+}
 #get_info .info_header .button {
     margin-left: 1em; /* 버튼 사이의 여백 */
 }
-
+#get_info .movie_detail {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+#get_info .movie_detail span b {
+    font-size: 1.2em;
+}
 #get_info .movie_info {
     margin-left: 5%;
     vertical-align: center;
 }
 #get_info .movie_info div > span {
-    border-right: 1px solid #000;
     padding: 0 10px;
+    font-size: 0.8em;
 }
-#get_info .movie_info div > span.genres {
-    border-right: none;
-    padding: 0 5px;
+#get_info .movie_info > h4.genres {
+    font-size: 0.8em;
 }
 .last-genre {
     border-right: 1px solid #000 !important;
@@ -421,11 +492,37 @@ a#movie_title:not(:hover) {
 #get_info .movie_data {
     margin-right: 5%;
 }
+#get_info .button_box {
+    margin-top: 0 !important;
+}
+#get_info .movie_info > .button_box {
+    position: absolute;
+    bottom: 0;
+}
+#get_info .reservation_btn {
+    padding: 0.6em 5em;
+    font-size: 1em;
+    font-weight: 400;
+}
+#get_info .video_btn {
+    margin-left: 1em;
+}
+#get_info .video_btn img {
+    width: 100%;
+    height: auto;
+}
+#get_info
 .indicator-line {
     height: 4px;
     background-color: #333;
     width: 30%;
     transition: transform 0.1s ease-out;
+}
+.movie_get .cast {
+    margin: 6em 0;
+}
+.movie_get .cast h4 {
+    margin-bottom: 0.5em;
 }
 .movie_etc {
     margin-top: 5%;
@@ -438,41 +535,82 @@ a#movie_title:not(:hover) {
 }
 .movie_etc button {
     width: 50%;
-    height: 5%;
+    padding: 1em 0;
+    margin-bottom: 1em;
     font-size: 1em;
+    background: transparent;
+    color: #1e2c3c;
     border-radius: 0;
-    background: #fafafa;
-    color: #3B353C;
+    border-bottom: 2px solid #dddddd;
 }
 .movie_etc button:hover {
-    width: 50%;
-    height: 5%;
-    font-size: 1em;
-    border-radius: 0;
-    background: #e5e5e5;
-    color: #3B353C;
+    background: transparent;
+    color: #1e2c3c;
 }
 .movie_etc button.clicked {
-    background: #e5e5e5;
-    color: #3B353C;
+    font-weight: 400;
+    border-bottom: 2px solid #1e2c3c;
+}
+.still-cut {
+    padding-left: 40px !important;
+}
+.movie_get .more_btn {
+    width: 1em;
+}
+#reviews header {
+    display: block;
+    position: relative;
+}
+#reviews .modal_open {
+    margin-bottom: 3em;
+    float: right;
+    padding: 0.5em 0;
+    width: 15%;
+    font-size: 0.9em;
+    background-color: rgba(81, 85, 166, 0.8);
+}
+#reviews .modal_open:hover {
+    background: #5155A6;
 }
 #reviews .row {
+    display: block;
     margin: 0;
 }
 #reviews table {
-    margin-top: 2%;
+    margin-top: 3em;
     width: 100%;
+}
+#reviews table td {
+    padding-left: 0;
+    padding-right: 0;
 }
 #reviews table td p {
     text-align: left;
 }
-#reviews .modal_open {
-    margin-top: 2%;
-    width: 100%;
-    font-size: 1em;
-    border-radius: 0;
-    background: #483949;
-    color: #fff;
+.review {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.review-right {
+    margin-left: auto;
+}
+#reviews .review .review-user-email {
+    width: 20%;
+    text-align: left;
+}
+#reviews .review-emoji {
+    font-size: 2em;
+}
+#reviews .review-right {
+    float: right;
+}
+#reviews .review-right .delete-btn {
+    background: transparent;
+    color: #1e2c3c;
+    font-size: 0.8em;
 }
 /* 리뷰 모달 */
 #review_modal {
@@ -538,17 +676,16 @@ a#movie_title:not(:hover) {
 #review_modal button:first-child:hover {
     background: #e5e5e5;
 }
-#stillcut {
+#still-cut {
     padding-top: 2%;
 }
-#stillcut h3 {
+#still-cut h3 {
     padding-bottom: 2%;
     font-size: 40px;
 }
-#stillcut p, #reviews > #showMore_review, #reviews > #showLess_review {
+#still-cut p, #reviews > #showMore_review, #reviews > #showLess_review {
     text-align: center;
  }
-
 /* 현재 상영작 페이지*/
 .list {
     min-height: 600px;
@@ -699,6 +836,9 @@ a#movie_title:not(:hover) {
 .notice_get table {
     margin: 4em 0 2em;
 }
+.notice_get table tr td {
+    font-size: 0.8em;
+}
 .notice_get table tr td:first-child{
     text-align: center;
     width: 30%;
@@ -706,8 +846,12 @@ a#movie_title:not(:hover) {
 .notice_get button {
     margin: 0 auto;
     display: block; /* 버튼을 블록 요소로 설정 */
-    font-size: 1em;
-    padding: 0.2em 2em;
+    font-size: 0.8em;
+    padding: 0.5em 2em;
+    background: rgba(81, 85, 166, 0.8);
+}
+.notice_get button:hover {
+    background: #5155A6;
 }
 /* cart_list */
 .cart_list {
@@ -747,13 +891,13 @@ td p {
     width: 15%;
 }
 #cart_list_section table tr td:nth-child(1) {
-    width: 15%;
+    width: 13%;
 }
 #cart_list_section table tr td:nth-child(1) img {
     width: 100%;
 }
 #cart_list_section table tr td:nth-child(2) {
-    width: 30%;
+    width: 32%;
     padding: 0;
     word-break: keep-all;
 }
@@ -868,22 +1012,28 @@ article#pay > button {
     width: 100%;
 }
 /* 개인정보수정 */
-#mypage_private_info tr:first-child td {
-    border-top: 2px solid #efefef;
+.mypage-wrapper {
+    background: #f2f2f2 !important;
 }
 #mypage_private_info td {
     padding: 0.8em 0 0.8em 0.5em;
     text-align: left;
+    font-size: 0.8em;
     border-bottom: 2px solid #efefef;
+}
+#mypage_private_info tr:last-child td {
+    border-bottom: 0;
 }
 #mypage_private_info td input {
     padding: 0.5em 1em;
+    font-size: 1em;
 }
 #mypage_private_info ul li {
     list-style-type: disc;
 }
 #mypage_private_info .info_submit_box button {
     padding: 0.5em 2em;
+    font-size: 0.8em;
 }
 #input-email {
     display: flex;
@@ -905,9 +1055,9 @@ article#pay > button {
     border: 1px solid #aaaaaa;
 }
 .edit_info tr td:nth-child(2) button {
-    font-size: 0.8em;
+    font-size: 0.7em;
     margin-left: 10px;
-    padding: 0.3em 1.5em 0.3em 1.5em;
+    padding: 0.3em 1em 0.3em 1em;
     background: #e5e5e5;
     color: #3B353C;
 }
@@ -955,9 +1105,12 @@ article#pay > button {
 }
 /* 마이페이지 */
 .mypage_nav {
-    padding-left: 0;
-    width: 80%;
+    width: 100%;
     cursor: pointer;
+    padding: 0.5em 0 0.5em 1em;
+    background: #f9fafb;
+    border-radius: 15px;
+    box-shadow: 4px 4px 4px #dadee3;
 }
 .mypage_nav ul, li {
     padding-left: 0;
@@ -967,19 +1120,28 @@ article#pay > button {
     font-size: 0.8em;
 }
 .mypage_nav nav > ul > li > a {
-    font-weight: 700;
+    font-weight: 400;
     text-decoration-color: #e5e5e5;
 }
 .mypage_nav ul > li li {
     padding: 0;
 }
-.mypage_nav li li:hover {
-    font-weight: 700;
+.mypage_nav li li a.clicked {
+    font-weight: 400;
+    padding: 0 0 0.1em 0;
+    border-bottom: 2px solid #1e2c3c;
+    color: #1e2c3c;
+}
+.mypage_nav .reservation_btn {
+    color: inherit;
+    padding-left: 0;
+    margin-left: 0;
 }
 #mypage_main .user-info-box {
     margin: 0.8em 0 2em;
     border-radius: 1em;
-    background: #fcfdfd;
+    background: #f9fafb;
+    box-shadow: 4px 4px 4px #dadee3;
 }
 #mypage_main .user_info {
     padding: 1em 2em;
@@ -1010,14 +1172,6 @@ article#pay > button {
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
 }
-.history header {
-    display: flex;
-    justify-content: space-between;
-}
-.history header div{
-    display: flex;
-    flex-direction: row;
-}
 .history header p {
     margin-left: 10px;
     font-size: 16px;
@@ -1026,36 +1180,55 @@ article#pay > button {
     margin-left: 10px;
     font-size: 16px;
 }
-.history_get {
-    border-radius: 10px;
-    background: #fcfdfd;
-}
-.history_get header {
+.history_item {
+    padding-bottom: 1em;
+    border-radius: 15px;
+    background: #f9fafb;
+    box-shadow: 4px 4px 4px #dadee3;
     display: flex;
-    flex-direction: row;
-    justify-content: left;
-    width: 100%;
-    height: 3em;
-    margin: 0;
-    padding: 0.5em 0 0 2em;
-    background: rgba(242, 225, 172, 0.5);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    flex-direction: column;
+    justify-content: center;
+}
+.history_item header {
+    padding: 1em 0 0 2em;
+    margin-bottom: 0;
+}
+.history_item header h4 {
+    margin-top: 0;
+    margin-bottom: 0;
+    cursor: pointer;
 }
 .history_data {
     display: flex;
     flex-direction: row;
     padding: 1em 2em;
-    background: #fcfdfd;
-    border-radius: 10px;
+}
+.history_none {
+    padding: 1em 2em;
+    border-radius: 15px;
+    background: #f9fafb;
+    box-shadow: 4px 4px 4px #dadee3;
 }
 .history_data img {
-    width: 4em;
+    width: 5em;
     margin-right: 1em;
 }
 .history_data p {
     font-size: 0.8em;
     margin-bottom: 0;
+}
+.history_item .button_box {
+    padding: 0 2em;
+    display: flex;
+    justify-content: space-between;
+}
+.history_item .cancel_btn,
+.history_item .detail_btn {
+    width: 49%;
+    padding: 0.5em;
+    font-size: 0.9em;
+    background: #f2f2f2;
+    color: #1e2c3c;
 }
 #mypage_main > section {
     margin-top: 5em;
@@ -1065,6 +1238,7 @@ article#pay > button {
     text-align: center;
     background: #fcfdfd;
     border-radius: 10px;
+    box-shadow: 4px 4px 4px #dadee3;
 }
 #mypage_membership .user_info p {
     text-align: center;
@@ -1077,7 +1251,7 @@ article#pay > button {
 #mypage_membership .user_info .point p {
     margin-right: 1em;
 }
-#mypage_membership h4 {
+#mypage_membership h5 {
     margin-top: 2em;
     margin-bottom: 1em;
 }
@@ -1107,6 +1281,9 @@ article#pay > button {
     display: flex;
     justify-content: space-between;
 }
+#mypage_point table td p {
+    font-size: 0.8em;
+}
 .plus-point {
     color: #007bff;
 }
@@ -1119,22 +1296,46 @@ article#pay > button {
 #mypage_point td div:last-child p {
     text-align: right;
 }
+#mypage_review section,
+#mypage_private_info section {
+    margin-top: 1em;
+    padding: 0.5em 1em 1em;
+    background: #ffffff;
+    box-shadow: 4px 4px 4px #dadee3;
+    border-radius: 10px;
+    min-height: 400px;
+}
 #mypage_review th, td {
-    text-align: center;
+    text-align: left;
+    font-size: 0.8em;
+    font-weight: 400;
+    padding: 0.5em 0.1em;
+    border-bottom: 2px solid #dddddd;
+}
+#mypage_review th:nth-child(1),
+#mypage_review td:nth-child(1) {
+    width: 15%;
+}
+#mypage_review th:nth-child(5),
+#mypage_review td:nth-child(5) {
+    width: 5%;
 }
 #mypage_review td img {
+    width: 1em;
     vertical-align: middle;
 }
 .movie-item-favorite {
     position: relative;
     cursor: pointer;
+    border-radius: 10px;
+    box-shadow: 4px 4px 4px #dadee3;
 }
 .movie-item-favorite img#favoriteButton {
     position: absolute;
     top: 5%;
     right: 5%;
     width: 1.5em;
-    z-index: 99;
+    z-index: 99999;
 }
 .movie-item-favorite img.featured-img {
     width: 100%;
@@ -1166,6 +1367,69 @@ article#pay > button {
 }
 .details-button:hover {
     background-color: rgba(242, 225, 172, 0.9);
+}
+/* 마이페이지 구매 상세페이지 */
+#mypage_order_detail .history-get {
+    padding: 2em 2em 3em;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 4px 4px 4px #dadee3;
+}
+#mypage_order_detail .order-info header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+#mypage_order_detail .order-info header h4,
+#mypage_order_detail .order-info header span {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+#mypage_order_detail .order-info header span {
+    font-size: 0.8em;
+    margin-left: 1em;
+}
+#mypage_order_detail .order-info hr {
+    background: #1e2c3c;
+    height: 2px;
+    margin: 2em 0;
+}
+#mypage_order_detail .order-info section b {
+    font-size: 0.9em;
+}
+#mypage_order_detail table {
+    margin-top: 2em;
+}
+#mypage_order_detail table td, th {
+    font-size: 0.8em;
+    font-weight: 400;
+    border-bottom: 1px solid #dadee3;
+    text-align: center;
+}
+#mypage_order_detail table td:nth-child(1) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+#mypage_order_detail table:last-child tr:last-child td,
+#mypage_order_detail table:last-child tr:last-child th {
+    border-bottom: 0;
+}
+#mypage_order_detail .price-calc {
+    margin: 1em 0 4em;
+    padding: 2em 0;
+    background: #f9fafb;
+    border-bottom: 2px solid #f4f4f4;
+    border-top: 2px solid #f4f4f4;
+    text-align: center;
+}
+#mypage_order_detail .price-calc span {
+    font-weight: 400;
+    font-size: 1em;
+    margin-right: 0.3em;
+}
+#mypage_order_detail .price-calc .total_price {
+    color: #F24949;
 }
 /* 상영시간표 */
 .bg-black-wrapper {
@@ -1608,6 +1872,67 @@ button.pay-btn {
     margin: 0;
     width: 100%;
     border-radius: 0;
+}
+/* 결제완료 페이지 */
+.payment_successful {
+    width: 50%;
+}
+.payment_successful section > h4 {
+    margin: 5em 0 1em;
+}
+.payment_successful span {
+    font-size: 0.9em;
+    font-weight: 400;
+}
+.payment_successful .order-header,
+.payment_successful .order-info,
+.payment_successful .payment-info {
+    background: #f7f8f9;
+    border-radius: 15px;
+    padding: 0.5em 2em;
+}
+.payment_successful .order-header span,
+.payment_successful .order-header h4 {
+    padding-left: 30px;
+    font-size: 0.9em;
+}
+.payment_successful .order-info {
+    padding-top: 1em;
+}
+.payment_successful .order-info-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.payment_successful .order-info-section img {
+    margin-right: 2em;
+}
+.payment_successful .order-info p {
+    font-weight: 400;
+    font-size: 0.9em;
+}
+.payment_successful .payment-info p {
+    display: flex;
+    justify-content: space-between;
+}
+.payment_successful .payment-info > p {
+    margin-top: 6px !important;
+    margin-bottom: 6px !important;
+}
+.payment_successful .payment-info header > p {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+}
+.payment_successful .payment-info header {
+    border-bottom: 2px solid #dddddd;
+}
+.payment_successful .payment-info header .big-span span {
+    font-size: 1em;
+    color: #5155A6;
+}
+.payment_successful .payment-info header .light-span span {
+    font-weight: 300;
+    color: #a7aeb5;
 }
 /* 챗봇 */
 .chatbot-toggle {
