@@ -1,5 +1,6 @@
 package com.busanit.entity;
 
+import com.busanit.domain.PointDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,8 @@ public class Point extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String impUid;
 
     private String content;
 
@@ -39,12 +42,27 @@ public class Point extends BaseTimeEntity {
     public static Point createPoint(Long memberId) {
         Member member = Member.builder().id(memberId).build();
         return Point.builder()
+                .impUid("이벤트")
                 .content("신규 가입 적립")
                 .contentType(false)
                 .pointType("+")
                 .points(3000)
                 .currentPoints(3000)
                 .totalPoints(3000)
+                .member(member)
+                .build();
+    }
+
+    public static Point toEntity(Long memberId, PointDTO pointDTO) {
+        Member member = Member.builder().id(memberId).build();
+        return Point.builder()
+                .impUid(pointDTO.getImpUid())
+                .content(pointDTO.getContent())
+                .contentType(pointDTO.getContentType())
+                .pointType(pointDTO.getPointType())
+                .points(pointDTO.getPoints())
+                .currentPoints(pointDTO.getCurrentPoints())
+                .totalPoints(pointDTO.getTotalPoints())
                 .member(member)
                 .build();
     }
