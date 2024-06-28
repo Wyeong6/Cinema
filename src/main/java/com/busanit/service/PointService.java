@@ -34,8 +34,13 @@ public class PointService {
         return pointRepository.countByMovieMembership(memberId, startDate, endDate);
     }
 
-    // 결제시 사용 가능 포인트
-    public long getCurrentPoints(Long memberId) {
-        return pointRepository.currentPoints(memberId);
-    }
+//    // 결제시 사용 가능 포인트
+//    public long getCurrentPoints(Long memberId) {
+//        return pointRepository.currentPoints(memberId);
+//    }
+
+//    // 누적 포인트
+//    public long getTotalPoints(Long memberId) {
+//        return pointRepository.totalPoints(memberId);
+//    }
 }
