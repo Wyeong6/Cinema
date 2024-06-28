@@ -8,6 +8,7 @@ import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
 import com.busanit.entity.*;
 import com.busanit.entity.movie.Comment;
+import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.TheaterNumberRepository;
 import com.busanit.service.*;
@@ -128,15 +129,12 @@ public class AdminPageController {
     }
 
     @PostMapping("/movieRegister")
-    public String movieRegister() {
-        return "admin/admin_movie_register";
-    }
-
-    @PostMapping("/movieUpdate")
-    public String movieUpdate(@RequestParam(name = "movieId") Long movieId, Model model) {
-
-        model.addAttribute("movieId", movieId);
-
+    public String movieRegister(@RequestParam(required = false) Long movieId, Model model) {
+        if (movieId != null) {
+            // 영화 정보 가져오기 및 모델에 추가
+            Movie movie = movieService.getMovieById(movieId);
+            model.addAttribute("movie", movie);
+        }
         return "admin/admin_movie_register";
     }
 
