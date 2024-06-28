@@ -13,7 +13,7 @@
     <div class="col-xl">
         <div class="card mb-4">
             <div class="card-body">
-                <form action="/admin/noticeRegister" method="post">
+                <form id="noticeForm">
                     <div class="mb-3">
                         <label class="form-label" for="noticeTitle">공지사항 제목</label>
                         <input class="form-control" id="noticeTitle" name="noticeTitle" placeholder="공지사항 제목을 입력해주세요."
@@ -31,5 +31,26 @@
     </div>
 </div>
 
+<script>
+    $(document).ready(function() {
+        $('#noticeForm').on('submit', function(event) {
+            event.preventDefault(); // 기본 폼 제출을 막음
+
+            $.ajax({
+                url: '/admin/noticeRegister',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    // 성공 시 컨테이너에 공지사항 목록 로드
+                    $('.container-xxl').load('/admin/noticeList');
+                },
+                error: function() {
+                    // 에러 처리
+                    alert('폼 제출 중 오류가 발생했습니다.');
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

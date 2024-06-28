@@ -168,6 +168,8 @@
         showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
         document.getElementById('message').value = ''; // 입력 필드를 비움
 
+ 
+
         // 메시지 전송 후 타이핑 상태 초기화
         clearTimeout(typingTimeout);
         typingIndicatorSent = false;
@@ -188,16 +190,6 @@
         messageElement.appendChild(document.createTextNode(message));
         messages.appendChild(messageElement);
         document.getElementById('typingIndicatorDTO').style.display = 'none';
-    }
-
-    //이전 메세지 문구
-    function addPreviousMessagesIndicator() {
-        const messages = document.getElementById('messages');
-        const previousMessagesIndicator = document.createElement('p');
-        previousMessagesIndicator.id = 'previousMessagesIndicator';
-        previousMessagesIndicator.className = 'message-style';
-        previousMessagesIndicator.textContent = '----------- 이전 메시지입니다 -----------';
-        messages.appendChild(previousMessagesIndicator);
     }
 
     //카테고리를 선택한 후
@@ -282,16 +274,33 @@
                 throw new Error('Network response was not ok ' + response.statusText);
             }
             const data = await response.json();
+
+            console.log("data: " + JSON.stringify(data, null, 2));
             if (Array.isArray(data) && data.length > 0) {
                 chatRoomId = data[0].id;
             }
             let messageExist = false;
+            let unreadMessageFlag = false;
 
             // 각 메시지 객체를 순회
             data.forEach(item => {
+                let lastReadTimestamp = parseInt(localStorage.getItem(`lastReadTimestamp_${chatRoomId}`), 10) || 0;
+
                 if (Array.isArray(item.messages) && item.messages.length > 0) {
                     messageExist = true;
                     item.messages.forEach(message => {
+                        let messageTimestamp = new Date(message.createAt).getTime();
+
+                        console.log("로컬읽은 시간:", lastReadTimestamp);
+                        console.log("메세지 생성시간:", messageTimestamp);
+
+                        if (messageTimestamp > lastReadTimestamp && !unreadMessageFlag && messageExist) {
+                            console.log("이전 메시지입니다");
+                            showMessage('----------이전 메시지입니다 ----------');
+                            unreadMessageFlag = true;
+                        }
+
+
                         recipient = message.sender;
                         chatRoomTitle = message.chatRoomTitle;
                         document.getElementById('categoryButtons').style.display = 'none';
@@ -299,10 +308,11 @@
 
                         showMessage(displayMessage);
                     });
-                    //이전 메세지 문구
-                    // addPreviousMessagesIndicator();
+
                 }
             });
+
+
 
             // 메시지가 없을 경우에만 카테고리 메시지를 표시
             if (!messageExist) {

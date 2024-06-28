@@ -487,21 +487,20 @@ public class AdminPageController {
 
     //이벤트 등록 기능
     @PostMapping("/eventRegister")
-    public String eventRegister(@Valid EventDTO eventDTO, BindingResult bindingResult, Model model) {
+    public ResponseEntity<String> eventRegister(@Valid EventDTO eventDTO, BindingResult bindingResult) {
 
-        model.addAttribute("urlLoad", "/admin/eventRegister");
         if (bindingResult.hasErrors()) {
-            return "admin/admin_event_register";
+            return ResponseEntity.badRequest().body("유효성 검사 오류가 발생했습니다.");
         }
 
         // 중복 체크 로직 추가
         if (eventService.isDuplicate(eventDTO.getEventDetail(), eventDTO.getEventName())) {
-            return "admin/admin_layout";
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 이벤트입니다.");
         }
 
         eventService.saveEvent(eventDTO);
 
-        return "admin/admin_layout";
+        return ResponseEntity.ok("이벤트가 성공적으로 등록되었습니다.");
     }
 
     @GetMapping("/eventList")
@@ -564,20 +563,20 @@ public class AdminPageController {
 
     //공지사항 등록기능
     @PostMapping("/noticeRegister")
-    public String noticeRegister(@Valid NoticeDTO noticeDTO, BindingResult bindingResult, Model model) {
+    public ResponseEntity<String> noticeRegister(@Valid NoticeDTO noticeDTO, BindingResult bindingResult) {
 
-        model.addAttribute("urlLoad", "/admin/noticeRegister");
         if (bindingResult.hasErrors()) {
-            return "admin/admin_notice_register";
+            return ResponseEntity.badRequest().body("유효성 검사 오류가 발생했습니다.");
         }
 
         // 중복 체크 로직 추가
         if (noticeService.isDuplicate(noticeDTO.getNoticeTitle(), noticeDTO.getNoticeContent())) {
-            return "admin/admin_layout";
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 공지사항입니다.");
         }
 
         noticeService.saveNotice(noticeDTO);
-        return "admin/admin_layout";
+
+        return ResponseEntity.ok("공지사항이 성공적으로 등록되었습니다.");
     }
 
     //공지사항 리스트

@@ -70,12 +70,11 @@ export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            console.log("updateLastReadTimestamp의 response" + response)
             // loadChatList를 호출하고 그 결과 프로미스를 반환
             return loadChatList(activePage, inactivePage, 8, true);
         })
         .then(() => {
-            console.log("Chat list and unread count updated successfully.");
+            // console.log("Chat list and unread count updated successfully.");
         })
         .catch(error => {
             console.error('Error updating last read timestamp:', error);
@@ -128,8 +127,8 @@ export function updateUnreadCount(response) {
     var totalUnreadCount = activeChatRoomList.reduce((sum, activeChatRoom) => sum + activeChatRoom.unreadMessageCount, 0);
     var $unreadCount = $('#unreadCount');
 
-    console.log("activeChatRoomList" + activeChatRoomList)
-    console.log("totalUnreadCount" + totalUnreadCount)
+    // console.log("activeChatRoomList" + activeChatRoomList)
+    // console.log("totalUnreadCount" + totalUnreadCount)
     // 안 읽은 메시지 수 업데이트
     $unreadCount.text(totalUnreadCount);
 
@@ -212,7 +211,7 @@ function displayRoomList(roomList, $container, noRoomsMessageId) {
             $container.append(chatRoomRow);
         });
     }
-
+}
 //페이징 기능
     function updatePagination(response, type) {
         var $pagination = $("#" + type + "-pagination");
@@ -274,7 +273,6 @@ function displayRoomList(roomList, $container, noRoomsMessageId) {
         },
         get inactivePage() {
             return inactivePage;
-            1
         }
     };
-}
+

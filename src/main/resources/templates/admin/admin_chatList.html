@@ -70,6 +70,7 @@
         td, th {
             padding: 15px;
         }
+
         .no-rooms-message {
             text-align: center;
             font-size: 16px;
@@ -83,7 +84,7 @@
 <div class="row">
     <div class="col">
         <div class="card">
-            <h5 class="card-header">Active Chat Rooms</h5>
+            <h5 class="card-header">상담 중</h5>
             <div class="table-responsive text-nowrap">
                 <table class="table table-hover">
                     <thead>
@@ -107,7 +108,7 @@
     </div>
     <div class="col">
         <div class="card">
-            <h5 class="card-header">Inactive Chat Rooms</h5>
+            <h5 class="card-header">상담 완료</h5>
             <div class="table-responsive text-nowrap">
                 <table class="table table-hover">
                     <thead>
@@ -208,7 +209,7 @@
     }
 
     // 메시지를 표시하는 함수
-    function showMessage(message) {
+    function showMessage(message, updateTimestamp = true) {
         document.getElementById('typingIndicatorDTO').style.display = 'none';
         const messages = getElement('messages');
         const messageElement = document.createElement('p');
@@ -217,19 +218,22 @@
         messageElement.textContent = message;
         messages.appendChild(messageElement);
 
+        const timestamp = new Date().getTime();
+        localStorage.setItem(`lastReadTimestamp_${chatRoomId.toString()}`, timestamp.toString());
+
+        // activePage = window.chatUtils.activePage;
+        // inactivePage = window.chatUtils.inactivePage;
+        //
+        // window.chatUtils.updateLastReadTimestamp(chatRoomId, activePage, inactivePage); // 페이징 번호 전달
+    }
+
+    function updateLastReadTimestamp(chatRoomId) {
         activePage = window.chatUtils.activePage;
         inactivePage = window.chatUtils.inactivePage;
-        window.chatUtils.updateLastReadTimestamp(chatRoomId, activePage, inactivePage); // 페이징 번호 전달
+        window.chatUtils.updateLastReadTimestamp(chatRoomId, activePage, inactivePage);
     }
-    //이전 메세지 문구
-    function addPreviousMessagesIndicator() {
-        const messages = getElement('messages');
-        const previousMessagesIndicator = document.createElement('p');
-        previousMessagesIndicator.id = 'previousMessagesIndicator';
-        previousMessagesIndicator.className = 'message-style';
-        previousMessagesIndicator.textContent = '----------- 이전 메시지입니다 -----------';
-        messages.appendChild(previousMessagesIndicator);
-    }
+
+
 
     // Stomp 연결 함수
     function connect() {
@@ -267,6 +271,7 @@
             }
         });
     }
+
     // 관리자가 채팅방에 입장했다는 알림을 전송
     function sendAdminExit() {
         console.log("채팅방나감")
@@ -287,6 +292,7 @@
         };
         stompClient.send("/app/chat/admin/enter", {}, JSON.stringify(EnterNotification));
     }
+
     // 메시지 전송 함수
     function sendMessage() {
         var messageContent = getElement('message').value;
@@ -310,6 +316,9 @@
             // 메시지 전송 후 타이핑 상태 초기화
             clearTimeout(typingTimeout);
             typingIndicatorSent = false;
+
+            // const timestamp = new Date().getTime();
+            // localStorage.setItem(`lastReadTimestamp_${chatRoomId.toString()}`, timestamp.toString());
         }
     }
 
@@ -372,6 +381,7 @@
         //입력필드 비활성화
         document.getElementById('message').disabled = true;
     }
+
     // 메시지 가져오기 함수
     function fetchMessages(chatRoomId) {
 
@@ -382,31 +392,34 @@
             })
             .then(data => {
                 console.log("Fetch response:", data);
+
+                let lastReadTimestamp = parseInt(localStorage.getItem(`lastReadTimestamp_${chatRoomId}`), 10) || 0;
+                let unreadMessageFlag = false;
+
+                // 변수 초기화
+                // let messageExist = data.some(item => Array.isArray(item.messages) && item.messages.length > 0);
+
                 data.forEach(item => {
-                    let hasUnreadMessages = false; // 안 읽은 메시지 여부를 판단하는 변수
-
-
                     item.messages.forEach(message => {
-                        if (message.chatRoomTitle !== "endChat") {
-                            let displayMessage = message.recipient === currentRecipient ? `관리자 : ${message.content}` : `${message.sender} : ${message.content}`;
-                            showMessage(displayMessage);
+                        messageExist = true;
+                        let messageTimestamp = new Date(message.createAt).getTime();
 
-                            // // 안 읽은 메시지가 있으면 플래그를 설정
-                            // if (!message.read) {
-                            //     hasUnreadMessages = true;
-                            // }
+                        console.log("로컬읽은 시간:", lastReadTimestamp);
+                        console.log("메세지 생성시간:", messageTimestamp);
+
+                        if (messageTimestamp > lastReadTimestamp && !unreadMessageFlag ) {
+                            console.log("이전 메시지입니다");
+                            showMessage('----------이전 메시지입니다 ----------');
+                            unreadMessageFlag = true;
                         }
-                    });
 
-                    // 첫 번째 안 읽은 메시지 섹션을 출력
-                    // if (hasUnreadMessages) {
-                    //     showMessage('---------- 안 읽은 메시지입니다 ----------');
-                    // }
+                        let displayMessage = message.recipient === currentRecipient ? `관리자 : ${message.content}` : `${message.sender} : ${message.content}`;
+                        showMessage(displayMessage);
+                    });
                 });
 
-
-                // 상태가 "active"일 때 입력창 활성화
                 document.getElementById('message').disabled = !data.some(item => item.type === "active");
+                updateLastReadTimestamp(chatRoomId);
             })
             .catch(error => console.error('Error fetching messages:', error));
     }
@@ -440,6 +453,8 @@
         disconnect(); //웹소켓 연결 해제
         currentRecipient = '';
         window.chatUtils.loadChatList(activePage, inactivePage, 8, false);
+
+
     }
 
     // 연결 해제 함수

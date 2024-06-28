@@ -51,7 +51,7 @@
                 </li>
                 <li><a href="/payment/cartList">장바구니</a></li>
                 <li class="chat-alarm" sec:authorize="isAuthenticated()">
-                    <img class="chat-img" src="/images/alarm.png" alt="1:1채팅 메시지" />
+                    <img id="chatImage" class="chat-img" src="/images/alarm.png" alt="1:1채팅 메시지" />
                     <div id="unreadCount">
                         0
                     </div>
@@ -86,10 +86,10 @@
             loadChatList(1, 1, 8, true);
             setupWebSocketConnection();
 
-            // unreadCount 요소가 존재하는지 확인
-            const unreadCount = document.getElementById("unreadCount");
-            if (unreadCount) {
-                unreadCount.addEventListener("click", function() {
+            // chatImage 요소가 존재하는지 확인
+            const chatImage = document.getElementById("chatImage");
+            if (chatImage) {
+                chatImage.addEventListener("click", function() {
                     window.location.href = "/inquiry#work";
                 });
             }

@@ -1,30 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
-<!-- Navbar -->
-
-<nav
-        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-        id="layout-navbar" style="margin-bottom: 10px;"
->
-
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <!-- Search -->
-        <div class="navbar-nav align-items-center">
-            <div class="nav-item d-flex align-items-center">
-                <i class="bx bx-search fs-4 lh-0"></i>
-                <input
-                        aria-label="Search..."
-                        class="form-control border-0 shadow-none"
-                        placeholder="Search..."
-                        type="text"
-                />
-            </div>
-        </div>
-        <!-- /Search -->
-    </div>
-</nav>
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -40,7 +15,7 @@
     <div class="col-xl">
         <div class="card mb-4">
             <div class="card-body">
-                <form action="/admin/eventRegister" method="post">
+                <form id="eventForm">
                     <input type="hidden" name="memberEmail" id="memberEmail">
                     <div class="mb-3">
                         <label class="form-label" for="eventName">이벤트 제목</label>
@@ -71,6 +46,24 @@
 <script>
     var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
     document.getElementById('memberEmail').value = userInfo.email;
+
+    $(document).ready(function() {
+        $('#eventForm').on('submit', function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: '/admin/eventRegister',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('.container-xxl').load('/admin/eventList');
+                },
+                error: function() {
+                    alert('폼 제출 중 오류가 발생했습니다.');
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>
