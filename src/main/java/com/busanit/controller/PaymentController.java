@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,14 +18,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/payment")
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -126,14 +125,10 @@ public class PaymentController {
                                                PaymentDTO paymentDTO) {
 
         Map<String, String> response_complete = new HashMap<>();
-//        if(request != null) {
-//            response_complete.put("merchant_uid", request.get("merchant_uid"));
-//            response_complete.put("currentPrice", request.get("amount"));
-//            response_complete.put("apply_num", request.get("apply_num")); // 카드 승인 번호
-//            response_complete.put("payment_status", request.get("payment_status"));
-//            response_complete.put("buyer_email2", request.get("buyer_email")); // 결제사에서 받아오는 메일
 
         if(merchant_uid != null) {
+            response_complete.put("imp_uid", imp_uid);
+
             paymentDTO.setMerchantUid(merchant_uid);
             paymentDTO.setImpUid(imp_uid);
             paymentDTO.setApplyNum(apply_num);
@@ -156,9 +151,25 @@ public class PaymentController {
     }
 
     @GetMapping("/paymentSuccessful")
-    public String paymentSuccessful() {
+    public String paymentSuccessful(@RequestParam String imp_uid, Model model) {
 
-        return "payment/payment_complete";
+        PaymentDTO paymentDTO = paymentService.get(imp_uid);
+        if(paymentDTO.getProductType().equals("MO")){ // 영화
+            List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(Long.valueOf(paymentDTO.getProductIdx()));
+            model.addAttribute("movieDTOs", movieDTOs);
+        } else { // 스낵
+            SnackDTO snackDTO = snackService.get(Long.valueOf(paymentDTO.getProductIdx())); // 스낵 바로 결제
+            model.addAttribute("productInfo", snackDTO);
+        }
+
+        if(memberService.findUserIdx(memberService.currentLoggedInEmail()) == null ||
+                paymentDTO.getMember_id() == null ||
+                memberService.findUserIdx(memberService.currentLoggedInEmail()) != paymentDTO.getMember_id()) { // 비회원 혹은 다른 멤버가 요청할때
+            return "redirect:/";
+        } else { // 해당 멤버가 요청할때
+            model.addAttribute("paymentInfo", paymentDTO);
+            return "payment/payment_complete";
+        }
     }
 
     @PostMapping("/paymentFailed")

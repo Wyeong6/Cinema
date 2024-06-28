@@ -41,9 +41,9 @@ function requestPay() {
                             "amount": currentPrice
                         }),
                         success: function(response_complete) {
-                            alert("DB 저장 완료");
-                            // 결제가 완료된 후 리디렉션할 페이지
-                            window.location.href = '/payment/paymentSuccessful';
+                            var params = new URLSearchParams();
+                            params.append("imp_uid", response_complete.imp_uid);
+                            window.location.href = '/payment/paymentSuccessful?'+ params.toString(); // 결제가 완료된 후 리디렉션할 페이지
                         },
                         error: function() {
                             alert("서버 통신에 실패했습니다.");
@@ -92,9 +92,26 @@ function requestPay() {
                             "amount": currentPrice
                         }),
                         success: function(response_complete) {
-                            alert("DB 저장 완료");
+                            // alert("DB 저장 완료");
                             // 결제가 완료된 후 리디렉션할 페이지
-                            window.location.href = '/payment/paymentSuccessful';
+                            var params = new URLSearchParams();
+                            params.append("imp_uid", response_complete.imp_uid);
+                            window.location.href = '/payment/paymentSuccessful?'+ params.toString();
+                            // $.ajax({
+                            //     type: "POST",
+                            //     url: "/payment/paymentSuccessful",
+                            //     data: JSON.stringify({
+                            //         imp_uid: response_complete.imp_uid
+                            //     }),
+                            //     contentType: "application/json",
+                            //     success: function(response_success) {
+                            //         // 서버에서 받은 응답을 처리한 후 페이지를 리디렉션
+                            //         window.location.href = "/payment/payment_complete";
+                            //     },
+                            //     error: function() {
+                            //         alert("결제 완료 후 서버 통신에 실패했습니다.");
+                            //     }
+                            // });
                         },
                         error: function() {
                             alert("서버 통신에 실패했습니다.");
