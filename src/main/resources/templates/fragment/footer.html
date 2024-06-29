@@ -26,7 +26,11 @@
           <h3>궁금하신 점 있으신가요 ?</h3>
         </header>
         <p>아래 버튼을 클릭하시면 FAQ, 1:1 채팅방, 문의하기로 이동하실 수 있습니다.</p>
-        <button class="button" onclick="redirectToServiceCenter()">Customer Service Center</button>      </section>
+        <button class="button" onclick="redirectToServiceCenter()">
+          <img src="/images/center.png" alt="센터 이미지"/>
+          <p>Customer Service Center</p>
+        </button>
+      </section>
 
     </div>
     <hr />
@@ -46,7 +50,7 @@
     </div>
   </div>
 </div>
-<script>
+  <script>
   function redirectToServiceCenter() {
     window.location.href = "/inquiry";
   }

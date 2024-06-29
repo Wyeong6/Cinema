@@ -64,7 +64,6 @@ public class ChatService {
         chatRoom.addReadStatus(receiverReadStatus);
 
         chatRoomRepository.save(chatRoom);
-
     }
 
     // 채팅방과 멤버에 대한 읽음 상태를 찾거나, 없으면 새로 생성하는 메서드
@@ -79,29 +78,45 @@ public class ChatService {
                 });
     }
 
-    // 채팅방 리스트 페이징 조회
-    public Page<ChatRoomDTO> getChatList(int page, int size, String memberEmail) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        Page<ChatRoom> chatRoomPage = chatRoomRepository.findByMemberEmail(memberEmail, pageable);
-        // chatRoomPage의 상태 확인
-        System.out.println("chatRoomPage: " + chatRoomPage);
-
+    // 채팅방 리스트 페이징 조회 (공통 메서드)
+    public Page<ChatRoomDTO> getPagedChatRoomList(String memberEmail, Page<ChatRoom> chatRoomPage) {
         List<ChatRoomDTO> chatRoomList = chatRoomPage.getContent().stream()
-                .peek(chatRoom -> System.out.println("Processing chatRoom: " + chatRoom)) // 각 chatRoom 상태 확인
+                .peek(chatRoom -> System.out.println("Processing chatRoom: " + chatRoom))
                 .map(this::convertToChatRoomDTO)
-                .peek(chatRoomDTO -> { // map 대신 peek을 사용하여 DTO 변환 후 처리
-                    System.out.println("Before calculateUnreadMessages - chatRoomDTO: " + chatRoomDTO); // convertToChatRoomDTO 결과 확인
-
-                    // 읽지 않은 메시지 수 계산
+                .peek(chatRoomDTO -> {
                     int unreadMessages = calculateUnreadMessages(chatRoomDTO.getId(), memberEmail);
                     chatRoomDTO.setUnreadMessageCount(unreadMessages);
-                    System.out.println("After calculateUnreadMessages - unreadMessages: " + unreadMessages); // unreadMessages 값 확인
+                    System.out.println("After calculateUnreadMessages - unreadMessages: " + unreadMessages);
                 })
                 .collect(Collectors.toList());
 
-        System.out.println("chatRoomList: " + chatRoomList); // 최종 chatRoomList 상태 확인
+        System.out.println("ChatRoomList: " + chatRoomList);
 
-        return new PageImpl<>(chatRoomList, pageable, chatRoomPage.getTotalElements());
+        return new PageImpl<>(chatRoomList, chatRoomPage.getPageable(), chatRoomPage.getTotalElements());
+    }
+
+    // 활성 채팅방 리스트 페이징 조회
+    public Page<ChatRoomDTO> getActiveChatList(int page, int size, String memberEmail) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ChatRoom> chatRoomPage = chatRoomRepository.findByMembersEmailAndType(memberEmail, "active", pageable);
+
+        return getPagedChatRoomList(memberEmail, chatRoomPage);
+    }
+
+    // 비활성 채팅방 리스트 페이징 조회
+    public Page<ChatRoomDTO> getInactiveChatList(int page, int size, String memberEmail) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ChatRoom> chatRoomPage = chatRoomRepository.findByMembersEmailAndType(memberEmail, "inactive", pageable);
+
+        return getPagedChatRoomList(memberEmail, chatRoomPage);
+    }
+
+    // 전체 채팅방 리스트 페이징 조회
+    public Page<ChatRoomDTO> getChatList(int page, int size, String memberEmail) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ChatRoom> chatRoomPage = chatRoomRepository.findByMemberEmail(memberEmail, pageable);
+
+        return getPagedChatRoomList(memberEmail, chatRoomPage);
     }
 
     // 사용자 이메일로 채팅방의 상태가 active인 메세지 조회
@@ -110,34 +125,22 @@ public class ChatService {
         String readEmail = getAuthenticatedUserEmail();
         //유저들이 있는 채팅방의 상태가 active인 것
         List<ChatRoom> chatRooms = chatRoomRepository.findByRecipientAndSender(recipient, readEmail);
-        System.out.println("Found chat rooms: " + chatRooms.size());
 
         return chatRooms.stream()
                 .map(chatRoom -> {
-                    System.out.println("Updating last read timestamp for chat room: " + chatRoom.getId());
-
                     // 해당 채팅방의 메시지를 가져오면서 읽은 시간을 업데이트
                     updateLastReadTimestamp(chatRoom.getId());
-                    System.out.println("updateLastReadTimestamp 가져오고나서  ");
                     return convertToChatRoomDTOWithMessages(chatRoom, readEmail);
                 })
                 .collect(Collectors.toList());
     }
-//
-//    // 채팅방 생성 또는 조회
-//    public ChatRoom getOrCreateChatRoom(String chatRoomTitle, String senderEmail, String recipientEmail) {
-//        return handleUserMessage(chatRoomTitle, senderEmail, recipientEmail);
-//
-//    }
 
     //클릭한 채팅방 메세지 읽음 표시
     public List<ChatRoomDTO> findChatRoomByChatRoomId(Long chatRoomId) {
 
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId);
-
         //메세지 상태추가
         updateLastReadTimestamp(chatRoomId);
-
         return Collections.singletonList(convertToChatRoomDTO(chatRoom));
     }
 
@@ -147,13 +150,11 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email: " + email));
     }
 
-
     //로그인한 유저의 채팅중인 채팅룸
     public List<String> findCHatRoomByRecipient() {
         String loginUser = getAuthenticatedUserEmail();
         List<ChatRoom> activeChatRooms = chatRoomRepository.findActiveChatRoomsByMemberEmail(loginUser);
         List<Member> recipients = messageRepository.findReceiversByChatRooms(activeChatRooms);
-
 
         // 로그인된 사용자의 이메일을 제외한 이메일 목록을 반환
         return recipients.stream()
@@ -221,34 +222,77 @@ public class ChatService {
         }
     }
 
-    //사용자의 마지막 읽은 시간을 업데이트하는 메서드
+//    //사용자의 마지막 읽은 시간을 업데이트하는 메서드
+//    public void updateLastReadTimestamp(Long chatRoomId) {
+//
+//        String readEmail = getAuthenticatedUserEmail();
+//
+//        // 채팅방 ID로 채팅방을 찾음
+//        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+//                .orElseThrow(() -> new EntityNotFoundException("ChatRoom not found with id " + chatRoomId));
+//
+//        // 해당 사용자의 읽은 상태를 찾음
+//        ChatRoomReadStatus userReadStatus = chatRoom.getReadStatuses().stream()
+//                .filter(readStatus -> readEmail.equals(readStatus.getMember().getEmail()))
+//                .findFirst()
+//                .orElseThrow(() -> new EntityNotFoundException("ReadStatus not found for user " + readEmail));
+//
+//        // 만약 읽은 상태가 존재하지 않는 경우 새로운 상태를 생성
+//        if (userReadStatus == null) {
+//            userReadStatus = new ChatRoomReadStatus();
+//            userReadStatus.setMember(memberRepository.findByEmail(readEmail)
+//                    .orElseThrow(() -> new EntityNotFoundException("Member not found with email " + readEmail)));
+//            userReadStatus.setChatRoom(chatRoom);
+//            chatRoom.getReadStatuses().add(userReadStatus);
+//        }
+//        // 읽은 시간을 현재 시간으로 업데이트
+//        userReadStatus.setLastReadTimestamp(LocalDateTime.now());
+//
+//        // 변경된 채팅방 객체를 저장
+//        chatRoomRepository.save(chatRoom);
+//    }
+
+
+    // 사용자의 마지막 읽은 시간을 업데이트하는 메서드 (인증된 사용자의 이메일 사용)
     public void updateLastReadTimestamp(Long chatRoomId) {
-
         String readEmail = getAuthenticatedUserEmail();
+        updateLastReadTimestamp(chatRoomId, readEmail);
+    }
 
+    // 사용자의 마지막 읽은 시간을 업데이트하는 메서드 (지정된 이메일 사용)
+    public void updateLastReadTimestamp(Long chatRoomId, String userEmail) {
         // 채팅방 ID로 채팅방을 찾음
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new EntityNotFoundException("ChatRoom not found with id " + chatRoomId));
 
         // 해당 사용자의 읽은 상태를 찾음
-        ChatRoomReadStatus userReadStatus = chatRoom.getReadStatuses().stream()
-                .filter(readStatus -> readEmail.equals(readStatus.getMember().getEmail()))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("ReadStatus not found for user " + readEmail));
+        ChatRoomReadStatus userReadStatus = findOrCreateUserReadStatus(chatRoom, userEmail);
 
-        // 만약 읽은 상태가 존재하지 않는 경우 새로운 상태를 생성
-        if (userReadStatus == null) {
-            userReadStatus = new ChatRoomReadStatus();
-            userReadStatus.setMember(memberRepository.findByEmail(readEmail)
-                    .orElseThrow(() -> new EntityNotFoundException("Member not found with email " + readEmail)));
-            userReadStatus.setChatRoom(chatRoom);
-            chatRoom.getReadStatuses().add(userReadStatus);
-        }
         // 읽은 시간을 현재 시간으로 업데이트
         userReadStatus.setLastReadTimestamp(LocalDateTime.now());
 
         // 변경된 채팅방 객체를 저장
         chatRoomRepository.save(chatRoom);
+    }
+
+    // 채팅방과 사용자의 이메일을 이용해 읽은 상태를 찾거나 새로 생성하는 메서드
+    private ChatRoomReadStatus findOrCreateUserReadStatus(ChatRoom chatRoom, String userEmail) {
+        // 해당 사용자의 읽은 상태를 찾음
+        ChatRoomReadStatus userReadStatus = chatRoom.getReadStatuses().stream()
+                .filter(readStatus -> userEmail.equals(readStatus.getMember().getEmail()))
+                .findFirst()
+                .orElse(null);
+
+        // 읽은 상태가 존재하지 않는 경우 새로운 상태를 생성하고 추가
+        if (userReadStatus == null) {
+            userReadStatus = new ChatRoomReadStatus();
+            userReadStatus.setMember(memberRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new EntityNotFoundException("Member not found with email " + userEmail)));
+            userReadStatus.setChatRoom(chatRoom);
+            chatRoom.getReadStatuses().add(userReadStatus);
+        }
+
+        return userReadStatus;
     }
 
     // ChatRoomDTO 변환

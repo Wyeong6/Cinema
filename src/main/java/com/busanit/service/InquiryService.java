@@ -84,14 +84,32 @@ public class InquiryService {
         return InquiryDTO.toDTO(inquiry);
     }
 
-    //문의리스트 반환
-    public Page<InquiryDTO> getInquiryList(int page, int size) {
+    public InquiryReplyDTO findInquiryReplyByInquiryId(Long inquiryId) {
+        InquiryReply inquiryReply = inquiryReplyRepository.findByInquiryId(inquiryId);
+        return InquiryReplyDTO.toDTO(inquiryReply);
+    }
+
+    public Page<InquiryDTO> getUnansweredInquiryList(int page, int size) {
+        return getInquiriesByType("미답변", page, size);
+    }
+
+    public Page<InquiryDTO> getAnsweredInquiryList(int page, int size) {
+        return getInquiriesByType("답변완료", page, size);
+    }
+
+
+    private Page<InquiryDTO> getInquiriesByType(String type, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        Page<Inquiry> inquiryPage = inquiryRepository.findAll(pageable);
+        Page<Inquiry> inquiryPage = inquiryRepository.findByType(type, pageable);
         List<InquiryDTO> inquiryDTOList = inquiryPage.getContent().stream()
                 .map(InquiryDTO::toDTO)
                 .collect(Collectors.toList());
         return new PageImpl<>(inquiryDTOList, pageable, inquiryPage.getTotalElements());
+    }
+
+    // 미답변 문의의 갯수 조회 메서드
+    public int getUnansweredInquiryCount() {
+        return inquiryRepository.countByType("미답변");
     }
 
     //문의하기 이메일전송

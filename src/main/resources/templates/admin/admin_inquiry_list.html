@@ -3,91 +3,140 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <!-- Navbar -->
-
-<nav
-        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-        id="layout-navbar" style="margin-bottom: 10px;"
->
-
+<nav class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+     id="layout-navbar" style="margin-bottom: 10px;">
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <!-- Search -->
         <div class="navbar-nav align-items-center">
             <div class="nav-item d-flex align-items-center">
                 <i class="bx bx-search fs-4 lh-0"></i>
-                <input
-                        aria-label="Search..."
-                        class="form-control border-0 shadow-none"
-                        placeholder="Search..."
-                        type="text"
-                />
+                <input aria-label="Search..."
+                       class="form-control border-0 shadow-none"
+                       placeholder="Search..." type="text"/>
             </div>
         </div>
-        <!-- /Search -->
     </div>
 </nav>
-
-<!-- / Navbar -->
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event List</title>
-    <style>
-        td {
-            padding: 15px; /* 좌우 간격을 조절할 값 */
-        }
+    <!-- jQuery와 부트스트랩 JS 추가 -->
 
-        th {
-            padding: 15px;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+
+    <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
-<div class="card">
-    <h5 class="card-header">Inquiry List</h5>
-    <div class="table-responsive text-nowrap">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th>문의 번호</th>
-                <th>작성자 이름</th>
-                <th>제목</th>
-                <th>내용</th>
-                <th>작성자 이메일</th>
-                <th>문의 상태</th>
-                <th></th>
-                <th style="display: none;">답변받을 이메일</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:if="${#lists.isEmpty(inquiryList)}">
-                <td colspan="6" style="text-align: center;">문의가 없습니다.</td>
-            </tr>
-            <tr th:each="inquiry : ${inquiryList}" data-toggle="modal" data-target="#inquiryModal"
-                th:data-id="${inquiry.id}">
-                <td th:text="${inquiry.id}"></td>
-                <td th:text="${inquiry.name}"></td>
-                <td th:text="${inquiry.subject}"></td>
-                <td th:text="${inquiry.message}"></td>
-                <td th:text="${inquiry.email}"></td>
-                <td th:text="${inquiry.type}"></td>
-                <td th:data-createdat="${inquiry.createdAt}">
-                    <span class="time-since-created"></span>
-                </td>                <td style="display: none;" th:text="${inquiry.recipientEmail}"></td>
-            </tr>
-            </tbody>
-        </table>
-        <div style="text-align: center;" th:if="${!#lists.isEmpty(inquiryList.content)}">
-            <a href="#" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:data-page="${i}"
-               th:text="'[' + ${i} + ']'" class="paging-btn"></a>
+<div class="row">
+    <!-- 미답변 문의 리스트 -->
+    <div class="col-md-6">
+        <div class="card">
+            <h5 class="card-header">미답변 문의</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>문의 번호</th>
+                        <th>작성자 이름</th>
+                        <th>제목</th>
+                        <th>내용</th>
+                        <th>작성자 이메일</th>
+                        <th>문의 상태</th>
+                        <th></th>
+                        <th style="display: none;">답변받을 이메일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="inquiry : ${unansweredInquiryList.content}" data-toggle="modal"
+                        th:data-id="${inquiry.id}"
+                        data-target="#inquiryModal" th:data-type="${inquiry.type}"
+                        th:data-original-subject="${inquiry.subject}" th:data-original-message="${inquiry.message}">
+                    <td th:text="${inquiry.id}"></td>
+                        <td th:text="${inquiry.name}"></td>
+                        <td>
+                            <span th:text="${#strings.length(inquiry.subject) > 5 ? #strings.substring(inquiry.subject, 0, 5) + '..' : inquiry.subject}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#strings.length(inquiry.message) > 6 ? #strings.substring(inquiry.message, 0, 6) + '..' : inquiry.message}"></span>
+                        </td>
+                        <td th:text="${inquiry.email}"></td>
+                        <td th:text="${inquiry.type}"></td>
+                        <td th:data-createdat="${inquiry.createdAt}">
+                            <span class="time-since-created"></span>
+                        </td>
+                        <td style="display: none;" th:text="${inquiry.recipientEmail}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style="text-align: center;" th:if="${!#lists.isEmpty(unansweredInquiryList.content)}"
+                     th:with="startunansweredPage=${startunansweredPage}, endunansweredPage=${endunansweredPage}">
+                    <a href="#" th:each="i : ${#numbers.sequence(startunansweredPage, endunansweredPage)}"
+                       th:data-page="${i}" th:text="'[' + ${i} + ']'" class="paging-btn" data-type="unanswered"></a>
+                </div>
+                <input type="hidden" id="unansweredPage" th:value="${unansweredPage}"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- 답변 완료된 문의 리스트 -->
+    <div class="col-md-6">
+        <div class="card">
+            <h5 class="card-header">답변 완료 문의</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>문의 번호</th>
+                        <th>작성자 이름</th>
+                        <th>제목</th>
+                        <th>내용</th>
+                        <th>작성자 이메일</th>
+                        <th>문의 상태</th>
+                        <th></th>
+                        <th style="display: none;">답변받을 이메일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="inquiry : ${answeredInquiryList.content}" data-toggle="modal"
+                        th:data-id="${inquiry.id}"
+                        data-target="#answeredInquiryModal" th:data-type="${inquiry.type}"
+                        th:data-original-subject="${inquiry.subject}" th:data-original-message="${inquiry.message}">
+                    <td th:text="${inquiry.id}"></td>
+                        <td th:text="${inquiry.name}"></td>
+                        <td>
+                            <span th:text="${#strings.length(inquiry.subject) > 5 ? #strings.substring(inquiry.subject, 0, 5) + '..' : inquiry.subject}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#strings.length(inquiry.message) > 6 ? #strings.substring(inquiry.message, 0, 6) + '..' : inquiry.message}"></span>
+                        </td>
+                        <td th:text="${inquiry.email}"></td>
+                        <td th:text="${inquiry.type}"></td>
+                        <td th:data-createdat="${inquiry.createdAt}">
+                            <span class="time-since-created"></span>
+                        </td>
+                        <td style="display: none;" th:text="${inquiry.recipientEmail}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style="text-align: center;" th:if="${!#lists.isEmpty(answeredInquiryList.content)}"
+                     th:with="startansweredPage=${startansweredPage}, endansweredPage=${endansweredPage}">
+                    <a href="#" th:each="i : ${#numbers.sequence(startansweredPage, endansweredPage)}"
+                       th:data-page="${i}" th:text="'[' + ${i} + ']'" class="paging-btn" data-type="answered"></a>
+                </div>
+                <input type="hidden" id="answeredPage" th:value="${answeredPage}"/>
+            </div>
         </div>
     </div>
 </div>
-<!-- Inquiry Modal -->
+
+<!-- 미답변문의 모달 -->
 <div class="modal fade" id="inquiryModal" tabindex="-1" role="dialog" aria-labelledby="inquiryModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
+     aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.5);">>
+    <div class="modal-dialog" role="document" style="background-color: rgba(0, 0, 0, 0.5);">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="inquiryModalLabel">문의 상세</h5>
@@ -104,7 +153,8 @@
 
                     </div>
                     <div class="col-md-6">
-                        <p><strong>문의상태:</strong> <span id="modal-inquiry-type"></span></p>
+                        <p><strong>문의 상태:</strong> <span id="modal-inquiry-type"></span></p>
+                        <p><strong>작성자 이메일:</strong> <span id="modal-inquiry-email"></span></p>
                         <p><strong>답변받을 이메일:</strong> <span id="modal-recipient-email"></span></p>
                     </div>
                 </div>
@@ -115,8 +165,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Reply Form -->
+            <!-- 답변 입력폼 -->
             <div class="card-body">
                 <form id="replyForm">
                     <input type="hidden" id="inquiryIdInput" name="inquiryId">
@@ -129,147 +178,214 @@
                         <textarea class="form-control" id="replyMessage" name="replyMessage" rows="5"
                                   required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Send Reply</button>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-primary">메일 답변하기</button>
+                    </div>
                 </form>
             </div>
-
         </div>
     </div>
 </div>
+
+<!-- 답변완료 모달 -->
+<div class="modal fade" id="answeredInquiryModal" tabindex="-1" role="dialog"
+     aria-labelledby="answeredInquiryModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="answeredInquiryModalLabel">답변 완료된 문의 상세</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>문의 번호:</strong> <span id="modal-answered-inquiry-id"></span></p>
+                        <p><strong>작성자:</strong> <span id="modal-answered-inquiry-name"></span></p>
+                        <p><strong>제목:</strong> <span id="modal-answered-inquiry-subject"></span></p>
+                        <p><strong>내용:</strong> <span id="modal-answered-inquiry-message"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>문의 상태:</strong> <span id="modal-answered-inquiry-type"></span></p>
+                        <p><strong>작성자 이메일:</strong> <span id="modal-answered-inquiry-email"></span></p>
+                        <p><strong>답변받을 이메일:</strong> <span id="modal-answered-recipient-email"></span></p>
+                    </div>
+                    <hr> <!-- 구분선 추가 -->
+                    <div class="row">
+                        <!-- 답변 내용 -->
+                        <div class="col-md-12">
+                            <p><strong>문의에 대한 답변:</strong></p>
+                            <p id="modal-answered-inquiry-reply"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--서버로 보냈던 페이징 번호를 받아옴-->
+<div id="pageVariables"
+     th:data-answered-page="${answeredPage}"
+     th:data-unanswered-page="${unansweredPage}"
+     hidden></div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script type="module">
 
-    import { updateTimeSinceCreated } from '/modules/timeSinceCreated.js'; //시간 경과 모듈
+<script type="module">
+    import {updateTimeSinceCreated} from '/modules/timeSinceCreated.js'; //시간 경과 모듈
 
     $(document).ready(function () {
-
         updateTimeSinceCreated();
-
-        $('tr[data-toggle="modal"]').on('click', function () {
-            var inquiryId = $(this).data('id');
-            var inquiry = $(this).children('td');
-
-            // 모달의 각 항목에 클릭한 행의 정보를 할당
-            $('#modal-inquiry-id').text(inquiry.eq(0).text());
-            $('#modal-inquiry-name').text(inquiry.eq(1).text());
-            $('#modal-inquiry-subject').text(inquiry.eq(2).text());
-            $('#modal-inquiry-message').text(inquiry.eq(3).text());
-            $('#modal-inquiry-email').text(inquiry.eq(4).text());
-            $('#modal-inquiry-type').text(inquiry.eq(5).text());
-            $('#modal-recipient-email').text(inquiry.eq(6).text());
-
-            //모달의 입력값을 할당
-            $('#inquiryIdInput').val(inquiryId);
-            $('#modal-inquiry-name-input').val(inquiry.eq(1).text().trim()); // 작성자 이름
-            $('#modal-recipient-email-input').val(inquiry.eq(6).text().trim()); //
-            $('#modal-inquiry-subject-input').val(inquiry.eq(2).text().trim()); // 제목
-            $('#modal-inquiry-message-input').val(inquiry.eq(3).text().trim()); // 내용
-
-
-        });
-
-                    $('#replyForm').on('submit', function (event) {
-
-                        // FormData 객체 생성
-                        const formData = new FormData(this);
-
-                        console.log("formData 체크1 === " + formData);
-
-                        // sendRequest 함수를 사용하여 서버로 데이터 전송
-                        sendRequest('POST', '/admin/sendReply', formData, function (response) {
-
-                            console.log("formData 체크2 === " + formData);
-
-                            console.log(response);
-
-                            if (response === 'success') {
-                                $('#inquiryModal').modal('hide');
-                                alert('답변이 성공적으로 전송되었습니다.');
-                                console.log(response);
-
-                            } else {
-                                alert('답변 전송 중 오류가 발생했습니다.');
-                            }
-                        }, function (xhr, status, error) {
-                            console.error('Error occurred: ', error);
-                            alert('답변 전송 중 오류가 발생했습니다.');
-                        });
-                    });
-                });
-                    // AJAX 요청을 보내는 공통 함수
-                    function sendRequest(type, url, data, onSuccess, onError) {
-                        $.ajax({
-                            type: type,
-                            url: url,
-                            data: data,
-                            success: onSuccess,
-                            processData: false, // FormData 사용 시 필수
-                            contentType: false, // FormData 사용 시 필수
-                            error: onError
-                        });
-                    }
-
-        // 페이지 번호를 세션 스토리지에 저장하거나 제거하는 함수
-        function setPageNumber(pageNumber, shouldRemove = false) {
-            if (shouldRemove) {
-                sessionStorage.removeItem('pageNumber');
-            } else {
-                sessionStorage.setItem('pageNumber', pageNumber);
-            }
-        }
-
-        // 업데이트 버튼 클릭 이벤트 핸들러
-        $('.update-btn').click(function () {
-            var eventId = $(this).data('id');
-            var pageNumber = $(this).data('page');
-            setPageNumber(pageNumber);
-            sendRequest('GET', '/admin/eventUpdate', {eventId: eventId}, function (response) {
-                $('.container-xxl').html(response);
-            });
-        });
+        let pageVariablesElement = document.getElementById('pageVariables'); // 변수 이름을 변경함
+        let answeredPage = parseInt(pageVariablesElement.getAttribute('data-answered-page')) || 1;
+        let unansweredPage = parseInt(pageVariablesElement.getAttribute('data-unanswered-page')) || 1;
 
         // 페이징 버튼 클릭 이벤트 핸들러
         $('.paging-btn').click(function (e) {
             e.preventDefault();
-            var pageNumber = $(this).data('page');
-            sendRequest('GET', '/admin/inquiryList?page=' + pageNumber, {}, function (response) {
-                $('.container-xxl').html(response);
-                setPageNumber(pageNumber);
-            });
-        });
-        //
-        // // 삭제 버튼 클릭 이벤트 핸들러
-        // $('.delete-btn').click(function (e) {
-        //     e.preventDefault();
-        //     var eventId = $(this).data('id');
-        //     var pageNumber = $(this).data('page');
-        //     sendRequest('/admin/eventDelete/' + eventId + '?pageNumber=' + pageNumber, {}, function (response) {
-        //         console.log('Event deleted successfully');
-        //         $('.container-xxl').html(response);
-        //         setPageNumber(pageNumber, true);
-        //     });
-        // });
+            var page = $(this).data('page');
+            var type = $(this).data("type");
 
-        // 텍스트를 10자로 자르고 "..."을 추가하는 함수
-        function truncateText(text, length) {
-            if (text.length > length) {
-                return text.substring(0, length) + '...';
+            if (type === 'unanswered') {
+                unansweredPage = page;
+            } else if (type === 'answered') {
+                answeredPage = page;
             }
-            return text;
-        }
 
-        //.truncate-text 요소에 대해 텍스트를 변환
-        $('.truncate-row').each(function () {
-            $(this).find('td').each(function () {
-                if (!$(this).html().match(/<a|<img/)) {
-                    var originalText = $(this).text();
-                    var truncatedText = truncateText(originalText, 10);
-                    $(this).text(truncatedText);
-                }
+            const url = '/admin/inquiryList?unansweredPage=' + unansweredPage + '&answeredPage=' + answeredPage;
+
+            sendRequest('GET', url, {}, function (response) {
+                $('.container-xxl').html(response);
+                updateTimeSinceCreated();
             });
         });
+        //리스트의 행클릭 시 해당하는 문의모달값을 전달
+        $('tr[data-toggle="modal"]').on('click', function () {
+            var inquiryId = $(this).data('id');
+            var inquiryType = $(this).data('type');
+            var inquiry = $(this).children('td');
 
+            // 원본 제목과 메시지 가져오기
+            var originalSubject = $(this).data('original-subject');
+            var originalMessage = $(this).data('original-message');
+
+            if (inquiryType === '미답변') {  // 미답변 문의리스트
+                $('#modal-inquiry-id').text(inquiry.eq(0).text());
+                $('#modal-inquiry-name').text(inquiry.eq(1).text());
+                $('#modal-inquiry-subject').text(originalSubject); // 원본 제목 사용
+                $('#modal-inquiry-message').text(originalMessage); // 원본 메시지 사용
+                $('#modal-inquiry-email').text(inquiry.eq(4).text());
+                $('#modal-inquiry-type').text(inquiry.eq(5).text());
+                $('#modal-recipient-email').text(inquiry.eq(7).text());
+
+                //답변내용 입력폼 값
+                $('#inquiryIdInput').val(inquiryId);
+                $('#modal-inquiry-name-input').val(inquiry.eq(1).text().trim());
+                $('#modal-recipient-email-input').val(inquiry.eq(7).text().trim());
+                $('#modal-inquiry-subject-input').val('[Cinemacast] ' + inquiry.eq(1).text().trim() + '님의 문의에 대한 답변입니다');
+                $('#modal-inquiry-message-input').val(inquiry.eq(3).text().trim());
+
+                //미답변모달시 입력폼 보여주기
+                $('#replyFormContainer').show();
+            } else {    // 답변완료 문의리스트
+                $('#answeredInquiryModalLabel').text('답변 완료된 문의 상세');
+                $('#modal-answered-inquiry-id').text(inquiry.eq(0).text());
+                $('#modal-answered-inquiry-name').text(inquiry.eq(1).text());
+                $('#modal-answered-inquiry-subject').text(originalSubject); // 원본 제목 사용
+                $('#modal-answered-inquiry-message').text(originalMessage); // 원본 메시지 사용
+                $('#modal-answered-inquiry-email').text(inquiry.eq(4).text());
+                $('#modal-answered-inquiry-type').text(inquiry.eq(5).text());
+                $('#modal-answered-recipient-email').text(inquiry.eq(7).text());
+
+                // Ajax 요청으로 답변 데이터 가져오기
+                $.ajax({
+                    type: 'GET',
+                    url: '/admin/inquiryReplies/' + inquiryId,
+                    success: function (response) {
+                        console.log("응답 답변내용 데이터:", response);
+                        $('#modal-answered-inquiry-reply').text(response.replyMessage);
+                    },
+                    error: function () {
+                        alert('답변 데이터를 가져오는 데 실패했습니다.');
+                    }
+                });
+                //답변입력폼 숨기기
+                $('#replyFormContainer').hide();
+            }
+        });
+
+        //메일답변 클릭 시
+        $('#replyForm').on('submit', function (event) {
+            event.preventDefault();
+
+            // FormData 객체 생성
+            const formData = new FormData(this);
+
+            sendRequest('POST', '/admin/sendReply', formData, function (response) {
+
+                if (response.trim() === 'success') {
+                    // $('#inquiryModal').modal('hide');
+                    alert('답변이 성공적으로 전송되었습니다.');
+                    console.log(response);
+                    location.reload();          //--------------------------------- 수정해야함 리스트로 가도록
+                    $('.container-xxl').load('/admin/inquiryList');
+                } else {
+                    alert('답변 전송 중 오류가 발생했습니다.');
+                }
+            }, function (xhr, status, error) {
+                console.error('Error occurred: ', error);
+                alert('답변 전송 중 오류가 발생했습니다.');
+            });
+        });
+    });
+
+    // AJAX 요청을 보내는 공통 함수
+    function sendRequest(type, url, data, onSuccess, onError) {
+        $.ajax({
+            type: type,
+            url: url,
+            data: data,
+            success: onSuccess,
+            processData: false, // FormData 사용 시 필수
+            contentType: false, // FormData 사용 시 필수
+            error: onError
+        });
+    }
+
+    //
+    // // 삭제 버튼 클릭 이벤트 핸들러
+    // $('.delete-btn').click(function (e) {
+    //     e.preventDefault();
+    //     var eventId = $(this).data('id');
+    //     var pageNumber = $(this).data('page');
+    //     sendRequest('/admin/eventDelete/' + eventId + '?pageNumber=' + pageNumber, {}, function (response) {
+    //         console.log('Event deleted successfully');
+    //         $('.container-xxl').html(response);
+    //         setPageNumber(pageNumber, true);
+    //     });
+    // });
+
+    // 텍스트를 10자로 자르고 "..."을 추가하는 함수
+    function truncateText(text, length) {
+        if (text.length > length) {
+            return text.substring(0, length) + '...';
+        }
+        return text;
+    }
+
+    //.truncate-text 요소에 대해 텍스트를 변환
+    $('.truncate-row').each(function () {
+        $(this).find('td').each(function () {
+            if (!$(this).html().match(/<a|<img/)) {
+                var originalText = $(this).text();
+                var truncatedText = truncateText(originalText, 10);
+                $(this).text(truncatedText);
+            }
+        });
+    });
 </script>
 </body>
 </html>

@@ -1,5 +1,10 @@
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,400italic,600");
 @import url("fontawesome-all.min.css");
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+body {
+	font-family: 'Noto Sans KR', sans-serif;
+}
 
 /*
 	Helios by HTML5 UP
@@ -8,7 +13,7 @@
 */
 
 html, body, span, applet, object,
-iframe, h1, h2, h3, h4, h5, h6, p, blockquote,
+iframe, h2, h3, h4, h5, h6, p, blockquote,
 pre, a, abbr, acronym, address, big, cite,
 code, del, dfn, em, img, ins, kbd, q, s, samp,
 small, strike, strong, sub, sup, tt, var, b,
@@ -23,7 +28,8 @@ section, summary, time, mark, audio, video {
 	border: 0;
 	font-size: 100%;
 	font: inherit;
-	vertical-align: baseline;}
+	vertical-align: baseline;
+	font-family: 'Noto Sans KR', sans-serif;}
 
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
@@ -130,12 +136,16 @@ input, select, textarea {
 	}
 
 	h3 {
-		font-size: 1.25em;
+		font-size: 2em;
 	}
 
 	h4 {
 		font-size: 1em;
 		margin: 0 0 0.25em 0;
+	}
+
+	h5 {
+		font-size: 1.2em;
 	}
 
 	strong, b {
@@ -149,7 +159,7 @@ input, select, textarea {
 
 	a {
 		color: inherit;
-		border-bottom: solid 1px rgba(128, 128, 128, 0.15);
+		/*border-bottom: solid 1px rgba(128, 128, 128, 0.15);*/
 		text-decoration: none;
 		-moz-transition: background-color 0.35s ease-in-out, color 0.35s ease-in-out;
 		-webkit-transition: background-color 0.35s ease-in-out, color 0.35s ease-in-out;
@@ -187,6 +197,7 @@ input, select, textarea {
 
 	p {
 		text-align: justify;
+		font-size: 1em;
 	}
 
 	br.clear {
@@ -197,7 +208,6 @@ input, select, textarea {
 		position: relative;
 		display: block;
 		border: 0;
-		margin-bottom: 4em;
 		height: 6px;
 	}
 
@@ -1763,7 +1773,7 @@ input, select, textarea {
 
 		header > p {
 			display: block;
-			font-size: 1.5em;
+			font-size: 1em;
 			margin: 1em 0 2em 0;
 			line-height: 1.5em;
 			text-align: inherit;
@@ -1931,7 +1941,6 @@ input, select, textarea {
 			}
 
 				ul.icons li a:hover {
-					color: #ef8376;
 				}
 
 /* Form */
@@ -2177,7 +2186,7 @@ input, select, textarea {
 		background-attachment: fixed;
 		color: #fff;
 		text-align: center;
-		padding: 7.5em 0 2em 0;
+		padding: 10em 0 0 0;
 		cursor: default;
 	}
 
@@ -2207,7 +2216,7 @@ input, select, textarea {
 
 		#header h1 {
 			color: #fff;
-			font-size: 3em;
+			font-size: 1.5em;
 			line-height: 1em;
 		}
 
@@ -2244,7 +2253,7 @@ input, select, textarea {
 	}
 
 		body.homepage #header h1 {
-			font-size: 4em;
+			font-size: 1.5em;
 		}
 
 		body.homepage #header:after {
@@ -2279,7 +2288,7 @@ input, select, textarea {
 		left: 0;
 		width: 100%;
 		text-align: center;
-		padding: 5em 0 1.5em 0;
+		padding: 4.5em 0 2.5em 0;
 		z-index: 1;
 		overflow: hidden;
 	}
@@ -2297,7 +2306,7 @@ input, select, textarea {
 #nav > ul:before, #nav > ul:after {
 	content: '';
 	display: block;
-	width: 120%;
+	width: 140%;
 	position: absolute;
 	top: 50%;
 	height: 5px;
@@ -2334,6 +2343,7 @@ input, select, textarea {
 					display: block;
 					color: inherit;
 					text-decoration: none;
+					font-size: 0.8em;
 					border: 0;
 					outline: 0;
 				}
@@ -2366,7 +2376,6 @@ input, select, textarea {
 			}
 
 			.dropotron li:hover {
-				color: #ef8376;
 			}
 
 			.dropotron li a, .dropotron li span {
@@ -2398,10 +2407,10 @@ input, select, textarea {
 /* Banner */
 
 	#banner {
-		background: #3B353C;
 		text-align: center;
-		padding: 4.5em 0 4.5em 0;
-		margin-bottom: 0;
+		padding: 2.5em 0 2.5em 0;
+		margin-top: 0;
+		margin-bottom: 1em;
 	}
 
 		#banner header > p {
@@ -2449,7 +2458,7 @@ input, select, textarea {
 	#footer {
 		position: relative;
 		overflow: hidden;
-		padding: 6em 0 6em 0;
+		padding: 4em 0 2em 0;
 		background: #2b252c;
 		color: #fff;
 	}
@@ -2467,6 +2476,9 @@ input, select, textarea {
 		#footer h2, #footer h3, #footer h4, #footer h5, #footer h6 {
 			color: #fff;
 		}
+		#footer h3 {
+			font-size: 1.3em;
+		}
 
 		#footer .contact {
 			text-align: center;
@@ -2474,7 +2486,7 @@ input, select, textarea {
 
 			#footer .contact p {
 				text-align: center;
-				margin: 0 0 3em 0;
+				margin: 0 0 2em 0;
 			}
 
 		#footer .copyright {
@@ -2539,7 +2551,7 @@ input, select, textarea {
 			}
 
 			.carousel .forward:hover:before, .carousel .backward:hover:before {
-				background-color: rgba(239, 131, 118, 0.75);
+				background-color: rgba(115, 13, 21, 0.75);
 			}
 
 		.carousel .forward {
@@ -2579,7 +2591,7 @@ input, select, textarea {
 
 		.carousel article {
 			display: inline-block;
-			width: 18em;
+			width: 13em;
 			background: #fff;
 			text-align: center;
 			padding: 0 1em 1em 1em;
@@ -2623,7 +2635,7 @@ input, select, textarea {
 		/* Carousel */
 
 			.carousel {
-				padding: 1.5em 0 1.5em 0;
+				margin-bottom: 2em;
 			}
 
 				.carousel .reel {
@@ -2631,7 +2643,7 @@ input, select, textarea {
 				}
 
 				.carousel article {
-					width: 18em;
+					width: 13em;
 					margin: 0 1.25em 0 0;
 				}
 
@@ -2671,6 +2683,7 @@ input, select, textarea {
 			#banner {
 				padding-left: 2em;
 				padding-right: 2em;
+				margin-bottom: 2em;
 			}
 
 		/* Footer */
@@ -2752,7 +2765,6 @@ input, select, textarea {
 
 			hr {
 				top: 3em;
-				margin-bottom: 6em;
 			}
 
 		/* Section/Article */
@@ -3036,7 +3048,6 @@ input, select, textarea {
 		/* Header */
 
 			#header {
-
 				background-attachment: scroll;
 				padding: 2.5em 0 0 0;
 			}
@@ -3052,12 +3063,11 @@ input, select, textarea {
 				}
 
 				#header h1 {
-					font-size: 1.75em;
+					font-size: 1.5em;
 				}
 
 				#header hr {
 					top: 1em;
-					margin-bottom: 2.5em;
 				}
 
 			body.homepage #header {
@@ -3071,7 +3081,7 @@ input, select, textarea {
 				}
 
 				body.homepage #header h1 {
-					font-size: 2.5em;
+					font-size: 1.5em;
 				}
 
 

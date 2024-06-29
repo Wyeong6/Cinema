@@ -10,6 +10,7 @@
         <div class="wrapper style1 seat-selection bg-black-wrapper">
             <div class="container" th:each="movie, iterStat : ${movieDTOs}">
                 <article id="main" class="special">
+                    <input type="hidden" id="schedule-id" th:data-schedule-id="${scheduleDTO.id}" />
                     <input type="hidden"
                            id="movieId"
                            th:value="${movie.id}"
@@ -118,16 +119,13 @@
                         <div>
                             <h3>총 금액 </h3><h3 id="total-price">0</h3><h4>원</h4>
                         </div>
-                        <button type="button" onclick="moveToPaymentPage()">결제하기</button>
+                        <button class="pay-btn" type="button" onclick="moveToPaymentPage()">결제하기</button>
                     </div>
                 </article>
             </div>
 
         </div>
     </div>
-
-    <!-- 스크립트 -->
-    <script src="/assets/js/jquery.min.js"></script>
 
     <script>
         $(document).ready(function() {
@@ -154,7 +152,7 @@
             let totalCount = 0;
             let totalPrice = 0;
 
-            $(document).on('click', '.seat:not(.remove)', function() {
+            $(document).on('click', '.seat:not(.remove):not(.reserved)', function() {
                 if (totalCount === 0) {
                     Swal.fire({
                         position: "center",
@@ -194,6 +192,15 @@
                 }
             });
 
+            $('.seat').each(function() {
+                const isReserved = $(this).find('input').data('seat-reserved');
+                if (isReserved) {
+                    $(this).addClass('reserved');
+                    $(this).addClass('disabled');
+                    $(this).removeClass('able');
+                }
+            });
+
             $('#seat-form').on('submit', function(event) {
                 event.preventDefault();
 
@@ -219,18 +226,45 @@
         });
 
         function moveToPaymentPage() {
-            window.location.href = "/payment/";
+            const adultCount = parseInt($('#adult-cnt').val()) || 0;
+            const teenagerCount = parseInt($('#teenager-cnt').val()) || 0;
+            const grandCount = parseInt($('#grand-cnt').val()) || 0;
+
+            const selectedSeats = [];
+            $('.seat.selected input[type="hidden"]').each(function() {
+                const seatId = $(this).data('seat-id');
+                const seatRow = $(this).data('seat-row');
+                const seatColumn = $(this).data('seat-column');
+
+                if (seatId && seatRow && seatColumn) {
+                    selectedSeats.push({
+                        seatId: seatId,
+                        seatRow: seatRow,
+                        seatColumn: seatColumn
+                    });
+                }
+            });
+
+            const scheduleId = $('#schedule-id').data('schedule-id');
+            const reservedBy = 'user'; // 실제로는 로그인된 사용자 정보로 대체
+
+            // 예약된 좌석의 총 금액 계산 (예시 가격, 실제 가격에 맞게 수정 필요)
+            const adultPrice = 15000;
+            const teenagerPrice = 12000;
+            const grandPrice = 12000;
+            const totalAmount = adultPrice * adultCount + teenagerPrice * teenagerCount + grandPrice * grandCount;
+
+            console.log('Sending data:');
+            console.log('scheduleId:', scheduleId);
+            console.log('selectedSeats:', JSON.stringify(selectedSeats));
+            console.log('adultCount:', adultCount);
+            console.log('teenagerCount:', teenagerCount);
+            console.log('grandCount:', grandCount);
+            console.log('totalAmount:', totalAmount);
+
+            window.location.href = `/payment?scheduleId=${scheduleId}&selectedSeats=${encodeURIComponent(JSON.stringify(selectedSeats))}&adultCount=${adultCount}&teenagerCount=${teenagerCount}&grandCount=${grandCount}&totalAmount=${totalAmount}`;
         }
     </script>
-
-    <script src="/assets/js/jquery.dropotron.min.js"></script>
-    <script src="/assets/js/jquery.scrolly.min.js"></script>
-    <script src="/assets/js/jquery.scrollex.min.js"></script>
-    <script src="/assets/js/browser.min.js"></script>
-    <script src="/assets/js/breakpoints.min.js"></script>
-    <script src="/assets/js/util.js"></script>
-    <script src="/assets/js/main.js"></script>
-
 </th:block>
 </body>
 </html>

@@ -81,25 +81,6 @@
     }
 </style>
 
-<nav class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-        id="layout-navbar" style="margin-bottom: 10px;" >
-
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <!-- Search -->
-        <div class="navbar-nav align-items-center">
-            <div class="nav-item d-flex align-items-center">
-                <i class="bx bx-search fs-4 lh-0"></i>
-                <input
-                        aria-label="Search..."
-                        class="form-control border-0 shadow-none"
-                        placeholder="Search..."
-                        type="text"
-                />
-            </div>
-        </div>
-        <!-- /Search -->
-    </div>
-</nav>
 
 <!-- / Navbar -->
 
@@ -181,7 +162,8 @@
                     <div class="mb-3">
                         <label class="form-label" for="video">트레일러</label>
                         <div class="input-group">
-                            <input class="form-control" id="video" name="video" placeholder="유튜브 키 를 입력해주세요 (ex. LU7ujHmsc-s)"
+                            <input class="form-control" id="video" name="video"
+                                   th:value="${movie != null ? movie.movieDetail.video : ''}"
                                    required type="text"/>
                             <button class="btn btn-outline-secondary" type="button" id="check-trailer-btn" onclick="previewTrailer()">미리보기</button>
                         </div>
@@ -324,7 +306,6 @@
         const posterPathInput = document.getElementById('RegisteredPoster');
         const backdropPathInput = document.getElementById('RegisteredBackdrop');
         const stillCutPathsInput = document.getElementById('RegisteredStillCut');
-        const videoInput = document.getElementById('video');
         const actorInput = document.getElementById('actorSearch');
         const formTitle = document.getElementById('formTitle');
         const formSubmit = document.getElementById('formSubmit');
@@ -338,10 +319,7 @@
         posterPathInput.disabled = true;
         backdropPathInput.disabled = true;
         stillCutPathsInput.disabled = true;
-        videoInput.placeholder = '미입력시 기존 트레일러 키 사용, 또는 새로운 트레일러 키를 입력하세요.';
         actorInput.disabled = true;
-
-
     }
 
 
@@ -601,6 +579,12 @@
                     idError.textContent = '';
                     window.selectedActors = [];
                     updateSelectedActorsDisplay();
+
+                    if(window.isEditMode){
+                        window.isEditMode = false;
+                    }
+
+                    $('.container-xxl').load('/admin/movieList', { type: 'POST' });
                 }
             });
 

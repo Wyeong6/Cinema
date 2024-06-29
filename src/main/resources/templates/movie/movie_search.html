@@ -18,29 +18,33 @@
             text-align: center;
             margin-top: 20px;
         }
+
+        .row {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
+
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
-
-        <!-- Header -->
-        <header data-include-path="./header.html"></header>
-
         <div class="wrapper style1 movie_list">
             <div class="container">
                 <article id="main" class="special">
                     <header>
-                        <h2><a href="#">검색 결과</a></h2>
-                        <p>
-                            Morbi convallis lectus malesuada sed fermentum dolore amet
-                        </p>
+                        <h3>검색 결과</h3>
                     </header>
                 </article>
                 <hr/>
-                <div class="row">
+
+                <div class="row" th:if="${searchResults.empty}">
+                    <p class="no-results-message">검색 결과가 없습니다.</p>
+                </div>
+
+                <div class="row" th:unless="${searchResults.empty}">
                     <article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${searchResults}">
-                        <a th:href="@{'/movies/' + ${movie.id}}" class="image featured"><img
+                        <a th:href="@{'/movies/' + ${movie.id}}" class="image featured"><img class="featured-img fixed-height-image"
                                 th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/></a>
                         <header>
                             <h4><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a>
@@ -50,41 +54,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-
-    <footer data-include-path="footer.html"></footer>
-
-
-    <!-- Scripts -->
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/jquery.dropotron.min.js"></script>
-    <script src="/assets/js/jquery.scrolly.min.js"></script>
-    <script src="/assets/js/jquery.scrollex.min.js"></script>
-    <script src="/assets/js/browser.min.js"></script>
-    <script src="/assets/js/breakpoints.min.js"></script>
-    <script src="/assets/js/util.js"></script>
-    <script src="/assets/js/main.js"></script>
-
-    <script>
-        // include.js
-        window.addEventListener('load', function () {
-            var allElements = document.getElementsByTagName('*');
-            Array.prototype.forEach.call(allElements, function (el) {
-                var includePath = el.dataset.includePath;
-                if (includePath) {
-                    var xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            el.outerHTML = this.responseText;
-                        }
-                    };
-                    xhttp.open('GET', includePath, true);
-                    xhttp.send();
-                }
-            });
-        });
-    </script>
 </th:block>
 </body>
 </html>

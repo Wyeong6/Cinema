@@ -1,39 +1,17 @@
 <!DOCTYPE HTML>
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html lang="en" layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Cinemacast</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" href="/assets/css/main.css"/>
-    <link rel="stylesheet" href="/assets/css/custom.css"/>
-    <link rel="stylesheet" href="/assets/css/nav.css"/>
-    <noscript>
-        <link rel="stylesheet" href="/assets/css/noscript.css"/>
-    </noscript>
-</head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
-
-        <!-- Header -->
-        <header data-include-path="header.html"></header>
-
-        <!-- Main movie_list 한 페이지에 16개 정도되게 해주세요 -->
         <div class="wrapper style1 movie_list list">
-
             <div class="container">
                 <article id="main" class="special">
                     <header>
-                        <h2><a href="#">이벤트</a></h2>
+                        <h3>이벤트</h3>
                         <p>
-                            영화와 함께하는 즐거운 시간
+                            특별한 혜택을 즐기세요. 다가오는 경험을 기대해 보세요!
                         </p>
                     </header>
                 </article>
@@ -46,9 +24,9 @@
                                  style="width: 300px; height: auto;"/>
                         </a>
                         <header>
-                            <h3>
+                            <h4>
                                 <a th:href="@{'/event_get/' + ${event.id}}" th:text="${event.eventName}"></a>
-                            </h3>
+                            </h4>
                         </header>
                         <p>
                             <!-- 여기에 추가적인 설명이나 내용을 넣을 수 있습니다. 필요하지 않다면 비워둡니다. -->
@@ -56,12 +34,12 @@
                     </article>
                 </div>
                 <div style="text-align: center" th:unless="${eventList.totalElements > 0}">
-                    <h3>준비중 입니다.</h3>
+                    <h4>준비중 입니다.</h4>
                 </div>
             </div>
-            <div style="text-align: center;" th:if="${!#lists.isEmpty(eventList.content)}">
+            <div class="pagination" th:if="${!#lists.isEmpty(eventList.content)}">
                 <a th:href="@{'/event/eventList?page=' + ${i}}" th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                   class="paging-btn" th:text="'[' + ${i} + ']'"></a>
+                   class="page" th:text="${i}"></a>
             </div>
         </div>
 

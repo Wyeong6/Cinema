@@ -1,17 +1,16 @@
 <article id="mypage_point">
-    <header><h3>나의 포인트</h3></header>
+    <header>
+        <h5>포인트 적립/사용 내역</h5>
+    </header>
     <hr>
     <section>
         <header>
-            <h4>적립/사용 내역</h4>
             <div th:unless="${pointInfo == null or pointInfo.isEmpty()}">
                 <!-- 첫 번째 요소에 접근하기 위해 getContent() 메서드를 사용하고, 첫 번째 요소 (index 0)를 가져옴 -->
-                <p>잔여 포인트 : <b style="color: #e45649"
-                               th:text="${pointInfo.getContent().get(0).currentPoints}+p">2000p</b></p>
+                <p>잔여 포인트 : <b th:text="${pointInfo.getContent().get(0).currentPoints}+p">2000p</b></p>
             </div>
             <div th:if="${pointInfo == null or pointInfo.isEmpty()}">
-                <p>잔여 포인트 : <b style="color: #e45649"
-                               th:text="0p">2000p</b></p>
+                <p>잔여 포인트 : <b th:text="0p">2000p</b></p>
             </div>
         </header>
         <table class="default">
@@ -20,11 +19,11 @@
                     <div>
                         <p th:text="${point.content}">신규 가입 적립</p>
                         <p>
-                            <span th:text="'적립'">적립</span>
+                            <span class="plus-point" th:text="'적립'">적립</span>
                         </p>
                     </div>
                     <div>
-                        <p th:text="${point.pointType}+' '+${point.points}+p">1000p</p>
+                        <p class="plus-point" th:text="${point.pointType}+' '+${point.points}+p">1000p</p>
                         <p th:text="${#temporals.format(point.getRegDate(), 'yyyy-MM-dd HH:mm:ss')}">2024.5.23 14:31</p>
                     </div>
                 </td>
@@ -32,11 +31,11 @@
                     <div>
                         <p th:text="${point.content}">시네마캐스트 강남점</p>
                         <p>
-                            <span th:text="'사용'">사용</span>
+                            <span class="minus-point" th:text="'사용'">사용</span>
                         </p>
                     </div>
                     <div>
-                        <p class="price_minus" th:text="${point.pointType}+' '+${point.points}+p">1000p</p>
+                        <p class="price_minus minus-point" th:text="${point.pointType}+' '+${point.points}+p">1000p</p>
                         <p th:text="${#temporals.format(point.getRegDate(), 'yyyy-MM-dd HH:mm:ss')}">2024.5.23 14:31</p>
                     </div>
                 </td>

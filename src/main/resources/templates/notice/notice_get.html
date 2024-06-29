@@ -1,109 +1,30 @@
 <!DOCTYPE HTML>
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html lang="en"
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Cinemacast</title>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
-    <link href="/assets/css/main.css" rel="stylesheet"/>
-    <link href="/assets/css/custom.css" rel="stylesheet"/>
-    <link href="/assets/css/nav.css" rel="stylesheet"/>
-    <noscript>
-        <link href="/assets/css/noscript.css" rel="stylesheet"/>
-    </noscript>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .wrapper {
-            padding: 20px;
-        }
-        .container {
-            margin: 0 auto;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-        }
-        .special header h2 {
-            font-size: 36px; /* 제목 글자 크기 크게 */
-            margin-bottom: 10px;
-            color: #333;
-            text-align: center; /* 제목 중앙 정렬 */
-        }
-        .special header p {
-            font-size: 14px;
-            color: #999;
-            text-align: right; /* 작성자, 조회수, 등록일 오른쪽 정렬 */
-        }
-        .special p {
-            font-size: 16px;
-            line-height: 1.5;
-            color: #555;
-            text-align: center; /* content 중앙 정렬 */
-        }
-        table.default {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            font-size: 12px; /* 테이블 글자 크기 작게 */
-        }
-        table.default td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-        table.default a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        table.default a:hover {
-            text-decoration: underline;
-        }
-        .button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #007bff;
-            color: #fff;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px; /* 버튼 글자 크기 작게 */
-        }
-        .button:hover {
-            background: #0056b3;
-        }
-    </style>
-</head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
-
-        <header data-include-path="header.html"></header>
-
         <!-- Main -->
         <div class="wrapper style1">
             <div class="container notice_get">
                 <article class="special" id="main">
                     <header>
-                        <h2><a href="#">[[${notice.noticeTitle}]]</a></h2>
+                        <h3>[[${notice.noticeTitle}]]</h3>
                         <p>
-                            <span>작성자: [[${notice.memberEmail}]]</span> | <span>조회수: [[${notice.viewCount}]]</span> | <span>등록일: [[${#temporals.format(notice.regDate, 'yyyy-MM-dd HH:mm:ss')}]]</span>
-                        </p>
+                            <img src="/images/views.png" alt="조회수 이미지" />
+                            <span>[[${notice.viewCount}]]</span></p>
                     </header>
-                    <p>
-                        [[${notice.noticeContent}]]
-                    </p>
+                    <section class="contents">
+                        <p>
+                            [[${notice.noticeContent}]]
+                        </p>
+                    </section>
+                    <footer>
+                        <p>작성자: [[${notice.memberEmail}]]</p>
+                        <p>등록일: [[${#temporals.format(notice.regDate, 'yyyy-MM-dd HH:mm:ss')}]]</p>
+                    </footer>
                 </article>
                 <table class="default">
                     <tr>
@@ -124,42 +45,7 @@
                 <button class="button" onclick="window.location.href='/notice/noticeList'">목록</button>
             </div>
         </div>
-
-        <footer data-include-path="footer.html"></footer>
     </div>
-</th:block>
-
-
-
-    <!-- Scripts -->
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/jquery.dropotron.min.js"></script>
-    <script src="/assets/js/jquery.scrolly.min.js"></script>
-    <script src="/assets/js/jquery.scrollex.min.js"></script>
-    <script src="/assets/js/browser.min.js"></script>
-    <script src="/assets/js/breakpoints.min.js"></script>
-    <script src="/assets/js/util.js"></script>
-    <script src="/assets/js/main.js"></script>
-
-    <script>
-        // include.js
-        window.addEventListener('load', function () {
-            var allElements = document.getElementsByTagName('*');
-            Array.prototype.forEach.call(allElements, function (el) {
-                var includePath = el.dataset.includePath;
-                if (includePath) {
-                    var xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            el.outerHTML = this.responseText;
-                        }
-                    };
-                    xhttp.open('GET', includePath, true);
-                    xhttp.send();
-                }
-            });
-        });
-    </script>
 </th:block>
 </body>
 </html>

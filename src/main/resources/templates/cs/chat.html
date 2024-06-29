@@ -27,8 +27,6 @@
     <div id="typingIndicatorDTO" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
 </div>
 
-
-
 <script th:inline="javascript">
     /*<![CDATA[*/
     var sender = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
@@ -41,6 +39,11 @@
     var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
     var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
     var status = null; //채팅방 상태
+    var entranceStatus  = "exit"; //관리자의 입장상태
+
+    // 초기 페이징 값 설정
+    var activePage = 1;
+    var inactivePage = 1;
 
     // WebSocket 연결 함수
     function connect() {
@@ -49,7 +52,6 @@
         stompClient.connect({}, function (frame) {
             // 연결 성공 시 콘솔에 로그 출력
             console.log('Connected: ' + frame);
-            console.log('커넥터 chatRoomId: ' + chatRoomId);
             // 타이핑 이벤트를 감지하여 서버로 전송
             document.getElementById('message').addEventListener('input', handleTypingEvent);
             // 특정 사용자 큐에 구독 (개인 메시지 수신)
@@ -59,6 +61,17 @@
 
                 handleMessage(parsedMessage);
             })
+            // 전체 메시지를 받기 위해 토픽 구독
+            stompClient.subscribe('/Topic/paging', function (message) {
+                var parsedMessage = JSON.parse(message.body);
+                console.log("Broadcast Message " + JSON.stringify(parsedMessage));
+
+                // 메시지 받을 때마다 페이징 값 업데이트
+                activePage = parsedMessage.activePage;
+                inactivePage = parsedMessage.inactivePage;
+
+                handleMessage(parsedMessage);
+            });
         });
     }
 
@@ -71,24 +84,29 @@
             showMessage(parsedMessage.content);
             showMessage('다른 문의가 있으면 카테고리를 선택해주세요.');
             updateCategoryButtonsDisplay('block');
-        //타이핑 중이면
+            //일반 메세지
+        } else if (parsedMessage.status === 'active') {
+            console.log("일반메세지.");
+            showMessage('관리자 : ' + parsedMessage.content);
+            //타이핑 중이면
         } else if (parsedMessage.typing === "typing") {
             console.log("상대방이 타이핑 중입니다.");
             updateTypingIndicatorDisplay('block');
-        //타이핑 안할 때
+            //타이핑 안할 때
         } else if (parsedMessage.typing === "not_typing") {
             console.log("채팅안함");
             updateTypingIndicatorDisplay('none');
-            //일반 메세지
         } else {
-            console.log("일반메세지.");
-            showMessage('관리자 : ' + parsedMessage.content);
+            entranceStatus = parsedMessage.type;
+            console.log("관리자 상태" +entranceStatus);
         }
     }
+
     //카테고리 활성화
     function updateCategoryButtonsDisplay(displayStyle) {
         document.getElementById('categoryButtons').style.display = displayStyle;
     }
+
     //입력창 활성화
     function updateTypingIndicatorDisplay(displayStyle) {
         document.getElementById('typingIndicatorDTO').style.display = displayStyle;
@@ -119,18 +137,19 @@
             chatRoomId: chatRoomId,
             sender: sender,
             recipient: recipient,
-            typing: type
+            typing: type,
         };
         stompClient.send("/app/chat/typing", {}, JSON.stringify(typingIndicatorDTO));
     }
 
     // 메시지 전송 함수
     function sendMessage() {
-        var messageContent = document.getElementById('message').value; // 입력된 메시지 내용 가져오기
+        var messageContent = document.getElementById('message').value;
         console.log("메세지전송의 ChatRoomId" + chatRoomId)
         console.log("메세지전송의 recipient" + recipient)
 
-        if (!messageContent) return; // 메시지 내용이 없으면 함수 종료
+        // 메시지 내용이 없으면 함수 종료
+        if (!messageContent) return;
 
         var message = {
             chatRoomId: chatRoomId,
@@ -138,13 +157,16 @@
             recipient: recipient,
             content: messageContent,
             chatRoomTitle: chatRoomTitle,
-            status: "active"
+            status: "active",
+            paging: {
+                activePage: activePage,
+                inactivePage: inactivePage
+            }
         };
 
-            console.log("Sending message:", message); // 메시지를 전송하기 전에 콘솔에 로그 출력
-            stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
-            showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
-            document.getElementById('message').value = ''; // 입력 필드를 비움
+        stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
+        showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
+        document.getElementById('message').value = ''; // 입력 필드를 비움
 
         // 메시지 전송 후 타이핑 상태 초기화
         clearTimeout(typingTimeout);
@@ -166,6 +188,16 @@
         messageElement.appendChild(document.createTextNode(message));
         messages.appendChild(messageElement);
         document.getElementById('typingIndicatorDTO').style.display = 'none';
+    }
+
+    //이전 메세지 문구
+    function addPreviousMessagesIndicator() {
+        const messages = document.getElementById('messages');
+        const previousMessagesIndicator = document.createElement('p');
+        previousMessagesIndicator.id = 'previousMessagesIndicator';
+        previousMessagesIndicator.className = 'message-style';
+        previousMessagesIndicator.textContent = '----------- 이전 메시지입니다 -----------';
+        messages.appendChild(previousMessagesIndicator);
     }
 
     //카테고리를 선택한 후
@@ -201,8 +233,6 @@
             default:
                 recipient = 'admin@admin.com';
         }
-        console.log("선택한 category의 아이디 " + recipient)
-
         createChatRoomAndConnect(recipient, category);
     }
 
@@ -225,7 +255,6 @@
             })
             .then(data => {
                 chatRoomId = data.chatRoomId; // 서버 응답에서 채팅방 ID 추출
-                console.log("Created chat room ID:", chatRoomId);
                 // 채팅방 생성 후 연결
                 connect();
             })
@@ -236,15 +265,14 @@
     async function fetchRecipientEmail() {
         try {
             const response = await fetch('/chat/getRecipientEmail');
-            console.log("받는 이메일", response); // Response 객체를 그대로 로깅하지 않음
             const data = await response.json(); // JSON 형식으로 응답을 파싱
-            console.log("받는 이메일 data", data); // 파싱된 JSON 데이터 로깅
             return Array.isArray(data) ? data[0] : data || '이메일을 찾을 수 없습니다.';
         } catch (error) {
             console.error('오류:', error);
             return '오류 발생';
         }
     }
+
     //관리자 이메일로 채팅중인 채팅룸반환
     async function fetchMessages(recipient) {
         console.log("fetchMessages의 recipient: " + recipient);
@@ -253,32 +281,30 @@
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            console.log("response:", response);
             const data = await response.json();
-            console.log('Data:', data);
-
             if (Array.isArray(data) && data.length > 0) {
                 chatRoomId = data[0].id;
             }
-            console.log('chatRoomId:', chatRoomId);
             let messageExist = false;
 
-            // 각 메시지 객체를 순회합니다.
+            // 각 메시지 객체를 순회
             data.forEach(item => {
-                // 여기서 'messages' 필드가 실제 메시지 배열을 가지고 있음
                 if (Array.isArray(item.messages) && item.messages.length > 0) {
-                    messageExist = true; // 메시지가 존재함을 표시
+                    messageExist = true;
                     item.messages.forEach(message => {
                         recipient = message.sender;
                         chatRoomTitle = message.chatRoomTitle;
                         document.getElementById('categoryButtons').style.display = 'none';
                         let displayMessage = message.sender === sender ? `나 : ${message.content}` : `관리자 : ${message.content}`;
+
                         showMessage(displayMessage);
                     });
+                    //이전 메세지 문구
+                    // addPreviousMessagesIndicator();
                 }
             });
 
-            // 메시지가 없을 경우에만 카테고리 메시지를 표시합니다.
+            // 메시지가 없을 경우에만 카테고리 메시지를 표시
             if (!messageExist) {
                 showMessage('안녕하세요 고객님 카테고리를 선택해주세요');
             } else if (chatRoomTitle === '상담이 완료되었습니다.') {
@@ -290,14 +316,16 @@
     }
 </script>
 <script type="module">
-    import {connectWebSocket, updateUnreadCount} from '/module/chatMessageCount.js';
+    import {connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
 
     document.addEventListener('DOMContentLoaded', function () {
+        console.log("모달연결")
         // WebSocket 연결 설정
         setupWebSocketConnection();
     });
 
-    async function setupWebSocketConnection() {
+    //웹소켓 옵션
+    function setupWebSocketConnection() {
         const options = {
             subscribeCallback: handleWebSocketMessage
         };
@@ -306,6 +334,7 @@
         connectWebSocket(options);
     }
 
+    //안읽은 메세지수 업데이트
     function handleWebSocketMessage(response) {
         updateUnreadCount(response);
     }

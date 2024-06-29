@@ -5,29 +5,37 @@
     <head>
         <meta charset="UTF-8">
         <title>Cinemacast</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-        <link rel="stylesheet" href="/assets/css/main.css" />
-        <link rel="stylesheet" href="/assets/css/custom.css" />
-        <link rel="stylesheet" href="/assets/css/custom_player.css" />
-        <link rel="stylesheet" href="/assets/css/nav.css" />
+        <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
+        <link href="/assets/css/main.css" rel="stylesheet"/>
+        <link href="/assets/css/custom.css" rel="stylesheet"/>
+        <link href="/assets/css/custom_player.css" rel="stylesheet"/>
+        <link href="/assets/css/nav.css" rel="stylesheet"/>
         <noscript>
-            <link rel="stylesheet" href="/assets/css/noscript.css"/>
+            <link href="/assets/css/noscript.css" rel="stylesheet"/>
         </noscript>
+        <!-- 스크립트 -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="/assets/js/jquery.min.js"></script>
+        <script src="/assets/js/jquery.dropotron.min.js"></script>
+        <script src="/assets/js/jquery.scrolly.min.js"></script>
+        <script src="/assets/js/jquery.scrollex.min.js"></script>
+        <script src="/assets/js/browser.min.js"></script>
+        <script src="/assets/js/breakpoints.min.js"></script>
+        <script src="/assets/js/util.js"></script>
+        <script src="/assets/js/main.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!-- SockJS 클라이언트 라이브러리 비동기 로드 -->
-        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js" async></script>
 
         <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
         <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-
-
     </head>
     <body>
     <!-- Header -->
     <div id="header">
-        <h1 class="logo" style="font-size: 2em;"><a href="/">CINEMACAST</a></h1>
+        <h1 class="logo" style="top:15%"><a href="/">CINEMACAST</a></h1>
 
         <!-- info -->
         <div id="info" th:data-username="${#authentication.name}">
@@ -41,9 +49,6 @@
                 <li sec:authorize="isAuthenticated()">
                     <a href="/member/logout" id="logoutLink">로그아웃</a>
                 </li>
-                <li sec:authorize="isAuthenticated()">
-                    <span id="unreadCount">0</span>
-                </li>
                 <li sec:authorize="hasRole('USER')">
                     <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
                 </li>
@@ -51,6 +56,12 @@
                     <a th:href="@{/admin/adminMain}" th:text="'관리자페이지'"></a>
                 </li>
                 <li><a href="/payment/cartList">장바구니</a></li>
+                <li class="chat-alarm" sec:authorize="isAuthenticated()">
+                    <img class="chat-img" src="/images/alarm.png" alt="1:1채팅 메시지" />
+                    <div id="unreadCount">
+                        0
+                    </div>
+                </li>
             </ul>
         </div>
 
@@ -60,17 +71,13 @@
                 <li>
                     <a href="#">영화</a>
                     <ul>
-                        <li><a href="movie_list_full.html">영화 전체보기</a></li>
-                        <li><a href="movie_list_now.html">현재 상영작</a></li>
-                        <li><a href="movie_list_comming.html">상영 예정작</a></li>
+                        <li><a href="/allMovies">영화 전체보기</a></li>
+                        <li><a href="/nowMovies">현재 상영작</a></li>
+                        <li><a href="/comingMovies">상영 예정작</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#">예매</a>
-                    <ul>
-                        <li><a href="#">예매</a></li>
-                        <li><a th:href="@{/reservation/screeningSchedule}">상영 시간표</a></li>
-                    </ul>
+                    <a href="/reservation/screeningSchedule">예매</a>
                 </li>
                 <li><a href="/snack/snackList">스낵 스토어</a></li>
                 <li><a href="/event/eventList">이벤트</a></li>
@@ -79,23 +86,23 @@
         </nav>
     </div>
     <script type="module">
-        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatMessageCount.js';
-        window.addEventListener('DOMContentLoaded', function () {
-            loadChatList(1, 8, true);
+        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
+        //웹소켓 연결
+        document.addEventListener('DOMContentLoaded', function () {
+            loadChatList(1, 1, 8, true);
             setupWebSocketConnection();
         });
-
-        async function setupWebSocketConnection() {
+        //웹소켓 연결 후 콜백함수
+        function setupWebSocketConnection() {
             console.log('Setting up WebSocket connection');
             const options = {
-                subscribeCallback: handleWebSocketMessage
+                subscribeCallback: handleWebSocketMessage,
             };
             connectWebSocket(options); // WebSocket 연결 함수 호출
         }
 
-        function handleWebSocketMessage(response) {
-            console.log('WebSocket message received:', response);
-            updateUnreadCount(response);
+        function handleWebSocketMessage(message) {
+            updateUnreadCount(message);
         }
     </script>
     <script th:inline="javascript">
@@ -107,35 +114,10 @@
             window.location.href = "/member/logout";
         });
 
-        // $(document).ready(function () {
-        //     const socket = new SockJS('/ws'); // WebSocket 엔드포인트 '/ws'로 연결
-        //     const stompClient = Stomp.over(socket); // Stomp 클라이언트 객체 생성
-        //
-        //     stompClient.connect({}, function (frame) {
-        //         console.log('Connected to WebSocket: ' + frame);
-        //
-        //         // '/user/queue/unreadCount' 주제를 구독하여 메시지 처리
-        //         stompClient.subscribe('/user/queue/chatList', function (message) {
-        //             const response = JSON.parse(message.body);
-        //             console.log("Received message:", response);
-        //
-        //             updateUnreadCount(response); // Update unread message count
-        //
-        //             // Determine display based on unread count
-        //             if (response.totalUnreadCount > 0) {
-        //                 $('#unreadMessages').show(); // Show element if there are unread messages
-        //             } else {
-        //                 $('#unreadMessages').hide(); // Hide element if no unread messages
-        //             }
-        //         });
-        //     });
-        // });
-        //
-        // function updateUnreadCount(response) {
-        //     var totalUnreadCount = response.chatRoom.reduce((sum, chatRoom) => sum + chatRoom.unreadMessageCount, 0);
-        //     document.getElementById('unreadCount').textContent = totalUnreadCount; // Update unread count display
-        //     return totalUnreadCount; // Return total unread count
-        // }
+        //안읽은 메세지수 클릭시
+        document.getElementById("unreadCount").addEventListener("click", function() {
+            window.location.href = "/inquiry#work";
+        });
     </script>
     </body>
 </th:block>

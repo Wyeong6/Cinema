@@ -5,4 +5,6 @@ import com.busanit.entity.InquiryReply;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InquiryReplyRepository  extends JpaRepository<InquiryReply, Long> {
+
+    InquiryReply findByInquiryId(Long inquiryId);
 }

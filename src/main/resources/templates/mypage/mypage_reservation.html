@@ -3,24 +3,36 @@
     <section>
         <div class="reservation history">
             <header style="margin-bottom: 1em">
-                    <h3>영화 예매 내역</h3>
+                <h5>영화 예매 내역</h5>
             </header>
             <hr style="top:0; margin-bottom: 1em">
             <section>
-                <article class="history_get">
+                <article class="history_item">
                     <header>
-                        <h3>2024-05-23</h3>
+                        <h4 class="reservation-status">결제완료</h4>
                     </header>
                     <div class="history_data">
-                        <img src="/images/movieposter.webp" alt="영화 포스터">
+                        <img class="featured-img" alt="영화 포스터" src="/images/movieposter.webp">
                         <div>
-                            <h4>예매번호 : </h4>
+                            <p>예매번호</p>
                             <p>범죄도시 4</p>
-                            <p>2024-05-23 | 10:30 | I12</p>
+                            <p><span class="history-data-date">상영일자</span><span class="history-data-time">시간</span></p>
+                            <p><span class="history-data-theater">상영관</span><span class="history-data-seats">좌석</span></p>
                         </div>
+                    </div>
+                    <div class="button_box">
+                        <button type="button" class="cancel_btn">예매취소</button>
+                        <button type="button" class="detail_btn">예매상세</button>
                     </div>
                 </article>
             </section>
         </div>
     </section>
 </article>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $('.container').on('click', '.detail_btn', function() {
+            $('#content').load('/mypage/order/detail');
+        });
+    });
+</script>

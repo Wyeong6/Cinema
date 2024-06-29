@@ -1,15 +1,102 @@
-<!DOCTYPE html>
-<html lang="en" layout:decorate="~{layout/layout_total}"
+<!DOCTYPE HTML>
+<html lang="en"
+      layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
-<body class="right-sidebar is-preload bg-black-wrapper">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body class="no-sidebar is-preload bg-black-wrapper">
 <th:block layout:fragment="content">
     <div id="page-wrapper" class="bg-black-wrapper">
 
         <!-- 메인 -->
         <div class="wrapper style1 payment bg-black-wrapper">
-            <div class="container">
+            <div class="container" th:each="movie, iterStat : ${movieDTOs}">
                 <article id="main" class="special">
+                    <input type="hidden" id="schedule-id" th:data-schedule-id="${scheduleDTO.id}" />
+                    <input type="hidden"
+                           id="movieId"
+                           th:value="${movie.id}"
+                           th:data-certification="${movie.certifications}"
+                           th:data-theaterNumber="${scheduleDTO.theaterNumberId}" />
+                    <table class="payment-table">
+                        <thead>
+                        <tr>
+                            <th>예매정보</th>
+                            <th>포인트</th>
+                            <th>결제확인</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="ticket-info">
+                                <img th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" />
+                                <div class="ticket-movie-title"><img src="" alt="연령등급 이미지" /><h4 th:text="${movie.title}" id="movieTitle">영화 제목</h4></div>
+                                    <table>
+                                        <tr>
+                                            <th>일시</th>
+                                            <td th:text="${scheduleDTO.date} + ' ' + ${scheduleDTO.startTime} + '~' + ${scheduleDTO.endTime}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>영화관</th>
+                                            <td th:text="${scheduleDTO.theaterName} + ' ' + ${scheduleDTO.theaterNumber} + '관'"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>인원</th>
+                                            <td>
+                                                <span id="adult-cnt" th:if="${adultCount > 0}"
+                                                      th:data-cnt="${adultCount}"
+                                                      th:text="'성인 ' + ${adultCount} + '인'"></span>
+                                                <span id="teenager-cnt" th:if="${teenagerCount > 0}"
+                                                      th:data-cnt="${teenagerCount}"
+                                                      th:text="', 청소년 ' + ${teenagerCount} + '인'"></span>
+                                                <span id="grand-cnt" th:if="${grandCount > 0}"
+                                                      th:data-cnt="${grandCount}"
+                                                      th:text="', 경로 ' + ${grandCount} + '인'"></span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div class="seats-info">
+                                        <span>선택 좌석</span>
+                                        <div id="selected-seats"></div>
+                                    </div>
+                                </td>
+                                <td class="point-info">
+                                    <label for="point">포인트 사용</label>
+                                    <input type="number" class="point-input" id="point">
+                                    <div><span>사용가능포인트 </span><span th:text="${pointInfo}"></span></div>
+                                </td>
+                                <td class="payment-info">
+                                    <table>
+                                        <tr>
+                                            <th>상품 금액</th>
+                                            <td id="total-amount" th:data-total-amount="${totalAmount}" class="total-price" ></td>
+                                        </tr>
+                                        <tr>
+                                            <th>할인 금액</th>
+                                            <td><span>- </span>0원</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="result-price-td" colspan="2">
+                                                <h4>최종 결제금액</h4>
+                                                <div>
+                                                    <p>총 </p><h3 id="result-price">27000원</h3>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>적립예정 포인트</th>
+                                            <td id="add-point">270p</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="padding: 0">
+                                                <button class="pay-btn" type="button" onclick="moveToPayment()">결제하기</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </article>
             </div>
 
@@ -19,9 +106,134 @@
     <!-- 스크립트 -->
     <script src="/assets/js/jquery.min.js"></script>
 
-    <script>
+    <!--결제 프로그램 관련 script-->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" type="text/javascript"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script src="/personal-scripts/payment.js"></script>
+    <script src="/personal-scripts/util.js"></script>
 
+    <script th:inline="javascript">
+        /* 결제 프로그램 사용시 필요한 변수 */
+        const productIdx = document.getElementById("movieId").value;
+        const content1 = [[${scheduleDTO.date}]]; // 상영일자
+        const content2 = [[${scheduleDTO.startTime}]]; // 시간
+        const content3 = [[${scheduleDTO.theaterName}]]; // 상영관
+        const content4 = [[${scheduleDTO.theaterNumber}]]; // 좌석
+        let productCount = null;
+        let currentPrice = null;
+        const orderName = document.getElementById("movieTitle").textContent; // 결제시 사용할 이름(제품명)
+        const reqIDX = "MO"; // 결제를 요청한 페이지 IDX
+        let plusPoint = 0;
+        let minusPoint = 0;
+
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            const gradeInfo = [[${gradeInfo}]];
+            const certification = $('#movieId').data('certification');
+
+            let imageUrl;
+            switch (certification) {
+                case '12세 이상 관람가':
+                    imageUrl = '/images/ratings/12.png';
+                    break;
+                case '15세 이상 관람가':
+                    imageUrl = '/images/ratings/15.png';
+                    break;
+                case 19:
+                case '18세 이상 관람가':
+                    imageUrl = '/images/ratings/18.png';
+                    break;
+                default:
+                    imageUrl = '/images/ratings/all.svg';
+            }
+            $('.ticket-info .ticket-movie-title > img').attr('src', imageUrl);
+
+            var selectedSeats = /*[[ ${selectedSeats} ]]*/ '';
+            // JSON.parse()를 사용하여 JavaScript 객체로 변환
+            var seatsArray = JSON.parse(selectedSeats);
+
+            seatsArray.forEach(function(seat) {
+                const seatInfo = seat.seatColumn + seat.seatRow;
+                const seatDiv = $('<div>').text(seatInfo)
+                    .attr('data-seat-id', seat.seatId)
+                    .attr('data-seat-row', seat.seatRow)
+                    .attr('data-seat-column', seat.seatColumn)
+                    .addClass('seat-info');
+                $('#selected-seats').append(seatDiv);
+            });
+
+            const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
+            $('#total-amount').text(totalAmount + '원');
+
+            // 포인트 입력시 사용자가 보유한 포인트를 넘지 않게 제한, 포인트는 1의자리 올림
+            const pointInfo = [[${pointInfo}]];
+            $('.point-input').on('input', function () {
+                const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
+                let pointInput = parseInt($(this).val(), 10) || 0;
+                if (pointInput > pointInfo) {
+                    alert("보유 포인트 내에서만 포인트 사용이 가능합니다.");
+                    $(this).val(pointInfo); // Reset the value to the maximum allowed
+                }
+                const resultPrice = totalAmount - (parseInt($(this).val(), 10) || 0);
+                currentPrice = resultPrice;
+                $('#result-price').text(resultPrice + '원');
+                $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
+                plusPoint = Math.ceil(resultPrice * gradeInfo);
+                minusPoint = parseInt($("#point").val(), 10);
+            });
+
+            // 초기 실행 (포인트 입력 값이 비어있을 경우 0으로 처리)
+            const pointInput = parseInt($('.point-input').val(), 10) || 0;
+            const resultPrice = totalAmount - pointInput;
+            currentPrice = resultPrice;
+            $('#result-price').text(resultPrice + '원');
+            $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
+            plusPoint = Math.ceil(resultPrice * gradeInfo);
+        });
+        /*]]>*/
+
+        function moveToPayment() {
+            const adultCount = parseInt($('#adult-cnt').data('cnt')) || 0;
+            const teenagerCount = parseInt($('#teenager-cnt').data('cnt')) || 0;
+            const grandCount = parseInt($('#grand-cnt').data('cnt')) || 0;
+            productCount = "성인:"+adultCount+" 청소년:"+teenagerCount+" 경로:"+grandCount;
+
+            const selectedSeats = [];
+            $('.seat-info').each(function() {
+                const seatId = $(this).data('seat-id');
+                const seatRow = $(this).data('seat-row');
+                const seatColumn = $(this).data('seat-column');
+
+                if (seatId && seatRow && seatColumn) {
+                    selectedSeats.push({
+                        seatId: seatId,
+                        seatRow: seatRow,
+                        seatColumn: seatColumn
+                    });
+                }
+            });
+
+            const scheduleId = $('#schedule-id').data('schedule-id');
+            const memberIdx = [[${memberInfo[1]}]];
+            const reservedBy = memberIdx; // member_id값
+
+            $.ajax({
+                type: 'POST',
+                url: '/reservation/reserveSeats',
+                contentType: 'application/json',
+                data: JSON.stringify({ scheduleId, reservedBy, selectedSeats }),
+                success: function(response) {
+                    console.log('Reserved seats successfully:', response);
+                    requestPay(); // 결제 요청
+                },
+                error: function(error) {
+                    alert('Error reserving seats: ' + error.responseText);
+                }
+            });
+        }
     </script>
+
 
     <script src="/assets/js/jquery.dropotron.min.js"></script>
     <script src="/assets/js/jquery.scrolly.min.js"></script>

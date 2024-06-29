@@ -20,18 +20,16 @@ public class Inquiry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String email;
     private String subject;
+    @Column(length = 1000)
     private String message;
     private String type;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
     @CreatedDate
     private LocalDateTime createdAt;
-
-
     @OneToOne(mappedBy = "inquiry", cascade = CascadeType.ALL)
     private InquiryReply reply;
 
@@ -61,7 +59,5 @@ public class Inquiry {
                 .message(dto.getMessage())
                 .type("미답변")
                 .build();
-
     }
-
 }

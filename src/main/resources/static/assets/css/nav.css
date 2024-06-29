@@ -7,7 +7,7 @@
     display: none;
     width: 1000%; /* 부모 요소의 너비의 2배로 설정 */
     position: absolute;
-    top: 100%; /* 기준점에서의 위치 계산 */
+    top: 100%;
     left: -40%;
     padding: 30px 0; /* 서브 메뉴의 상하 패딩 */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
@@ -52,4 +52,5 @@
     font-weight: 700;
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
+    padding: 0.3em 1em;
 }

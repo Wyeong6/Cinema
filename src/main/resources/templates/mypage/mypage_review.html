@@ -1,7 +1,10 @@
 <article id="mypage_review">
-    <header>내가 작성한 관람평 전체보기</header>
-    <section>
-        <table class="default">
+    <header>
+        <h5>내가 작성한 리뷰</h5>
+    </header>
+    <!-- 댓글 목록 테이블 -->
+    <section th:unless="${#lists.isEmpty(comments)}">
+        <table>
             <tr>
                 <th>날짜</th>
                 <th>영화명</th>
@@ -17,6 +20,11 @@
                 <td><img src="/images/delete.png" alt="삭제 버튼" class="delete-btn" th:data-comment-id="${comment.cno}"/></td>
             </tr>
         </table>
+    </section>
+
+    <!-- 관람평이 없을 때 메시지 -->
+    <section th:if="${#lists.isEmpty(comments)}">
+        <p>작성한 관람평이 없습니다.</p>
     </section>
 </article>
 <script>

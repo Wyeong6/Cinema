@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import static com.busanit.domain.movie.ActorDTO.convertToDto;
 
@@ -46,7 +47,11 @@ import static com.busanit.domain.movie.ActorDTO.convertToDto;
 @Getter
 public class MovieService {
 
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .build();
     private final MovieRepository movieRepository;
     private final MovieDetailRepository movieDetailRepository;
     private final MovieStillCutRepository movieStillCutRepository;
@@ -69,6 +74,7 @@ public class MovieService {
     // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+
     @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
     public void fetchAndStoreMovies() throws IOException {
         fetchAndStoreMoviesNowPlaying();
@@ -85,6 +91,7 @@ public class MovieService {
         cachedHotMovies = getHotMovies();
         lastFetchDate = LocalDate.now();
     }
+
 
     // 어드민페이지에서 영화를 삭제했을때 만약 API에서 주기적으로 받아와 서버에 저장하고있는 영화라면
     //
@@ -137,13 +144,12 @@ public class MovieService {
     }
 
     // 상영예정작 DB에 넣기
-    @Async
     public void fetchAndStoreMoviesUpcoming() throws IOException {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds();
         List<Movie> modifiedMovies = getModifiedMovies();
 
-        for (int page = 1; page <= 8; page++) {
+        for (int page = 1; page <= 5; page++) {
             String url = "https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
@@ -488,12 +494,20 @@ public class MovieService {
         }
     }
 
-    //상영 중인 전체 영화
+    //전체 영화
     public List<MovieDTO> getAll() {
         List<Movie> movieList = movieRepository.findAll();
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // 영화 전체보기
+    public Page<MovieDTO> getAllMoviesPagingAndSorting(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Movie> movieList = movieRepository.findAll(pageable);
+        return movieList.map(MovieDTO::convertToDTO);
+    }
+
 
     // 상영중 영화 목록 더보기 화면 페이징 및 정렬
     public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size, boolean isUpcoming) {
@@ -607,6 +621,8 @@ public class MovieService {
         return movieList;
     }
 
+
+
     public long getTotalMovies() {
         // 전체 영화 개수 조회
         return movieRepository.count();
@@ -708,6 +724,17 @@ public class MovieService {
             movie.addImage(movieImage);
         }
         movieRepository.save(movie); // 변경 감지에 의해 자동으로 데이터베이스에 저장됨
+
+        updateCachedMovies();
+    }
+
+    // 캐시 업데이트 메서드
+    private void updateCachedMovies() {
+        // 데이터 로컬 캐시 전략 업데이트
+        cachedVideoMovies = getVideoMovies();
+        cachedAllMovies = getAll();
+        cachedHotMovies = getHotMovies();
+        cachedActors = getActors();
     }
 
     // 영화 등록 관련 로직
@@ -760,6 +787,7 @@ public class MovieService {
     // 영화 삭제 (어드민 페이지)
     public void deleteMovie(Long movieId) {
         movieRepository.deleteById(movieId);
+        updateCachedMovies();
     }
 
     //영화 수정 (어드민 페이지)

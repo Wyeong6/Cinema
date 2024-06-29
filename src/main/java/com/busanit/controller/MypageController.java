@@ -50,25 +50,11 @@ public class MypageController {
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
-        String userEmail = null;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
-        }
+        // 현재 로그인한 사용자의 이메일
+        String userEmail = memberService.currentLoggedInEmail();
 
         // 사용자의 등급 확인+저장 (수정예정 은 아니고 추가로 다른 곳에도 넣을 예정 - pay쪽에도 넣어야함)
-        long userGradeCount = pointService.getPointMovieCount(memberService.findUserIdx(userEmail));
-        long userEditGrade;
-        if(userGradeCount >= 10) {
-            userEditGrade = 1;
-        } else if(userGradeCount >= 5) {
-            userEditGrade = 2;
-        } else if(userGradeCount >= 3) {
-            userEditGrade = 3;
-        } else {
-            userEditGrade = 4;
-        }
-        memberService.updateGrade(userEditGrade, userEmail);
+        long userGrade = memberService.userGrade();
 
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
         if(principal instanceof OAuth2MemberDTO) {
@@ -87,11 +73,8 @@ public class MypageController {
 
     @GetMapping("/main")
     public String mypageMain(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        String userEmail = null;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
-        }
+        // 현재 로그인한 사용자의 이메일
+        String userEmail = memberService.currentLoggedInEmail();
 
         // 사용자의 정보 + 포인트 정보
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
@@ -126,11 +109,8 @@ public class MypageController {
 
     @GetMapping("/order")
     public String mypageOrder(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        String userEmail = null;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
-        }
+        // 현재 로그인한 사용자의 이메일
+        String userEmail = memberService.currentLoggedInEmail();
 
         // 사용자의 주문내역
         Slice<SnackPaymentDTO> snackPaymentDTOList = null;
@@ -149,13 +129,15 @@ public class MypageController {
         return snackPaymentService.getSnackPaymentInfo(memberRegFormDTO.getId(), pageable);
     }
 
+    @GetMapping("/order/detail")
+    public String mypageOrderDetail() {
+        return "/mypage/mypage_order_detail";
+    }
+
     @GetMapping("/membership")
     public String mypageMembership(Model model) {
-        String userEmail = null;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
-        }
+        // 현재 로그인한 사용자의 이메일
+        String userEmail = memberService.currentLoggedInEmail();
 
         // 사용자의 정보
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
@@ -176,11 +158,8 @@ public class MypageController {
 
     @GetMapping("/point")
     public String mypagePoint(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        String userEmail = null;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
-        }
+        // 현재 로그인한 사용자의 이메일
+        String userEmail = memberService.currentLoggedInEmail();
 
         // 사용자의 정보 + 포인트 정보
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
@@ -220,6 +199,7 @@ public class MypageController {
         System.out.println("favoriteMovies === " + favoriteMovies.size());
         return "/mypage/mypage_favorite";
     }
+
     @GetMapping("/infoEdit")
     public String mypageEdit(@AuthenticationPrincipal Object principal, Model model) {
         String userEmail = null;
