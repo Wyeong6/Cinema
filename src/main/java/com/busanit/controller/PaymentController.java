@@ -68,7 +68,11 @@ public class PaymentController {
             default -> 0.03;
         };
         long currentPoints = 0;
-        currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
+        List<PointDTO> points = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent();
+        if (!points.isEmpty()) {
+            currentPoints = points.get(0).getCurrentPoints();
+        }
+
 
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율

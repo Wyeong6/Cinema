@@ -22,9 +22,10 @@
                 </div>
             </div>
         </div>
-        <div th:unless="${hasFavorites}">
-            <p style="margin-top: 2em">찜한 영화가 없습니다.</p>
-        </div>
+    </section>
+    <section class="info-none" th:unless="${hasFavorites}">
+        <img src="/images/magnifier2.png" alt="돋보기 이미지" />
+        <a href="/allMovies"><p>아직 찜한 영화가 없습니다.<br/> 마음에 드는 영화를 찾아 찜해보세요!</p></a>
     </section>
 </article>
 <script th:inline="javascript">

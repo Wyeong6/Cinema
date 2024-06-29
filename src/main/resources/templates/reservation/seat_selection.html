@@ -2,7 +2,7 @@
 <html lang="en" layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
-<body class="right-sidebar is-preload bg-black-wrapper">
+<body class="right-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper" class="bg-black-wrapper">
 
@@ -10,35 +10,37 @@
         <div class="wrapper style1 seat-selection bg-black-wrapper">
             <div class="container" th:each="movie, iterStat : ${movieDTOs}">
                 <article id="main" class="special">
-                    <input type="hidden" id="schedule-id" th:data-schedule-id="${scheduleDTO.id}" />
+                    <input type="hidden" id="schedule-id" th:data-schedule-id="${scheduleDTO.id}"/>
                     <input type="hidden"
                            id="movieId"
                            th:value="${movie.id}"
                            th:data-certification="${movie.certifications}"
-                           th:data-theaterNumber="${scheduleDTO.theaterNumberId}" />
+                           th:data-theaterNumber="${scheduleDTO.theaterNumberId}"/>
                     <header>
                         <h4>인원/좌석 선택</h4>
                         <div id="select-info">
                             <div id="movie-info">
-                                <img th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" />
+                                <img th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터"/>
                                 <div class="text">
                                     <div class="movie-title">
                                         <img src="" alt="연령 제한"><h4 th:text="${scheduleDTO.movieTitle}">영화 제목</h4>
                                     </div>
-                                    <span th:text="${scheduleDTO.date}">2024-06-17</span>&nbsp;<span th:text="${scheduleDTO.startTime + ' ~' + scheduleDTO.endTime}"> 04:35 ~ 06:14</span>
-                                    <p><span th:text="${scheduleDTO.theaterName}">인천대</span>&nbsp;<span th:text="${scheduleDTO.theaterNumber + '관'}"> 1관</span></p>
+                                    <span th:text="${scheduleDTO.date}">2024-06-17</span>&nbsp;<span
+                                        th:text="${scheduleDTO.startTime + ' ~' + scheduleDTO.endTime}"> 04:35 ~ 06:14</span>
+                                    <p><span th:text="${scheduleDTO.theaterName}">인천대</span>&nbsp;<span
+                                            th:text="${scheduleDTO.theaterNumber + '관'}"> 1관</span></p>
                                 </div>
                             </div>
                             <div id="select-info-form">
                                 <form id="seat-form">
                                     <label>성인
-                                        <input type="number" id="adult-cnt" min="0" />
+                                        <input type="number" id="adult-cnt" min="0"/>
                                     </label>
                                     <label>청소년
-                                        <input type="number" id="teenager-cnt" min="0" />
+                                        <input type="number" id="teenager-cnt" min="0"/>
                                     </label>
                                     <label>경로
-                                        <input type="number" id="grand-cnt" min="0" />
+                                        <input type="number" id="grand-cnt" min="0"/>
                                     </label>
                                     <button type="submit">선택</button>
                                 </form>
@@ -55,44 +57,19 @@
                                     <div class="column-header">
                                         <h4 th:text="${columnEntry.key}"></h4>
                                     </div>
-                                    <!-- 첫 번째 블록: 0부터 3까지의 좌석 -->
-                                    <div th:each="seat, stat : ${columnEntry.value}" th:if="${stat.index >= 0 and stat.index <= 3}">
-                                        <div class="seat">
-                                            <p th:text="${seat.seatRow}"></p>
-                                            <input type="hidden"
-                                                    th:data-seat-row="${seat.seatRow}"
-                                                    th:data-seat-column="${seat.seatColumn}"
-                                                    th:data-seat-id="${seat.id}"
-                                                    th:data-seat-available="${seat.isAvailable()}"
-                                                    th:data-seat-reserved="${seat.isReserved()}" />
-                                        </div>
+                                    <div class="seat remove" th:if="${columnEntry.value.size() < 20}"
+                                         th:each="index : ${#numbers.sequence(0, (20 - columnEntry.value.size()) / 2 - 1)}"></div>
+                                    <div class="seat" th:each="seat, stat : ${columnEntry.value}">
+                                        <p th:text="${seat.seatRow}"></p>
+                                        <input type="hidden"
+                                               th:data-seat-row="${seat.seatRow}"
+                                               th:data-seat-column="${seat.seatColumn}"
+                                               th:data-seat-id="${seat.id}"
+                                               th:data-seat-available="${seat.isAvailable()}"
+                                               th:data-seat-reserved="${seat.isReserved()}"/>
                                     </div>
-                                    <div class="seat remove"></div>
-                                    <!-- 두 번째 블록: 5부터 16까지의 좌석 -->
-                                    <div th:each="seat, stat : ${columnEntry.value}" th:if="${stat.index >= 4 and stat.index <= 15}">
-                                        <div class="seat">
-                                            <p th:text="${seat.seatRow}"></p>
-                                            <input type="hidden"
-                                                   th:data-seat-row="${seat.seatRow}"
-                                                   th:data-seat-column="${seat.seatColumn}"
-                                                   th:data-seat-id="${seat.id}"
-                                                   th:data-seat-available="${seat.isAvailable()}"
-                                                   th:data-seat-reserved="${seat.isReserved()}" />
-                                        </div>
-                                    </div>
-                                    <div class="seat remove"></div>
-                                    <!-- 세 번째 블록: 18부터 끝까지의 좌석 -->
-                                    <div th:each="seat, stat : ${columnEntry.value}" th:if="${stat.index >= 16}">
-                                        <div class="seat">
-                                            <p th:text="${seat.seatRow}"></p>
-                                            <input type="hidden"
-                                                   th:data-seat-row="${seat.seatRow}"
-                                                   th:data-seat-column="${seat.seatColumn}"
-                                                   th:data-seat-id="${seat.id}"
-                                                   th:data-seat-available="${seat.isAvailable()}"
-                                                   th:data-seat-reserved="${seat.isReserved()}" />
-                                        </div>
-                                    </div>
+                                    <div class="seat remove" th:if="${columnEntry.value.size() < 20}"
+                                         th:each="index : ${#numbers.sequence(0, (20 - columnEntry.value.size()) / 2 - 1)}"></div>
                                 </div>
                             </div>
                         </div>
@@ -110,14 +87,16 @@
                                 <p>예매완료좌석</p>
                             </div>
                             <div class="seat-disable">
-                                <div class="seat disabled small"><div class="diagonal-line"></div></div>
+                                <div class="seat disabled small">
+                                    <div class="diagonal-line"></div>
+                                </div>
                                 <p>선택불가좌석</p>
                             </div>
                         </div>
                     </div>
                     <div id="pay-box">
                         <div>
-                            <h3>총 금액 </h3><h3 id="total-price">0</h3><h4>원</h4>
+                            <h4>총 금액 </h4><h4 id="total-price">0</h4><h4>원</h4>
                         </div>
                         <button class="pay-btn" type="button" onclick="moveToPaymentPage()">결제하기</button>
                     </div>
@@ -128,7 +107,7 @@
     </div>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const certification = $('#movieId').data('certification');
 
             let imageUrl;
@@ -152,7 +131,19 @@
             let totalCount = 0;
             let totalPrice = 0;
 
-            $(document).on('click', '.seat:not(.remove):not(.reserved)', function() {
+            $('.column-group').each(function () {
+                const seatsInColumn = $(this).find('.seat');
+
+                if (seatsInColumn.length > 4) {
+                    $(seatsInColumn.eq(3)).after('<div class="seat remove"></div>');
+                }
+
+                if (seatsInColumn.length > 16) {
+                    $(seatsInColumn.eq(15)).after('<div class="seat remove"></div>');
+                }
+            });
+
+            $(document).on('click', '.seat:not(.remove):not(.reserved)', function () {
                 if (totalCount === 0) {
                     Swal.fire({
                         position: "center",
@@ -175,7 +166,7 @@
                 }
 
                 if (selectedCount === totalCount) {
-                    $('.column-group .seat:not(.remove):not(.selected)').addClass('disabled').each(function() {
+                    $('.column-group .seat:not(.remove):not(.selected)').addClass('disabled').each(function () {
                         $(this).find('p').empty();
                         if ($(this).find('.diagonal-line').length === 0) {
                             const diagonalDiv = '<div class="diagonal-line"></div>';
@@ -184,7 +175,7 @@
                     });
                     $('#total-price').text(totalPrice);
                 } else {
-                    $('.column-group .seat.disabled').removeClass('disabled').each(function() {
+                    $('.column-group .seat.disabled').removeClass('disabled').each(function () {
                         $(this).find('p').text($(this).find('input').data('seat-row')); // p 태그에 좌석 번호를 다시 설정
                         $(this).find('.diagonal-line').remove();
                     });
@@ -192,7 +183,7 @@
                 }
             });
 
-            $('.seat').each(function() {
+            $('.seat').each(function () {
                 const isReserved = $(this).find('input').data('seat-reserved');
                 if (isReserved) {
                     $(this).addClass('reserved');
@@ -201,7 +192,7 @@
                 }
             });
 
-            $('#seat-form').on('submit', function(event) {
+            $('#seat-form').on('submit', function (event) {
                 event.preventDefault();
 
                 const adultCount = parseInt($('#adult-cnt').val()) || 0;
@@ -212,10 +203,10 @@
                 const adultPrice = 15000;
                 const teenagerPrice = 12000;
                 const grandPrice = 12000;
-                totalPrice = adultPrice*adultCount + teenagerPrice*teenagerCount + grandPrice*grandCount;
+                totalPrice = adultPrice * adultCount + teenagerPrice * teenagerCount + grandPrice * grandCount;
 
                 $('.column-group .seat.selected').removeClass('selected');
-                $('.column-group .seat.disabled').each(function() {
+                $('.column-group .seat.disabled').each(function () {
                     $(this).removeClass('disabled');
                     $(this).find('p').text($(this).find('input').data('seat-row'));
                     $(this).find('.diagonal-line').remove();
@@ -231,7 +222,7 @@
             const grandCount = parseInt($('#grand-cnt').val()) || 0;
 
             const selectedSeats = [];
-            $('.seat.selected input[type="hidden"]').each(function() {
+            $('.seat.selected input[type="hidden"]').each(function () {
                 const seatId = $(this).data('seat-id');
                 const seatRow = $(this).data('seat-row');
                 const seatColumn = $(this).data('seat-column');
