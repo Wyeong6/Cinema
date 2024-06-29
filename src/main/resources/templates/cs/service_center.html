@@ -1,31 +1,41 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
 <head>
     <title>Cinemacast</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/assets/css/center.css" />
-    <link rel="stylesheet" href="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/assets/css/custom_center.css" />
-    <noscript><link rel="stylesheet" href="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/assets/css/noscript.css" /></noscript>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
+    <link href="/assets/css/center.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/css/custom_center.css" rel="stylesheet" type="text/css"/>
+    <noscript>
+        <link href="/assets/css/noscript.css" rel="stylesheet" type="text/css"/>
+    </noscript>
+    <style>
+        h2 {
+            text-align: center;
+        }
+
+        p {
+            margin : 50px;
+        }
+    </style>
 </head>
 <body class="is-preload">
-
 <!-- Wrapper-->
 <div id="wrapper">
 
     <!-- Nav -->
     <nav id="nav">
-        <a href="#" class="icon solid fa-question-circle"></a>
-        <a href="#work" class="icon solid fa-comments"></a>
-        <a href="#contact" class="icon solid fa-envelope"></a>
-        <a href="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/index.html" class="icon solid fa-home"></a>
+        <a class="icon solid fa-question-circle" href="#home"></a>
+        <a class="icon solid fa-comments" href="#work" id="loadChat" onclick="checkLoginStatus(event)"></a>
+        <a class="icon solid fa-envelope" href="#contact"></a>
+        <a class="icon solid fa-home" href="/"></a>
     </nav>
 
     <!-- Main -->
     <div id="main">
 
         <!-- Me -->
-        <article id="home" class="panel intro">
+        <article class="panel intro" id="home">
             <header>
                 <h2>자주 묻는 질문</h2>
             </header>
@@ -35,28 +45,28 @@
                         <tbody>
                         <tr>
                             <td></td>
-                            <td><img src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/images/magnifier.png" alt="돋보기 이미지" /></td>
-                            <td><a href="#home_get">카드로 결제할 경우 환불은 언제 되나요?</a></td>
+                            <td><img alt="돋보기 이미지" src="/images/magnifier.png"/></td>
+                            <td><a href="#home_get1">카드로 결제할 경우 환불은 언제 되나요?</a></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><img src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/images/magnifier.png" alt="돋보기 이미지" /></td>
-                            <td><a href="#home_get">분실물을 찾고 싶어요</a></td>
+                            <td><img alt="돋보기 이미지" src="/images/magnifier.png"/></td>
+                            <td><a href="#home_get2">분실물을 찾고 싶어요</a></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><img src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/images/magnifier.png" alt="돋보기 이미지" /></td>
-                            <td><a href="#home_get">영화티켓 예매 및 취소는 어떻게 하나요?</a></td>
+                            <td><img alt="돋보기 이미지" src="/images/magnifier.png"/></td>
+                            <td><a href="#home_get3">영화티켓 예매 및 취소는 어떻게 하나요?</a></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><img src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/images/magnifier.png" alt="돋보기 이미지" /></td>
-                            <td><a href="#home_get">관람등급 안내</a></td>
+                            <td><img alt="돋보기 이미지" src="/images/magnifier.png"/></td>
+                            <td><a href="#home_get4">관람등급 안내</a></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><img src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/images/magnifier.png" alt="돋보기 이미지" /></td>
-                            <td><a href="#home_get">48개월 미만(만 4세 미만)의 아동 관련 요금 안내</a></td>
+                            <td><img alt="돋보기 이미지" src="/images/magnifier.png"/></td>
+                            <td><a href="#home_get5">48개월 미만(만 4세 미만)의 아동 관련 요금 안내</a></td>
                         </tr>
                         </tbody>
                     </table>
@@ -64,9 +74,133 @@
             </section>
         </article>
 
-        <article id="home_get" class="panel intro">
+        <article class="panel intro" id="home_get1">
             <header>
                 <h2>카드로 결제할 경우 환불은 언제 되나요?</h2>
+            </header>
+            <section>
+                <div class="row">
+                    <p>
+                        환불안내
+                        <br><br>
+                        ㆍ 신용카드<br>
+                        - 결제 후 3일 이내 취소시 승인취소 가능합니다.<br>
+                        - 3일 이후 예매 취소 시 영업일 기준 3일 ~7일 이내 카드사에서 환불됩니다.
+                        <br>
+                        <br>
+                        ㆍ 체크카드<br>
+                        - 결제 후 3일 이내 취소 시 당일 카드사에서 환불 처리됩니다.<br>
+                        - 3일 이후 예매 취소 시 카드사에 따라 3일 ~ 10일 이내 카드사에서 환불됩니다.
+                        <br>
+                        <br>
+                        ㆍ카카오페이 간편결제<br>
+                        - 카카오페이머니를 사용하신 경우 카카오페이머니 잔액으로 원복됩니다.<br>
+                        - 카드 결제를 한 경우 카드사 정책에 따라 승인취소가 진행되며,
+                        3일 이후 매입 취소 시 영업일 기준 3~10일 소요됩니다.
+                        <br>
+                        <br>
+                        ㆍ페이코 간편결제<br>
+                        - PAYCO 쿠폰/포인트를 사용하신 경우 각각의 쿠폰/포인트로 원복됩니다.<br>
+                        - 카드 결제 금액은 카드사 정책에 따라 승인취소가 진행되며,
+                        3일 이후 매입취소 시 영업일 기준 3~10일 소요됩니다.</p>
+                </div>
+            </section>
+        </article>
+
+        <article class="panel intro" id="home_get2" style="padding-left: 15px;">
+            <header>
+                <h2>분실물을 찾고 싶어요</h2>
+            </header>
+            <section>
+                <div class="row">
+                    <p>
+                        영화관에서 물건을 분실하셨나요? 걱정하지 마세요! 다음 절차를 따라 분실물을 찾을 수 있습니다.
+                    </p>
+                    <ul style="font-size: 20px;">
+                        <li><b>현장 문의 :</b> 영화를 관람하신 영화관의 고객 서비스 데스크에 직접 문의해 주세요. 영화관 직원이 바로 도움을 드릴 수 있습니다.</li>
+                        <li><b>전화 문의 :</b> 영화관의 고객 센터로 전화하여 분실물 관련 정보를 제공해 주세요. 고객 센터 번호는 영화관 웹사이트에 기재되어 있습니다.</li>
+                        <li><b>온라인 문의 :</b> 고객 지원 페이지에서 문의해주세요. 분실한 물건의 설명과 분실 장소, 날짜 등을 기재해 주시면 찾는 데 도움이 됩니다.</li>
+                        <li><b>확인 :</b> 분실물이 발견되면 영화관측에서 연락을 드립니다. 분실물이 발견되지 않을 경우에도 지속적으로 확인해 주실 것을 권장합니다.</li>
+                    </ul>
+                    <p style="font-size: 20px;">
+                        분실물 관련하여 추가적인 도움이 필요하시면 언제든지 고객 센터로 문의해주세요. 고객님의 물건이 안전하게 돌아오기를 바랍니다.
+                    </p>
+                </div>
+            </section>
+        </article>
+
+        <article class="panel intro" id="home_get3">
+            <header>
+                <h2>영화티켓 예매 및 취소는 어떻게 하나요?</h2>
+            </header>
+            <section>
+                <div class="row">
+                    <p>
+                        환불안내
+
+                        ㆍ 신용카드
+                        - 결제 후 3일 이내 취소시 승인취소 가능합니다.
+                        - 3일 이후 예매 취소 시 영업일 기준 3일 ~7일 이내 카드사에서 환불됩니다.
+
+                        ㆍ 체크카드
+                        - 결제 후 3일 이내 취소 시 당일 카드사에서 환불 처리됩니다.
+                        - 3일 이후 예매 취소 시 카드사에 따라 3일 ~ 10일 이내 카드사에서 환불됩니다.
+
+                        ㆍ 휴대폰 결제
+                        - 결제 일자 기준 당월(1일~말일까지) 취소만 가능합니다.
+                        - 익월 취소의 경우 롯데시네마 고객센터(1544-8855)로 문의 주시기 바랍니다.
+
+                        ㆍ카카오페이 간편결제
+                        - 카카오페이머니를 사용하신 경우 카카오페이머니 잔액으로 원복됩니다.
+                        - 카드 결제를 한 경우 카드사 정책에 따라 승인취소가 진행되며,
+                        3일 이후 매입 취소 시 영업일 기준 3~10일 소요됩니다.
+
+                        ㆍ페이코 간편결제
+                        - PAYCO 쿠폰/포인트를 사용하신 경우 각각의 쿠폰/포인트로 원복됩니다.
+                        - 카드 결제 금액은 카드사 정책에 따라 승인취소가 진행되며,
+                        3일 이후 매입취소 시 영업일 기준 3~10일 소요됩니다.</p>
+                </div>
+                <button onclick="location.href = '#home'">뒤로가기</button>
+            </section>
+        </article>
+
+        <article class="panel intro" id="home_get4">
+            <header>
+                <h2>관람등급 안내</h2>
+            </header>
+            <section>
+                <div class="row">
+                    <p>
+                        환불안내
+
+                        ㆍ 신용카드
+                        - 결제 후 3일 이내 취소시 승인취소 가능합니다.
+                        - 3일 이후 예매 취소 시 영업일 기준 3일 ~7일 이내 카드사에서 환불됩니다.
+
+                        ㆍ 체크카드
+                        - 결제 후 3일 이내 취소 시 당일 카드사에서 환불 처리됩니다.
+                        - 3일 이후 예매 취소 시 카드사에 따라 3일 ~ 10일 이내 카드사에서 환불됩니다.
+
+                        ㆍ 휴대폰 결제
+                        - 결제 일자 기준 당월(1일~말일까지) 취소만 가능합니다.
+                        - 익월 취소의 경우 롯데시네마 고객센터(1544-8855)로 문의 주시기 바랍니다.
+
+                        ㆍ카카오페이 간편결제
+                        - 카카오페이머니를 사용하신 경우 카카오페이머니 잔액으로 원복됩니다.
+                        - 카드 결제를 한 경우 카드사 정책에 따라 승인취소가 진행되며,
+                        3일 이후 매입 취소 시 영업일 기준 3~10일 소요됩니다.
+
+                        ㆍ페이코 간편결제
+                        - PAYCO 쿠폰/포인트를 사용하신 경우 각각의 쿠폰/포인트로 원복됩니다.
+                        - 카드 결제 금액은 카드사 정책에 따라 승인취소가 진행되며,
+                        3일 이후 매입취소 시 영업일 기준 3~10일 소요됩니다.</p>
+                </div>
+            </section>
+        </article>
+
+        <article class="panel intro" id="home_get5">
+            <header>
+                <h2>48개월 미만(만 4세 미만)의 아동 관련 요금 안내</h2>
             </header>
             <section>
                 <div class="row">
@@ -99,63 +233,139 @@
         </article>
 
         <!-- Work -->
-        <article id="work" class="panel">
-            <header>
-                <h2>1:1 CHAT</h2>
-            </header>
-            <p>
-                Phasellus enim sapien, blandit ullamcorper elementum eu, condimentum eu elit.
-                Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia
-                luctus elit eget interdum.
-            </p>
+        <article class="panel" id="work">
+            <!-- 채팅룸 -->
         </article>
 
-        <!-- Contact -->
-        <article id="contact" class="panel">
+        <!-- 이메일 문의 -->
+        <article class="panel" id="contact">
             <header>
                 <h2>문의하기</h2>
                 <p>기타 문의 사항은 메일로 보내주시면 회신드리겠습니다.</p>
             </header>
-            <form action="#" method="post">
+            <form action="/register/inquiry" method="post" th:object="${Inquiry}">
                 <div>
-                    <div class="row">
-                        <div class="col-6 col-12-medium">
-                            <input type="text" name="name" placeholder="Name" />
-                        </div>
-                        <div class="col-6 col-12-medium">
-                            <input type="text" name="email" placeholder="Email" />
-                        </div>
-                        <div class="col-12">
-                            <input type="text" name="subject" placeholder="Subject" />
-                        </div>
-                        <div class="col-12">
-                            <textarea name="message" placeholder="Message" rows="6"></textarea>
-                        </div>
-                        <div class="col-12">
-                            <input type="submit" value="Send Message" style="font-size: 20px"/>
-                        </div>
-                    </div>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" th:field="*{name}" required>
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" th:field="*{email}" required>
+                </div>
+                <div>
+                    <label for="subject">Subject:</label>
+                    <input type="text" id="subject" name="subject" th:field="*{subject}" required>
+                </div>
+                <div>
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" th:field="*{message}" rows="6" required></textarea>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit">메일 보내기</button>
                 </div>
             </form>
         </article>
-
     </div>
 
     <!-- Footer -->
     <div id="footer">
         <ul class="copyright">
-            <li>&copy; Untitled.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+            <li>&copy; Untitled.</li>
+            <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
         </ul>
     </div>
-
 </div>
 
 <!-- Scripts -->
-<script src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/assets/centerjs/jquery.min.js"></script>
-<script src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/assets/centerjs/browser.min.js"></script>
-<script src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/assets/centerjs/breakpoints.min.js"></script>
-<script src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/assets/centerjs/util.js"></script>
-<script src="../../../../../../../Users/it/Downloads/html5up-helios_1_2%20(1)/html5up-helios%20(1)/assets/centerjs/main.js"></script>
+<script src="/assets/centerjs/jquery.min.js"></script>
+<script src="/assets/centerjs/browser.min.js"></script>
+<script src="/assets/centerjs/breakpoints.min.js"></script>
+<script src="/assets/centerjs/util.js"></script>
+<script src="/assets/centerjs/main.js"></script>
 
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 페이지 로드 시 채팅방반환
+        loadChatContent()
+    });
+
+    //채팅방반환
+    function loadChatContent() {
+        console.log("로그인 상태면 채팅방반환")
+        $.ajax({
+            url: '/chatUser',
+            type: 'GET',
+            dataType: 'html',
+            success: function (response) {
+                console.log("로그인 상태면 채팅방반환 성공")
+                $('#work').html(response);
+
+                //관리자 이메일을 가져와서 해당 메세지내역 가져오기
+                async function afterChatLoaded() {
+                    recipient = await fetchRecipientEmail();
+                    console.log("로드된 recipient" + recipient);
+                    console.log("로드시 로그인된 이메일" + sender);
+
+                    if (recipient) {
+                        await fetchMessages(recipient);
+                        if (chatRoomId) {
+                            connect(); // chatRoomId가 있는 경우에만 커넥션 설정
+                        }
+                    }
+                }
+                afterChatLoaded();
+            },
+            error: function (error) {
+                console.error('Failed to fetch chat HTML:', error);
+                alert("Failed to load content. Please try again.");
+            }
+        });
+    }
+
+    //로그인, 비로그인 상태확인
+    function checkLoginStatus(event) {
+        event.preventDefault();
+
+        $.ajax({
+            url: '/checkLoginStatus',
+            type: 'GET',
+            success: function (response) {
+                if (response.loggedIn) { //로그인 상태
+                    console.log("로그인 상태에서 메세지클릭함")
+                } else { //비로그인 상태
+                    alert('로그인 후 이용 가능합니다.');
+                    // 클릭 이벤트 발생 전 주소로 되돌아감
+                    history.back();
+
+                }
+            },
+            error: function (error) {
+                console.error('Failed to check login status:', error);
+                alert("Failed to load content. Please try again.");
+            }
+        });
+    }
+
+    function showHome() {
+        document.getElementById('home').style.display = 'block';
+        var articles = document.querySelectorAll('article');
+        articles.forEach(function(article) {
+            if (article.id !== 'home') {
+                article.style.display = 'none';
+            }
+        });
+    }
+
+    function showArticle(id) {
+        document.getElementById(id).style.display = 'block';
+        document.getElementById('home').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        showHome();
+    });
+
+</script>
 </body>
 </html>
