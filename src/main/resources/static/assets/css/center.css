@@ -74,7 +74,6 @@ input, select, textarea {
 
 a {
 	color: inherit;
-	border-bottom: solid 1px rgba(128, 128, 128, 0.15);
 	text-decoration: none;
 	-moz-transition: background-color 0.35s ease-in-out, color 0.35s ease-in-out, border-bottom-color 0.35s ease-in-out;
 	-webkit-transition: background-color 0.35s ease-in-out, color 0.35s ease-in-out, border-bottom-color 0.35s ease-in-out;
@@ -83,8 +82,9 @@ a {
 }
 
 a:hover {
-	color: #ef8376;
+	color: #1e2c3c;
 	border-bottom-color: transparent;
+	font-weight: 400;
 }
 
 /* Row */
@@ -1394,9 +1394,28 @@ a:hover {
 		letter-spacing: -0.015em;
 	}
 
-	h3, h4, h5, h6 {
+	h3 {
 		font-size: 1.25em;
 		letter-spacing: -0.015em;
+	}
+
+	h4 {
+		font-size: 1em;
+		letter-spacing: -0.015em;
+	}
+
+	h5 {
+		font-size: 0.9em;
+		letter-spacing: -0.015em;
+	}
+
+	h6 {
+		font-size: 0.8em;
+		letter-spacing: -0.015em;
+	}
+
+	p {
+		font-size: 0.7em;
 	}
 
 	@media screen and (max-width: 736px) {
@@ -1609,12 +1628,13 @@ a:hover {
 		transition: background-color .25s ease-in-out;
 		-webkit-appearance: none;
 		display: inline-block;
-		background-color: #222222;
+		font-size: 0.8em;
+		background-color: #1e2c3c;
 		color: #ffffff;
 		border: 0;
 		cursor: pointer;
 		outline: 0;
-		padding: 0.6em 1em 0.6em 1em;
+		padding: 0.7em 3em 0.7em 3em;
 	}
 
 		input[type="button"]:hover,
@@ -1622,7 +1642,7 @@ a:hover {
 		input[type="reset"]:hover,
 		button:hover,
 		.button:hover {
-			background-color: #333333;
+			background-color: rgba(30, 44, 60, 0.8);
 		}
 
 		input[type="button"]:active,

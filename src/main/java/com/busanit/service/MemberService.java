@@ -174,6 +174,20 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         return userEmail;
     }
 
+    // 현재 로그인한 사용자의 나이
+    public String currentLoggedInAge() {
+        String userEmail = null;
+        String userAge = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+            userAge = memberRepository.findByAge(userEmail);
+        }
+
+        return userAge;
+    }
+
     // 현재 로그인한 사용자의 등급 확인(+저장)
     public long userGrade() {
         long userGradeCount = pointService.getPointMovieCount(findUserIdx(currentLoggedInEmail()));

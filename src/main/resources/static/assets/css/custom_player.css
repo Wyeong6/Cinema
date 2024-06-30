@@ -306,7 +306,7 @@ div.mb-3 {
 }
 .seat.remove {
     margin: 0.5em;
-    background: #000;
+    background: transparent;
     cursor: default;
 }
 /* 상영 스케줄 등록하기 */

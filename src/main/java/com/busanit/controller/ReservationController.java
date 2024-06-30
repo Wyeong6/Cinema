@@ -36,13 +36,34 @@ public class ReservationController {
     private final ScheduleService scheduleService;
     private final SeatService seatService;
     private final SeatReservationService seatReservationService;
+    private final MemberService memberService;
 
     @GetMapping("/screeningSchedule")
     public String screeningSchedule(Model model) {
         try {
             List<MovieDTO> allMovies = movieService.getAll();
+            String userAge = memberService.currentLoggedInAge();
+
             model.addAttribute("movies", allMovies);
-            System.out.println("Movies: " + allMovies);
+            model.addAttribute("userAge", userAge);
+            System.out.println("userage : " + userAge);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
+        }
+
+        return "reservation/screening_schedule";
+    }
+
+    @GetMapping("/screeningSchedule/{movieId}")
+    public String screeningScheduleByMovieId(@PathVariable("movieId") Long movieId, Model model) {
+        try {
+            List<MovieDTO> allMovies = movieService.getAll();
+            String userAge = memberService.currentLoggedInAge();
+
+            model.addAttribute("movies", allMovies);
+            model.addAttribute("movieId", movieId);
+            model.addAttribute("userAge", userAge);
+            System.out.println("userage : " + userAge);
         } catch (Exception e) {
             model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
         }

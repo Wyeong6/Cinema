@@ -31,11 +31,11 @@
                                         />
                                         <div class="movie-overlay">
                                             <img th:if="${#strings.length(movie.id) == 10}"
-                                                 src="/images/poster-show.png"
+                                                 src="/images/magnifier2.png"
                                                  onclick="openModal(this.getAttribute('src'))"
                                                  alt="돋보기" />
                                             <img th:if="${movie.posterPath != 'null' && movie.posterPath != '' && #strings.length(movie.id) != 10}"
-                                                 src="/images/poster-show.png"
+                                                 src="/images/magnifier2.png"
                                                  th:onclick="'openModal(\'' + @{'https://image.tmdb.org/t/p/original' + ${movie.posterPath}} + '\')'"
                                                  alt="돋보기" />
                                             <img src="/images/play.png" id="videoModalBtn" th:data-video-id="${movie.video}" href="#"
@@ -75,7 +75,7 @@
                                             ~ overview ~
                                         </p>
                                         <div class="button_box">
-                                            <button href="#" class="reservation_btn">예매하기</button>
+                                            <button class="reservation_btn"><a th:href="@{'/reservation/screeningSchedule/' + ${movieId}}">예매하기</a></button>
                                         </div>
                                     </div>
                                 </header>

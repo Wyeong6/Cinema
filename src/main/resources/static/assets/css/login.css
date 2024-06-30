@@ -1,50 +1,65 @@
-body{
+@font-face {
+    font-family: 'MyCustomFont';
+    src: url('font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
+}
+
+body {
     font-family: 'Montserrat', sans-serif;
     background-color: #1f2029;
 }
 
-.container{
-    display:block;
-    max-width:680px;
-    width:80%;
-    margin:120px auto;
+.container {
+    display: block;
+    max-width: 680px;
+    width: 80%;
+    margin: 10em auto;
 }
 
-h1{
+h1 {
     color: #c4c3ca;
-    font-size:48px;
-    letter-spacing:-3px;
-    text-align:center;
-    margin:120px 0 80px 0 ;
-    transition:.2s linear;
+    font-size: 48px;
+    letter-spacing: -3px;
+    text-align: center;
+    margin: 120px 0 80px 0;
+    transition: .2s linear;
     font-weight: 900;
 }
 
-.links{
-    list-style-type:none;
-    li{
-        display:inline-block;
-        margin:0 20px 0 0;
-        transition:.2s linear;
-        &:nth-child(2){
-            opacity : .6;
-            &:hover{
-                opacity : 1;
+h1 a {
+    font-family: 'MyCustomFont', sans-serif !important;
+}
+
+.links {
+    list-style-type: none;
+
+    li {
+        display: inline-block;
+        margin: 0 20px 0 0;
+        transition: .2s linear;
+
+        &:nth-child(2) {
+            opacity: .6;
+
+            &:hover {
+                opacity: 1;
             }
         }
-        &:nth-child(3){
-            opacity : .6;
-            float:right;
-            &:hover{
-                opacity : 1;
+
+        &:nth-child(3) {
+            opacity: .6;
+            float: right;
+
+            &:hover {
+                opacity: 1;
             }
         }
-        a{
-            text-decoration:none;
+
+        a {
+            text-decoration: none;
             color: #c4c3ca;
-            font-weight:bolder;
-            text-align:center;
-            cursor : pointer;
+            font-weight: bolder;
+            text-align: center;
+            cursor: pointer;
         }
     }
 }
@@ -53,95 +68,178 @@ a {
     text-decoration: none;
 }
 
+form {
+    width: 100%;
+    max-width: 680px;
+    margin: 40px auto 10px;
 
-form{
-    width:100%;
-    max-width:680px;
-    margin:40px auto 10px;
-    .input__block{
-        margin:20px auto;
-        display:block;
-        position:relative;
-        &.first-input__block{
-            &::before{
-                content:"";
-                position:absolute;
-                top:-15px;
-                left:50px;
-                display:block;
-                width:0;
-                height:0;
-                background:transparent;
-                border-left:15px solid transparent;
-                border-right:15px solid transparent;
+    .input__block {
+        margin: 20px auto;
+        display: block;
+        position: relative;
+
+        &.first-input__block {
+            &::before {
+                content: "";
+                position: absolute;
+                top: -15px;
+                left: 50px;
+                display: block;
+                width: 0;
+                height: 0;
+                background: transparent;
+                border-left: 15px solid transparent;
+                border-right: 15px solid transparent;
                 border-bottom: 15px solid rgba(255, 255, 255, 0.1);
-                transition:.2s linear;
+                transition: .2s linear;
             }
         }
-        &.signup-input__block{
-            &::before{
-                content:"";
-                position:absolute;
-                top:-15px;
-                left:150px;
-                display:block;
-                width:0;
-                height:0;
-                background:transparent;
-                border-left:15px solid transparent;
-                border-right:15px solid transparent;
+
+        &.signup-input__block {
+            &::before {
+                content: "";
+                position: absolute;
+                top: -15px;
+                left: 150px;
+                display: block;
+                width: 0;
+                height: 0;
+                background: transparent;
+                border-left: 15px solid transparent;
+                border-right: 15px solid transparent;
                 border-bottom: 15px solid rgba(255, 255, 255, 0.3);
-                transition:.2s linear;
+                transition: .2s linear;
             }
         }
-        input{
-            display:block;
-            width:90%;
-            max-width:680px;
-            height:50px;
-            margin:0 auto;
-            border-radius:8px;
-            border:none;
+
+        input {
+            display: block;
+            width: 90%;
+            max-width: 680px;
+            height: 50px;
+            margin: 0 auto;
+            border-radius: 8px;
+            border: none;
             background: rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.3);
-            padding:0 0 0 15px;
-            font-size:14px;
+            padding: 0 0 0 15px;
+            font-size: 14px;
             font-family: 'Montserrat', sans-serif;
-            &:focus,
-            &:active{
-                outline:none;
-                border:none;
-                color: rgba(255, 255, 255, 0.1);
-            }
-            &.repeat__password{
-                opacity : 0;
-                display : none;
-                transition:.2s linear;
-            }
-        }
-    }
 
-    .signin__btn{
-        background:#df7366;
-        color:white;
-        display:block;
-        width:92.5%;
-        max-width:680px;
-        height:50px;
-        border-radius:8px;
-        margin:0 auto;
-        border:none;
-        cursor:pointer;
-        font-size:20px;
-        font-family: 'Montserrat', sans-serif;
-        box-shadow: 0 15px 30px rgba(223, 115, 102, 0.36);
-    ;
-        transition:.2s linear;
-        &:hover{
-            box-shadow: 0 0 0 rgba(233, 30, 99, 0);
+            &:focus,
+            &:active {
+                outline: none;
+                border: none;
+            }
+
+            &.repeat__password {
+                opacity: 0;
+                display: none;
+                transition: .2s linear;
+            }
         }
     }
 }
+
+/* 로그인 체크박스 커스텀 */
+/* 기본 체크박스 숨김 */
+input[type="checkbox"] {
+    display: none;
+}
+
+/* 커스텀 체크박스 스타일 */
+input[type="checkbox"] + label {
+    display: inline-block;
+    margin-right: 0.5em;
+    width: 1em;
+    height: 1em;
+    border: 2px solid #f2f2f2;
+    border-radius: 2px;
+    cursor: pointer;
+    vertical-align: middle;
+    user-select: none;
+}
+
+/* 체크된 상태의 스타일 */
+input[type="checkbox"]:checked + label {
+    background-color: #f2f2f2;
+}
+
+/* 추가적인 레이블에 대한 스타일 */
+label[for="modal_optional_chk"] + label,
+label[for="modal_essential_chk"] + label {
+    cursor: pointer;
+    user-select: none;
+    width: 1em;
+    height: 1em;
+    border: 2px solid #1e2c3c;
+}
+
+/* 체크박스가 선택된 상태일 때 추가적인 레이블 스타일 */
+input[type="checkbox"]:checked + label[for="modal_optional_chk"],
+input[type="checkbox"]:checked + label[for="modal_essential_chk"] {
+    background-color: #1e2c3c; /* 배경색을 변경하여 선택된 상태를 나타냄 */
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+    -webkit-transition: background-color 9999s ease-out;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset !important;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.3);
+!important;
+}
+
+/* 회원가입 체크박스 커스텀 */
+/* 체크박스 숨기기 */
+#signup_form input[type="checkbox"] {
+    display: none; /* 기본 체크박스 숨기기 */
+}
+
+#signup_form input[type="checkbox"] + label {
+    position: absolute;
+    right: 0;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid #f2f2f2;
+    border-radius: 2px;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+#signup_form input[type="checkbox"]:checked + label {
+    background-color: #f2f2f2; /* 체크되었을 때 배경색 변경 */
+}
+
+#signup_form .terms-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+/* 레이블 텍스트 스타일 */
+#signup_form label[for="essential_chk"] {
+    cursor: pointer;
+}
+
+/* 약관 보기 버튼 스타일 */
+#signup_form #modal_show1,
+#signup_form #modal_show2 {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    margin-left: 1em;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 14px; /* 필요에 따라 조정 */
+}
+
 .terms-container {
     width: 90%;
     margin: 0 auto;
@@ -151,6 +249,7 @@ form{
     flex-direction: row;
     align-items: center; /* 수직 가운데 정렬을 위해 */
 }
+
 .terms-container .terms_show {
     height: 5%;
     margin-left: 3%; /* 버튼과 label 사이의 간격 조정 */
@@ -158,12 +257,9 @@ form{
     border: none;
     border-radius: 5px;
 }
-.terms-container input[type="checkbox"] {
-    margin-left: 50%;
-}
 
 .terms-container label {
-    color:#fff;
+    color: #fff;
 }
 
 #sign_action {
@@ -173,110 +269,132 @@ form{
     display: flex;
     justify-content: space-between;
 }
+
 #find {
     float: left;
     display: flex;
     flex-direction: row;
 }
+
 .find_link {
+    padding: 0;
     background: none;
     border: none;
     color: #fff;
     font-size: 16px;
+    cursor: pointer;
 }
+
+.find_link {
+    padding-right: 0.5em;
+}
+
 .remember_email label {
     color: #fff;
     font-size: 16px;
 }
 
-.separator{
-    display:block;
-    margin:30px auto 10px;
-    text-align:center;
-    height:40px;
-    position:relative;
-    background:transparent;
+.separator {
+    display: block;
+    width: 92.5%;
+    margin: 30px auto 10px;
+    text-align: center;
+    height: 40px;
+    position: relative;
+    background: transparent;
     color: #c4c3ca;
-    font-size:13px;
-    width:90%;
-    max-width:680px;
-    &::before{
-        content:"";
-        position:absolute;
-        top:8px;
-        left:0;
+    font-size: 13px;
+    max-width: 680px;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 0;
         background: #c4c3ca;
-        height:1px;
-        width:45%;
+        height: 1px;
+        width: 45%;
     }
-    &::after{
-        content:"";
-        position:absolute;
-        top:8px;
-        right:0;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 8px;
+        right: 0;
         background: #c4c3ca;
-        height:1px;
-        width:45%;
+        height: 1px;
+        width: 45%;
     }
 }
 
 .google_btn,
-.naver_btn{
-    display:block;
-    width:90%;
-    max-width:680px;
-    margin:20px auto;
-    height:50px;
-    cursor:pointer;
-    font-size:16px;
+.naver_btn {
+    position: relative;
+    display: block;
+    width: 92.5%;
+    max-width: 680px;
+    margin: 20px auto;
+    height: 50px;
+    cursor: pointer;
+    font-size: 1.3em;
     font-family: 'Montserrat', sans-serif;
     vertical-align: middle;
-    border-radius:8px;
-    border:none;
-    line-height:40px;
-    &.google_btn{
-        background:#5b90f0;
-        color:white;
-        box-shadow:0 15px 30px rgba(91, 144, 240, 0.36);
-        transition:.2s linear;
+    border-radius: 8px;
+    border: none;
+    line-height: 40px;
+
+    &.google_btn {
+        background: rgba(255, 255, 255, 0.8);
+        color: #1e2c3c;
+        transition: .2s linear;
+
         .fa {
-            padding:0 5px 0 0 ;
+            padding: 0 5px 0 0;
         }
-        .fa img {
+
+        img {
+            position: absolute;
+            top: 30%;
+            left: 3%;
             vertical-align: middle;
-            width: 20px;
+            width: 1em;
         }
-        &:hover{
-            box-shadow: 0 0 0 rgba(91, 144, 240, 0);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.9);
         }
     }
-    &.naver_btn{
+
+    &.naver_btn {
         background: #c0c3c1;
-        color:white;
-        box-shadow: 0 15px 30px rgba(192, 195, 193, 0.36);
-    ;
-        transition:.2s linear;
-        .fa{
-            padding:0 5px 0 0 ;
+        color: white;
+        transition: .2s linear;
+
+        .fa {
+            padding: 0 5px 0 0;
         }
+
         .fa img {
             vertical-align: middle;
             width: 20px;
         }
-        &:hover{
-            box-shadow: 0 0 0 rgba(37, 40, 45, 0);
+
+        &:hover {
         }
     }
 }
-footer{
-    p{
-        text-align:center;
+
+footer {
+    p {
+        text-align: center;
         color: #c4c3ca;
-        .fa{
+
+        .fa {
             color: #c4c3ca;
         }
     }
 }
+
 #modal_overlay {
     position: fixed;
     top: 0;
@@ -288,6 +406,7 @@ footer{
     z-index: 999; /* 모달보다 위에 표시되도록 z-index 설정 */
     display: none; /* 초기에는 숨겨짐 */
 }
+
 /* 모달 창 */
 .modal {
     display: none;
@@ -308,11 +427,13 @@ footer{
     color: #1f1920;
     font-size: 30px;
 }
+
 .modal_content {
     width: 80%;
     height: 70%;
     margin: 0 auto;
 }
+
 .modal_content textarea {
     width: 100%;
     height: 80%; /* 원하는 높이로 조절하세요 */
@@ -330,6 +451,41 @@ footer{
     justify-content: space-between;
 }
 
+.modal input + label {
+    border-radius: 2px !important;
+    border: 2px solid #1e2c3c !important;
+}
+
+.modal input:checked + label {
+    background: #1e2c3c !important;
+}
+
+.signin_btn {
+    background: #f24949;
+    color: white;
+    display: block;
+    width: 92.5%;
+    max-width: 680px;
+    height: 50px;
+    border-radius: 8px;
+    margin: 0 auto;
+    margin-bottom: 1em;
+    border: none;
+    cursor: pointer;
+    font-size: 1.3em;
+    font-family: 'Montserrat', sans-serif;
+    transition: .2s linear;
+}
+
+.signin_btn:hover {
+    background: #F28379;
+}
+
+.errorMessage {
+    color: white;
+    text-align: center;
+}
+
 /* find_email */
 #sign_action {
     width: 92.5%;
@@ -337,16 +493,20 @@ footer{
     margin-top: 1em;
     margin-bottom: 1em;
 }
+
 #sign_action p, a {
     color: #fafafa;
 }
+
 #sign_action div:nth-child(2) {
     display: flex;
     justify-content: space-between;
 }
+
 #sign_action div:nth-child(2) p {
     margin-left: 10px;
 }
+
 .result {
     width: 92%;
     margin: 0 auto;
@@ -355,53 +515,66 @@ footer{
     border-radius: 20px;
     text-align: center;
 }
+
 .result h3 {
     font-size: 30px;
     color: #3B353C;
 }
+
 .result div {
     width: 60%;
     margin: 0 auto;
 }
+
 .result .find_email, .signup_date {
     display: flex;
     flex-direction: row;
 }
+
 .result p {
     font-size: 20px;
     color: #3B353C;
-    text-align: left;
+    text-align: center;
     margin-block-end: 0.2em;
+    margin-bottom: 3em;
 }
-.result .button {
-    width: 30%;
-    font-size: 20px;
-    padding: 1em;
-    margin-top: 2em;
-    border-radius: 50px;
-    border: none;
-    color: #3B353C;
+
+.result button {
+    cursor: pointer;
+    display: block;
+    background: transparent;
+    border-radius: 15px;
+    border: 2px solid #F28379;
+    width: 100%;
+    font-size: 1.1em;
+    padding: 0.5em 0;
 }
-.result button.btn1 {
-    background: #2B252C;
-    color: #fafafa;
+
+.result button:hover {
+    background: #F28379;
 }
-.result button.btn1:hover {
-    background: #3B353C
+
+.result button:last-child {
+    margin-top: 0.5em;
 }
-.result button.btn2 {
-    background: #df7366;
-    color: #fafafa;
+
+.result ul {
+    padding: 0;
 }
-.result button.btn2:hover {
-    background: #ef8376;
+
+.result ul li {
+    list-style-type: none;
+    font-size: 1.3em;
+    text-align: center;
 }
+
 .result .password_flex {
     display: flex;
     flex-direction: row;
     width: 37%;
 }
+
 .success_result_email, .success_result_password,
-.fail_result_email, .fail_result_password{
+.fail_result_email, .fail_result_password {
     display: none;
 }
