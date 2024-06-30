@@ -45,7 +45,8 @@ public class MypageController {
     private final PasswordEncoder passwordEncoder;
     private final FavoriteMovieService favoriteMovieService;
     private final PointService pointService;
-    private final SnackPaymentService snackPaymentService;
+//    private final SnackPaymentService snackPaymentService;
+    private final PaymentService paymentService;
     private final ObjectMapper objectMapper;
 
     @GetMapping("/")
@@ -94,8 +95,8 @@ public class MypageController {
         model.addAttribute("myPageGrade", gradeString);
 
         // 최근 스낵 주문 내역
-        Slice<SnackPaymentDTO> snackPaymentDTOList = null;
-        snackPaymentDTOList = snackPaymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
+        Slice<PaymentDTO> snackPaymentDTOList = null;
+        snackPaymentDTOList = paymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
         model.addAttribute("snackPaymentInfo", snackPaymentDTOList);
 
         return "/mypage/mypage_main";
@@ -113,8 +114,8 @@ public class MypageController {
         String userEmail = memberService.currentLoggedInEmail();
 
         // 사용자의 주문내역
-        Slice<SnackPaymentDTO> snackPaymentDTOList = null;
-        snackPaymentDTOList = snackPaymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
+        Slice<PaymentDTO> snackPaymentDTOList = null;
+        snackPaymentDTOList = paymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
         model.addAttribute("snackPaymentInfo", snackPaymentDTOList);
 
         return "/mypage/mypage_order";
@@ -122,11 +123,11 @@ public class MypageController {
 
     @GetMapping("/order/more")
     @ResponseBody
-    public Slice<SnackPaymentDTO> getOrders(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Slice<PaymentDTO> getOrders(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = (authentication != null) ? authentication.getName() : null;
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-        return snackPaymentService.getSnackPaymentInfo(memberRegFormDTO.getId(), pageable);
+        return paymentService.getSnackPaymentInfo(memberRegFormDTO.getId(), pageable);
     }
 
     @GetMapping("/order/detail")

@@ -19,6 +19,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import java.util.List;
 public class PaymentService {
     private final MemberRepository memberRepository;
     private final PaymentRepository paymentRepository;
+    private final SnackService snackService;
 
     @Value("${imp_rest_api_key}")
     private String imp_rest_api_key;
@@ -52,6 +55,13 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentRepository.findByImpUid(imp_uid)).orElseThrow(() -> new NullPointerException("payment null"));
 
         return PaymentDTO.toDTO(payment);
+    }
+
+    // 스낵 결제 내역
+    public Slice<PaymentDTO> getSnackPaymentInfo(Long member_id, Pageable pageable) {
+        Slice<Payment> paymentSlice = paymentRepository.findByMember_IdAndProductType(member_id, "SN", pageable);
+
+        return PaymentDTO.toDTOSnackSlice(paymentSlice, snackService);
     }
 
     // 결제 토큰 받기
