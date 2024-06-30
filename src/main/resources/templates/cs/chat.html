@@ -9,8 +9,6 @@
 
     <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" async></script>
-
-
 </head>
 <body>
 <div id="messages"></div> <!-- 메시지를 보여주는 부분을 버튼 위로 이동 -->
@@ -22,7 +20,7 @@
     <button onclick="selectCategory('기타')">기타</button>
 </div>
 <div>
-    <input type="text" id="message" placeholder="Type a message..."/>
+    <input type="text" id="message" placeholder="Type a message..."  required></input>
     <button onclick="sendMessage()">Send</button>
     <div id="typingIndicatorDTO" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
 </div>
@@ -168,7 +166,7 @@
         showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
         document.getElementById('message').value = ''; // 입력 필드를 비움
 
- 
+
 
         // 메시지 전송 후 타이핑 상태 초기화
         clearTimeout(typingTimeout);

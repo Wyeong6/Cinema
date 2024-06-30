@@ -1628,12 +1628,13 @@ a:hover {
 		transition: background-color .25s ease-in-out;
 		-webkit-appearance: none;
 		display: inline-block;
-		background-color: #222222;
+		font-size: 0.8em;
+		background-color: #1e2c3c;
 		color: #ffffff;
 		border: 0;
 		cursor: pointer;
 		outline: 0;
-		padding: 0.6em 1em 0.6em 1em;
+		padding: 0.7em 3em 0.7em 3em;
 	}
 
 		input[type="button"]:hover,
@@ -1641,7 +1642,7 @@ a:hover {
 		input[type="reset"]:hover,
 		button:hover,
 		.button:hover {
-			background-color: #333333;
+			background-color: rgba(30, 44, 60, 0.8);
 		}
 
 		input[type="button"]:active,
