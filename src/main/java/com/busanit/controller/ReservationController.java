@@ -54,6 +54,23 @@ public class ReservationController {
         return "reservation/screening_schedule";
     }
 
+    @GetMapping("/screeningSchedule/{movieId}")
+    public String screeningScheduleByMovieId(@PathVariable("movieId") Long movieId, Model model) {
+        try {
+            List<MovieDTO> allMovies = movieService.getAll();
+            String userAge = memberService.currentLoggedInAge();
+
+            model.addAttribute("movies", allMovies);
+            model.addAttribute("movieId", movieId);
+            model.addAttribute("userAge", userAge);
+            System.out.println("userage : " + userAge);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
+        }
+
+        return "reservation/screening_schedule";
+    }
+
     @GetMapping("/getTheatersByRegion")
     @ResponseBody
     public List<TheaterDTO> getTheatersByRegion(@RequestParam String region) {

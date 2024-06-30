@@ -12,6 +12,7 @@
                 <article id="main" class="special">
                     <div class="row table-div">
                         <input type="hidden" th:value="${userAge}" class="user-age"/>
+                        <input type="hidden" th:value="${movieId}" class="movieId"/>
                         <table id="schedule-table">
                             <thead>
                             <tr>
@@ -173,6 +174,21 @@
                 $('#select-movie-th').text($(this).text());
 
                 sendAjaxRequest();
+            });
+
+            $(".movie-item").each(function() {
+                var itemMovieId = $(this).find("input[type='hidden']").val();
+                var movieId = $('.movieId').val();
+                if (itemMovieId === movieId) {
+                    $(this).addClass("clicked");
+
+                    var offsetTop = $(this).offset().top;
+                    var scrollTo = offsetTop - $(window).height() / 2;
+
+                    $('#select-movie-group .scrollable-content').animate({
+                        scrollTop: scrollTo
+                    }, 500);
+                }
             });
 
             const dateGroup = $('#select-date-group ul');

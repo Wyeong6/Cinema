@@ -284,14 +284,38 @@ a#movie_title:not(:hover) {
     display: inline-block; /* 요소들이 인라인으로 나타나도록 설정 */
     border-radius: 15px;
 }
-.carousel .overlay-img {
-    width: 5em;
+.carousel .overlay-rank {
+    width: 100%;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 1; /* 겹쳐진 이미지가 위에 표시되도록 설정 */
-    margin-left: -5%;
-    margin-top: -5%;
+}
+.carousel .overlay-rank::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)); /* 세로 방향 그라데이션 배경 */
+    z-index: -1; /* 텍스트 뒤에 배경이 오도록 설정 */
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    text-align: left;
+}
+.carousel .overlay-rank h1 {
+    font-size: 2.3em;
+    color: #eceef1;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
+    margin: 0;
+    padding: 0;
+    font-family: 'MyCustomFont', sans-serif !important;
+    position: relative; /* 텍스트를 배경 위에 위치시키기 위해 상대 위치 사용 */
+    text-align: left;
+    top: 0;
+    left: 5%;
+    margin-top: 0.1em;
 }
 .carousel header {
     margin-bottom: 0.5em;
@@ -300,10 +324,15 @@ a#movie_title:not(:hover) {
     font-size: 0.8em;
     line-height: 1em;
     margin: 0.8em 0 0 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
 .carousel header > p > img {
     width: 1em;
     line-height: 1em;
+    margin-right: 0.5em;
 }
 .carousel .button_box {
     display: flex;

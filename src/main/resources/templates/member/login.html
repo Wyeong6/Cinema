@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CINEMACAST</title>
+    <title>Cinemacast</title>
     <link href="/assets/css/login.css" rel="stylesheet"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
@@ -23,23 +23,11 @@
         });
     </script>
 
-    <!-- css -->
-    <style>
-        .errorMessage {
-            color: white;
-            text-align: center;
-        }
-
-        [class^="find_link"] {
-            cursor: pointer;
-        }
-    </style>
-
 </head>
 <body>
 <div class="container">
     <!-- Heading -->
-    <h1>SIGN IN</h1>
+    <h1><a href="/">CINEMACAST</a></h1>
 
     <ul class="links">
         <li>
@@ -66,14 +54,20 @@
         </div>
 
         <!-- sign in button -->
-        <button class="signin__btn" type="submit">
-            Sign in
+        <button class="signin_btn" type="submit">
+            로그인
+        </button>
+        <!-- sign up button -->
+        <button class="google_btn" onclick="location.href='/oauth2/authorization/google'">
+            <img src="/images/google-logo.png" alt="구글 로고" />
+            구글 로그인
         </button>
     </form>
+
     <div id="sign_action">
         <div id="find">
             <button class="find_link signup_btn" onclick="location.href='/member/new'">
-                회원가입
+                이메일 가입
             </button>
             <button class="find_link" onclick="location.href='/member/findId'">
                 이메일 찾기
@@ -83,25 +77,13 @@
             </button>
         </div>
         <div class="remember_email">
-            <input id="remember_email" name="save_check" th:checked="${cookieCheck}" type="checkbox" value="Y"/>
-            <label for="remember_email">이메일 기억하기</label>
+            <input id="remember_email" class="check" name="save_check" th:checked="${cookieCheck}" type="checkbox" value="Y"/>
+            <label for="remember_email"></label>
+            <label for="remember_email">
+                <span>이메일 기억하기</span>
+            </label>
         </div>
     </div>
-
-    <!-- separator -->
-    <div class="separator">
-        <p>OR</p>
-    </div>
-    <!-- google button -->
-    <button class="google_btn" onclick="location.href='/oauth2/authorization/google'">
-        <i class="fa fa-google"><img alt="구글 아이콘" src="/images/google-logo.png"/></i>
-        Sign in with Google
-    </button>
-    <!-- naver button -->
-    <button class="naver_btn">
-        <i class="fa fa-github"><img alt="네이버 아이콘" src="/images/naver-logo.png"/></i>
-        Sign in with Naver (미구현)
-    </button>
 
     <!-- 관리자 회원가입 (삭제예정) css 불필요 -->
     <button class="admin_btn" onclick="location.href='/member/new2'">

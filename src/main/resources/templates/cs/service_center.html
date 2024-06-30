@@ -185,7 +185,7 @@
         <!-- 이메일 문의 -->
         <article class="panel" id="contact">
             <header>
-                <h2>문의하기</h2>
+                <h3>문의하기</h3>
                 <p>기타 문의 사항은 메일로 보내주시면 회신드리겠습니다.</p>
             </header>
             <form action="/register/inquiry" method="post" th:object="${Inquiry}">
@@ -205,7 +205,7 @@
                     <label for="message">Message:</label>
                     <textarea id="message" name="message" th:field="*{message}" rows="6" required></textarea>
                 </div>
-                <div style="text-align: center; margin-top: 20px;">
+                <div>
                     <button type="submit">메일 보내기</button>
                 </div>
             </form>

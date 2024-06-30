@@ -26,7 +26,7 @@
                 <p>Another fine freebie by HTML5 UP</p>
             </header>
             <footer>
-                <a href="#banner" class="button circled scrolly">예매</a>
+                <a class="button circled scrolly">예매</a>
             </footer>
         </div>
         <!-- info -->
@@ -102,12 +102,12 @@
     <!-- Now Playing -->
     <section class="carousel">
         <div class="section_title">
-            <h3>현재 상영작 TOP 9</h3>
+            <h3>현재 상영작</h3>
             <p><a href="/nowMovies">더보기</a></p>
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${allMovies}"
-                     th:if="${iterStat.index < 9}">
+                     th:if="${iterStat.index < 10}">
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
                     <img th:if="${movie.posterPath != null}"
                          th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}"
@@ -118,18 +118,20 @@
                     alt="이미지 준비 중" width="150" height="300"
                     style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
                 </a>
-                <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
+                <div class="overlay-rank">
+                    <h1 th:text="${iterStat.index + 1} + '.'"></h1>
+                </div>
                 <header>
                     <h4>
                         <a th:href="@{'/movies/' + ${movie.id}}">
                             <span th:utext="${#strings.length(movie.title) &gt; 10 ? #strings.substring(movie.title, 0, 10) + '...' : movie.title}">...</span>
                         </a>
                     </h4>
-                    <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
+                    <p><img src="/images/clock.png" alt="clock"/><span th:text="${movie.runtime}">runtime</span></p>
                 </header>
                 <div class="button_box">
-                    <button class="reservation_btn button">예매하기</button>
-                    <button class="get_btn button"><a href="#" class="movie-detail-link">상세보기</a></button>
+                    <button class="reservation_btn button"><a th:href="@{'/reservation/screeningSchedule/' + ${movie.id}}">예매하기</a></button>
+                    <button class="get_btn button"><a th:href="@{'/movies/' + ${movie.id}}" class="movie-detail-link">상세보기</a></button>
                 </div>
             </article>
         </div>
@@ -170,7 +172,7 @@
                     <p><img src="/images/calendar.png" alt="clock"/> <span th:text="${movie.releaseDate}">개봉날짜</span></p>
                 </header>
                 <div class="button_box">
-                    <button class="reservation_btn button">예매하기</button>
+                    <button class="reservation_btn button"><a th:href="@{'/reservation/screeningSchedule/' + ${movie.id}}">예매하기</a></button>
                     <button class="get_btn button"><a th:href="@{'/movies/' + ${movie.id}}">상세보기</a></button>
                 </div>
 <!--                </form>-->
@@ -271,9 +273,11 @@
 
             /*<![CDATA[*/
             const movies = /*[[${videoMovies}]]*/ [];
+            const movieIds = movies.map(movie => movie.id);
             const movieTitles = movies.map(movie => movie.title);
             const moviePosters = movies.map(movie => "https://image.tmdb.org/t/p/w1280" + movie.backdropPath);
             const movieVideos = movies.filter(movie => movie.video).map(movie => "https://www.youtube.com/embed/" + movie.video);
+
             /*]]>*/
 
             console.log(movieTitles);
@@ -333,7 +337,6 @@
                 const info = document.getElementById('info');
                 const logo = document.getElementById('logo');
 
-
                 $('#movie_title').off('click').on('click', function () {
                     const videoUrl = movieVideos[index];
                     console.log("videoUrl" + videoUrl)
@@ -346,6 +349,12 @@
 
                 header.style.backgroundImage = `url(${moviePosters[index]})`;
                 movieTitle.textContent = movieTitles[index];
+
+                $('.circled').on('click', function() {
+                    var url = '/reservation/screeningSchedule/' + movieIds[index]; // 예매 페이지 URL
+
+                    window.location.href = url;
+                });
 
                 // 버튼 스타일 업데이트
                 buttons.forEach((button, idx) => {
