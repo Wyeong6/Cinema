@@ -303,6 +303,7 @@
                         await fetchMessages(recipient);
                         if (chatRoomId) {
                             connect(); // chatRoomId가 있는 경우에만 커넥션 설정
+                            fetchChatRoomPresence(chatRoomId) //채팅룸 입장상태
                         }
                     }
                 }
@@ -325,6 +326,7 @@
             success: function (response) {
                 if (response.loggedIn) { //로그인 상태
                     console.log("로그인 상태에서 메세지클릭함")
+
                 } else { //비로그인 상태
                     alert('로그인 후 이용 가능합니다.');
                     // 클릭 이벤트 발생 전 주소로 되돌아감

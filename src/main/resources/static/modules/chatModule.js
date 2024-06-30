@@ -1,4 +1,4 @@
-import { updateTimeSinceCreated } from './timeSinceCreated.js';
+import {updateTimeSinceCreated} from './timeSinceCreated.js';
 
 /**
  * 웹소켓 연결 함수
@@ -19,32 +19,25 @@ export function connectWebSocket(options) {
         initialDataParams
     } = options;
 
-    console.log("Connecting to WebSocket server...");
     const socket = new SockJS('/ws'); // WebSocket 엔드포인트 '/ws'로 연결
     const stompClient = Stomp.over(socket); // Stomp 클라이언트 객체 생성
 
     // 웹소켓 연결
-    stompClient.connect({},function (frame) {
-        console.log('Connected to WebSocket: ' + frame);
-        console.log('Connected to WebSocket: ' + frame);
+    stompClient.connect({}, function (frame) {
         // '/user/queue/chatList' 주제를 구독하여 메시지 처리
         stompClient.subscribe('/user/queue/chatList', function (message) {
             const response = JSON.parse(message.body);
-            console.log("Received message:", response);
-
-            // 클라이언트가 가지고 있는 페이징 번호를 사용하여 업데이트
-            console.log("response.inactiveCurrentPage" + response.inactiveCurrentPage);
 
             // displayChatListCallback 함수를 호출하여 채팅 목록을 화면에 업데이트
             if (displayChatListCallback) {
-                 displayChatListCallback(response);
+                displayChatListCallback(response);
             }
             // subscribeCallback 함수를 호출하여 구독된 메시지 처리
-             subscribeCallback(response);
+            subscribeCallback(response);
         });
         // loadInitialData가 함수인 경우 최초 데이터 로드 수행
         if (initialDataParams) {
-             loadChatList(...initialDataParams); // 파라미터 전달하여 초기 데이터 로드
+            loadChatList(...initialDataParams); // 파라미터 전달하여 초기 데이터 로드
         }
     });
 
@@ -57,7 +50,13 @@ export let adminEmail = '';
 export let activePage = 1;
 export let inactivePage = 1;
 
-
+/**
+ * 주어진 채팅방의 마지막 읽은 시간을 업데이트하고, 채팅 목록을 가져오는 함수
+ * @param {number|string} chatRoomId - 업데이트할 채팅방의 고유 식별자(ID)
+ * @param {number} activePage - 활성 채팅방 목록의 페이지 번호
+ * @param {number} inactivePage - 비활성 채팅방 목록의 페이지 번호
+ * @returns {Promise} - AJAX 요청의 Promise 객체 반환
+ */
 //모달창 열려있을 때 메세지가 오면 해당 메세지 읽은 시간 업데이트 후 리스트반환
 export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
     return fetch(`/chat/updateLastReadTimestamp/${chatRoomId}`, {
@@ -74,7 +73,7 @@ export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
             return loadChatList(activePage, inactivePage, 8, true);
         })
         .then(() => {
-            // console.log("Chat list and unread count updated successfully.");
+            console.log("Chat list and unread count updated successfully.");
         })
         .catch(error => {
             console.error('Error updating last read timestamp:', error);
@@ -92,29 +91,33 @@ export function updateLastReadTimestamp(chatRoomId, activePage, inactivePage) {
  * @returns {Promise} - AJAX 요청의 Promise 객체 반환
  */
 export function loadChatList(page1, page2, size, isUpdateUnreadCountOnly) {
-    activePage = page1;
-    inactivePage = page2;
-    $.ajax({
-        url: "/admin/getChatList",
-        data: {
-            activePage: activePage,
-            inactivePage: inactivePage,
-            size: size
-        },
-        type: "POST",
-        contentType: "application/x-www-form-urlencoded",
-        success: function (response) {
-            adminEmail = response.activeMemberEmail || response.inactiveMemberEmail;
-            if (isUpdateUnreadCountOnly) {
-                updateUnreadCount(response);
-            } else {
-                updateUnreadCount(response);
-                displayChatList(response);
+    return new Promise((resolve, reject) => {
+        activePage = page1;
+        inactivePage = page2;
+        $.ajax({
+            url: "/admin/getChatList",
+            data: {
+                activePage: activePage,
+                inactivePage: inactivePage,
+                size: size
+            },
+            type: "POST",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (response) {
+                adminEmail = response.activeMemberEmail || response.inactiveMemberEmail;
+                if (isUpdateUnreadCountOnly) {
+                    updateUnreadCount(response);
+                } else {
+                    updateUnreadCount(response);
+                    displayChatList(response);
+                }
+                resolve(response); // 성공 시 resolve 호출
+            },
+            error: function (error) {
+                console.log("Error: ", error);
+                reject(error); // 실패 시 reject 호출
             }
-        },
-        error: function (error) {
-            console.log("Error: ", error);
-        }
+        });
     });
 }
 
@@ -127,8 +130,6 @@ export function updateUnreadCount(response) {
     var totalUnreadCount = activeChatRoomList.reduce((sum, activeChatRoom) => sum + activeChatRoom.unreadMessageCount, 0);
     var $unreadCount = $('#unreadCount');
 
-    // console.log("activeChatRoomList" + activeChatRoomList)
-    // console.log("totalUnreadCount" + totalUnreadCount)
     // 안 읽은 메시지 수 업데이트
     $unreadCount.text(totalUnreadCount);
 
@@ -168,6 +169,12 @@ export function displayChatList(response) {
     updatePagination(response, 'inactive');
 }
 
+/**
+ * 채팅 방 목록을 화면에 표시하는 함수
+ * @param {Array} roomList - 채팅 방 객체들의 배열
+ * @param {JQuery} $container - 채팅 목록을 담을 컨테이너 jQuery 엘리먼트
+ * @param {string} noRoomsMessageId - 상담 문의가 없을 때 보여질 메시지의 ID
+ */
 // 채팅 방 목록을 화면에 표시하는 함수
 function displayRoomList(roomList, $container, noRoomsMessageId) {
 
@@ -177,7 +184,6 @@ function displayRoomList(roomList, $container, noRoomsMessageId) {
     } else {
         // 목록이 비어 있지 않으면 "상담문의가 없습니다" 메시지 숨기기
         $(noRoomsMessageId).hide();
-
 
         roomList.forEach(function (chatRoom) {
             var lastMessageContent = "";
@@ -212,67 +218,81 @@ function displayRoomList(roomList, $container, noRoomsMessageId) {
         });
     }
 }
+
+/**
+ * 서버 응답에 따라 페이징을 업데이트하는 함수
+ * @param {object} response - 서버에서 받은 응답 객체
+ * @param {string} type - 활성(active) 또는 비활성(inactive) 페이징 구분
+ */
 //페이징 기능
-    function updatePagination(response, type) {
-        var $pagination = $("#" + type + "-pagination");
-        $pagination.empty();
+function updatePagination(response, type) {
+    var $pagination = $("#" + type + "-pagination");
+    $pagination.empty();
 
-        var startPage = response[type + "StartPage"];
-        var endPage = response[type + "EndPage"];
+    var startPage = response[type + "StartPage"];
+    var endPage = response[type + "EndPage"];
 
-        var paginationHtml = '<div style="text-align: center;">';
-        for (var i = startPage; i <= endPage; i++) {
-            paginationHtml += '<a href="#" data-page="' + i + '" class="paging-btn" data-type="' + type + '">[' + i + ']</a>';
-        }
-        paginationHtml += '</div>';
-
-        $pagination.html(paginationHtml);
-
-        // 페이징 버튼 클릭 이벤트 처리
-        $pagination.find(".paging-btn").on("click", function (event) {
-            event.preventDefault();
-            var page = parseInt($(this).data("page"), 10);
-            var type = $(this).data("type");
-
-            // 전역 변수 업데이트
-            if (type === 'active') {
-                activePage = page;
-            } else {
-                inactivePage = page;
-            }
-
-            var socket = new SockJS('/ws');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-
-                var paging = {
-                    activePage: activePage,
-                    inactivePage: inactivePage
-                };
-
-                // 현재 페이지 정보를 서버에 전송
-                stompClient.send("/app/chat/updatePage", {}, JSON.stringify(paging));
-
-                // WebSocket 연결 해제
-                stompClient.disconnect(function () {
-                    console.log('웹소켓 연결 해제');
-                });
-
-                loadChatList(activePage, inactivePage, 8, false);
-            });
-        });
+    var paginationHtml = '<div style="text-align: center;">';
+    for (var i = startPage; i <= endPage; i++) {
+        paginationHtml += '<a href="#" data-page="' + i + '" class="paging-btn" data-type="' + type + '">[' + i + ']</a>';
     }
+    paginationHtml += '</div>';
+
+    $pagination.html(paginationHtml);
+
+    // 페이징 버튼 클릭 이벤트 처리
+    $pagination.find(".paging-btn").on("click", function (event) {
+        event.preventDefault();
+        var page = parseInt($(this).data("page"), 10);
+        var type = $(this).data("type");
+
+        // 전역 변수 업데이트
+        if (type === 'active') {
+            activePage = page;
+        } else {
+            inactivePage = page;
+        }
+
+        var socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+
+            var paging = {
+                activePage: activePage,
+                inactivePage: inactivePage
+            };
+
+            // 현재 페이지 정보를 서버에 전송
+            stompClient.send("/app/chat/updatePage", {}, JSON.stringify(paging));
+
+            // WebSocket 연결 해제
+            stompClient.disconnect(function () {
+            });
+
+            loadChatList(activePage, inactivePage, 8, false)
+                .then(response => {
+                    // 성공적으로 데이터를 받아온 경우 처리할 로직
+                    console.log('Chat list loaded successfully:', response);
+                    // 추가적으로 할 작업들...
+                })
+                .catch(error => {
+                    // 에러가 발생한 경우 처리할 로직
+                    console.error('Error loading chat list:', error);
+                });
+        });
+    });
+}
 
 // 전역 객체에 loadChatList 함수 추가
-    window.chatUtils = {
-        loadChatList: loadChatList,
-        updateLastReadTimestamp: updateLastReadTimestamp,
-        updateUnreadCount: updateUnreadCount,
-        get activePage() {
-            return activePage;
-        },
-        get inactivePage() {
-            return inactivePage;
-        }
-    };
+window.chatUtils = {
+    loadChatList: loadChatList,
+    updateLastReadTimestamp: updateLastReadTimestamp,
+    updateUnreadCount: updateUnreadCount,
+    get activePage() {
+        return activePage;
+    },
+    get inactivePage() {
+        return inactivePage;
+    }
+};
 
