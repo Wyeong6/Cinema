@@ -167,7 +167,7 @@ public class PaymentController {
             paymentDTO.setApplyNum(apply_num);
             paymentDTO.setBuyerEmail(buyer_email);
             paymentDTO.setPaymentType("CARD");
-            paymentDTO.setPaymentStatus(payment_status);
+            paymentDTO.setPaymentStatus("결제완료");
             paymentDTO.setProductIdx(product_idx);
             paymentDTO.setProductName(product_name);
             paymentDTO.setProductType(product_type);
@@ -243,14 +243,14 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/paymentFailed")
-    @ResponseBody
-    public Map<String, String> paymentFailed(@RequestBody Map<String, String> request) {
-        Map<String, String> response_failed = new HashMap<>();
-        response_failed.put("response_failed", "response_failed");
-
-        return response_failed;
-    }
+//    @PostMapping("/paymentFailed")
+//    @ResponseBody
+//    public Map<String, String> paymentFailed(@RequestBody Map<String, String> request) {
+//        Map<String, String> response_failed = new HashMap<>();
+//        response_failed.put("response_failed", "response_failed");
+//
+//        return response_failed;
+//    }
 
     // 주문 취소
     @GetMapping("/paymentCancel")

@@ -19,7 +19,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     long findByImpUid(String impUid);
 
     // 회원 등급
-    @Query("SELECT COUNT(p) FROM Payment p WHERE p.member.id = :memberId AND p.productType = 'MO' AND p.regDate >= :startDate AND p.regDate <= :endDate")
+    @Query("SELECT COUNT(p) FROM Payment p WHERE p.member.id = :memberId AND p.productType = 'MO' AND p.paymentStatus = '결제완료' AND p.regDate >= :startDate AND p.regDate <= :endDate")
     long countByMovieMembership(
             @Param("memberId") Long memberId,
             @Param("startDate") LocalDateTime startDate,
