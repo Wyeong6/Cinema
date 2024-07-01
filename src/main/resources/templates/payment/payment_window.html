@@ -3,7 +3,7 @@
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper" class="bg-black-wrapper">
@@ -215,9 +215,11 @@
                 }
             });
 
+            console.log("Selected Seats: ", JSON.stringify(selectedSeats)); // 좌석 정보 로그
+
             const scheduleId = $('#schedule-id').data('schedule-id');
-            const memberIdx = [[${memberInfo[1]}]];
-            const reservedBy = memberIdx; // member_id값
+            const reservedBy = [[${memberInfo[1]}]]; // member_id값
+            // const reservedBy = '${memberInfo[1]}'; // member_id값
 
             $.ajax({
                 type: 'POST',

@@ -889,15 +889,15 @@
             // 현재 리액션에 해당하는 버튼에 active 클래스 추가
             // active 클래스 활용해서 선택한버튼에만 css를 추가해 꾸밀수있음
             if (userCurrentReaction === 'LIKE') {
-                $('#likeButton').addClass('active');
+                $('#likeButton').addClass('reaction, active');
             } else if (userCurrentReaction === 'DISLIKE') {
-                $('#dislikeButton').addClass('active');
+                $('#dislikeButton').addClass('reaction, active');
             } else if (userCurrentReaction === 'SAD') {
-                $('#sadButton').addClass('active');
-            } else if (userCurrentReaction === 'FUNNY') {
-                $('#funnyButton').addClass('active');
+                $('#sadButton').addClass('reaction, active');
+            } else if (userCurrentReaction === 'reaction, active') {
+                $('#funnyButton').addClass('reaction, active');
             } else if (userCurrentReaction === 'SCARY') {
-                $('#scaryButton').addClass('active');
+                $('#scaryButton').addClass('reaction, active');
             }
         }
 

@@ -177,17 +177,18 @@
             });
 
             $(".movie-item").each(function() {
-                var itemMovieId = $(this).find("input[type='hidden']").val();
-                var movieId = $('.movieId').val();
+                const itemMovieId = $(this).find("input[type='hidden']").val();
+                const movieId = $('.movieId').val();
                 if (itemMovieId === movieId) {
                     $(this).addClass("clicked");
 
                     var offsetTop = $(this).offset().top;
                     var scrollTo = offsetTop - $(window).height() / 2;
 
+                    // 스크롤 애니메이션
                     $('#select-movie-group .scrollable-content').animate({
                         scrollTop: scrollTo
-                    }, 500);
+                    }, 500); // 애니메이션 속도 설정 (500ms)
                 }
             });
 
@@ -362,7 +363,6 @@
                         date: isoDate
                     },
                     success: function (data) {
-                        console.log("성공적으로 데이터를 받았습니다:", data);
                         renderSchedules(data);
                     },
                     error: function (xhr, status, error) {
@@ -386,7 +386,6 @@
                     // 앞에 0을 제거하고, 그대로 반환합니다.
                     return new Date().getFullYear() + '-' + parseInt(month, 10) + '-' + parseInt(day, 10);
                 } else {
-                    console.error('잘못된 날짜 형식:', dateString);
                     return null; // 또는 다른 적절한 에러 처리
                 }
             }
@@ -410,50 +409,45 @@
                     const startTime = schedule.startTime; // 시작 시간
                     const endTime = schedule.endTime;
                     const totalSeats = schedule.totalSeats;
+                    const sessionType = schedule.sessionType;
 
-                    let theaterNumberGroup = selectTimeGroup.find(`.theaterNumber-group[data-theater-number="${theaterNumber}"]`);
-                    if (theaterNumberGroup.length === 0) {
-                        theaterNumberGroup = $(`
-                <div class="theaterNumber-group" data-theater-number="${theaterNumber}">
-                    <h4>${theaterNumber}관</h4>
-                    <ul></ul>
-                </div>
-            `);
-                        selectTimeGroup.parent().removeClass('info-none');
-                        selectTimeGroup.removeClass('info-none');
-                        selectTimeGroup.append(theaterNumberGroup);
+                    if(schedule.status === true) {
+                        let theaterNumberGroup = selectTimeGroup.find(`.theaterNumber-group[data-theater-number="${theaterNumber}"]`);
+                        if (theaterNumberGroup.length === 0) {
+                            theaterNumberGroup = $(`
+                                <div class="theaterNumber-group" data-theater-number="${theaterNumber}">
+                                    <h4>${theaterNumber}관</h4>
+                                    <ul></ul>
+                                </div>
+                            `);
+                            selectTimeGroup.parent().removeClass('info-none');
+                            selectTimeGroup.removeClass('info-none');
+                            selectTimeGroup.append(theaterNumberGroup);
+                        }
+
+                        // 시간표 항목 생성
+                        const scheduleItem = $(`
+                                <li class="schedule-item">
+                                    <input type="hidden" class="schedule-id" value="${scheduleId}" />
+                                    <input type="hidden" class="schedule-status" value="${schedule.status}" />
+                                    <input type="hidden" class="schedule-sessionType" value="${schedule.sessionType}" />
+                                    <img src="/images/sun.png" alt="조조" style="display: none;"/>
+                                    <img src="/images/moon.png" alt="심야" style="display: none;"/>
+                                    <h5>${startTime}</h5>
+                                    <h6>${totalSeats}석</h6>
+                                    <input type="hidden" class="end-time" value="${endTime}" />
+                                </li>
+                            `);
+
+                        // startTime과 비교하여 이미지 표시
+                        if (sessionType == '조조') {
+                            scheduleItem.find('img[alt="조조"]').css('display', 'inline');
+                        } else if (sessionType == '심야') {
+                            scheduleItem.find('img[alt="심야"]').css('display', 'inline');
+                        }
+
+                        theaterNumberGroup.find("ul").append(scheduleItem);
                     }
-
-                    // startTime을 Date 객체로 변환
-                    const [startHour, startMinute] = startTime.split(':');
-                    const startDateTime = new Date();
-                    startDateTime.setHours(startHour, startMinute, 0, 0);
-
-                    const morning = new Date();
-                    morning.setHours(12, 0, 0, 0);
-                    const night = new Date();
-                    night.setHours(22, 0, 0, 0);
-
-                    // 시간표 항목 생성
-                    const scheduleItem = $(`
-                    <li class="schedule-item">
-                        <input type="hidden" class="schedule-id" value="${scheduleId}" />
-                        <img src="/images/sun.png" alt="조조" style="display: none;"/>
-                        <img src="/images/moon.png" alt="심야" style="display: none;"/>
-                        <h5>${startTime}</h5>
-                        <h6>${totalSeats}석</h6>
-                        <input type="hidden" class="end-time" value="${endTime}" />
-                    </li>
-                `);
-
-                    // startTime과 비교하여 이미지 표시
-                    if (startDateTime < morning) {
-                        scheduleItem.find('img[alt="조조"]').css('display', 'inline');
-                    } else if (startDateTime >= night) {
-                        scheduleItem.find('img[alt="심야"]').css('display', 'inline');
-                    }
-
-                    theaterNumberGroup.find("ul").append(scheduleItem);
                 });
             }
         });

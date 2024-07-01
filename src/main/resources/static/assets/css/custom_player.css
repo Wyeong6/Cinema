@@ -54,7 +54,7 @@
     justify-content: left !important;
 }
 /* 리액션 관련 css 시작 */
-.active {
+.reaction.active {
     width: 30px !important;
     height: 30px !important;
     filter: drop-shadow(0 0 1px #F2E7AE) drop-shadow(0 0 2px #F2E7AE) drop-shadow(0 0 3px #F2E7AE); /* 이미지 부분만 그림자 적용가능하게함 (필터로) */
