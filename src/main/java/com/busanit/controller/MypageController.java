@@ -54,7 +54,7 @@ public class MypageController {
         // 현재 로그인한 사용자의 이메일
         String userEmail = memberService.currentLoggedInEmail();
 
-        // 사용자의 등급 확인+저장 (수정예정 은 아니고 추가로 다른 곳에도 넣을 예정 - pay쪽에도 넣어야함)
+        // 사용자의 등급 확인+저장
         long userGrade = memberService.userGrade();
 
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
@@ -129,6 +129,14 @@ public class MypageController {
         return paymentService.getMoviePaymentInfo(memberRegFormDTO.getId(), pageable);
     }
 
+    @GetMapping("/reservation/detail")
+    public String mypageReservationDetail(@RequestParam String paymentId, Model model) {
+        PaymentDTO paymentDTO = paymentService.getMoviePaymentDetail(paymentId);
+        model.addAttribute("paymentInfo", paymentDTO);
+
+        return "/mypage/mypage_reservation_detail";
+    }
+
     @GetMapping("/order")
     public String mypageOrder(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         // 현재 로그인한 사용자의 이메일
@@ -152,7 +160,10 @@ public class MypageController {
     }
 
     @GetMapping("/order/detail")
-    public String mypageOrderDetail() {
+    public String mypageOrderDetail(@RequestParam String paymentId, Model model) {
+        PaymentDTO paymentDTO = paymentService.getSnackPaymentDetail(paymentId);
+        model.addAttribute("paymentInfo", paymentDTO);
+
         return "/mypage/mypage_order_detail";
     }
 

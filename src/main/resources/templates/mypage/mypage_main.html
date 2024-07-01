@@ -43,14 +43,14 @@
                         <img class="featured-img" alt="영화 포스터" th:src="@{'https://image.tmdb.org/t/p/w500/' + ${moviePaymentInfo.getContent().get(0).getMovie().getPosterPath()}}">
                         <div>
                             <p th:text="'예매번호 : ' + ${moviePaymentInfo.getContent().get(0).getMerchantUid()}">예매번호</p>
-                            <p>범죄도시 4</p>
+                            <p th:text="${moviePaymentInfo.getContent().get(0).getProductName()}">범죄도시 4</p>
                             <p><span class="history-data-date" th:text="${moviePaymentInfo.getContent().get(0).getContent1()}">상영일자</span> <span class="history-data-time" th:text="${moviePaymentInfo.getContent().get(0).getContent2()}">시간</span></p>
                             <p><span class="history-data-theater" th:text="${moviePaymentInfo.getContent().get(0).getContent3()}">상영관</span> <span class="history-data-seats" th:text="${moviePaymentInfo.getContent().get(0).getContent4()}">좌석</span></p>
                         </div>
                     </div>
                     <div class="button_box">
                         <button type="button" class="cancel_btn">예매취소</button>
-                        <button type="button" class="detail_btn">예매상세</button>
+                        <button type="button" class="detail_btn" id="movie_detail">예매상세</button>
                     </div>
                 </article>
                 <article th:if="${moviePaymentInfo == null or moviePaymentInfo.isEmpty()}">
@@ -89,7 +89,7 @@
                     </div>
                     <div class="button_box">
                         <button type="button" class="cancel_btn">주문취소</button>
-                        <button type="button" class="detail_btn">구매상세</button>
+                        <button type="button" class="detail_btn" id="snack_detail">구매상세</button>
                     </div>
                 </article>
                 <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
@@ -104,6 +104,9 @@
 
 <script th:inline="javascript">
     $(document).ready(function() {
+        const reservationIdx = [[${moviePaymentInfo.getContent().get(0).getId()}]];
+        const orderIdx = [[${snackPaymentInfo.getContent().get(0).getId()}]];
+
         $('#membership_btn').click(function(e) {
             $.ajax({
                 type: 'GET',
@@ -122,13 +125,17 @@
             $('#content').load('/mypage/reservation');
         });
 
+        $('#movie_detail').click(function() {
+            $('#content').load('/mypage/reservation/detail?paymentId='+reservationIdx);
+        });
+
         // 주문내역조회 버튼 클릭 이벤트 설정
         $('#AllOrderInfo').click(function() {
             $('#content').load('/mypage/order');
         });
 
-        $('.container').on('click', '.detail_btn', function() {
-            $('#content').load('/mypage/order/detail');
+        $('#snack_detail').click(function() {
+            $('#content').load('/mypage/order/detail?paymentId='+orderIdx);
         });
     });
 </script>

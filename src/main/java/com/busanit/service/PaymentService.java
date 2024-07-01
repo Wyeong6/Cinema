@@ -80,6 +80,20 @@ public class PaymentService {
         return PaymentDTO.toDTOSnackSlice(paymentSlice, snackService);
     }
 
+    // 영화 상세 보기
+    public PaymentDTO getMoviePaymentDetail(String paymentId) {
+        Payment payment = paymentRepository.findById(Long.valueOf(paymentId)).orElseThrow(() -> new NullPointerException("payment null"));
+
+        return PaymentDTO.toDTOMovie(payment, movieService);
+    }
+
+    // 스낵 상세 보기
+    public PaymentDTO getSnackPaymentDetail(String paymentId) {
+        Payment payment = paymentRepository.findById(Long.valueOf(paymentId)).orElseThrow(() -> new NullPointerException("payment null"));
+
+        return PaymentDTO.toDTOSnack(payment, snackService);
+    }
+
     // 결제 토큰 받기
     public String getImportToken() {
         String result = null;
