@@ -265,6 +265,8 @@
     </script>
     <script th:inline="javascript">
         $(document).ready(function() {
+
+
             if ($.fn.modal) {
                 console.log('Bootstrap modal is loaded');
             } else {
@@ -364,16 +366,15 @@
                 });
             }
 
-            changeBackgroundAndTitle(0);
-
             let currentIndex = 0;
             const totalMovies = moviePosters.length;
 
-            const intervalTime = 5000;
+            changeBackgroundAndTitle(currentIndex);
+
             setInterval(function() {
                 currentIndex = (currentIndex + 1) % totalMovies;
                 changeBackgroundAndTitle(currentIndex);
-            }, intervalTime);
+            }, 5000);
         });
 
         // 로그아웃시 session storage값 삭제

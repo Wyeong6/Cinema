@@ -336,7 +336,7 @@ input:-webkit-autofill:active {
     margin: 20px auto;
     height: 50px;
     cursor: pointer;
-    font-size: 1.3em;
+    font-size: 1.1em;
     font-family: 'Montserrat', sans-serif;
     vertical-align: middle;
     border-radius: 8px;
@@ -344,7 +344,7 @@ input:-webkit-autofill:active {
     line-height: 40px;
 
     &.google_btn {
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255);
         color: #1e2c3c;
         transition: .2s linear;
 
@@ -354,10 +354,11 @@ input:-webkit-autofill:active {
 
         img {
             position: absolute;
-            top: 30%;
+            top: 50%;
             left: 3%;
+            transform: translateY(-50%);
             vertical-align: middle;
-            width: 1em;
+            width: 1.5em;
         }
 
         &:hover {
@@ -366,20 +367,24 @@ input:-webkit-autofill:active {
     }
 
     &.naver_btn {
-        background: #c0c3c1;
-        color: white;
+        background: #03C75A;
+        color: #f6f8f9;
         transition: .2s linear;
 
         .fa {
             padding: 0 5px 0 0;
         }
 
-        .fa img {
+        img {
+            position: absolute;
+            top: 15%;
+            left: 3%;
             vertical-align: middle;
-            width: 20px;
+            width: 2em;
         }
 
         &:hover {
+            background: rgba(3, 199, 90, 0.9);
         }
     }
 }
@@ -472,7 +477,7 @@ footer {
     margin-bottom: 1em;
     border: none;
     cursor: pointer;
-    font-size: 1.3em;
+    font-size: 1.1em;
     font-family: 'Montserrat', sans-serif;
     transition: .2s linear;
 }
