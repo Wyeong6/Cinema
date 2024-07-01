@@ -111,7 +111,7 @@ public class AdminPageController {
     @PostMapping("/commentList")
     public String commentList(Model model,
                               @RequestParam(defaultValue = "0") int page) {
-        int pageSize = 5;
+        int pageSize = 10;
         List<CommentDTO> commentList = commentService.getCommentsWithPaging(page, pageSize);
         int totalPages = (int) Math.ceil(commentService.getTotalComments() / (double) pageSize);
 

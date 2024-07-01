@@ -1,6 +1,7 @@
 package com.busanit.service;
 
 import com.busanit.domain.movie.FavoriteMovieDTO;
+import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Member;
 import com.busanit.entity.movie.FavoriteMovie;
 import com.busanit.entity.movie.Movie;
@@ -8,6 +9,8 @@ import com.busanit.repository.FavoriteMovieRepository;
 import com.busanit.repository.MemberRepository;
 import com.busanit.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,4 +85,16 @@ public class FavoriteMovieService {
         return favoriteMovieDTO;
     }
 
+    public Page<MovieDTO> getFavoriteMovies(String userEmail, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<FavoriteMovie> favoriteMoviesPage = favoriteMovieRepository.findByMember_Email(userEmail, pageRequest);
+
+        // FavoriteMovie를 MovieDTO로 매핑하여 반환
+        return favoriteMoviesPage.map(favoriteMovie -> {
+            MovieDTO movieDTO = new MovieDTO();
+            movieDTO.setId(favoriteMovie.getMovie().getMovieId());
+            movieDTO.setTitle(favoriteMovie.getMovie().getTitle()); // 예시: 필요한 경우 영화의 다른 정보도 설정합니다.
+            return movieDTO;
+        });
+    }
 }

@@ -74,7 +74,6 @@ public class MovieService {
     // 상영작/상영예정작을 구분하기위한 로직중 개봉일자를 날짜타입에 맞추기위한 fomatter
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-
     @Scheduled(fixedRate = 43200000) // 12시간마다 데이터 갱신
     public void fetchAndStoreMovies() throws IOException {
         fetchAndStoreMoviesNowPlaying();
@@ -92,18 +91,18 @@ public class MovieService {
         lastFetchDate = LocalDate.now();
     }
 
-
     // 어드민페이지에서 영화를 삭제했을때 만약 API에서 주기적으로 받아와 서버에 저장하고있는 영화라면
-    //
     private List<Long> getBlacklistedMovieIds() {
         return movieBlacklistRepository.findAll()
                 .stream()
                 .map(MovieBlacklist::getMovieId)
                 .collect(Collectors.toList());
     }
+
     public List<Movie> getModifiedMovies() {
         return movieRepository.findByModifiedTrue();
     }
+
     // 수정된 영화인지 확인하는 메소드
     private boolean isModifiedMovie(Long movieId, List<Movie> modifiedMovies) {
         return modifiedMovies.stream()
@@ -131,8 +130,8 @@ public class MovieService {
 
         List<Long> blacklistedMovieIds = getBlacklistedMovieIds(); // 삭제된 영화 ID 목록 가져오기
         List<Movie> modifiedMovies = getModifiedMovies();
-
         int totalPages = fetchTotalPages();
+
         for (int page = 1; page <= totalPages; page++) {
             String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=" + page + "&api_key=" + apiKey + "&region=KR";
             Request request = new Request.Builder().url(url).build();
@@ -160,8 +159,10 @@ public class MovieService {
     }
 
     private int fetchTotalPages() throws IOException { // 토탈페이지를 뽑는 함수
+
         String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=" + apiKey + "&region=KR";
         Request request = new Request.Builder().url(url).build();
+
         try (Response response = client.newCall(request).execute()) {
             String responseBody = response.body().string();
             JsonNode jsonNode = objectMapper.readTree(responseBody);
@@ -173,8 +174,6 @@ public class MovieService {
     public String fetchMovieVideoKey(int movieId) throws IOException {
         // TMDB API URL을 포맷팅하여 생성합니다. 영화 ID와 API 키를 사용
         String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=ko-KR&api_key=%s", movieId, apiKey);
-
-        System.out.println("String.format key === " + url);
         // 요청을 생성
         Request request = new Request.Builder().url(url).build();
 
@@ -192,7 +191,6 @@ public class MovieService {
                 String videoKey = firstVideo.path("key").asText("");
                 // 키 값이 비어있지 않은 경우, 출력하고 반환합니다.
                 if (!videoKey.isEmpty()) {
-                    System.out.println("Saving video key to database: " + videoKey);
                     return videoKey;
                 }
             }
@@ -209,18 +207,14 @@ public class MovieService {
         if (results.isArray()) {
             for (JsonNode node : results) {
                 Long movieId = node.get("id").asLong();
-                System.out.println("현재 movieId: " + movieId);
 
                 if (isModifiedMovie(movieId, modifiedMovies)) {
-                    System.out.println("수정된 영화입니다. 덮어씌우지 않습니다.");
                     continue;
                 }
-
                 if (blacklistedMovieIds.contains(movieId)) {
                     continue;
                 }
 
-                System.out.println("movieId 체크 === " + movieId);
                 processMovieData(node);
             }
         }
@@ -253,7 +247,6 @@ public class MovieService {
         movieRepository.save(movie);
         // 영화 이미지 정보 처리
         processImageData(node, movie);
-
     }
 
     // Movie 객체를 MovieDTO 정보로 업데이트
@@ -301,7 +294,6 @@ public class MovieService {
         }
     }
 
-
     public void fetchAndStoreMovieRuntimeAndReleaseData() throws IOException {
         List<Long> movieIds = getAllMovieIds();
         for (Long movieId : movieIds) {
@@ -314,22 +306,16 @@ public class MovieService {
         }
     }
 
-
     public void processRuntimeAndReleaseDataResponse(String responseBody) throws IOException {
 
         MovieDetailDTO movieDetailDTO = objectMapper.readValue(responseBody, MovieDetailDTO.class);
-        System.out.println("responseBody = " + responseBody);
-        System.out.println("movieDetailDTO===" + movieDetailDTO);
-        System.out.println("널체크 == " + movieRepository.findById(movieDetailDTO.getId()));
-
         Movie movie = movieRepository.findById(movieDetailDTO.getId()).orElse(new Movie());
+
         MovieDetail movieDetail = getOrCreateMovieDetail(movie);
         movieDetail.setReleaseDate(movieDetailDTO.getRelease_date());
         movieDetail.setRuntime(movieDetailDTO.getRuntime());
         movieDetailRepository.save(movieDetail);
     }
-
-//   체크용 링크 https://api.themoviedb.org/3/movie/653346?language=ko-KR&api_key=547e2cd4d0e26e68fb907dafef4f90ac
 
     public void fetchAndStoreMovieStillCuts() throws IOException {
 
@@ -382,7 +368,6 @@ public class MovieService {
     private void processImageData(JsonNode node, Movie movie) {
         Optional<Movie> optionalMovie = movieRepository.findById(movie.getMovieId());
         if (!optionalMovie.isPresent()) {
-            System.out.println("해당 ID의 영화가 존재하지 않습니다.");
             return;
         }
         Movie existingMovie = optionalMovie.get();
@@ -449,10 +434,12 @@ public class MovieService {
     private boolean isKoreanName(String name) {
         return name.matches(".*[가-힣].*");
     }
+
     private boolean isActorExists(String name) {
         // 배우 이름으로 데이터베이스에서 검색하여 존재 여부 확인
         return movieActorRepository.existsByActorName(name);
     }
+
     private static String getGender(int genderCode) {
         switch (genderCode) {
             case 1:
@@ -489,7 +476,7 @@ public class MovieService {
         if (certification != null) {
             Movie movie = movieRepository.findById(movieId).orElse(new Movie());
             MovieDetail movieDetail = getOrCreateMovieDetail(movie);
-            movieDetail.setCertification(certification); // MovieDetail에 certification 세팅
+            movieDetail.setCertification(certification);
             movieDetailRepository.save(movieDetail);
         }
     }
@@ -507,7 +494,6 @@ public class MovieService {
         Page<Movie> movieList = movieRepository.findAll(pageable);
         return movieList.map(MovieDTO::convertToDTO);
     }
-
 
     // 상영중 영화 목록 더보기 화면 페이징 및 정렬
     public Page<MovieDTO> getMoviesPagingAndSorting(int page, int size, boolean isUpcoming) {
@@ -544,10 +530,10 @@ public class MovieService {
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
-    //인기순 영화 중 영상있는 것
+    //인기순 영화 중 영상이 존재하고 배경포스터가 존재하는것들
     public List<MovieDTO> getVideoMovies() {
         Pageable topFive = PageRequest.of(0, 5);
-        List<Movie> movieList = movieRepository.findByVideoTrueOrderByPopularityDesc(topFive);
+        List<Movie> movieList = movieRepository.findByVideoTrueAndBackdropPathNotNullOrderByPopularityDesc(topFive);
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -557,7 +543,6 @@ public class MovieService {
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
-
     public List<MovieDTO> getActors() {
         List<MovieActor> movieActors = movieActorRepository.findAll();
         return movieActors.stream().map(MovieDTO::convertActorToDTO)
@@ -621,8 +606,6 @@ public class MovieService {
         return movieList;
     }
 
-
-
     public long getTotalMovies() {
         // 전체 영화 개수 조회
         return movieRepository.count();
@@ -659,10 +642,10 @@ public class MovieService {
 
         movieDetail.setCertification(certifications);
         movieDetail.setReleaseDate(movieReleaseDate);
-        System.out.println("video 체크 === " + video);
         if (video != null && !video.isEmpty()) {
             movieDetail.setVideo(video);
         } else {
+            // 일부러 비워뒀습니다 수정하지마세요 (비워둬야 작동합니다)
         }
 
         movieDetail.setRuntime(runtime);
@@ -717,7 +700,9 @@ public class MovieService {
         if(registeredPoster != null && registeredBackdrop != null) {
             movieImage.setPosterPath(registeredPoster);
             movieImage.setBackdropPath(registeredBackdrop);
-        } else {}
+        } else {
+            // 일부러 비워뒀습니다 수정하지마세요 (비워둬야 작동합니다)
+        }
 
         if (registeredPoster != null && registeredBackdrop != null) {
             movieImageRepository.save(movieImage);
@@ -741,7 +726,6 @@ public class MovieService {
     public List<String> saveStillCutImages(List<MultipartFile> registeredStillCut, String uploadDirectory, String stillCutRelativeUploadDir) throws IOException {
 
         if (registeredStillCut == null) {
-            System.out.println("registeredStillCut is null. Exiting method.");
             return null;
         }
 
