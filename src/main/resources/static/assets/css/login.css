@@ -1,3 +1,7 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,400italic,600");
+@import url("fontawesome-all.min.css");
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
 @font-face {
     font-family: 'MyCustomFont';
     src: url('font/canela-text-trial/Canela-Black-Trial.otf') format('opentype');
