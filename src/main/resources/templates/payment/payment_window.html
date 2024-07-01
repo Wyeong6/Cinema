@@ -120,7 +120,7 @@
         const content1 = [[${scheduleDTO.date}]]; // 상영일자
         const content2 = [[${scheduleDTO.startTime}]]; // 시간
         const content3 = [[${scheduleDTO.theaterName}]]; // 상영관
-        const content4 = [[${scheduleDTO.theaterNumber}]]; // 좌석
+        let content4 = null; // 좌석
         let productCount = null;
         let currentPrice = null;
         const orderName = document.getElementById("movieTitle").textContent; // 결제시 사용할 이름(제품명)
@@ -163,6 +163,12 @@
                     .addClass('seat-info');
                 $('#selected-seats').append(seatDiv);
             });
+
+            let content4Array = [];
+            $('#selected-seats .seat-info').each(function() {
+                content4Array.push($(this).text());
+            });
+            content4 = [[${scheduleDTO.theaterNumber}]] + "관 " + content4Array.join(' ');
 
             const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
             $('#total-amount').text(totalAmount + '원');

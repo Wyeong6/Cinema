@@ -13,12 +13,12 @@ public interface PointRepository extends JpaRepository<Point, Long> {
 
     Slice<Point> findByMember_Id(Long member_id, Pageable pageable);
 
-    @Query("SELECT COUNT(p) FROM Point p WHERE p.member.id = :memberId AND p.contentType = true AND p.regDate >= :startDate AND p.regDate <= :endDate")
-    long countByMovieMembership(
-            @Param("memberId") Long memberId,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
-    );
+//    @Query("SELECT COUNT(p) FROM Point p WHERE p.member.id = :memberId AND p.contentType = true AND p.regDate >= :startDate AND p.regDate <= :endDate")
+//    long countByMovieMembership(
+//            @Param("memberId") Long memberId,
+//            @Param("startDate") LocalDateTime startDate,
+//            @Param("endDate") LocalDateTime endDate
+//    );
 
 //    // 결제시 사용 가능 포인트
 //    @Query("SELECT p.currentPoints FROM Point p WHERE p.member.id = :memberId")

@@ -34,6 +34,7 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final PointService pointService;
+    private final PaymentService paymentService;
     private final JavaMailSender mailSender;
 
     public void saveMember(Member member) {
@@ -190,7 +191,7 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
 
     // 현재 로그인한 사용자의 등급 확인(+저장)
     public long userGrade() {
-        long userGradeCount = pointService.getPointMovieCount(findUserIdx(currentLoggedInEmail()));
+        long userGradeCount = paymentService.getMovieCount(findUserIdx(currentLoggedInEmail()));
         long userGrade;
         if(userGradeCount >= 10) {
             userGrade = 1;

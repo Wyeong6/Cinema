@@ -7,9 +7,18 @@ import com.busanit.entity.Point;
 import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +29,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpClient;
 import java.util.*;
 
 @Controller
@@ -88,6 +98,18 @@ public class PaymentController {
         model.addAttribute("totalAmount", totalAmount);
 
         return "payment/payment_window"; // 뷰 이름 리턴
+    }
+
+    // 스낵 cart
+    @GetMapping("/cartList")
+    public String cartList(Model model, @PageableDefault(size = 6) Pageable pageable) {
+
+        // 스낵 추천 리스트(랜덤)
+        Page<SnackDTO> snackDTOList = null;
+        snackDTOList = snackService.getSnackListRandom(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        return "payment/cart_list";
     }
 
     @PostMapping("/request")
@@ -230,15 +252,28 @@ public class PaymentController {
         return response_failed;
     }
 
-    // 스낵 cart
-    @GetMapping("/cartList")
-    public String cartList(Model model, @PageableDefault(size = 6) Pageable pageable) {
+    // 주문 취소
+    @GetMapping("/paymentCancel")
+    public String paymentCancel(@RequestParam String merchant_uid) {
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
+        post.setHeader("Authorization", paymentService.getImportToken());
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("merchant_uid", merchant_uid));
 
-        // 스낵 추천 리스트(랜덤)
-        Page<SnackDTO> snackDTOList = null;
-        snackDTOList = snackService.getSnackListRandom(pageable);
-        model.addAttribute("snackList", snackDTOList);
-
-        return "payment/cart_list";
+        String asd = "";
+        try {
+            post.setEntity(new UrlEncodedFormEntity(params));
+            HttpResponse res = client.execute(post);
+            ObjectMapper mapper = new ObjectMapper();
+            String body = EntityUtils.toString(res.getEntity());
+            JsonNode rootNode = mapper.readTree(body); asd = rootNode.get("response").asText();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } if (asd.equals("null")) {
+            System.err.println("환불실패"); return "payment/cart_list";
+        } else {
+            System.err.println("환불성공"+asd); return "payment/cart_list";
+        }
     }
 }
