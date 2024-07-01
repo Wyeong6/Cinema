@@ -153,6 +153,13 @@ public class MovieController {
         return "movie/movie_search";
     }
 
+    @GetMapping("/listSearch")
+    public String listSearchMovies(@RequestParam("query") String query, Model model) {
+        List<MovieDTO> searchResults = movieService2.searchMovies(query);
+        model.addAttribute("searchResults", searchResults);
+        return "admin/admin_movie_list_search_result";
+    }
+
     // 영화 등록 (어드민페이지에서)
     @PostMapping("/movies/regist")
     public ResponseEntity<String> registMovie(

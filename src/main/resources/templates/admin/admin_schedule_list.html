@@ -1,5 +1,4 @@
 <!-- Navbar -->
-
 <nav
         class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
         id="layout-navbar" style="margin-bottom: 10px;"
@@ -21,10 +20,7 @@
         <!-- /Search -->
     </div>
 </nav>
-
 <!-- / Navbar -->
-
-<!-- Content -->
 
 <!-- Hoverable Table rows -->
 <div class="card">
@@ -49,7 +45,7 @@
             <tbody class="table-border-bottom-0">
             <!-- theaterDTOList가 비어 있거나 null인 경우 -->
             <tr th:if="${scheduleDTOList == null || scheduleDTOList.isEmpty()}">
-                <td colspan="10" style="text-align: center">등록된 상영관이 없습니다.</td>
+                <td colspan="10" style="text-align: center">등록된 상영 스케줄이 없습니다.</td>
             </tr>
             <!-- theaterDTOList에 요소가 있는 경우 -->
             <tr th:each="schedule: ${scheduleDTOList}" th:if="${not #lists.isEmpty(scheduleDTOList)}">
@@ -63,7 +59,7 @@
                 <td id="running-time"></td>
                 <td th:text="${schedule.sessionType}"></td>
                 <td th:text="${schedule.totalSeats}"></td>
-                <td th:text="${schedule.unavailableSeats}"></td>
+                <td th:text="${schedule.availableSeats}"></td>
                 <td>
                     <span th:if="${schedule.status}">예매 가능</span>
                     <span th:unless="${schedule.status}">마감</span>

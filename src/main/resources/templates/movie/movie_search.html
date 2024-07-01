@@ -3,6 +3,29 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cinemacast</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="/assets/css/main.css"/>
+    <link rel="stylesheet" href="/assets/css/custom.css"/>
+    <link rel="stylesheet" href="/assets/css/nav.css"/>
+    <noscript>
+        <link rel="stylesheet" href="/assets/css/noscript.css"/>
+    </noscript>
+    <style>
+        .pagination{
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .row {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
@@ -14,7 +37,12 @@
                     </header>
                 </article>
                 <hr/>
-                <div class="row">
+
+                <div class="row" th:if="${searchResults.empty}">
+                    <p class="no-results-message">검색 결과가 없습니다.</p>
+                </div>
+
+                <div class="row" th:unless="${searchResults.empty}">
                     <article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${searchResults}">
                         <a th:href="@{'/movies/' + ${movie.id}}" class="image featured"><img class="featured-img fixed-height-image"
                                 th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/></a>

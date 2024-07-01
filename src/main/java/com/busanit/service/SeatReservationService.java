@@ -41,4 +41,14 @@ public class SeatReservationService {
         SeatReservation seatReservation = new SeatReservation(schedule, seat, reservedBy);
         seatReservationRepository.save(seatReservation);
     }
+
+    public void updateAvailableSeats(Long scheduleId, List<Seat> selectedSeats) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found for id: " + scheduleId));
+
+        int seatsReserved = selectedSeats.size();
+        schedule.decreaseAvailableSeats(seatsReserved);
+
+        scheduleRepository.save(schedule);
+    }
 }

@@ -1,19 +1,23 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>공지사항 등록</title>
-    <!-- 필요한 CSS 파일 및 기타 헤더 내용 -->
-</head>
-<body>
-<h4 class="fw-bold py-3 mb-4">공지사항 등록</h4>
+<nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar" style="margin-bottom: 10px;">
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <h4>공지사항 등록하기</h4>
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+<!-- / Navbar -->
 <!-- Basic Layout -->
 
 <div class="row">
     <div class="col-xl">
         <div class="card mb-4">
             <div class="card-body">
-                <form action="/admin/noticeRegister" method="post">
+                <form id="noticeForm">
                     <div class="mb-3">
                         <label class="form-label" for="noticeTitle">공지사항 제목</label>
                         <input class="form-control" id="noticeTitle" name="noticeTitle" placeholder="공지사항 제목을 입력해주세요."
@@ -31,5 +35,24 @@
     </div>
 </div>
 
-</body>
-</html>
+<script>
+    $(document).ready(function() {
+        $('#noticeForm').on('submit', function(event) {
+            event.preventDefault(); // 기본 폼 제출을 막음
+
+            $.ajax({
+                url: '/admin/noticeRegister',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    // 성공 시 컨테이너에 공지사항 목록 로드
+                    $('.container-xxl').load('/admin/noticeList');
+                },
+                error: function() {
+                    // 에러 처리
+                    alert('폼 제출 중 오류가 발생했습니다.');
+                }
+            });
+        });
+    });
+</script>

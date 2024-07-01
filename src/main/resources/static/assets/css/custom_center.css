@@ -27,9 +27,64 @@
     margin-left: 0;
     margin-bottom: 1em;
 }
+.info {
+    margin: 0;
+    padding: 0 2.5em 3em 3.5em;
+}
+.info h5 {
+    margin: 0.5em 0 0;
+}
+.info p {
+    margin: 0;
+}
+.info p img {
+    width: 0.8em;
+    height: auto;
+    margin-right: 0.5em;
+}
+.info button {
+    margin-top: 4em;
+    padding: 0.5em 1em;
+    background: #f4f4f4;
+    color: #1e2c3c;
+    font-size: 0.7em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.info button img {
+    width: 0.8em;
+    height: auto;
+    margin-right: 0.5em;
+}
 #home_get .row p {
     padding: 0 4.5em;
     font-size: 20px;
+}
+/* 1:1 채팅 */
+#categoryButtons {
+    margin-bottom: 3em;
+}
+.category-btn {
+    font-size: 0.7em;
+    padding: 0.5em 1em;
+    border-radius: 10px;
+}
+.input-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.input-div input {
+    width: 90%;
+    padding: 0.1em 0 0.1em 0.5em;
+    font-size: 0.9em;
+}
+.input-div button {
+    width:8%;
+    font-size: 0.7em;
+    padding: 0.8em 1em;
 }
 /* 이메일 보내기 contact */
 #contact header {

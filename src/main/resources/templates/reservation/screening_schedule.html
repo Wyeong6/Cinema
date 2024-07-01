@@ -2,7 +2,7 @@
 <html lang="en" layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
-<body class="left-sidebar is-preload bg-black-wrapper">
+<body class="left-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper" class="bg-black-wrapper">
 
@@ -11,7 +11,9 @@
             <div class="container">
                 <article id="main" class="special">
                     <div class="row table-div">
-                        <table id="schedule-table" class="default">
+                        <input type="hidden" th:value="${userAge}" class="user-age"/>
+                        <input type="hidden" th:value="${movieId}" class="movieId"/>
+                        <table id="schedule-table">
                             <thead>
                             <tr>
                                 <th id="select-theater-th" colspan="2">영화관 선택</th>
@@ -50,28 +52,30 @@
                                             </li>
                                             <li class="region-btn">
                                                 <a>광주 / 전라</a>
-                                                <input type="hidden" value="Gwa" class="region-value" />
+                                                <input type="hidden" value="Gwa" class="region-value"/>
                                             </li>
                                             <li class="region-btn">
                                                 <a>제주</a>
-                                                <input type="hidden" value="Jeju" class="region-value" />
+                                                <input type="hidden" value="Jeju" class="region-value"/>
                                             </li>
                                         </ul>
                                     </div>
                                 </td>
                                 <td id="theater-list">
                                     <div class="scrollable-content" style="padding: 0">
-                                        <table>
-                                            <tbody></tbody>
-                                        </table>
+                                        <ul>
+                                            <li class="info-text">지역을 선택해주세요.</li>
+                                        </ul>
                                     </div>
                                 </td>
                                 <td id="select-movie-group">
                                     <div class="scrollable-content">
                                         <ul>
                                             <li class="movie-item" th:each="movie : ${movies}">
-                                                <input type="hidden" th:value="${movie.id}" th:data-poster="${movie.posterPath}" />
-                                                <img src="" alt="관람가 연령" class="certification-img" th:data-certification="${movie.certifications}" />
+                                                <input type="hidden" th:value="${movie.id}"
+                                                       th:data-poster="${movie.posterPath}"/>
+                                                <img src="" alt="관람가 연령" class="certification-img"
+                                                     th:data-certification="${movie.certifications}"/>
                                                 <p th:text="${movie.title}"></p>
                                             </li>
                                         </ul>
@@ -83,7 +87,9 @@
                                         </ul>
                                     </div>
                                     <div id="select-time-group">
-                                        <div class="scrollable-content"></div>
+                                        <div class="scrollable-content">
+                                            <p class="info-text">지점, 영화, 날짜를 선택해주세요.</p>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -99,9 +105,9 @@
     <!-- 스크립트 -->
     <script src="/assets/js/jquery.min.js"></script>
 
-    <script>
-        $(document).ready(function(){
-            $(".region-btn").click(function(event){
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $(".region-btn").click(function (event) {
                 event.preventDefault();
                 $(".region-btn.clicked").removeClass("clicked");
                 $(this).addClass('clicked');
@@ -112,16 +118,14 @@
                     data: {
                         region: regionValue
                     },
-                    success: function(data) {
-                        const $tbody = $("#theater-list tbody");
-                        $tbody.empty();
-                        if(data.length > 0) {
-                            $.each(data, function(index, theater) {
-                                const $tr = $("<tr class='theater-row'></tr>");
-                                const $td = $("<td></td>").text(theater.theaterName);
-                                $td.addClass('theater-name');
-                                $tr.append($td);
-                                $tbody.append($tr);
+                    success: function (data) {
+                        const $ul = $("#theater-list ul");
+                        $ul.empty();
+                        if (data.length > 0) {
+                            $.each(data, function (index, theater) {
+                                const $li = $("<li></li>").text(theater.theaterName);
+                                $li.addClass('theater-name');
+                                $ul.append($li);
                             });
 
                             $('.theater-name').on('click', function (event) {
@@ -133,19 +137,18 @@
                                 sendAjaxRequest();
                             });
                         } else {
-                            const $tr = $("<tr class='theater-row'></tr>");
-                            const $td = $("<td></td>").text("해당 지역에 영화관이 없습니다.");
-                            $tr.append($td);
-                            $tbody.append($tr);
+                            const $li = $("<li></li>").text("해당 지역에 영화관이 없습니다.");
+                            $li.addClass('info-text');
+                            $ul.append($li);
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error("AJAX 요청 실패:", error);
                     }
                 });
             });
 
-            $('.certification-img').each(function() {
+            $('.certification-img').each(function () {
                 let certification = $(this).data('certification'); // 관람 등급 데이터 가져오기
 
                 switch (certification) {
@@ -173,12 +176,28 @@
                 sendAjaxRequest();
             });
 
+            $(".movie-item").each(function() {
+                const itemMovieId = $(this).find("input[type='hidden']").val();
+                const movieId = $('.movieId').val();
+                if (itemMovieId === movieId) {
+                    $(this).addClass("clicked");
+
+                    var offsetTop = $(this).offset().top;
+                    var scrollTo = offsetTop - $(window).height() / 2;
+
+                    // 스크롤 애니메이션
+                    $('#select-movie-group .scrollable-content').animate({
+                        scrollTop: scrollTo
+                    }, 500); // 애니메이션 속도 설정 (500ms)
+                }
+            });
+
             const dateGroup = $('#select-date-group ul');
 
             const today = new Date();
             const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < 8; i++) {
                 const date = new Date(today);
                 date.setDate(today.getDate() + i);
 
@@ -204,7 +223,7 @@
                 sendAjaxRequest();
             });
 
-            $('#select-time-group').on('click', '.schedule-item', function(e) {
+            $('#select-time-group').on('click', '.schedule-item', function (e) {
                 e.preventDefault();
                 $('.schedule-item').removeClass('clicked');
                 $(this).addClass('clicked');
@@ -213,10 +232,36 @@
                 const h5 = $(".date-btn.clicked h5").text();
                 const date = formatDateToISO(h5);
                 const scheduleId = $(".schedule-item.clicked input.schedule-id").val();
-                const startTime = $(".schedule-item.clicked h5").text();
-                const endTime = $(".schedule-item.clicked input.end-time").val();
-                const totalSeats = $(".schedule-item.clicked h6").text();
-                console.log(date, scheduleId, startTime, endTime, totalSeats);
+                let startTime = $(".schedule-item.clicked h5").text();
+                let endTime = $(".schedule-item.clicked input.end-time").val();
+                let totalSeats = $(".schedule-item.clicked h6").text();
+                let userAgeStr = $('.user-age').val();
+
+                let year = parseInt(userAgeStr.substr(0, 2), 10);
+                let month = parseInt(userAgeStr.substr(2, 2), 10);
+                let day = parseInt(userAgeStr.substr(4, 2), 10);
+                let startHour = parseInt(startTime.substr(0, 2), 10);
+                let startMinute = parseInt(startTime.substr(3, 2), 10);
+
+                let currentDate = new Date();
+                let birthYear = null;
+                if(year > 24) {
+                    birthYear = 1900 + year; // 1900년대를 기준으로 연도 계산
+                } else {
+                    birthYear = 2000 + year;
+                }
+                let birthDate = new Date(birthYear, month - 1, day);
+
+                // 만 나이 계산
+                let age = currentDate.getFullYear() - birthDate.getFullYear();
+
+                let currentMonth = currentDate.getMonth() + 1;
+                let currentDay = currentDate.getDate();
+
+                // 생일이 지났는지 체크하여 만 나이 조정
+                if (currentMonth < month || (currentMonth === month && currentDay < day)) {
+                    age--;
+                }
 
                 const certification = $(".movie-item.clicked .certification-img").data('certification');
                 let imageUrl, certificationTitle, certificationInfo;
@@ -250,7 +295,7 @@
                     default:
                         imageUrl = '/images/ratings/all.svg';
                         certificationTitle = '전체 관람가';
-                        certificationInfo =`이 영화는 모든 연령이 관람할 수 있는 <br>
+                        certificationInfo = `이 영화는 모든 연령이 관람할 수 있는 <br>
                                             전체 관람가 등급입니다.<br>
                                             가족 모두가 즐길 수 있는 안전한 콘텐츠를 담고 있습니다.`;
                 }
@@ -267,19 +312,39 @@
                     confirmButtonText: "인원/좌석 선택",
                     cancelButtonText: "취소"
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: certificationTitle,
-                            html: certificationInfo,
-                            imageUrl: imageUrl,
-                            imageWidth: 100,
-                            imageAlt: "연령고지 이미지"
-                        }).then((innerResult) => {
-                            if (innerResult.isConfirmed) {
-                                window.location.href = `/reservation/seatSelection/${scheduleId}`;
+                    Swal.fire({
+                        title: certificationTitle,
+                        html: certificationInfo,
+                        imageUrl: imageUrl,
+                        imageWidth: 100,
+                        imageAlt: "연령고지 이미지"
+                    }).then((innerResult) => {
+                        if (innerResult.isConfirmed) {
+                            if (result.isConfirmed) {
+                                if (age < 19 && certificationTitle === '18세 이상 관람가') {
+                                    Swal.fire({
+                                        position: "center",
+                                        icon: "error",
+                                        html: "죄송하지만, 본 영화는 19세 미만 회원님들에게는<br /> 관람이 제한됩니다.",
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                } else if (age < 19 && (startHour >= 22 || (startHour === 22 && startMinute >= 0))) {
+                                    Swal.fire({
+                                        position: "center",
+                                        icon: "error",
+                                        html: "죄송하지만, 본 영화는 22:00 이후에 시작되어<br /> 19세 미만 회원님들에게는 관람이 제한됩니다.",
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                } else {
+                                    window.location.href = `/reservation/seatSelection/${scheduleId}`;
+                                }
+                            } else if (result.isDismissed) {
+                                $('.schedule-item').removeClass('clicked');
                             }
-                        });
-                    }
+                        }
+                    });
                 });
             });
 
@@ -288,7 +353,6 @@
                 const movieId = $(".movie-item.clicked input[type='hidden']").val();
                 const date = $(".date-btn.clicked h5").text();
                 const isoDate = formatDateToISOJson(date);
-                console.log("AJAX 요청 매개변수:", theaterName, movieId, isoDate);
 
                 $.ajax({
                     type: "GET",
@@ -298,11 +362,10 @@
                         movieId: movieId,
                         date: isoDate
                     },
-                    success: function(data) {
-                        console.log("성공적으로 데이터를 받았습니다:", data);
+                    success: function (data) {
                         renderSchedules(data);
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error("AJAX 요청 실패:", error);
                     }
                 });
@@ -313,7 +376,6 @@
                 if (month && day) {
                     return new Date().getFullYear() + '-' + month.padStart(2, '0') + '-' + day.padStart(2, '0');
                 } else {
-                    console.error('Invalid date format:', dateString);
                     return null; // 또는 다른 적절한 에러 처리
                 }
             }
@@ -324,16 +386,22 @@
                     // 앞에 0을 제거하고, 그대로 반환합니다.
                     return new Date().getFullYear() + '-' + parseInt(month, 10) + '-' + parseInt(day, 10);
                 } else {
-                    console.error('잘못된 날짜 형식:', dateString);
                     return null; // 또는 다른 적절한 에러 처리
                 }
             }
 
             function renderSchedules(schedules) {
-                console.log("Rendering schedules with data:", schedules);
                 const selectTimeGroup = $("#select-time-group .scrollable-content");
 
                 selectTimeGroup.empty();
+
+                if (schedules.length === 0) {
+                    const p = $(`<p class="info-text">조회가능한 상영시간이 없습니다.</p><p class="info-text">조건을 변경해주세요.</p>`)
+
+                    selectTimeGroup.parent().addClass('info-none');
+                    selectTimeGroup.addClass('info-none');
+                    selectTimeGroup.append(p);
+                }
 
                 schedules.forEach(schedule => {
                     const theaterNumber = schedule.theaterNumber; // 극장 번호
@@ -341,49 +409,45 @@
                     const startTime = schedule.startTime; // 시작 시간
                     const endTime = schedule.endTime;
                     const totalSeats = schedule.totalSeats;
-                    console.log("시간표 항목:", startTime, endTime, totalSeats);
+                    const sessionType = schedule.sessionType;
 
-                    let theaterNumberGroup = selectTimeGroup.find(`.theaterNumber-group[data-theater-number="${theaterNumber}"]`);
-                    if (theaterNumberGroup.length === 0) {
-                        theaterNumberGroup = $(`
-                <div class="theaterNumber-group" data-theater-number="${theaterNumber}">
-                    <h4>${theaterNumber}관</h4>
-                    <ul></ul>
-                </div>
-            `);
-                        selectTimeGroup.append(theaterNumberGroup);
+                    if(schedule.status === true) {
+                        let theaterNumberGroup = selectTimeGroup.find(`.theaterNumber-group[data-theater-number="${theaterNumber}"]`);
+                        if (theaterNumberGroup.length === 0) {
+                            theaterNumberGroup = $(`
+                                <div class="theaterNumber-group" data-theater-number="${theaterNumber}">
+                                    <h4>${theaterNumber}관</h4>
+                                    <ul></ul>
+                                </div>
+                            `);
+                            selectTimeGroup.parent().removeClass('info-none');
+                            selectTimeGroup.removeClass('info-none');
+                            selectTimeGroup.append(theaterNumberGroup);
+                        }
+
+                        // 시간표 항목 생성
+                        const scheduleItem = $(`
+                                <li class="schedule-item">
+                                    <input type="hidden" class="schedule-id" value="${scheduleId}" />
+                                    <input type="hidden" class="schedule-status" value="${schedule.status}" />
+                                    <input type="hidden" class="schedule-sessionType" value="${schedule.sessionType}" />
+                                    <img src="/images/sun.png" alt="조조" style="display: none;"/>
+                                    <img src="/images/moon.png" alt="심야" style="display: none;"/>
+                                    <h5>${startTime}</h5>
+                                    <h6>${totalSeats}석</h6>
+                                    <input type="hidden" class="end-time" value="${endTime}" />
+                                </li>
+                            `);
+
+                        // startTime과 비교하여 이미지 표시
+                        if (sessionType == '조조') {
+                            scheduleItem.find('img[alt="조조"]').css('display', 'inline');
+                        } else if (sessionType == '심야') {
+                            scheduleItem.find('img[alt="심야"]').css('display', 'inline');
+                        }
+
+                        theaterNumberGroup.find("ul").append(scheduleItem);
                     }
-
-                    // startTime을 Date 객체로 변환
-                    const [startHour, startMinute] = startTime.split(':');
-                    const startDateTime = new Date();
-                    startDateTime.setHours(startHour, startMinute, 0, 0);
-
-                    const morning = new Date();
-                    morning.setHours(12, 0, 0, 0);
-                    const night = new Date();
-                    night.setHours(22, 0, 0, 0);
-
-                    // 시간표 항목 생성
-                    const scheduleItem = $(`
-                    <li class="schedule-item">
-                        <input type="hidden" class="schedule-id" value="${scheduleId}" />
-                        <img src="/images/sun.png" alt="조조" style="display: none;"/>
-                        <img src="/images/moon.png" alt="심야" style="display: none;"/>
-                        <h5>${startTime}</h5>
-                        <h6>${totalSeats}석</h6>
-                        <input type="hidden" class="end-time" value="${endTime}" />
-                    </li>
-                `);
-
-                    // startTime과 비교하여 이미지 표시
-                    if (startDateTime < morning) {
-                        scheduleItem.find('img[alt="조조"]').css('display', 'inline');
-                    } else if (startDateTime >= night) {
-                        scheduleItem.find('img[alt="심야"]').css('display', 'inline');
-                    }
-
-                    theaterNumberGroup.find("ul").append(scheduleItem);
                 });
             }
         });

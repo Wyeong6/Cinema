@@ -33,7 +33,7 @@ public class Schedule {
     private String sessionType;
 
     private Long totalSeats = 0L;
-    private Long unavailableSeats = 0L;
+    private Long availableSeats = 0L;
     private Boolean status = true;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -44,7 +44,8 @@ public class Schedule {
         schedule.setDate(scheduleDTO.getDate());
         schedule.setStartTime(LocalTime.parse(scheduleDTO.getStartTime()));
         schedule.setEndTime(LocalTime.parse(scheduleDTO.getEndTime()));
-        schedule.setUnavailableSeats(0L);
+        schedule.setTotalSeats(theaterNumber.getSeatsPerTheater());
+        schedule.setAvailableSeats(schedule.getTotalSeats());
         schedule.setSessionType(determineSessionType(scheduleDTO.getDate(), LocalTime.parse(scheduleDTO.getStartTime())));
         schedule.setTheaterNumber(theaterNumber);
         schedule.setMovie(movie);
@@ -68,27 +69,30 @@ public class Schedule {
         updateStatus();
     }
 
-    private void updateStatus() {
+    void updateStatus() {
         LocalDate currentDate = LocalDate.now();
         LocalTime currentTime = LocalTime.now();
 
         boolean isBeforeCurrentDate = date.isBefore(currentDate);
         boolean isEqualCurrentDateAndBeforeCurrentTime = date.equals(currentDate) && startTime.isBefore(currentTime);
-        boolean isAvailableSeatsZero = calculateAvailableSeats() == 0;
 
-        if (isBeforeCurrentDate || isEqualCurrentDateAndBeforeCurrentTime || isAvailableSeatsZero) {
+        // 시간 단위로 실행되는 작업이므로, 시작 시간이 현재 시간보다 빠를 때 상태를 false로 설정
+        if (isEqualCurrentDateAndBeforeCurrentTime) {
             this.status = false;
         } else {
-            this.status = true;
+            // 그 외의 경우에는 가능한 좌석 수가 0이 아니고, 현재 날짜와 시간 이후에 상영이 시작될 경우에만 상태를 true로 설정
+            boolean isAvailableSeatsZero = this.availableSeats == 0;
+            if (isBeforeCurrentDate || isAvailableSeatsZero) {
+                this.status = false;
+            } else {
+                this.status = true;
+            }
         }
     }
 
-    private Long calculateAvailableSeats() {
-        if (this.totalSeats == null) {
-            this.totalSeats = 0L;
-        }
-
-        return this.totalSeats - this.unavailableSeats;
+    public void decreaseAvailableSeats(int seatsReserved) {
+        this.availableSeats -= seatsReserved;
+        updateStatus();
     }
 
     private static String determineSessionType(LocalDate date, LocalTime startTime) {

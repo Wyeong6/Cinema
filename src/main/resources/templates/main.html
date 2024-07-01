@@ -26,7 +26,7 @@
                 <p>Another fine freebie by HTML5 UP</p>
             </header>
             <footer>
-                <a href="#banner" class="button circled scrolly">예매</a>
+                <a class="button circled reservation_btn">예매</a>
             </footer>
         </div>
         <!-- info -->
@@ -49,7 +49,7 @@
                 </li>
                 <li><a href="/payment/cartList">장바구니</a></li>
                 <li class="chat-alarm" sec:authorize="isAuthenticated()">
-                    <img class="chat-img" src="/images/alarm.png" alt="1:1채팅 메시지" />
+                    <img id="chatImage" class="chat-img" src="/images/alarm.png" alt="1:1채팅 메시지" />
                     <div id="unreadCount" style="display: none;">
                         0
                     </div>
@@ -90,11 +90,10 @@
     <!-- Banner -->
     <section id="banner">
         <header>
-            <h3>영화 검색</h3>
             <form id="searchForm" method="get" action="/search" class="search-form">
                 <input class="search-input" type="text" name="query" placeholder="Search Movies..." required />
                 <button type="submit">
-                    <img src="/images/magnifier.png" alt="검색 버튼"/>
+                    <img src="/images/magnifier2.png" alt="검색 버튼"/>
                 </button>
             </form>
         </header>
@@ -103,29 +102,36 @@
     <!-- Now Playing -->
     <section class="carousel">
         <div class="section_title">
-            <h3>현재 상영작 TOP9</h3>
+            <h3>현재 상영작</h3>
             <p><a href="/nowMovies">더보기</a></p>
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${allMovies}"
-                     th:if="${iterStat.index < 9}" >
+                     th:if="${iterStat.index < 10}">
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진"
-                         width="150" height="300"
+                    <img th:if="${movie.posterPath != null}"
+                         th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}"
+                         alt="배경 사진" width="150" height="300"
                          style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
+                    <img th:if="${movie.posterPath == null || movie.posterPath == 'null' || movie.posterPath == ''}"
+                         th:src="@{/images/img_not_ready.png}"
+                    alt="이미지 준비 중" width="150" height="300"
+                    style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
                 </a>
-                <img th:src="${'/images/'.concat(iterStat.index + 1).concat('.png')}" alt="one" class="overlay-img" />
+                <div class="overlay-rank">
+                    <h1 th:text="${iterStat.index + 1} + '.'"></h1>
+                </div>
                 <header>
                     <h4>
                         <a th:href="@{'/movies/' + ${movie.id}}">
                             <span th:utext="${#strings.length(movie.title) &gt; 10 ? #strings.substring(movie.title, 0, 10) + '...' : movie.title}">...</span>
                         </a>
                     </h4>
-                    <p><img src="/images/clock.png" alt="clock"/> <span th:text="${movie.runtime}">runtime</span></p>
+                    <p><img src="/images/clock.png" alt="clock"/><span th:text="${movie.runtime}">runtime</span></p>
                 </header>
                 <div class="button_box">
-                    <button class="reservation_btn button">예매하기</button>
-                    <button class="get_btn button"><a href="#" class="movie-detail-link">상세보기</a></button>
+                    <button class="reservation_btn button"><a th:href="@{'/reservation/screeningSchedule/' + ${movie.id}}">예매하기</a></button>
+                    <button class="get_btn button"><a th:href="@{'/movies/' + ${movie.id}}" class="movie-detail-link">상세보기</a></button>
                 </div>
             </article>
         </div>
@@ -139,7 +145,7 @@
             <p><a href="/comingMovies">더보기</a></p>
         </div>
         <div class="reel">
-            <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 9}">
+            <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 10}">
 <!--                <form name="detailForm" th:action="@{'/upcoming/' + ${movie.id}}" method="post">-->
 <!--                    <input type="hidden" th:name="movieId" th:value="${movie.id}"/>-->
 <!--                    <input type="hidden" th:name="title" th:value="${movie.title}"/>-->
@@ -148,8 +154,13 @@
 <!--                    <input type="hidden" th:name="genres" th:value="${movie.genres}"/>-->
 <!--                    <input type="hidden" th:name="overview" th:value="${movie.overview}"/>-->
                 <a th:href="@{'/upcoming/' + ${movie.id}}"  class="image featured">
-                    <img th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}" alt="배경 사진"
-                         width="150" height="300"
+                    <img th:if="${movie.posterPath != 'null'}"
+                         th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}"
+                         alt="배경 사진" width="150" height="300"
+                         style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
+                    <img th:if="${movie.posterPath == 'null'}"
+                         th:src="@{/images/img_not_ready.png}"
+                         alt="이미지 준비 중" width="150" height="300"
                          style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
                 </a>
                  <header>
@@ -161,7 +172,7 @@
                     <p><img src="/images/calendar.png" alt="clock"/> <span th:text="${movie.releaseDate}">개봉날짜</span></p>
                 </header>
                 <div class="button_box">
-                    <button class="reservation_btn button">예매하기</button>
+                    <button class="reservation_btn button"><a th:href="@{'/reservation/screeningSchedule/' + ${movie.id}}">예매하기</a></button>
                     <button class="get_btn button"><a th:href="@{'/movies/' + ${movie.id}}">상세보기</a></button>
                 </div>
 <!--                </form>-->
@@ -229,7 +240,16 @@
         document.addEventListener('DOMContentLoaded', function () {
             loadChatList(1, 1, 8, true);
             setupWebSocketConnection();
+
+            // chatImage 요소가 존재하는지 확인
+            const chatImage = document.getElementById("chatImage");
+            if (chatImage) {
+                chatImage.addEventListener("click", function() {
+                    window.location.href = "/inquiry#work";
+                });
+            }
         });
+
         //웹소켓 연결 후 콜백함수
         function setupWebSocketConnection() {
             console.log('Setting up WebSocket connection');
@@ -245,6 +265,8 @@
     </script>
     <script th:inline="javascript">
         $(document).ready(function() {
+
+
             if ($.fn.modal) {
                 console.log('Bootstrap modal is loaded');
             } else {
@@ -253,9 +275,11 @@
 
             /*<![CDATA[*/
             const movies = /*[[${videoMovies}]]*/ [];
+            const movieIds = movies.map(movie => movie.id);
             const movieTitles = movies.map(movie => movie.title);
             const moviePosters = movies.map(movie => "https://image.tmdb.org/t/p/w1280" + movie.backdropPath);
             const movieVideos = movies.filter(movie => movie.video).map(movie => "https://www.youtube.com/embed/" + movie.video);
+
             /*]]>*/
 
             console.log(movieTitles);
@@ -315,7 +339,6 @@
                 const info = document.getElementById('info');
                 const logo = document.getElementById('logo');
 
-
                 $('#movie_title').off('click').on('click', function () {
                     const videoUrl = movieVideos[index];
                     console.log("videoUrl" + videoUrl)
@@ -329,6 +352,10 @@
                 header.style.backgroundImage = `url(${moviePosters[index]})`;
                 movieTitle.textContent = movieTitles[index];
 
+                $('.reservation_btn').on('click', function() {
+                    window.location.href = '/reservation/screeningSchedule/' + movieIds[index];
+                });
+
                 // 버튼 스타일 업데이트
                 buttons.forEach((button, idx) => {
                     if (idx === index) {
@@ -339,16 +366,15 @@
                 });
             }
 
-            changeBackgroundAndTitle(0);
-
             let currentIndex = 0;
             const totalMovies = moviePosters.length;
 
-            const intervalTime = 5000;
+            changeBackgroundAndTitle(currentIndex);
+
             setInterval(function() {
                 currentIndex = (currentIndex + 1) % totalMovies;
                 changeBackgroundAndTitle(currentIndex);
-            }, intervalTime);
+            }, 5000);
         });
 
         // 로그아웃시 session storage값 삭제
@@ -359,10 +385,10 @@
             window.location.href = "/member/logout";
         });
 
-        //안읽은 메세지수 클릭시
-        document.getElementById("unreadCount").addEventListener("click", function() {
-            window.location.href = "/inquiry#work";
-        });
+        // //안읽은 메세지수 클릭시
+        // document.getElementById("unreadCount").addEventListener("click", function() {
+        //     window.location.href = "/inquiry#work";
+        // });
     </script>
 
 <!--    <p>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;인기순 &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</p>-->

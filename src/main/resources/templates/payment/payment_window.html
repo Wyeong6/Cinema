@@ -3,8 +3,8 @@
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<body class="no-sidebar is-preload bg-black-wrapper">
+>
+<body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper" class="bg-black-wrapper">
 
@@ -29,7 +29,7 @@
                         <tbody>
                         <tr>
                             <td class="ticket-info">
-                                <img th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" />
+                                <img class="featured-img" th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" />
                                 <div class="ticket-movie-title"><img src="" alt="연령등급 이미지" /><h4 th:text="${movie.title}" id="movieTitle">영화 제목</h4></div>
                                     <table>
                                         <tr>
@@ -56,14 +56,17 @@
                                         </tr>
                                     </table>
                                     <div class="seats-info">
-                                        <span>선택 좌석</span>
+                                        <span>선택 좌석</span>&nbsp;&nbsp;
                                         <div id="selected-seats"></div>
                                     </div>
                                 </td>
                                 <td class="point-info">
-                                    <label for="point">포인트 사용</label>
-                                    <input type="number" class="point-input" id="point">
-                                    <div><span>사용가능포인트 </span><span th:text="${pointInfo}"></span></div>
+                                    <div>
+                                        <label for="point">포인트 사용</label>
+                                        <input type="number" class="point-input" id="point">
+                                        <button type="button">전체사용</button>
+                                    </div>
+                                    <div><label>사용가능포인트 </label><span th:text="${pointInfo} + 'p'"></span></div>
                                 </td>
                                 <td class="payment-info">
                                     <table>
@@ -73,19 +76,17 @@
                                         </tr>
                                         <tr>
                                             <th>할인 금액</th>
-                                            <td><span>- </span>0원</td>
+                                            <td style="color: #e45649"><span>- </span>0원</td>
                                         </tr>
                                         <tr>
-                                            <td class="result-price-td" colspan="2">
-                                                <h4>최종 결제금액</h4>
-                                                <div>
-                                                    <p>총 </p><h3 id="result-price">27000원</h3>
-                                                </div>
+                                            <th><h4>최종 결제금액</h4></th>
+                                            <td>
+                                                <p>총 <span id="result-price">27000원</span></p>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>적립예정 포인트</th>
-                                            <td id="add-point">270p</td>
+                                            <td id="add-point" style="color: #5155A6">270p</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2" style="padding: 0">
@@ -214,9 +215,11 @@
                 }
             });
 
+            console.log("Selected Seats: ", JSON.stringify(selectedSeats)); // 좌석 정보 로그
+
             const scheduleId = $('#schedule-id').data('schedule-id');
-            const memberIdx = [[${memberInfo[1]}]];
-            const reservedBy = memberIdx; // member_id값
+            const reservedBy = [[${memberInfo[1]}]]; // member_id값
+            // const reservedBy = '${memberInfo[1]}'; // member_id값
 
             $.ajax({
                 type: 'POST',

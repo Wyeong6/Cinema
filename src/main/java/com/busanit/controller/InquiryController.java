@@ -32,7 +32,6 @@ public class InquiryController {
     // 문의하기 폼 페이지로 이동
     @GetMapping("/inquiry")
     public String showInquiryForm(Model model) {
-        System.out.println("inquiry진입");
         model.addAttribute("Inquiry", new InquiryDTO());
         return "cs/service_center"; // inquiryForm.html과 같은 템플릿 파일을 사용하여 폼을 렌더링
     }
@@ -46,7 +45,6 @@ public class InquiryController {
         inquiryService.InquiryRegister(inquiryDTO); // 폼 데이터를 서비스를 통해 저장하거나 처리하는 로직 수행
 
         int updatedCount = inquiryService.getUnansweredInquiryCount();
-        System.out.println("문의등록 updatedCount" + updatedCount);
         messagingTemplate.convertAndSend("/Topic/unansweredCount", updatedCount);
         return "redirect:/inquiry"; // 폼 제출 후 보여줄 페이지로 리다이렉트
     }
@@ -67,15 +65,12 @@ public class InquiryController {
 
             // 데이터베이스에 문의 답변 저장
             inquiryService.InquiryReplyRegister(replyMessage, inquiryId);
-            System.out.println("데이터베이스에저장");
 
             // 미답변 문의 갯수 업데이트
             int updatedCount = inquiryService.getUnansweredInquiryCount();
-            System.out.println("Updated unanswered count: " + updatedCount);
 
             // 웹소켓을 통해 모든 클라이언트에게 업데이트 전송
             messagingTemplate.convertAndSend("/Topic/unansweredCount", updatedCount);
-            System.out.println("WebSocket 메시지 전송: " + updatedCount);
 
             return ResponseEntity.ok("success");
         } catch (Exception e) {

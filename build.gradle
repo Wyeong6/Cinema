@@ -67,6 +67,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'javax.mail:javax.mail-api:1.6.2'
 
+    implementation 'org.springframework.boot:spring-boot-starter'
+
     // 결제 취소 - java 서버 사이드
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 

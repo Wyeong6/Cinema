@@ -64,7 +64,11 @@
     <tr class="truncate-row" th:each="notice : ${noticeList.content}">
         <td><strong th:text="${notice.noticeId}"></strong></td>
         <td><strong th:text="${notice.memberEmail}"></strong></td>
-        <td><strong th:text="${notice.noticeTitle}"></strong></td>
+        <td>
+            <a th:href="@{/notice_get/{noticeId}(noticeId=${notice.noticeId})}">
+                <strong th:text="${notice.noticeTitle}"></strong>
+            </a>
+        </td>
         <td><strong th:text="${notice.noticeContent}"></strong></td>
         <td><strong th:text="${#temporals.format(notice.regDate, 'yyyy-MM-dd')}"></strong></td>
         <td style="text-align: right; width: 50px;">
@@ -135,7 +139,6 @@
             var noticeId = $(this).data('id');
             var pageNumber = $(this).data('page');
             sendRequest('/admin/noticeDelete/' + noticeId + '?pageNumber=' + pageNumber, {}, function (response) {
-                console.log('Event deleted successfully');
                 $('.container-xxl').html(response);
                 setPageNumber(pageNumber, true);
             });

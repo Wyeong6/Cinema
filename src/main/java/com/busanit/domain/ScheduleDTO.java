@@ -26,7 +26,7 @@ public class ScheduleDTO {
     private String runningTime;
     private String sessionType;
     private Long totalSeats;
-    private Long unavailableSeats;
+    private Long availableSeats;
     private List<SeatDTO> seats;
     private Boolean status;
 
@@ -45,9 +45,8 @@ public class ScheduleDTO {
                 .runningTime(schedule.getMovie().getMovieDetail().getRuntime())
                 .sessionType(schedule.getSessionType())
                 .totalSeats(schedule.getTotalSeats())
-                .unavailableSeats(schedule.getUnavailableSeats())
+                .totalSeats(schedule.getAvailableSeats())
                 .status(schedule.getStatus())
                 .build();
     }
 }
-

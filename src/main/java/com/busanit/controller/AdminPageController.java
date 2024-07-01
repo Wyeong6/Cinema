@@ -8,6 +8,7 @@ import com.busanit.entity.Member;
 import com.busanit.entity.Snack;
 import com.busanit.entity.*;
 import com.busanit.entity.movie.Comment;
+import com.busanit.entity.movie.Movie;
 import com.busanit.repository.MovieRepository;
 import com.busanit.repository.TheaterNumberRepository;
 import com.busanit.service.*;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -104,8 +106,22 @@ public class AdminPageController {
         model.addAttribute("totalPages", totalPages);
 
         return "admin/admin_movie_list";
-
     }
+
+    @PostMapping("/commentList")
+    public String commentList(Model model,
+                              @RequestParam(defaultValue = "0") int page) {
+        int pageSize = 5;
+        List<CommentDTO> commentList = commentService.getCommentsWithPaging(page, pageSize);
+        int totalPages = (int) Math.ceil(commentService.getTotalComments() / (double) pageSize);
+
+        model.addAttribute("commentList", commentList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
+        return "admin/admin_comment_list";
+    }
+
 
     @PostMapping("/member")
     public String memberManagement() {
@@ -113,24 +129,13 @@ public class AdminPageController {
     }
 
     @PostMapping("/movieRegister")
-    public String movieRegister() {
+    public String movieRegister(@RequestParam(required = false) Long movieId, Model model) {
+        if (movieId != null) {
+            // 영화 정보 가져오기 및 모델에 추가
+            Movie movie = movieService.getMovieById(movieId);
+            model.addAttribute("movie", movie);
+        }
         return "admin/admin_movie_register";
-    }
-
-    @PostMapping("/movieUpdate")
-    public String movieUpdate(@RequestParam(name = "movieId") Long movieId, Model model) {
-
-        model.addAttribute("movieId", movieId);
-
-        return "admin/admin_movie_register";
-    }
-
-    @PostMapping("/commentList")
-    public String commentList(Model model) {
-        List<CommentDTO> commentList = commentService.getAllComment();
-
-        model.addAttribute("commentList", commentList);
-        return "admin/admin_comment_list";
     }
 
     @GetMapping("/theaterList")
@@ -487,21 +492,20 @@ public class AdminPageController {
 
     //이벤트 등록 기능
     @PostMapping("/eventRegister")
-    public String eventRegister(@Valid EventDTO eventDTO, BindingResult bindingResult, Model model) {
+    public ResponseEntity<String> eventRegister(@Valid EventDTO eventDTO, BindingResult bindingResult) {
 
-        model.addAttribute("urlLoad", "/admin/eventRegister");
         if (bindingResult.hasErrors()) {
-            return "admin/admin_event_register";
+            return ResponseEntity.badRequest().body("유효성 검사 오류가 발생했습니다.");
         }
 
         // 중복 체크 로직 추가
         if (eventService.isDuplicate(eventDTO.getEventDetail(), eventDTO.getEventName())) {
-            return "admin/admin_layout";
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 이벤트입니다.");
         }
 
         eventService.saveEvent(eventDTO);
 
-        return "admin/admin_layout";
+        return ResponseEntity.ok("이벤트가 성공적으로 등록되었습니다.");
     }
 
     @GetMapping("/eventList")
@@ -564,20 +568,20 @@ public class AdminPageController {
 
     //공지사항 등록기능
     @PostMapping("/noticeRegister")
-    public String noticeRegister(@Valid NoticeDTO noticeDTO, BindingResult bindingResult, Model model) {
+    public ResponseEntity<String> noticeRegister(@Valid NoticeDTO noticeDTO, BindingResult bindingResult) {
 
-        model.addAttribute("urlLoad", "/admin/noticeRegister");
         if (bindingResult.hasErrors()) {
-            return "admin/admin_notice_register";
+            return ResponseEntity.badRequest().body("유효성 검사 오류가 발생했습니다.");
         }
 
         // 중복 체크 로직 추가
         if (noticeService.isDuplicate(noticeDTO.getNoticeTitle(), noticeDTO.getNoticeContent())) {
-            return "admin/admin_layout";
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 공지사항입니다.");
         }
 
         noticeService.saveNotice(noticeDTO);
-        return "admin/admin_layout";
+
+        return ResponseEntity.ok("공지사항이 성공적으로 등록되었습니다.");
     }
 
     //공지사항 리스트
@@ -638,7 +642,6 @@ public class AdminPageController {
     public Map<String, Object> ChatList(@RequestParam(defaultValue = "1") int activePage,
                                         @RequestParam(defaultValue = "1") int inactivePage,
                                         @RequestParam(defaultValue = "8") int size) {
-        System.out.println("Received activePage: " + activePage + ", inactivePage: " + inactivePage);
         String memberEmail = movieService.getUserEmail();
 
         // 활성 채팅방 목록 가져오기
@@ -693,10 +696,6 @@ public class AdminPageController {
         Page<InquiryDTO> answeredInquiries = inquiryService.getAnsweredInquiryList(answeredPage - 1, size);
         addPagingInquiryList(model, "answered", answeredInquiries, answeredPage);
 
-        System.out.println("컨트롤answeredPage" + answeredPage);
-        System.out.println("컨트롤unansweredPage" + unansweredPage);
-
-
         model.addAttribute("answeredPage", answeredPage);
         model.addAttribute("unansweredPage", unansweredPage);
 
@@ -705,13 +704,11 @@ public class AdminPageController {
 
     // 페이징으로 변환
     private void addPagingInquiryList(Model model, String type, Page<InquiryDTO> inquiries, int page) {
-        System.out.println("pageSize " + page);
+
         int totalPages = inquiries.getTotalPages();
-        System.out.println("totalPages " + totalPages);
         int startPage = Math.max(1, page - 4);
-        System.out.println("startPage " + startPage);
         int endPage = Math.min(totalPages, page + 4);
-        System.out.println("endPage " + endPage);
+
         model.addAttribute(type + "InquiryList", inquiries);
         model.addAttribute("current" + type + "Page", page);
         model.addAttribute("total" + type + "Pages", totalPages);
@@ -732,9 +729,7 @@ public class AdminPageController {
     public ResponseEntity<Integer> getUnansweredInquiryCount() {
         try {
             int updatedCount = inquiryService.getUnansweredInquiryCount();
-            System.out.println("Updated unanswered count: " + updatedCount);
             messagingTemplate.convertAndSend("/Topic/unansweredCount", updatedCount);
-            System.out.println("WebSocket 메시지 전송: " + updatedCount);
             return ResponseEntity.ok(updatedCount);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
