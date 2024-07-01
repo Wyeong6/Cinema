@@ -17,7 +17,9 @@
                 <td><a th:href="@{'/movies/' + ${comment.movieId}}" th:text="${comment.movieTitle}"></a></td>
                 <td th:text="${comment.comment}"></td>
                 <td th:text="${comment.grade}"></td>
-                <td><img src="/images/delete.png" alt="삭제 버튼" class="delete-btn" th:data-comment-id="${comment.cno}"/></td>
+                <td><a href="javascript:void(0);" class="delete-btn" th:data-comment-id="${comment.cno}">
+                        <img src="/images/delete.png" alt="삭제 버튼"/></a>
+                </td>
             </tr>
         </table>
     </section>

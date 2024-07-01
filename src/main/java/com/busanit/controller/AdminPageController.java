@@ -642,7 +642,6 @@ public class AdminPageController {
     public Map<String, Object> ChatList(@RequestParam(defaultValue = "1") int activePage,
                                         @RequestParam(defaultValue = "1") int inactivePage,
                                         @RequestParam(defaultValue = "8") int size) {
-        System.out.println("Received activePage: " + activePage + ", inactivePage: " + inactivePage);
         String memberEmail = movieService.getUserEmail();
 
         // 활성 채팅방 목록 가져오기
@@ -697,10 +696,6 @@ public class AdminPageController {
         Page<InquiryDTO> answeredInquiries = inquiryService.getAnsweredInquiryList(answeredPage - 1, size);
         addPagingInquiryList(model, "answered", answeredInquiries, answeredPage);
 
-        System.out.println("컨트롤answeredPage" + answeredPage);
-        System.out.println("컨트롤unansweredPage" + unansweredPage);
-
-
         model.addAttribute("answeredPage", answeredPage);
         model.addAttribute("unansweredPage", unansweredPage);
 
@@ -709,13 +704,11 @@ public class AdminPageController {
 
     // 페이징으로 변환
     private void addPagingInquiryList(Model model, String type, Page<InquiryDTO> inquiries, int page) {
-        System.out.println("pageSize " + page);
+
         int totalPages = inquiries.getTotalPages();
-        System.out.println("totalPages " + totalPages);
         int startPage = Math.max(1, page - 4);
-        System.out.println("startPage " + startPage);
         int endPage = Math.min(totalPages, page + 4);
-        System.out.println("endPage " + endPage);
+
         model.addAttribute(type + "InquiryList", inquiries);
         model.addAttribute("current" + type + "Page", page);
         model.addAttribute("total" + type + "Pages", totalPages);
@@ -736,9 +729,7 @@ public class AdminPageController {
     public ResponseEntity<Integer> getUnansweredInquiryCount() {
         try {
             int updatedCount = inquiryService.getUnansweredInquiryCount();
-            System.out.println("Updated unanswered count: " + updatedCount);
             messagingTemplate.convertAndSend("/Topic/unansweredCount", updatedCount);
-            System.out.println("WebSocket 메시지 전송: " + updatedCount);
             return ResponseEntity.ok(updatedCount);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
