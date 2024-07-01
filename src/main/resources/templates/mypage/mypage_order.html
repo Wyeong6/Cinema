@@ -11,7 +11,6 @@
                          th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
                     <header>
                         <h3 th:text="${#temporals.format(snackPayment.getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
-                        <p class="order_detail_btn">상세보기 <img src="/images/right-arrow.png" alt="오른쪽 화살표"/></p>
                     </header>
                     <div class="history_data">
                         <img th:alt="${snackPayment.getSnack().snack_alt}"

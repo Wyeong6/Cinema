@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +56,13 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentRepository.findByImpUid(imp_uid)).orElseThrow(() -> new NullPointerException("payment null"));
 
         return PaymentDTO.toDTO(payment);
+    }
+
+    // 최근 3개월간 영화관람 count
+    public long getMovieCount(Long memberId) {
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.minusMonths(3);
+        return paymentRepository.countByMovieMembership(memberId, startDate, endDate);
     }
 
     // 스낵 결제 내역
