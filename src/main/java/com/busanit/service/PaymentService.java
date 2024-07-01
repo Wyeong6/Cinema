@@ -34,6 +34,7 @@ public class PaymentService {
     private final MemberRepository memberRepository;
     private final PaymentRepository paymentRepository;
     private final SnackService snackService;
+    private final MovieService movieService;
 
     @Value("${imp_rest_api_key}")
     private String imp_rest_api_key;
@@ -63,6 +64,13 @@ public class PaymentService {
         LocalDateTime endDate = LocalDateTime.now();
         LocalDateTime startDate = endDate.minusMonths(3);
         return paymentRepository.countByMovieMembership(memberId, startDate, endDate);
+    }
+
+    // 영화 결제 내역
+    public Slice<PaymentDTO> getMoviePaymentInfo(Long member_id, Pageable pageable) {
+        Slice<Payment> paymentSlice = paymentRepository.findByMember_IdAndProductType(member_id, "MO", pageable);
+
+        return PaymentDTO.toDTOMovieSlice(paymentSlice, movieService);
     }
 
     // 스낵 결제 내역

@@ -1,7 +1,9 @@
 package com.busanit.domain;
 
+import com.busanit.domain.movie.MovieDTO;
 import com.busanit.entity.Payment;
 import com.busanit.entity.SnackPayment;
+import com.busanit.service.MovieService;
 import com.busanit.service.SnackService;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -37,6 +39,7 @@ public class PaymentDTO {
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
 
+    private MovieDTO movie;
     private SnackDTO snack; // 스낵 정보 포함
 
     public static PaymentDTO toDTO(Payment payment) {
@@ -61,6 +64,25 @@ public class PaymentDTO {
                 .regDate(payment.getRegDate())
                 .updateDate(payment.getUpdateDate())
                 .build();
+    }
+
+    // Movie Slice<Entity> -> Slice<DTO> 변환
+    public static Slice<PaymentDTO> toDTOMovieSlice(Slice<Payment> paymentSlice, MovieService movieService) {
+        return paymentSlice.map(entity -> {
+            MovieDTO movieDTO = movieService.findMovieById(Long.valueOf(entity.getProductIdx()));
+
+            return PaymentDTO.builder()
+                    .id(entity.getId())
+                    .productIdx(entity.getProductIdx())
+                    .productName(entity.getProductName())
+                    .productCount(entity.getProductCount())
+                    .totalPrice(entity.getTotalPrice())
+                    .merchantUid(entity.getMerchantUid())
+                    .regDate(entity.getRegDate())
+                    .updateDate(entity.getUpdateDate())
+                    .movie(movieDTO) // MovieDTO 설정
+                    .build();
+        });
     }
 
     // 스낵 Slice<Entity> -> Slice<DTO> 변환

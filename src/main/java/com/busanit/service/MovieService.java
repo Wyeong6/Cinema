@@ -813,4 +813,16 @@ public class MovieService {
     public Optional<Movie> findById(Long id) {
         return movieRepository.findById(id);
     }
+
+    // 마이페이지 주문내역조회 리스트 불러오기
+    public MovieDTO findMovieById(Long movieId) {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+
+        return MovieDTO.builder()
+                .id(movie.getMovieId())
+                .title(movie.getTitle())
+                .posterPath(movie.getImages().get(0).getPosterPath())
+                .build();
+    }
 }
