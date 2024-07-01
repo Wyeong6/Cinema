@@ -94,6 +94,11 @@ public class MypageController {
         };
         model.addAttribute("myPageGrade", gradeString);
 
+        // 최근 예매 내역
+        Slice<PaymentDTO> moviePaymentDTOList = null;
+        moviePaymentDTOList = paymentService.getMoviePaymentInfo(memberService.findUserIdx(userEmail), pageable);
+        model.addAttribute("moviePaymentInfo", moviePaymentDTOList);
+
         // 최근 스낵 주문 내역
         Slice<PaymentDTO> snackPaymentDTOList = null;
         snackPaymentDTOList = paymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
