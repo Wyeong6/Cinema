@@ -17,8 +17,8 @@
                         <div>
                             <p th:text="'예매번호 : ' + ${moviePayment.getMerchantUid()}">예매번호</p>
                             <p th:text="${moviePayment.getProductName()}">범죄도시 4</p>
-                            <p><span class="history-data-date">상영일자</span><span class="history-data-time">시간</span></p>
-                            <p><span class="history-data-theater">상영관</span><span class="history-data-seats">좌석</span></p>
+                            <p><span class="history-data-date" th:text="${moviePayment.getContent1()}">상영일자</span> <span class="history-data-time" th:text="${moviePayment.getContent2()}">시간</span></p>
+                            <p><span class="history-data-theater" th:text="${moviePayment.getContent3()}">상영관</span> <span class="history-data-seats" th:text="${moviePayment.getContent4()}">좌석</span></p>
                         </div>
                     </div>
                     <div class="button_box">
