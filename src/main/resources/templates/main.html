@@ -187,7 +187,7 @@
                 <h3>스낵 스토어</h3>
                 <p>달콤한 맛과 바삭한 식감이 어우러진 팝콘 한 컵, 영화의 재미를 더 높여줄 거예요.<br />
                     지금 바로 팝콘을 주문하고, 당신의 영화관 체험을 더욱 완벽하게 즐겨보세요!</p>
-                <p class="more_btn"><a href="/snack/snackList">더보기</a></p>
+                <p class="more_btn" th:if="${snackList.totalElements > 0}"><a href="/snack/snackList">더보기</a></p>
             </header>
             <div class="custom-grid">
                 <article class="custom-col special" th:each="snack : ${snackList}" th:if="${snackList.totalElements > 0}">

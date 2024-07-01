@@ -1858,6 +1858,48 @@ button.pay-btn {
     font-size: 1em;
     font-weight: 400;
 }
+/* 이벤트 상세 페이지 */
+.event_get header p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.event_get header p img {
+    width: 1em;
+    margin-right: 0.5em;
+}
+.event_get header .btn_box {
+    display: flex;
+    justify-content: right;
+}
+.event_get .btn_box img {
+    width: 1.6em;
+    cursor: pointer;
+}
+.event_get section {
+    text-align: center;
+}
+.event_get table {
+    margin: 4em 0 2em;
+}
+.event_get section p {
+    text-align: right;
+    font-size: 0.8em;
+    margin: 4em 0 0;
+}
+.event_get .event-main-img {
+    margin: 0 auto;
+}
+.event_get .btn_box:last-child button {
+    margin: 0 auto;
+    display: block; /* 버튼을 블록 요소로 설정 */
+    font-size: 0.8em;
+    padding: 0.5em 2em;
+    background: rgba(81, 85, 166, 0.8);
+}
+.event_get .btn_box:last-child button:hover {
+    background: #5155A6;
+}
 /* payment-window 결제 페이지 */
 .payment table.payment-table {
     background: #F2F2F2;

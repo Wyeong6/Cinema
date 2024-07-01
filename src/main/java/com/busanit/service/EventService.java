@@ -47,6 +47,7 @@ public class EventService {
     //업데이트 할 데이터를 페이지에 표시
     public EventDTO getEvent(Long eventId){
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NullPointerException("event null"));
+        event.setViewCount(event.getViewCount() + 1);
         return EventDTO.toDTO(event);
     }
     //이전 글

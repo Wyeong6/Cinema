@@ -30,6 +30,8 @@ public class Event {
 
     private String eventAlt;
 
+    private int viewCount;
+
     private String eventDetail;
     @Column(updatable = false)
     @CreationTimestamp
@@ -68,5 +70,6 @@ public class Event {
         this.eventImage = eventDTO.getEventImage();
         this.eventAlt = eventDTO.getEventAlt();
         this.eventDetail = eventDTO.getEventDetail();
+        this.viewCount = eventDTO.getViewCount();
     }
 }

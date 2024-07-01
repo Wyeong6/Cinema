@@ -21,8 +21,7 @@
                     <article class="col-3 col-12-mobile special" th:each="event : ${eventList}">
                         <input type="hidden" th:value="${event.id}"/>
                         <a th:href="@{'/event_get/' + ${event.id}}" class="image featured">
-                            <img th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지"
-                                 style="width: 300px; height: auto;"/>
+                            <img class="featured-img" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" />
                         </a>
                         <header>
                             <h4>
