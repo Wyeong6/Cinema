@@ -208,17 +208,6 @@
         return document.getElementById(id);
     }
 
-    // 메시지를 표시하는 함수
-    function showMessage(message, updateTimestamp = true) {
-        document.getElementById('typingIndicatorDTO').style.display = 'none';
-        const messages = getElement('messages');
-        const messageElement = document.createElement('p');
-
-        messageElement.className = 'message-style'; // 메시지 스타일 클래스 추가
-        messageElement.textContent = message;
-        messages.appendChild(messageElement);
-    }
-
     function updateLastReadTimestamp(chatRoomId) {
         activePage = window.chatUtils.activePage;
         inactivePage = window.chatUtils.inactivePage;
@@ -254,7 +243,7 @@
             } else if (parsedMessage.typing === "not_typing") { //상대방이 타이핑 안할때
                 hideTypingIndicator();
             } else if(parsedMessage.status === 'active'){  //일반 메세지일때
-                showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
+                showUserMessage(parsedMessage.sender, parsedMessage.content);
             }else{
                 entranceStatus = parsedMessage.type
             }
@@ -302,7 +291,7 @@
                 }
             };
             stompClient.send("/app/chat/private", {}, JSON.stringify(message));
-            showMessage('관리자 : ' + messageContent);
+            showAdminMessage(messageContent);
             getElement('message').value = '';
 
             // 메시지 전송 후 타이핑 상태 초기화
@@ -321,6 +310,32 @@
             sendMessage();
         }
     });
+
+    // 메시지를 채팅창에 추가하는 공통 함수
+    function addMessageToChat(prefix, content) {
+        var messages = document.getElementById('messages');
+        var messageDiv = document.createElement('div');
+        var messageElement = document.createElement('p');
+        messageElement.appendChild(document.createTextNode(prefix + content));
+        messageDiv.appendChild(messageElement);
+        messages.appendChild(messageDiv);
+        document.getElementById('typingIndicatorDTO').style.display = 'none';
+    }
+
+    //메시지 표현
+    function showMessage(content) {
+        addMessageToChat('', content);
+    }
+
+    //유저가 보낸 메시지 표현
+    function showUserMessage(sender, content ) {
+        addMessageToChat(sender + ' : ' , content);
+    }
+
+    //내가(관리자) 보낸 메시지 표현
+    function showAdminMessage(content) {
+        addMessageToChat('나 : ', content);
+    }
 
     // 타이핑 이벤트를 처리하는 함수
     function handleTypingEvent() {
@@ -394,8 +409,12 @@
 
         data.forEach(item => {
             item.messages.forEach(message => {
-                let displayMessage = message.recipient === currentRecipient ? `관리자 : ${message.content}` : `${message.sender} : ${message.content}`;
-                showMessage(displayMessage);
+
+                if (message.recipient === currentRecipient) {
+                    showAdminMessage(message.content);
+                } else {
+                    showUserMessage(message.sender, message.content);
+                }
 
                 // 메시지의 생성 시간을 타임스탬프로 변환
                 let messageTimestamp = new Date(message.createAt).getTime();

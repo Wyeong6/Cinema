@@ -103,14 +103,14 @@
             updateCategoryButtonsDisplay('block');
             //일반 메세지
         } else if (parsedMessage.status === 'active') {
-            showMessage('관리자 : ' + parsedMessage.content);
+            showAdminMessage(parsedMessage.content);
             //타이핑 중이면
         } else if (parsedMessage.typing === "typing") {
             updateTypingIndicatorDisplay('block');
             //타이핑 안할 때
         } else if (parsedMessage.typing === "not_typing") {
             updateTypingIndicatorDisplay('none');
-        } else {
+        } else { //채팅방 입퇴장시
             entranceStatus = parsedMessage.type;
         }
     }
@@ -177,7 +177,7 @@
         };
 
         stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
-        showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
+        showUserMessage(messageContent); // 전송한 메시지를 화면에 표시
         document.getElementById('message').value = ''; // 입력 필드를 비움
 
         const timestamp = new Date().getTime();
@@ -196,17 +196,31 @@
         }
     });
 
-    //메세지 표현
-    function showMessage(message) {
+    // 메시지를 채팅창에 추가하는 공통 함수
+    function addMessageToChat(prefix, content) {
         var messages = document.getElementById('messages');
+        var messageDiv = document.createElement('div');
         var messageElement = document.createElement('p');
-        messageElement.appendChild(document.createTextNode(message));
-        messages.appendChild(messageElement);
+        messageElement.appendChild(document.createTextNode(prefix + content));
+        messageDiv.appendChild(messageElement);
+        messages.appendChild(messageDiv);
         document.getElementById('typingIndicatorDTO').style.display = 'none';
-
-
     }
 
+    // 메시지 표현
+    function showMessage(content) {
+        addMessageToChat('', content);
+    }
+
+    // 내가 보낸 메시지 표현
+    function showUserMessage(content) {
+        addMessageToChat('나: ', content);
+    }
+
+    //관리자가 보낸 메시지 표현
+    function showAdminMessage(content) {
+        addMessageToChat('관리자: ', content);
+    }
     //카테고리를 선택한 후
     function selectCategory(category) {
 
@@ -303,8 +317,11 @@
                         chatRoomTitle = message.chatRoomTitle;
                         document.getElementById('categoryButtons').style.display = 'none';
 
-                        let displayMessage = message.sender === sender ? `나 : ${message.content}` : `관리자 : ${message.content}`;
-                        showMessage(displayMessage);
+                        if (message.sender === sender) {
+                            showUserMessage(message.content);
+                        } else {
+                            showAdminMessage(message.content);
+                        }
 
                         let messageTimestamp = new Date(message.createAt).getTime();
 
