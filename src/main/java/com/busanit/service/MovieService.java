@@ -35,13 +35,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.commons.codec.binary.Base64;
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import static com.busanit.domain.movie.ActorDTO.convertToDto;
@@ -830,23 +835,5 @@ public class MovieService {
 
     public Optional<Movie> findById(Long id) {
         return movieRepository.findById(id);
-    }
-    //카카오톡 공유하기 이미지리사이즈
-    public byte[] resizeImage(String imageUrl) throws IOException {
-
-        URL url = new URL(imageUrl);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        Thumbnails.of(url)
-                .size(400, 400)
-                .outputFormat("jpg") // 원하는 포맷으로 설정 (jpg, png 등)
-                .toOutputStream(baos);
-
-        return baos.toByteArray(); // 리사이즈된 이미지의 바이트 배열 반환
-    }
-
-    // 이미지를 Base64로 인코딩하는 메서드
-    public String encodeImageToBase64(byte[] imageBytes) {
-        return Base64.encodeBase64String(imageBytes);
     }
 }

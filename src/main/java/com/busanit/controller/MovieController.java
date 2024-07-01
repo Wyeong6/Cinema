@@ -105,22 +105,7 @@ public class MovieController {
         System.out.println("movieInfos === " + movieInfos);
         String userEmail = movieService2.getUserEmail();
 
-        // 첫 번째 영화 정보를 가져옴
-        MovieDTO firstMovie = movieInfos.get(0);
-        System.out.println("firstMovie === " + firstMovie.getPosterPath());
-        // 리사이즈된 이미지 경로를 얻기 위해 이미지 서비스를 호출
-        try {
-            byte[] resizedImageBytes = movieService2.resizeImage("https://image.tmdb.org/t/p/original" + firstMovie.getPosterPath());
-            String resizedImageBase64 = movieService2.encodeImageToBase64(resizedImageBytes);
-            firstMovie.setResizedImageBytes(resizedImageBase64); // Base64 인코딩된 이미지 문자열로 업데이트
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            // 예외 처리: 이미지 리사이징 실패
-        }
-        System.out.println("resizedImageBytes" + firstMovie.getResizedImageBytes());
-
-        model.addAttribute("movieInfos", firstMovie);
+        model.addAttribute("movieInfos", movieInfos);
         model.addAttribute("movieId", movieId);
         model.addAttribute("userEmail", userEmail);
 

@@ -36,8 +36,6 @@ public class MovieDTO {
     private List<Integer> genreIds;
     private List<String> Genres;
     private List<String> stillCutPaths;
-    private String resizedImageBytes;
-
     // 영화 배우 관련
     private String name;
     private String gender;

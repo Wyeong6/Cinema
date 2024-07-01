@@ -8,7 +8,6 @@
         <div class="wrapper style1 movie_get">
             <div class="container" th:each="movie, iterStat : ${movieInfos}">
                 <input type="hidden" id="movieId" th:value="${movie.id}">
-                <img id="resizedImageUrl" th:src="'https://image.tmdb.org/t/p/w500' + ${movieInfos.resizedImageBytes}" style="display: none;" />
                 <div class="row">
                     <div class="col-12-mobile" id="content">
                         <article id="main">
@@ -21,7 +20,7 @@
                                              alt="영화포스터"
                                         />
                                         <img th:if="${movie.posterPath != 'null' && movie.posterPath != '' && #strings.length(movie.id) != 10}"
-                                             class="featured-img"
+                                             class="featured-img" id="resizedImageUrl"
                                              th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}"
                                              alt="영화포스터"
                                         />
@@ -1007,12 +1006,6 @@
                 var releaseDate = releaseDateElement.innerText.trim(); // 개봉 날짜
                 var runtime = runtimeElement.innerText.trim(); // 상영 시간
                 var imageUrl = imageElement.src
-
-                console.log('원본 이미지 URL:', imageElement.src);
-                console.log('리사이즈된 이미지 URL:', imageUrl);
-
-                console.log('이미지 너비:', imageElement.width);
-                console.log('이미지 높이:', imageElement.height);
 
                 var genres = genresElement.innerText.trim(); // 장르 가져오기
                 var certificationValue = certificationElement.textContent;
