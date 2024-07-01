@@ -34,12 +34,9 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
     // 매서드 재정의로 만듦
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("oauth2 user............");
 
         ClientRegistration clientRegistration = userRequest.getClientRegistration();
         String clientName = clientRegistration.getClientName();
-
-        log.info("!!clientName : " + clientName);
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> paramMap = oAuth2User.getAttributes();

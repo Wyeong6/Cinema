@@ -7,15 +7,16 @@
             </header>
             <hr style="top:0; margin-bottom: 1em">
             <section>
-                <article class="history_item">
+                <article class="history_item" th:each="moviePayment : ${moviePaymentInfo}"
+                         th:unless="${moviePaymentInfo == null or moviePaymentInfo.isEmpty()}">
                     <header>
                         <h4 class="reservation-status">결제완료</h4>
                     </header>
                     <div class="history_data">
-                        <img class="featured-img" alt="영화 포스터" src="/images/movieposter.webp">
+                        <img class="featured-img" alt="영화 포스터" th:src="@{'https://image.tmdb.org/t/p/w500/' + ${moviePayment.getMovie().getPosterPath()}}">
                         <div>
-                            <p>예매번호</p>
-                            <p>범죄도시 4</p>
+                            <p th:text="'예매번호 : ' + ${moviePayment.getMerchantUid()}">예매번호</p>
+                            <p th:text="${moviePayment.getProductName()}">범죄도시 4</p>
                             <p><span class="history-data-date">상영일자</span><span class="history-data-time">시간</span></p>
                             <p><span class="history-data-theater">상영관</span><span class="history-data-seats">좌석</span></p>
                         </div>
@@ -25,12 +26,64 @@
                         <button type="button" class="detail_btn">예매상세</button>
                     </div>
                 </article>
+                <article th:if="${moviePaymentInfo == null or moviePaymentInfo.isEmpty()}">
+                    <div class="history_none">
+                        <p class="movie_nm">예매하신 내역이 없습니다.</p>
+                    </div>
+                </article>
+
+                <!-- 더보기 버튼 -->
+                <div id="moreContainer" style="text-align: center; margin-top: 15px;"
+                     th:if="${moviePaymentInfo.hasNext}">
+                    <button id="moreBtn" onclick="loadMore()">더보기</button>
+                </div>
             </section>
         </div>
     </section>
 </article>
 <script th:inline="javascript">
     $(document).ready(function () {
+        let currentPage = 0; // 현재 페이지 번호
+
+        window.loadMore = function() {
+            currentPage++; // 다음 페이지로
+            $.ajax({
+                url: '/mypage/reservation/more?page=' + currentPage + '&size=5', // 페이지 정보 포함
+                type: 'GET',
+                success: function(data) {
+                    // 데이터를 페이지에 추가하는 로직
+                    let container = $('.history'); // 주문 내역을 추가할 컨테이너
+                    data.content.forEach(moviePayment => {
+
+                        let item = `
+                                            <article class="history_item">
+                                                <header>
+                                                    <h4>결제완료</h4>
+                                                </header>
+                                                <div class="history_data">
+                                                    <img alt="영화 포스터" src="https://image.tmdb.org/t/p/w500/${moviePayment.movie.poster_path}">
+                                                    <div>
+                                                        <h4>주문번호 : ${moviePayment.merchantUid}</h4>
+                                                        <span class="movie_nm">${moviePayment.productName} </span>
+                                                        <span>시간</span>
+                                                        <p>좌석</p>
+                                                    </div>
+                                                </div>
+                                            </article>`;
+                        container.append(item);
+                    });
+
+                    // 다음 페이지가 없으면 더보기 버튼 숨김
+                    if(data.content.length < 5) {
+                        $('#moreContainer').hide();
+                    }
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
         $('.container').on('click', '.detail_btn', function() {
             $('#content').load('/mypage/order/detail');
         });

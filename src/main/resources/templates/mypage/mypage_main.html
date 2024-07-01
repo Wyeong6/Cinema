@@ -75,11 +75,11 @@
                         <img th:alt="${snackPaymentInfo.getContent().get(0).getSnack().snack_alt}"
                              th:src="@{/images/menu/{image}(image=${snackPaymentInfo.getContent().get(0).getSnack().snack_image})}">
                         <div>
-                            <h4 th:text="'주문번호 : SN'+${#temporals.format(snackPaymentInfo.getContent().get(0).getRegDate(), 'yyyyMMdd')}+${snackPaymentInfo.getContent().get(0).id}">
+                            <h4 th:text="'주문번호 : ' + ${snackPaymentInfo.getContent().get(0).getMerchantUid()}">
                                 주문번호 : </h4>
-                            <span class="snack_nm" th:text="${snackPaymentInfo.getContent().get(0).getContent()}+' '">팝콘</span><span><small
-                                style="font-size: 14px" th:text="${snackPaymentInfo.getContent().get(0).getCount()}+개">3개</small> </span>
-                            <p th:text="${snackPaymentInfo.getContent().get(0).getPrice()}+원">36,000원 </p>
+                            <span class="snack_nm" th:text="${snackPaymentInfo.getContent().get(0).getProductName()}+' '">팝콘</span><span><small
+                                style="font-size: 14px" th:text="${snackPaymentInfo.getContent().get(0).getProductCount()}+개">3개</small> </span>
+                            <p th:text="${snackPaymentInfo.getContent().get(0).getTotalPrice()}+원">36,000원 </p>
                         </div>
                     </div>
                     <div class="button_box">

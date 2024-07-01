@@ -11,20 +11,20 @@
                          th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
                     <header>
                         <h3 th:text="${#temporals.format(snackPayment.getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
-                        <p class="order_detail_btn">상세보기 <img src="/images/right-arrow.png" alt="오른쪽 화살표"/></p>
                     </header>
                     <div class="history_data">
                         <img th:alt="${snackPayment.getSnack().snack_alt}"
                              th:src="@{/images/menu/{image}(image=${snackPayment.getSnack().snack_image})}">
                         <div>
-                            <h4 th:text="'주문번호 : SN'+${#temporals.format(snackPayment.getRegDate(), 'yyyyMMdd')}+${snackPayment.id}">
+                            <h4 th:text="'주문번호 : ' + ${snackPayment.getMerchantUid()}">
                                 주문번호 : </h4>
-                            <span class="snack_nm" th:text="${snackPayment.getContent()}+' '">팝콘</span><span><small
-                                style="font-size: 14px" th:text="${snackPayment.getCount()}+개">3개</small> </span>
-                            <p th:text="${snackPayment.getPrice()}+원">36,000원 </p>
+                            <span class="snack_nm" th:text="${snackPayment.getProductName()}+' '">팝콘</span><span><small
+                                style="font-size: 14px" th:text="${snackPayment.getProductCount()}+개">3개</small> </span>
+                            <p th:text="${snackPayment.getTotalPrice()}+원">36,000원 </p>
                         </div>
                     </div>
                     <div class="button_box">
+<!--                        <button type="button" class="cancel_btn" th:onclick="'location.href=\'/payment/paymentCancel?merchant_uid=' + snackPayment.merchantUid + '\''">주문취소</button>-->
                         <button type="button" class="cancel_btn">주문취소</button>
                         <button type="button" class="detail_btn">구매상세</button>
                     </div>
@@ -56,17 +56,17 @@
                                         let formattedDate = new Date(snackPayment.regDate).toISOString().split('T')[0]; // 'yyyy-MM-dd' 포맷으로 날짜 변환
 
                                         let item = `
-                                            <article class="history_get">
+                                            <article class="history_item">
                                                 <header>
                                                     <h3>${formattedDate}</h3>
                                                 </header>
                                                 <div class="history_data">
                                                     <img alt="${snackPayment.snack.snack_alt}" src="/images/menu/${snackPayment.snack.snack_image}">
                                                     <div>
-                                                        <h4>주문번호 : SN${formattedDate.replace(/-/g, '')}${snackPayment.id}</h4>
-                                                        <span class="snack_nm">${snackPayment.content} </span>
-                                                        <span><small style="font-size: 14px">${snackPayment.count}개</small></span>
-                                                        <p>${snackPayment.price}원</p>
+                                                        <h4>주문번호 : ${snackPayment.merchantUid}</h4>
+                                                        <span class="snack_nm">${snackPayment.productName} </span>
+                                                        <span><small style="font-size: 14px">${snackPayment.productCount}개</small></span>
+                                                        <p>${snackPayment.totalPrice}원</p>
                                                     </div>
                                                 </div>
                                             </article>`;
