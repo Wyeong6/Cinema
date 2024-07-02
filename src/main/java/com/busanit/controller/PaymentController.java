@@ -141,7 +141,6 @@ public class PaymentController {
                                                @RequestParam String imp_uid,
                                                @RequestParam String apply_num, // 카드 승인 번호
                                                @RequestParam String buyer_email, // 결제사에서 받아오는 메일이라 결제시 메일 주소 수정해서 보내면 로그인한 사람 메일과 다를 것 같아서 데이터 받아봄
-                                               @RequestParam String payment_status,
                                                @RequestParam String product_idx,
                                                @RequestParam String product_name,
                                                @RequestParam String product_type,
@@ -211,12 +210,6 @@ public class PaymentController {
                 pointDTO.setTotalPoints(totalPoints);
                 pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
             }
-
-//            if(minusPoint == 0 && plusPoint == 0 ) {
-//
-//            }
-
-
         }
         return response_complete;
     }
@@ -228,9 +221,17 @@ public class PaymentController {
         if(paymentDTO.getProductType().equals("MO")){ // 영화
             List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(Long.valueOf(paymentDTO.getProductIdx()));
             model.addAttribute("movieDTOs", movieDTOs);
-        } else { // 스낵
+        } else if(paymentDTO.getProductType().equals("SN")) { // 스낵
             SnackDTO snackDTO = snackService.get(Long.valueOf(paymentDTO.getProductIdx())); // 스낵 바로 결제
             model.addAttribute("productInfo", snackDTO);
+        } else { // 장바구니 결제
+            List<SnackDTO> snackList = new ArrayList<>();
+            String[] stringArray = paymentDTO.getProductIdx().split(",");
+            for (int i = 0; i < stringArray.length; i++ ){
+                SnackDTO snackDTO = snackService.get(Long.valueOf(stringArray[i]));
+                snackList.add(snackDTO);
+            }
+            model.addAttribute("productsInfo", snackList);
         }
 
         if(memberService.findUserIdx(memberService.currentLoggedInEmail()) == null ||
@@ -238,7 +239,10 @@ public class PaymentController {
                 memberService.findUserIdx(memberService.currentLoggedInEmail()) != paymentDTO.getMember_id()) { // 비회원 혹은 다른 멤버가 요청할때
             return "redirect:/";
         } else { // 해당 멤버가 요청할때
+
             model.addAttribute("paymentInfo", paymentDTO);
+            model.addAttribute("plusPoint", pointService.getPlusPoint(imp_uid));
+            model.addAttribute("minusPoint", pointService.getMinusPoint(imp_uid));
             return "payment/payment_complete";
         }
     }
