@@ -87,7 +87,7 @@
         <div class="navbar-nav align-items-center">
             <div class="nav-item d-flex align-items-center">
                 <i class="bx bx-search fs-4 lh-0"></i>
-                <h4>영화 등록하기</h4>
+                <h4 id="formTitle">영화 등록하기</h4>
             </div>
         </div>
         <!-- /Search -->
@@ -283,6 +283,11 @@
     </div>
 </div>
 
+<script type="module">
+    import { errorAlert } from "modules/alerts.js";
+    import { deleteAlert } from "modules/alerts.js";
+    import { warningAlert } from "modules/alerts.js";
+</script>
 <script th:inline="javascript">
 
 
@@ -321,7 +326,7 @@
 
 
         window.isEditMode = true;
-        formTitle.textContent = ('영화 수정');
+        formTitle.textContent = ('영화 수정하기');
         formSubmit.textContent = ('수정')
         idInput.value = movieId;
         idInput.disabled = true; // 수정 모드에서는 ID 필드를 비활성화합니다.

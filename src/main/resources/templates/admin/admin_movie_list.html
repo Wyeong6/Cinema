@@ -119,9 +119,10 @@
         height: 100%;
     }
 </style>
-<script>
 
-
+<script type="module">
+    import { errorAlert } from "/modules/alerts.js";
+    import { deleteConfirm } from "/modules/alerts.js";
 
     $(document).ready(function () {
 
@@ -149,12 +150,7 @@
                     $('#movie-search-list-container').html(data);
                 },
                 error: function (xhr, status, error) {
-                    alert('검색 중 오류가 발생했습니다.');
-                    console.error('검색 중 오류가 발생했습니다.');
-                    console.error('Status:', status);
-                    console.error('Error:', error);
-                    console.error('Response:', xhr.responseText);
-                    alert('검색 중 오류가 발생했습니다.');
+                    errorAlert('검색 중 오류가 발생했습니다.');
                 }
             });
         }
@@ -189,22 +185,23 @@
         // 영화 삭제 버튼 클릭 시
         $(document).off('click', '.delete-movie-btn').on('click', '.delete-movie-btn', function () {
             var movieId = $(this).data('movie-id');
-            if (confirm('삭제하시겠습니까?')) {
-                $.ajax({
-                    url: '/movies/delete/' + movieId,
-                    type: 'POST', // DELETE 메서드를 사용할 경우, type: 'DELETE'로 변경
-                    success: function (data) {
-                        // 삭제 성공 시 메시지 표시 또는 영화 목록 갱신 등의 작업 수행
-                        alert('영화가 성공적으로 삭제되었습니다.');
-                        $('.container-xxl').load('/admin/movieList', { type : 'POST' });
-                    },
-                    error: function () {
-                        alert('영화 삭제 중 오류가 발생했습니다.');
-                    }
-                });
-            }
+
+            deleteConfirm().then((confirmed) => {
+                if(confirmed) {
+                    $.ajax({
+                        url: '/movies/delete/' + movieId,
+                        type: 'POST', // DELETE 메서드를 사용할 경우, type: 'DELETE'로 변경
+                        success: function (data) {
+                            $('.container-xxl').load('/admin/movieList', { type : 'POST' });
+                        },
+                        error: function () {
+                            errorAlert('영화 삭제 중 오류가 발생했습니다.');
+                        }
+                    });
+                }
+                return false;
+            })
             // confirm 창에서 '취소'를 클릭한 경우 이벤트 전파를 막기 위해 return false; 추가
-            return false;
         });
     });
 
