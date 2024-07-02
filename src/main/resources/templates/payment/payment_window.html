@@ -76,7 +76,7 @@
                                         </tr>
                                         <tr>
                                             <th>할인 금액</th>
-                                            <td style="color: #e45649"><span>- </span>0원</td>
+                                            <td id="minus-point" style="color: #e45649"><span>- </span>0원</td>
                                         </tr>
                                         <tr>
                                             <th><h4>최종 결제금액</h4></th>
@@ -175,19 +175,35 @@
 
             // 포인트 입력시 사용자가 보유한 포인트를 넘지 않게 제한, 포인트는 1의자리 올림
             const pointInfo = [[${pointInfo}]];
-            $('.point-input').on('input', function () {
+            let currentPrice = 0;
+            function updateValues() {
                 const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
-                let pointInput = parseInt($(this).val(), 10) || 0;
+                let pointInput = parseInt($('.point-input').val(), 10) || 0;
+
                 if (pointInput > pointInfo) {
                     alert("보유 포인트 내에서만 포인트 사용이 가능합니다.");
-                    $(this).val(pointInfo); // Reset the value to the maximum allowed
+                    $('.point-input').val(pointInfo);
+                    pointInput = pointInfo;
                 }
-                const resultPrice = totalAmount - (parseInt($(this).val(), 10) || 0);
+
+                const resultPrice = totalAmount - pointInput;
                 currentPrice = resultPrice;
                 $('#result-price').text(resultPrice + '원');
                 $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
                 plusPoint = Math.ceil(resultPrice * gradeInfo);
-                minusPoint = parseInt($("#point").val(), 10);
+                minusPoint = parseInt($("#point").val(), 10) || 0;
+                $('#minus-point').text(minusPoint + 'p');
+            }
+
+            $('.point-input').on('input', function() {
+                updateValues();
+            });
+
+            var button = $('.point-info').find('button');
+            button.on('click', function () {
+                $('.point-input').val(pointInfo);
+                $('#minus-point').text(pointInfo + 'p')
+                updateValues();
             });
 
             // 초기 실행 (포인트 입력 값이 비어있을 경우 0으로 처리)

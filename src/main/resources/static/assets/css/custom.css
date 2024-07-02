@@ -1986,6 +1986,7 @@ button.pay-btn {
     padding-left: 0.5em;
     border: 1px solid #c4c3ca;
     border-radius: 5px;
+    text-align: right;
 }
 .payment .point-info div {
     display: flex;
