@@ -67,9 +67,12 @@
                                             <span><b th:text="${movie.releaseDate}">releasedate</b></span>
                                             <span><b th:text="${movie.runtime} + '분'">runtime</b></span>
                                             <img id="certification-image" src="" alt="영화심의등급 이미지">
-                                            <span id="certification"
-                                            ><b id="certificationB" th:text="${movie.certifications}">certification</b></span>
-                                            <span><b class="movie_data_averageRating"></b></span>
+                                            <span id="certification">
+                                                <b id="certificationB" th:text="${movie.certifications}">certification</b>
+                                            </span>
+                                            <span>
+                                                <b class="movie_data_averageRating"></b>
+                                            </span>
                                         </div>
                                         <p th:text="${movie.overview}">
                                             ~ overview ~
@@ -101,12 +104,18 @@
                 <div id="videoModal" class="modal">
                     <div class="video-modal-content">
                         <span class="close">&times;</span>
-                        <iframe id="videoFrame" width="560" height="315" src="" frameborder="0"
-                                allowfullscreen></iframe>
+                        <iframe id="videoFrame"
+                                width="560"
+                                height="315"
+                                src="" frameborder="0"
+                                allowfullscreen>
+                            </iframe>
                     </div>
                 </div>
 
                 <!-- 스틸컷 for each (반복) -->
+                <!-- movieId가 10자리일경우 == 관리자가 직접 등록한 영화 -->
+                <!-- movieId가 10자리가 아닐경우 == API에서 받아온 영화 -->
                 <div id="still-cut" th:each="movie, iterStat : ${movieInfos}">
                     <div class="row">
                         <div th:each="stillCutPath, iterStat : ${movie.stillCutPaths}"
@@ -126,10 +135,18 @@
                             </article>
                         </div>
                     </div>
-                    <p id="showMore" class="cursor"><a><img class="more_btn" src="/images/under-arrow.png"
-                                                            alt="더보기"/></a></p>
-                    <p id="showLess" class="cursor" style="display: none;"><a>접기</a></p>
+                    <p id="showMore" class="cursor">
+                        <a>
+                            <img class="more_btn"
+                                 src="/images/under-arrow.png"
+                                 alt="더보기"/>
+                        </a>
+                    </p>
+                    <p id="showLess" class="cursor" style="display: none;">
+                        <a>접기</a>
+                    </p>
                 </div>
+                <!-- 리액션 관련 div -->
                 <div id="reviews" style="display: none">
                     <header>
                         <div class="reaction-container">
@@ -166,9 +183,16 @@
                             <!-- 댓글이 여기에 추가될 것입니다 -->
                         </table>
                     </div>
-                    <p id="showMore_review" class="cursor"><a><img class="more_btn" src="/images/under-arrow.png"
-                                                                   alt="더보기"/></a></p>
-                    <p id="showLess_review" class="cursor" style="display: none;"><a>접기</a></p>
+                    <p id="showMore_review" class="cursor">
+                        <a>
+                            <img class="more_btn"
+                                 src="/images/under-arrow.png"
+                                 alt="더보기"/>
+                        </a>
+                    </p>
+                    <p id="showLess_review" class="cursor" style="display: none;">
+                        <a>접기</a>
+                    </p>
                 </div>
                 <!-- 이미지 상세보기 모달 -->
                 <div id="myModal" class="modal">
@@ -230,6 +254,8 @@
             }
         };
 
+        // API에서 영화 출연진들을 받아와서 뿌려주는 함수
+        // movieId가 10자리일경우 api에서 받아올수없기때문에 함수 자체를 종료
         async function fetchMovieCredits(movieId) {
 
             if (movieId.length === 10) {
@@ -328,12 +354,12 @@
 
         // 스틸컷 더보기(more), 접기 클릭 함수
         // 현재 표시된 항목의 수를 추적하는 변수
-        var visibleCount = 6; // 처음에 보이는 항목 수
-        var increment = 8; // 한 번에 표시할 추가 항목 수
+        let visibleCount = 6; // 처음에 보이는 항목 수
+        const increment = 8; // 한 번에 표시할 추가 항목 수
 
         // 스틸컷이 있는지 확인하는 함수
         function hasStillCuts() {
-            var stillCuts = document.querySelectorAll(".still-cut");
+            const stillCuts = document.querySelectorAll(".still-cut");
             return stillCuts.length > 0;
         }
 
@@ -344,9 +370,10 @@
             document.getElementById("showMore").style.display = 'block';
         }
 
+        // 더보기 버튼
         document.getElementById("showMore").addEventListener("click", function () {
-            var stillCuts = document.querySelectorAll(".still-cut");
-            var newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
+            const stillCuts = document.querySelectorAll(".still-cut");
+            const newVisibleCount = Math.min(visibleCount + increment, stillCuts.length);
 
             for (var i = visibleCount; i < newVisibleCount; i++) {
                 stillCuts[i].classList.remove("hide");
@@ -366,6 +393,7 @@
             }
         });
 
+        // 접기 버튼
         document.getElementById("showLess").addEventListener("click", function () {
             var stillCuts = document.querySelectorAll(".still-cut");
             for (var i = 0; i < stillCuts.length; i++) {
@@ -390,7 +418,7 @@
             var modalImg = document.getElementById("modalImage");
             modal.style.display = "block";
             modalImg.src = imageSrc;
-        };
+        }
 
         function closeModal() {
             var header = document.getElementById("header");
@@ -398,18 +426,15 @@
             var modal = document.getElementById("myModal");
             modal.style.display = "none";
             document.body.style.overflow = '';
-            // 자꾸 모달 닫을때 포스터 이미지 크기가 바껴서
+            // 자꾸 모달 닫을때 포스터 이미지 크기가 바뀌어서
             // 걍 모달 함수에서 닫을때 포스터이미지 크기를 강제로 설정해서 크기변동이 없는것처럼 보이게함.
             document.querySelector('.image.featured img').style.width = '350px';
             document.querySelector('.image.featured img').style.height = '480px';
             window.scrollTo(0, currentScrollPosition);
         }
 
-        /*--------- 이미지 상세보기 모달 끝 --------*/
 
         /* 유튜브 트레일러 관련 모달 시작 */
-
-        // 자바스크립트에서 타임리프를 이용한 변수 가져오기위한 코드 포함
         document.addEventListener('DOMContentLoaded', function () {
             var openModalButton = document.getElementById('videoModalBtn');
             if (openModalButton) {
@@ -487,7 +512,13 @@
                     console.log("hasCommented 값:", hasCommented);
 
                     if (hasCommented) {
-                        alert("이미 댓글을 작성하셨습니다.");
+                        Swal.fire({
+                            position: "center",
+                            icon: "info",
+                            title: "이미 댓글을 작성하셨습니다.",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     } else {
                         var reviewWindow = window.open('/review/' + movieId, 'ReviewModal', 'width=600,height=400');
                         var checkWindowClosed = setInterval(function () {
@@ -500,7 +531,13 @@
                 },
                 error: function (xhr, status, error) {
                     if (xhr.status === 401) {
-                        alert("로그인해주세요.");
+                        Swal.fire({
+                            position: "center",
+                            icon: "warning",
+                            title: "로그인해주세요.",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     } else {
                         console.error("댓글 작성 여부를 확인하는 중 오류가 발생했습니다:", error);
                     }
@@ -529,7 +566,6 @@
                     let currentCommentIndex = 0;
                     const maxCommentDisplay = 3;
                     const remainingCommentCount = data.comments.length - currentCommentIndex;
-
 
                     //평점
                     const movieDataSection = $('.movie_data_averageRating');
@@ -591,7 +627,6 @@
                     $('#comments').append(`<div class="error"><p>댓글을 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</p></div>`);
                 }
             });
-
         };
 
         loadComments();
@@ -607,7 +642,6 @@
             } else {
                 emailName = '***';
             }
-
             return `${emailName}@${emailDomain}`;
         }
 
@@ -643,13 +677,11 @@
         }
 
         // 찜하기 관련 함수 시작 //
-
-
         $(document).ready(function () {
 
-            var isFavorited = false; // 현재 사용자의 찜하기(좋아요) 상태를 저장할 변수임
+            let isFavorited = false; // 현재 사용자의 찜하기(좋아요) 상태를 저장할 변수임
 
-            // 현재 찜하기 상태를 가져오기 위해 API 호출
+            // 현재 찜하기 상태를 가져오기 위해 서버에서 상태 호출
             $.ajax({
                 url: '/favorites/check/' + userEmail + '/' + movieId,
                 type: 'GET',
@@ -660,7 +692,6 @@
                 success: function (response) {
                     // 응답에서 현재 리액션 상태를 받아와 버튼 상태를 업데이트
                     isFavorited = response.isFavorited;
-                    console.log("현재 리액션 상태 가져오기 성공! 현재상태 = " + isFavorited)
                     updateFavoriteButton(isFavorited)
                 },
                 error: function (xhr, status, error) {
@@ -668,13 +699,15 @@
                 }
             });
 
-
+            // 찜하기 버튼을 클릭했을때 찜하기 버튼의 상태에따라 서버에 요청을보냄
+            // 찜하기 버튼이 이미 클릭한 상태일때 -> 찜하기 취소
+            // 찜하기 버튼이 클릭하지 않은 상태일때 -> 찜목록 추가
             $("#favoriteButton").click(function () {
 
                 checkAnonymousUser();
 
                 if (isFavorited === false) {
-                    // 좋아요 요청 (POST 요청)
+                    // 찜하기 요청 (POST 요청)
                     $.ajax({
                         url: '/favorites/' + userEmail + '/' + movieId,
                         type: 'POST',
@@ -688,7 +721,7 @@
                         }
                     });
                 } else {
-                    // 좋아요 삭제요청 (DELETE 요청)
+                    // 찜하기 삭제요청 (DELETE 요청)
                     $.ajax({
                         url: '/favorites/' + userEmail + '/' + movieId,
                         type: 'DELETE',
@@ -704,7 +737,8 @@
                 }
             });
 
-            // 버튼상태 함수 (임시!!!)
+            // 버튼상태 표시하는 업데이트 함수
+            // 클래스에 따라 css가 바뀌어서 클릭한것과 안한것 표시 다르게 함
             function updateFavoriteButton(isFavorited) {
                 var favoriteButton = $('#favoriteButton');
                 if (isFavorited) {
@@ -735,6 +769,7 @@
             return false;
         }
 
+        // 리액션 추가 함수
         async function addReaction(userEmail, movieId, reactionType) {
 
             if (isRequestPending) {
@@ -765,6 +800,7 @@
             }
         }
 
+        // 리액션 서버로 보내는 함수
         function sendReaction(userEmail, movieId, reactionType) {
             return new Promise((resolve, reject) => {
                 $.ajax({
@@ -789,6 +825,7 @@
             });
         }
 
+        // 서버에서 리액션 숫자받아와서 카운트하는 함수
         function updateReactionCount(movieId) {
             $.ajax({
                 url: '/movie/' + movieId,
@@ -813,7 +850,6 @@
                 movieId: movieId,
                 reactionType: reactionType
             };
-
             // movieId(영화식별정보)가 없거나 userEmail(회원정보,로그인정보)가 없으면 return
             // 버튼연타시 ajax 요청 꼬이는거 방지할려고 추가함
             if (!userEmail || !movieId) {
@@ -847,12 +883,10 @@
                 });
             });
         }
-
         // 사용자의 현재 리액션 상태를 가져오는 함수
         // 페이지 로드시 바로 발동되게 해놓음
         // 현재 리액션상태를 가져와서 새로고침하면 중복으로 누를수있던부분 해결
         function initializeReactions() {
-            // 현재 사용자와 영화 ID를 설정합니다. 이 부분은 사용자에 맞게 변경해야 합니다.
             // 현재 리액션 상태를 가져오기 위해 API 호출
             $.ajax({
                 url: '/getCurrentReaction',
@@ -873,7 +907,7 @@
         }
 
         // 버튼 상태 업데이트 함수 추가
-        function updateButtonState() { // 새로 추가된 함수
+        function updateButtonState() {
             // 모든 버튼에서 active 클래스를 제거
             $('#likeButton, #dislikeButton, #sadButton, #funnyButton, #scaryButton').removeClass('active');
 
@@ -892,6 +926,7 @@
             }
         }
 
+        // 리액션이 선택되있는 상태에서 다른 리액션 선택 ( 기존 리액션이 삭제되고 새 리액션이 추가됨)
         function react(reactionType) {
 
             // 비회원 체크
@@ -939,6 +974,7 @@
             var funnyCountSpans = document.querySelectorAll('.funny-count');
             var scaryCountSpans = document.querySelectorAll('.scary-count');
 
+            // 리액션 div에 id 설정하는 부분
             likeCountSpans.forEach(span => {
                 span.id = 'likeCount_' + movieId;
             });

@@ -24,7 +24,6 @@ public class MovieFavoriteController {
             boolean isFavorited = favoriteMovieService.checkFavoriteStatus(userEmail, movieId);
             return ResponseEntity.ok().body(Map.of("isFavorited", isFavorited));
         } catch (Exception e) {
-            // 예외 처리 로직. 실제 환경에서는 더 상세한 예외 처리가 필요함.
             return ResponseEntity.badRequest().body(Map.of("error", "좋아요 상태 조회 실패"));
         }
     }

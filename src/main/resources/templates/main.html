@@ -9,6 +9,15 @@
     <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" async></script>
 
+    <style>
+        #movie_overview {
+            max-width: 100%;
+            white-space: pre-wrap; /* 줄바꿈을 포함하여 표시 */
+            word-wrap: break-word; /* 단어 단위로 줄바꿈 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -130,7 +139,7 @@
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn button">예매하기</button>
-                    <button class="get_btn button"><a href="#" class="movie-detail-link">상세보기</a></button>
+                    <button class="get_btn button"><a th:href="@{'/movies/' + ${movie.id}}">상세보기</a></button>
                 </div>
             </article>
         </div>
@@ -317,10 +326,25 @@
 
                 header.style.backgroundImage = `url(${moviePosters[index]})`;
                 movieTitle.textContent = movieTitles[index];
-                // movieOverviewTag.textContent = movieOverview[index];
-                const maxLength = 70; // 원하는 최대 길이
-                const overviewText = movieOverview[index];
-                movieOverviewTag.textContent = overviewText.length > maxLength ? overviewText.substring(0, maxLength) + '...' : overviewText;
+
+                // 메인화면 영화 줄거리 뜨는거 관련 (필요하면 조정하세요)
+                const maxLength = 70; // 원하는 최대 길이 (총 줄거리 70글자 제한)
+                const lineLength = 30; // 줄바꿈 기준 글자수 (30글자마다 줄바꿈)
+                let overviewText = movieOverview[index];
+
+                // 텍스트를 70글자로 제한하고 "..." 추가
+                if (overviewText.length > maxLength) {
+                    overviewText = overviewText.substring(0, maxLength) + '...';
+                }
+
+                // 줄바꿈
+                let formattedText = '';
+                for (let i = 0; i < overviewText.length; i += lineLength) {
+                    formattedText += overviewText.substring(i, i + lineLength) + '\n';
+                }
+
+                movieOverviewTag.textContent = formattedText.trim();
+                // movieOverviewTag.textContent = overviewText.length > maxLength ? overviewText.substring(0, maxLength) + '...' : overviewText;
 
                 // 버튼 스타일 업데이트
                 buttons.forEach((button, idx) => {
