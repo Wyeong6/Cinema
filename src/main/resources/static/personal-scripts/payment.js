@@ -29,7 +29,6 @@ function requestPay() {
                             "imp_uid": rsp.imp_uid,
                             "apply_num": rsp.apply_num,
                             "buyer_email": rsp.buyer_email,
-                            "payment_status": rsp.payment_status,
                             "product_idx": productIdx,
                             "product_name": orderName,
                             "product_type": reqIDX,
@@ -49,27 +48,20 @@ function requestPay() {
                         },
                         error: function() {
                             alert("서버 통신에 실패했습니다.");
+                            console.log(scheduleId, seatIds);
+                            if(reqIDX == 'MO') {
+                                cancelReservedSeats(scheduleId, seatIds);
+                            }
                         }
                     });
 
                 } else {
                     var msg = "결제에 실패하였습니다.";
                     msg += "에러내용 : " + rsp.error_msg;
-
-                    // $.ajax({
-                    //     type: "POST",
-                    //     url: "/payment/paymentFailed",
-                    //     data: JSON.stringify({
-                    //         err_msg: rsp.error_msg,
-                    //     }),
-                    //     contentType: 'application/json',
-                    //     success: function(response_failed) {
-                    //         alert(msg);
-                    //     },
-                    //     error: function() {
-                    //         alert('서버 통신에 실패했습니다.');
-                    //     }
-                    // });
+                    console.log(scheduleId, seatIds);
+                    if(reqIDX == 'MO') {
+                        cancelReservedSeats(scheduleId, seatIds);
+                    }
 
                     alert(msg);
 
@@ -83,7 +75,6 @@ function requestPay() {
                     //         "imp_uid": rsp.imp_uid,
                     //         "apply_num": rsp.apply_num,
                     //         "buyer_email": rsp.buyer_email,
-                    //         "payment_status": rsp.payment_status,
                     //         "product_name": orderName,
                     //         "product_idx": productIdx,
                     //         "product_type": reqIDX,
@@ -112,6 +103,24 @@ function requestPay() {
         },
         error: function() {
             alert('오류가 발생했습니다.');
+            if(reqIDX == 'MO') {
+                cancelReservedSeats(scheduleId, seatIds);
+            }
+        }
+    });
+}
+
+function cancelReservedSeats(scheduleId, seatIds) {
+    $.ajax({
+        type: 'POST',
+        url: '/reservation/reserveSeatsCancel?scheduleId=' + scheduleId,
+        contentType: 'application/json',
+        data: JSON.stringify(seatIds),
+        success: function(response) {
+            console.log('Seats canceled successfully:', response);
+        },
+        error: function(error) {
+            alert('Error canceling seats: ' + JSON.stringify(error));
         }
     });
 }

@@ -234,7 +234,7 @@
                 const scheduleId = $(".schedule-item.clicked input.schedule-id").val();
                 let startTime = $(".schedule-item.clicked h5").text();
                 let endTime = $(".schedule-item.clicked input.end-time").val();
-                let totalSeats = $(".schedule-item.clicked h6").text();
+                let availableSeats = $(".schedule-item.clicked h6 span").text();
                 let userAgeStr = $('.user-age').val();
 
                 let year = parseInt(userAgeStr.substr(0, 2), 10);
@@ -302,7 +302,7 @@
 
                 Swal.fire({
                     title: `${date} ${startTime}~${endTime}`,
-                    html: `남은 좌석 ${totalSeats}`,
+                    html: `남은 좌석 ${availableSeats}`,
                     imageUrl: `https://image.tmdb.org/t/p/w500/${moviePosterPath}`,
                     imageWidth: 200,
                     imageAlt: "영화 포스터",
@@ -312,39 +312,43 @@
                     confirmButtonText: "인원/좌석 선택",
                     cancelButtonText: "취소"
                 }).then((result) => {
-                    Swal.fire({
-                        title: certificationTitle,
-                        html: certificationInfo,
-                        imageUrl: imageUrl,
-                        imageWidth: 100,
-                        imageAlt: "연령고지 이미지"
-                    }).then((innerResult) => {
-                        if (innerResult.isConfirmed) {
-                            if (result.isConfirmed) {
-                                if (age < 19 && certificationTitle === '18세 이상 관람가') {
-                                    Swal.fire({
-                                        position: "center",
-                                        icon: "error",
-                                        html: "죄송하지만, 본 영화는 19세 미만 회원님들에게는<br /> 관람이 제한됩니다.",
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                } else if (age < 19 && (startHour >= 22 || (startHour === 22 && startMinute >= 0))) {
-                                    Swal.fire({
-                                        position: "center",
-                                        icon: "error",
-                                        html: "죄송하지만, 본 영화는 22:00 이후에 시작되어<br /> 19세 미만 회원님들에게는 관람이 제한됩니다.",
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                } else {
-                                    window.location.href = `/reservation/seatSelection/${scheduleId}`;
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: certificationTitle,
+                            html: certificationInfo,
+                            imageUrl: imageUrl,
+                            imageWidth: 100,
+                            imageAlt: "연령고지 이미지"
+                        }).then((innerResult) => {
+                            if (innerResult.isConfirmed) {
+                                if (result.isConfirmed) {
+                                    if (age < 19 && certificationTitle === '18세 이상 관람가') {
+                                        Swal.fire({
+                                            position: "center",
+                                            icon: "error",
+                                            html: "죄송하지만, 본 영화는 19세 미만 회원님들에게는<br /> 관람이 제한됩니다.",
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        });
+                                    } else if (age < 19 && (startHour >= 22 || (startHour === 22 && startMinute >= 0))) {
+                                        Swal.fire({
+                                            position: "center",
+                                            icon: "error",
+                                            html: "죄송하지만, 본 영화는 22:00 이후에 시작되어<br /> 19세 미만 회원님들에게는 관람이 제한됩니다.",
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        });
+                                    } else {
+                                        window.location.href = `/reservation/seatSelection/${scheduleId}`;
+                                    }
+                                } else if (result.isDismissed) {
+                                    $('.schedule-item').removeClass('clicked');
                                 }
-                            } else if (result.isDismissed) {
-                                $('.schedule-item').removeClass('clicked');
                             }
-                        }
-                    });
+                        });
+                    } else if (result.isDismissed) {
+                        $('.schedule-item').removeClass('clicked');
+                    }
                 });
             });
 
@@ -409,6 +413,7 @@
                     const startTime = schedule.startTime; // 시작 시간
                     const endTime = schedule.endTime;
                     const totalSeats = schedule.totalSeats;
+                    const availableSeats = schedule.availableSeats;
                     const sessionType = schedule.sessionType;
 
                     if(schedule.status === true) {
@@ -429,12 +434,11 @@
                         const scheduleItem = $(`
                                 <li class="schedule-item">
                                     <input type="hidden" class="schedule-id" value="${scheduleId}" />
-                                    <input type="hidden" class="schedule-status" value="${schedule.status}" />
                                     <input type="hidden" class="schedule-sessionType" value="${schedule.sessionType}" />
                                     <img src="/images/sun.png" alt="조조" style="display: none;"/>
                                     <img src="/images/moon.png" alt="심야" style="display: none;"/>
                                     <h5>${startTime}</h5>
-                                    <h6>${totalSeats}석</h6>
+                                    <h6><span style="color: #F24949">${availableSeats}석</span>/${totalSeats}석</h6>
                                     <input type="hidden" class="end-time" value="${endTime}" />
                                 </li>
                             `);

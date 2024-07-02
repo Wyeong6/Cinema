@@ -40,7 +40,7 @@ public class MovieController {
 
     @Transactional
     @GetMapping("/")
-    public String getDetailMovies(Model model, @PageableDefault(size = 8, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public String getDetailMovies(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
         //비디오가 있는 인기순영화
         List<MovieDTO> videoMovies = movieService.getCachedVideoMovies();

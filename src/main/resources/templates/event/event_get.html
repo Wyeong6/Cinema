@@ -11,7 +11,7 @@
 			<div class="container">
 				<article id="main" class="special">
 					<header>
-						<h2 th:text="${event.eventName}">이벤트 제목</h2>
+						<h3 th:text="${event.eventName}">이벤트 제목</h3>
 						<p>
 							<img src="/images/views.png" alt="조회수 이미지" />
 							<span>[[${event.viewCount}]]</span></p>
@@ -20,7 +20,7 @@
 						</div>
 					</header>
 					<section>
-						<img class="event-main-img" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지"/>
+						<img class="event-main-img" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="max-width: 900px !important; height: auto;" />
 						<p class="event-detail" th:text="${event.eventDetail}" style="display: none;">
 							이벤트 상세 내용
 						</p>

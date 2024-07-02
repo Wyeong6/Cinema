@@ -173,6 +173,24 @@ public class ReservationController {
         }
     }
 
+    @PostMapping("/reserveSeatsCancel")
+    @ResponseBody
+    public ResponseEntity<String> cancelSeatReservations(@RequestParam Long scheduleId, @RequestBody List<String> seatIds) {
+        try {
+            if (scheduleId != null && seatIds != null && !seatIds.isEmpty()) {
+                seatReservationService.deleteSeat(scheduleId, seatIds);
+                return ResponseEntity.ok("Seat reservations canceled successfully");
+            } else {
+                return ResponseEntity.badRequest().body("Invalid scheduleId or seatIds");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception for debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to cancel seat reservations");
+        }
+    }
+
     private Long parseScheduleId(Map<String, Object> request) {
         Object scheduleIdObj = request.get("scheduleId");
         if (scheduleIdObj instanceof Number) {
