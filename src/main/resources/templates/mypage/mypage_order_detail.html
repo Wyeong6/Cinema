@@ -31,7 +31,7 @@
                                         <td th:text="${paymentInfo.getProductName()}">제품명</td>
                                         <td th:text="${paymentInfo.getTotalPrice()+'원'}">5000</td>
                                         <td th:text="${paymentInfo.getProductCount()+'개'}">2</td>
-                                        <td>결제완료</td>
+                                        <td th:text="${paymentInfo.getPaymentStatus()}">결제완료</td>
                                     </tr>
                                 </tbody>
                             </table>
