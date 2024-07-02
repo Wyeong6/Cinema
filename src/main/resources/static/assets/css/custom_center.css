@@ -63,14 +63,68 @@
 }
 /* 1:1 채팅 */
 #categoryButtons {
-    margin-bottom: 3em;
+    margin-bottom: 0.5em;
 }
-.category-btn {
+#categoryButtons button {
     font-size: 0.7em;
-    padding: 0.5em 1em;
+    padding: 0.3em 1em;
     border-radius: 10px;
+    background: #BF9A99;
+    font-weight: 400;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+}
+.message {
+    position: relative;
+    max-width: 45%;
+    border-radius: 30px;
+    padding: 0.5em 1em;
+    margin-bottom: 0.5em;
+    white-space: pre-line;
+    box-shadow: 5px 5px 8px #b4bdc6;
+}
+.admin-message p,
+.user-message p {
+    margin-bottom: 0;
+    color: #1e2c3c;
+    line-height: 1.2em;
+}
+.admin-message p {
+    color: #eceef1;
+}
+.message.user-message {
+    background: #FFCCCB;
+    text-align: right;
+    align-self: flex-end; /* 오른쪽으로 정렬합니다. */
+    margin-left: auto; /* 왼쪽 여백을 설정합니다. */
+}
+.message.admin-message {
+    background: #806666;
+    margin-right: auto;
+}
+.admin-message::before,
+.user-message::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 20px;
+    border-style: solid;
+}
+.user-message::before {
+    top: 0;
+    right: 2px; /* 삼각형 위치 조정 */
+    border-color: #FFCCCB transparent transparent transparent;
+}
+.admin-message::before {
+    bottom: 0;
+    left: 2px; /* 삼각형 위치 조정 */
+    border-color: transparent transparent #806666 transparent;
 }
 .input-div {
+    margin-top: 1em;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -78,13 +132,47 @@
 }
 .input-div input {
     width: 90%;
-    padding: 0.1em 0 0.1em 0.5em;
-    font-size: 0.9em;
+    padding: 0.3em 0 0.3em 1em;
+    border-radius: 10px;
+    border: 1px solid #403333;
+    font-size: 0.8em;
+}
+.input-div input:active,
+.input-div input:focus {
+    border: 1px solid #403333 !important;
 }
 .input-div button {
     width:8%;
     font-size: 0.7em;
     padding: 0.8em 1em;
+    background: #403333;
+    border-radius: 15px;
+}
+.admin-status {
+    font-size: 0.7em;
+    color: #aaaaaa;
+    margin-left: 1em;
+}
+.admin-status {
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+}
+#dots {
+    margin-left: 0.2em;
+}
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #000;
+    margin: 0 2px;
+    animation: pulse 1s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
 }
 /* 이메일 보내기 contact */
 #contact header {

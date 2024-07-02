@@ -11,19 +11,29 @@
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" async></script>
 </head>
 <body>
+    <header style="margin-bottom: 3em">
+        <h2>1:1 채팅문의</h2>
+    </header>
 <div id="messages"></div> <!-- 메시지를 보여주는 부분을 버튼 위로 이동 -->
-<div id="categoryButtons">
-    <!-- 카테고리 선택 버튼 -->
-    <button onclick="selectCategory('예매')">예매</button>
-    <button onclick="selectCategory('판매')">판매</button>
-    <button onclick="selectCategory('이벤트')">이벤트</button>
-    <button onclick="selectCategory('기타')">기타</button>
-</div>
-<div>
-    <p id="hello">안녕하세요 고객님 카테고리를 선택해주세요.</p>
-    <input type="text" id="message" placeholder="카테고리 선택 후 입력"/>
-    <button onclick="sendMessage()">Send</button>
-    <div id="typingIndicatorDTO" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
+<div class="container">
+    <div>
+        <div id="categoryButtons">
+            <!-- 카테고리 선택 버튼 -->
+            <button onclick="selectCategory('예매')">예매</button>
+            <button onclick="selectCategory('판매')">판매</button>
+            <button onclick="selectCategory('이벤트')">이벤트</button>
+            <button onclick="selectCategory('기타')">기타</button>
+        </div>
+        <div class="admin-message info-welcome message">
+            <p id="hello">안녕하세요! 시네마캐스트의 1:1 문의 채팅창에 오신 것을 환영합니다.
+                원하시는 카테고리를 선택하고 문의 내용을 입력해주세요.</p>
+        </div>
+    </div>
+    <div class="input-div">
+        <input type="text" id="message" placeholder="문의 유형 선택 후 문의할 내용을 입력해주세요."/>
+        <button onclick="sendMessage()">입력</button>
+    </div>
+    <div id="typingIndicatorDTO" class="admin-status" style="display: none;">상대방이 채팅 중입니다<span id="dots"></span></div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
 </div>
 
 <script th:inline="javascript">
@@ -199,12 +209,26 @@
     //메세지 표현
     function showMessage(message) {
         var messages = document.getElementById('messages');
+        var messageElementDiv = document.createElement('div');
         var messageElement = document.createElement('p');
-        messageElement.appendChild(document.createTextNode(message));
-        messages.appendChild(messageElement);
+
+        // 메시지가 '관리자 :'로 시작하면 관리자 메시지로 처리
+        if (message.startsWith('관리자 :')) {
+            messageElement.textContent = message.substring(6).trim(); // '관리자 :' 부분을 제외한 실제 메시지
+            messageElementDiv.classList.add('admin-message');
+        } else if (message.startsWith('나 :')) {
+            messageElement.textContent = message.substring(4).trim(); // '나 :' 부분을 제외한 실제 메시지
+            messageElementDiv.classList.add('user-message');
+        } else {
+            messageElement.textContent = message;
+            messageElementDiv.classList.add('admin-message');
+        }
+
+        messageElementDiv.appendChild(messageElement);
+        messageElementDiv.classList.add('message');
+
+        messages.appendChild(messageElementDiv);
         document.getElementById('typingIndicatorDTO').style.display = 'none';
-
-
     }
 
     //카테고리를 선택한 후
@@ -221,7 +245,10 @@
 
         // 카테고리 버튼 숨기기
         document.getElementById('categoryButtons').style.display = 'none';
-        document.getElementById('hello').style.display = 'none';
+        var elements = document.getElementsByClassName('info-welcome');
+        if (elements.length > 0) {
+            elements[0].style.display = 'none';
+        }
         //카테고리 별 수신자 이메일 설정
         switch (category) {
             case '예매':
@@ -240,6 +267,8 @@
                 recipient = 'admin@admin.com';
         }
         createChatRoomAndConnect(recipient, category);
+        const input = document.getElementById('message');
+        input.setAttribute('placeholder', '입력하세요.');
     }
 
     //관리자이메일과 카테고리로 채팅방 생성
@@ -369,6 +398,38 @@
     function handleWebSocketMessage(response) {
         updateUnreadCount(response);
     }
+
+    // 점을 추가하고 제거하는 함수
+    function animateDots() {
+        var dotsContainer = document.getElementById('dots');
+        var maxDots = 2;
+        var dotInterval = 500; // 점이 나타나는 시간 간격
+        var dotLifetime = 1500; // 점이 화면에 유지되는 시간
+
+        function addDot() {
+            var dot = document.createElement('span');
+            dot.className = 'dot';
+            dotsContainer.appendChild(dot);
+
+            setTimeout(function() {
+                dotsContainer.removeChild(dot);
+            }, dotLifetime);
+        }
+
+        var dotCount = 0;
+        var dotTimer = setInterval(function() {
+            if (dotCount < maxDots) {
+                addDot();
+                dotCount++;
+            } else {
+                clearInterval(dotTimer);
+            }
+        }, dotInterval);
+    }
+
+    setInterval(animateDots, 3000); // 점 애니메이션을 반복하는 시간 간격
+
+    setInterval(animateDots, 1500);
 </script>
 </body>
 </html>

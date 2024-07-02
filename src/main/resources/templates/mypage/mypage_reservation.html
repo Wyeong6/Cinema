@@ -28,7 +28,7 @@
                         <button type="button" class="cancel_btn" id="movie_cancel" th:data-reservation-merchantUid="${moviePayment.getMerchantUid()}" th:data-reservation-impUid="${moviePayment.getImpUid()}">예매취소</button>
                     </div>
                     <div class="button_box" th:unless="${moviePayment.getPaymentStatus() == '결제완료'}"> <!--결제취소상태-->
-                        <button type="button" class="detail_btn" id="movie_cancel_detail" th:data-reservation-idx="${moviePayment.getId()}">예매상세</button>
+                        <button type="button" style="width: 100%" class="detail_btn" id="movie_cancel_detail" th:data-reservation-idx="${moviePayment.getId()}">예매상세</button>
                     </div>
                 </article>
                 <article th:if="${moviePaymentInfo == null or moviePaymentInfo.isEmpty()}">
@@ -38,9 +38,9 @@
                 </article>
 
                 <!-- 더보기 버튼 -->
-                <div id="moreContainer" style="text-align: center; margin-top: 15px;"
+                <div id="moreContainer"
                      th:if="${moviePaymentInfo.hasNext}">
-                    <button id="moreBtn" onclick="loadMore()">더보기</button>
+                    <button id="moreBtn" onclick="loadMore()"><img src="/images/under-arrow.png" alt="더보기 버튼" /></button>
                 </div>
             </section>
         </div>
@@ -61,22 +61,58 @@
                     // 데이터를 페이지에 추가하는 로직
                     let container = $('.history'); // 주문 내역을 추가할 컨테이너
                     data.content.forEach(moviePayment => {
-
-                        let item = `
+                        let item = null;
+                        if(moviePayment.getPaymentStatus == '결제완료') {
+                            item = `
                                             <article class="history_item">
                                                 <header>
                                                     <h4>결제완료</h4>
                                                 </header>
-                                                <div class="history_data">
-                                                    <img alt="영화 포스터" src="https://image.tmdb.org/t/p/w500/${moviePayment.movie.poster_path}">
-                                                    <div>
-                                                        <h4>주문번호 : ${moviePayment.merchantUid}</h4>
-                                                        <span class="movie_nm">${moviePayment.productName} </span>
-                                                        <span>시간</span>
-                                                        <p>좌석</p>
-                                                    </div>
-                                                </div>
+                                                <header>
+                        <h4 class="reservation-status">결제완료</h4>
+                    </header>
+                    <div class="history_data">
+                        <input type="hidden" th:value="${moviePayment.getMovie().id}" class="movieId"/>
+                        <img class="featured-img" alt="영화 포스터" src="https://image.tmdb.org/t/p/w500/${moviePayment.movie.poster_path}">
+                        <div>
+                            <p>예매번호 : ${moviePayment.merchantUid}</p>
+                            <input type="hidden" value="${moviePayment.scheduleId}" class="schedule-id">
+                            <p>${moviePayment.productName}</p>
+                            <p><span class="history-data-date">${moviePayment.content1}</span> <span class="history-data-time">${moviePayment.content2}</span></p>
+                            <p><span class="history-data-theater">${moviePayment.content3}</span> <span class="history-data-seats">${moviePayment.content4}</span></p>
+                        </div>
+                    </div>
+                    <div class="button_box"> <!--결제상태-->
+                        <button type="button" class="detail_btn" id="movie_detail" data-reservation-idx="${moviePayment.id}">예매상세</button>
+                        <button type="button" class="cancel_btn" id="movie_cancel" data-reservation-merchantUid="${moviePayment.merchantUid}" data-reservation-impUid="${moviePayment.impUid}">예매취소</button>
+                    </div>
                                             </article>`;
+                        } else {
+                            item = `
+                                            <article class="history_item">
+                                                <header>
+                                                    <h4>결제완료</h4>
+                                                </header>
+                                                <header>
+                        <h4 class="reservation-status">결제완료</h4>
+                    </header>
+                    <div class="history_data">
+                        <input type="hidden" value="${moviePayment.movie.id}" class="movieId"/>
+                        <img class="featured-img" alt="영화 포스터" src="https://image.tmdb.org/t/p/w500/${moviePayment.movie.poster_path}">
+                        <div>
+                            <p>예매번호 : ${moviePayment.merchantUid}</p>
+                            <input type="hidden" value="${moviePayment.scheduleId}" class="schedule-id">
+                            <p>${moviePayment.productName}</p>
+                            <p><span class="history-data-date">${moviePayment.content1}</span> <span class="history-data-time">${moviePayment.content2}</span></p>
+                            <p><span class="history-data-theater">${moviePayment.content3}</span> <span class="history-data-seats">${moviePayment.content4}</span></p>
+                        </div>
+                    </div>
+                    <div class="button_box"> <!--결제취소상태-->
+                        <button type="button" style="width: 100%" class="detail_btn" id="movie_cancel_detail" data-reservation-idx="${moviePayment.id}">예매상세</button>
+                    </div>
+                                            </article>`;
+                        }
+
                         container.append(item);
                     });
 
@@ -100,21 +136,16 @@
             const merchant_uid = $(this).data('reservation-merchantuid');
             const imp_uid = $(this).data('reservation-impuid');
 
-            $('.history-data-seats').each(function() {
-                var seatsContent = $(this).text().trim();
+            var seatsContent = $(this).closest('.history_item').find('.history-data-seats').text().trim();
+            var seats = seatsContent.split(/\s+/);
+            var firstToken = seats[0];
+            var regex = /^\d+관$/;
 
-                // 공백을 기준으로 문자열을 분리하여 배열에 저장 (첫 번째 요소는 관 정보)
-                var seats = seatsContent.split(/\s+/);
+            if (regex.test(firstToken)) {
+                seats.splice(0, 1); // 첫 번째 요소(관 정보) 제거
+            }
 
-                var firstToken = seats[0];
-                var regex = /^\d+관$/;
-
-                if (regex.test(firstToken)) {
-                    seats.splice(0, 1); // 첫 번째 요소(관 정보) 제거
-                }
-
-                seatsIdArray.push(seats);
-            });
+            seatsIdArray.push(scheduleId + seats);
 
             $.ajax({
                 type: 'POST',
@@ -127,8 +158,8 @@
                     if(response_complete.errorMsg !== "errorMsg") {
                         let params = new URLSearchParams();
                         params.append("imp_uid", response_complete.imp_uid);
-                        window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
                         cancelReservedSeats(scheduleId, seatsIdArray);
+                        window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
                     } else {
                         alert("죄송합니다. 다시 시도해주세요.");
                     }
@@ -157,7 +188,7 @@
                 console.log('Seats canceled successfully:', response);
             },
             error: function(error) {
-                alert('Error canceling seats: ' + JSON.stringify(error));
+                console.log('Error canceling seats: ' + JSON.stringify(error));
             }
         });
     }
