@@ -7,6 +7,7 @@ import com.busanit.entity.SeatReservationId;
 import com.busanit.repository.ScheduleRepository;
 import com.busanit.repository.SeatRepository;
 import com.busanit.repository.SeatReservationRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,5 +51,19 @@ public class SeatReservationService {
         schedule.decreaseAvailableSeats(seatsReserved);
 
         scheduleRepository.save(schedule);
+    }
+
+    @Transactional
+    public void deleteSeat(Long scheduleId, List<String> seatIds) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid schedule ID: " + scheduleId));
+
+        List<SeatReservation> reservations = seatReservationRepository.findByScheduleIdAndSeatIdIn(scheduleId, seatIds);
+
+        if (reservations.isEmpty()) {
+            throw new IllegalArgumentException("No reservations found for the given schedule ID and seat IDs");
+        }
+
+        seatReservationRepository.deleteByScheduleIdAndSeatId(scheduleId, seatIds);
     }
 }

@@ -117,6 +117,8 @@
     <script th:inline="javascript">
         /* 결제 프로그램 사용시 필요한 변수 */
         const productIdx = document.getElementById("movieId").value;
+        const scheduleId = [[${scheduleDTO.id}]];
+        const seatIds = [];
         const content1 = [[${scheduleDTO.date}]]; // 상영일자
         const content2 = [[${scheduleDTO.startTime}]]; // 시간
         const content3 = [[${scheduleDTO.theaterName}]]; // 상영관
@@ -162,6 +164,7 @@
                     .attr('data-seat-column', seat.seatColumn)
                     .addClass('seat-info');
                 $('#selected-seats').append(seatDiv);
+                seatIds.push(seat.seatId);
             });
 
             let content4Array = [];
@@ -250,7 +253,7 @@
                 data: JSON.stringify({ scheduleId, reservedBy, selectedSeats }),
                 success: function(response) {
                     console.log('Reserved seats successfully:', response);
-                    requestPay(); // 결제 요청
+                    requestPay(response); // 결제 요청
                 },
                 error: function(error) {
                     alert('Error reserving seats: ' + error.responseText);
