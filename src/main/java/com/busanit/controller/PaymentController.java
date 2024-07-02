@@ -243,23 +243,17 @@ public class PaymentController {
         }
     }
 
-//    @PostMapping("/paymentFailed")
-//    @ResponseBody
-//    public Map<String, String> paymentFailed(@RequestBody Map<String, String> request) {
-//        Map<String, String> response_failed = new HashMap<>();
-//        response_failed.put("response_failed", "response_failed");
-//
-//        return response_failed;
-//    }
-
     // 주문 취소
-    @GetMapping("/paymentCancel")
-    public String paymentCancel(@RequestParam String merchant_uid) {
+    @PostMapping("/paymentCancel")
+    @ResponseBody
+    public Map<String, String> paymentCancel(@RequestParam("merchant_uid") String merchant_uid , @RequestParam("imp_uid") String imp_uid) {
         CloseableHttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
         post.setHeader("Authorization", paymentService.getImportToken());
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("merchant_uid", merchant_uid));
+
+        Map<String, String> response_complete = new HashMap<>();
 
         String asd = "";
         try {
@@ -270,10 +264,37 @@ public class PaymentController {
             JsonNode rootNode = mapper.readTree(body); asd = rootNode.get("response").asText();
         } catch (Exception e) {
             e.printStackTrace();
+            response_complete.put("errorMsg", "errorMsg");
         } if (asd.equals("null")) {
-            System.err.println("환불실패"); return "payment/cart_list";
+            System.err.println("환불실패");
+            response_complete.put("errorMsg", "errorMsg");
         } else {
-            System.err.println("환불성공"+asd); return "payment/cart_list";
+            System.err.println("환불성공"+imp_uid);
+            paymentService.updatePaymentStatus(imp_uid, memberService.findUserIdx(memberService.currentLoggedInEmail()));
+            response_complete.put("imp_uid", imp_uid);
+        }
+        return response_complete;
+    }
+
+    @GetMapping("/paymentCancelSuccessful")
+    public String paymentCancelSuccessful(@RequestParam String imp_uid, Model model) {
+
+        PaymentDTO paymentDTO = paymentService.get(imp_uid);
+        if(paymentDTO.getProductType().equals("MO")){ // 영화
+            List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(Long.valueOf(paymentDTO.getProductIdx()));
+            model.addAttribute("movieDTOs", movieDTOs);
+        } else { // 스낵
+            SnackDTO snackDTO = snackService.get(Long.valueOf(paymentDTO.getProductIdx())); // 스낵 바로 결제
+            model.addAttribute("productInfo", snackDTO);
+        }
+
+        if(memberService.findUserIdx(memberService.currentLoggedInEmail()) == null ||
+                paymentDTO.getMember_id() == null ||
+                memberService.findUserIdx(memberService.currentLoggedInEmail()) != paymentDTO.getMember_id()) { // 비회원 혹은 다른 멤버가 요청할때
+            return "redirect:/";
+        } else { // 해당 멤버가 요청할때
+            model.addAttribute("paymentInfo", paymentDTO);
+            return "payment/payment_cancel";
         }
     }
 }

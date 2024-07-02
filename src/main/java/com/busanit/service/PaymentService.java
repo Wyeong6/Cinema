@@ -94,6 +94,11 @@ public class PaymentService {
         return PaymentDTO.toDTOSnack(payment, snackService);
     }
 
+    // 결제 상태 수정
+    public void updatePaymentStatus(String impUid, Long memberId) {
+        paymentRepository.updatePaymentStatus(impUid, memberId);
+    }
+
     // 결제 토큰 받기
     public String getImportToken() {
         String result = null;

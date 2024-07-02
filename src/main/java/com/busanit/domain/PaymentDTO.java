@@ -79,6 +79,7 @@ public class PaymentDTO {
                 .totalPrice(payment.getTotalPrice())
                 .productType(payment.getProductType())
                 .merchantUid(payment.getMerchantUid())
+                .impUid(payment.getImpUid())
                 .applyNum(payment.getApplyNum())
                 .paymentStatus(payment.getPaymentStatus())
                 .regDate(payment.getRegDate())
@@ -104,6 +105,7 @@ public class PaymentDTO {
                 .totalPrice(payment.getTotalPrice())
                 .productType(payment.getProductType())
                 .merchantUid(payment.getMerchantUid())
+                .impUid(payment.getImpUid())
                 .applyNum(payment.getApplyNum())
                 .paymentStatus(payment.getPaymentStatus())
                 .regDate(payment.getRegDate())
@@ -128,6 +130,7 @@ public class PaymentDTO {
                     .productCount(entity.getProductCount())
                     .totalPrice(entity.getTotalPrice())
                     .merchantUid(entity.getMerchantUid())
+                    .impUid(entity.getImpUid())
                     .regDate(entity.getRegDate())
                     .updateDate(entity.getUpdateDate())
                     .movie(movieDTO) // MovieDTO 설정
@@ -147,6 +150,7 @@ public class PaymentDTO {
                     .productCount(entity.getProductCount())
                     .totalPrice(entity.getTotalPrice())
                     .merchantUid(entity.getMerchantUid())
+                    .impUid(entity.getImpUid())
                     .regDate(entity.getRegDate())
                     .updateDate(entity.getUpdateDate())
                     .snack(snackDTO) // SnackDTO 설정
