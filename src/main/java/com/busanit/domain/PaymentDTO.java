@@ -131,6 +131,7 @@ public class PaymentDTO {
                     .totalPrice(entity.getTotalPrice())
                     .merchantUid(entity.getMerchantUid())
                     .impUid(entity.getImpUid())
+                    .paymentStatus(entity.getPaymentStatus())
                     .regDate(entity.getRegDate())
                     .updateDate(entity.getUpdateDate())
                     .movie(movieDTO) // MovieDTO 설정
@@ -151,6 +152,7 @@ public class PaymentDTO {
                     .totalPrice(entity.getTotalPrice())
                     .merchantUid(entity.getMerchantUid())
                     .impUid(entity.getImpUid())
+                    .paymentStatus(entity.getPaymentStatus())
                     .regDate(entity.getRegDate())
                     .updateDate(entity.getUpdateDate())
                     .snack(snackDTO) // SnackDTO 설정

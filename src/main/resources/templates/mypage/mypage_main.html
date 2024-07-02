@@ -48,9 +48,12 @@
                             <p><span class="history-data-theater" th:text="${moviePaymentInfo.getContent().get(0).getContent3()}">상영관</span> <span class="history-data-seats" th:text="${moviePaymentInfo.getContent().get(0).getContent4()}">좌석</span></p>
                         </div>
                     </div>
-                    <div class="button_box">
+                    <div class="button_box" th:if="${moviePaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}"> <!--결제상태-->
                         <button type="button" class="cancel_btn" id="movie_cancel" th:data-reservation-merchantUid="${moviePaymentInfo.getContent().get(0).getMerchantUid()}" th:data-reservation-impUid="${moviePaymentInfo.getContent().get(0).getImpUid()}">예매취소</button>
                         <button type="button" class="detail_btn" id="movie_detail" th:data-reservation-idx="${moviePaymentInfo.getContent().get(0).getId()}">예매상세</button>
+                    </div>
+                    <div class="button_box" th:unless="${moviePaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}"> <!--결제취소상태-->
+                        <button type="button" class="detail_btn" id="movie_cancel_detail" th:data-reservation-idx="${moviePaymentInfo.getContent().get(0).getId()}">예매상세</button>
                     </div>
                 </article>
                 <article th:if="${moviePaymentInfo == null or moviePaymentInfo.isEmpty()}">
@@ -87,9 +90,12 @@
                             <p th:text="${snackPaymentInfo.getContent().get(0).getTotalPrice()}+원">36,000원 </p>
                         </div>
                     </div>
-                    <div class="button_box">
+                    <div class="button_box" th:if="${snackPaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}">
                         <button type="button" class="cancel_btn" id="snack_cancel" th:data-order-merchantUid="${snackPaymentInfo.getContent().get(0).getMerchantUid()}" th:data-order-impUid="${snackPaymentInfo.getContent().get(0).getImpUid()}">주문취소</button>
                         <button type="button" class="detail_btn" id="snack_detail" th:data-order-idx="${snackPaymentInfo.getContent().get(0).getId()}">구매상세</button>
+                    </div>
+                    <div class="button_box" th:unless="${snackPaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}">
+                        <button type="button" class="detail_btn" id="snack_cancel_detail" th:data-order-idx="${snackPaymentInfo.getContent().get(0).getId()}">구매상세</button>
                     </div>
                 </article>
                 <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
@@ -151,7 +157,7 @@
         });
 
         // 예매내역 상세보기
-        $('#movie_detail').click(function() {
+        $('#movie_detail, #movie_cancel_detail').click(function() {
             const reservationIdx = $(this).data('reservation-idx');
             $('#content').load('/mypage/reservation/detail?paymentId='+reservationIdx);
         });
@@ -189,7 +195,7 @@
         });
 
         // 주문 상세보기
-        $('#snack_detail').click(function() {
+        $('#snack_detail, #snack_cancel_detail').click(function() {
             const orderIdx = $(this).data('order-idx');
             $('#content').load('/mypage/order/detail?paymentId='+orderIdx);
         });
