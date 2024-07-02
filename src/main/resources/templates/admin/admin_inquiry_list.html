@@ -29,6 +29,14 @@
 
     <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        .no-rooms-message {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            padding: 20px 0;
+        }
+    </style>
 </head>
 <body>
 <div class="row">
@@ -72,6 +80,9 @@
                     </tr>
                     </tbody>
                 </table>
+                <div th:if="${#lists.isEmpty(unansweredInquiryList.content)}">
+                    <div class="no-rooms-message" style="text-align: center;">문의가 없습니다</div>
+                </div>
                 <div style="text-align: center;" th:if="${!#lists.isEmpty(unansweredInquiryList.content)}"
                      th:with="startunansweredPage=${startunansweredPage}, endunansweredPage=${endunansweredPage}">
                     <a href="#" th:each="i : ${#numbers.sequence(startunansweredPage, endunansweredPage)}"
@@ -122,6 +133,9 @@
                     </tr>
                     </tbody>
                 </table>
+                <div th:if="${#lists.isEmpty(answeredInquiryList.content)}">
+                    <div class="no-rooms-message" style="text-align: center;">문의가 없습니다</div>
+                </div>
                 <div style="text-align: center;" th:if="${!#lists.isEmpty(answeredInquiryList.content)}"
                      th:with="startansweredPage=${startansweredPage}, endansweredPage=${endansweredPage}">
                     <a href="#" th:each="i : ${#numbers.sequence(startansweredPage, endansweredPage)}"
@@ -317,7 +331,7 @@
             }
         });
 
-        //메일답변 클릭 시
+        // 메일 답변 클릭 시
         $('#replyForm').on('submit', function (event) {
             event.preventDefault();
 
@@ -325,19 +339,26 @@
             const formData = new FormData(this);
 
             sendRequest('POST', '/admin/sendReply', formData, function (response) {
-
                 if (response.trim() === 'success') {
-                    // $('#inquiryModal').modal('hide');
+                    $('#inquiryModal').modal('hide');
                     alert('답변이 성공적으로 전송되었습니다.');
-                    console.log(response);
-                    location.reload();          //--------------------------------- 수정해야함 리스트로 가도록
-                    $('.container-xxl').load('/admin/inquiryList');
                 } else {
                     alert('답변 전송 중 오류가 발생했습니다.');
                 }
             }, function (xhr, status, error) {
                 console.error('Error occurred: ', error);
                 alert('답변 전송 중 오류가 발생했습니다.');
+            });
+        });
+
+
+        // 모달이 완전히 숨겨진 후에 실행되는 이벤트 핸들러
+        $('#inquiryModal').on('hidden.bs.modal', function () {
+            // 모달이 완전히 숨겨진 후에 리스트를 새로고침
+            $('.container-xxl').load('/admin/inquiryList', function() {
+                // 모달 백그라운드 오버레이 제거
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
             });
         });
     });
@@ -354,19 +375,6 @@
             error: onError
         });
     }
-
-    //
-    // // 삭제 버튼 클릭 이벤트 핸들러
-    // $('.delete-btn').click(function (e) {
-    //     e.preventDefault();
-    //     var eventId = $(this).data('id');
-    //     var pageNumber = $(this).data('page');
-    //     sendRequest('/admin/eventDelete/' + eventId + '?pageNumber=' + pageNumber, {}, function (response) {
-    //         console.log('Event deleted successfully');
-    //         $('.container-xxl').html(response);
-    //         setPageNumber(pageNumber, true);
-    //     });
-    // });
 
     // 텍스트를 10자로 자르고 "..."을 추가하는 함수
     function truncateText(text, length) {

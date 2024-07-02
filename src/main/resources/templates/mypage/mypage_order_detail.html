@@ -10,7 +10,7 @@
                 <article class="history-get">
                     <div class="order-info">
                         <header>
-                            <h4>주문번호</h4><span>결제일시</span>
+                            <h4 th:text="'주문번호 : ' + ${paymentInfo.getMerchantUid()}">주문번호</h4><span th:text="'결제일시 : ' + ${#temporals.format(paymentInfo.getRegDate(), 'yyyy-MM-dd HH:mm:ss')}">결제일시</span>
                         </header>
                         <hr />
                         <section>
@@ -26,17 +26,18 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><img src="" alt="제품 이미지"/></td>
-                                        <td>제품명</td>
-                                        <td>5000</td>
-                                        <td>2</td>
-                                        <td>결제완료</td>
+                                        <td><img style="max-width: 100px; height: auto;" th:alt="${paymentInfo.getSnack().snack_alt}"
+                                                 th:src="@{/images/menu/{image}(image=${paymentInfo.getSnack().snack_image})}"></td>
+                                        <td th:text="${paymentInfo.getProductName()}">제품명</td>
+                                        <td th:text="${paymentInfo.getTotalPrice()+'원'}">5000</td>
+                                        <td th:text="${paymentInfo.getProductCount()+'개'}">2</td>
+                                        <td th:text="${paymentInfo.getPaymentStatus()}">결제완료</td>
                                     </tr>
                                 </tbody>
                             </table>
                             <div class="price-calc">
                                 <span>주문 상품금액 </span><span>10000</span><span> - </span><span>총 할인금액 </span><span>1000</span>
-                                <span> = </span><span>총 결제금액 </span><span class="total_price">9000</span>
+                                <span> = </span><span>결제금액 </span><span class="total_price" th:text="${paymentInfo.getTotalPrice()+'원'}">9000</span>
                             </div>
                             <b>결제정보</b>
                             <table>
@@ -46,15 +47,11 @@
                                 </tr>
                                 <tr>
                                     <th>결제금액</th>
-                                    <td>9000원</td>
+                                    <td th:text="${paymentInfo.getTotalPrice()}">9000원</td>
                                 </tr>
                                 <tr>
                                     <th>결제일시</th>
-                                    <td>2024/06/28 04:57:36</td>
-                                </tr>
-                                <tr>
-                                    <th>포인트 잔액</th>
-                                    <td>3000p</td>
+                                    <td th:text="${#temporals.format(paymentInfo.getRegDate(), 'yyyy/MM/dd HH:mm:ss')}">2024/06/28 04:57:36</td>
                                 </tr>
                             </table>
                         </section>

@@ -70,6 +70,13 @@
         td, th {
             padding: 15px;
         }
+
+        .no-rooms-message {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            padding: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +84,7 @@
 <div class="row">
     <div class="col">
         <div class="card">
-            <h5 class="card-header">Active Chat Rooms</h5>
+            <h5 class="card-header">상담 중</h5>
             <div class="table-responsive text-nowrap">
                 <table class="table table-hover">
                     <thead>
@@ -93,6 +100,7 @@
                     <!-- 활성 채팅방은 동적으로 추가 -->
                     </tbody>
                 </table>
+                <div id="active-no-rooms" class="no-rooms-message" style="display: none;">상담문의가 없습니다</div>
                 <!-- 활성 채팅방 페이지네이션 -->
                 <div id="active-pagination"></div>
             </div>
@@ -100,7 +108,7 @@
     </div>
     <div class="col">
         <div class="card">
-            <h5 class="card-header">Inactive Chat Rooms</h5>
+            <h5 class="card-header">상담 완료</h5>
             <div class="table-responsive text-nowrap">
                 <table class="table table-hover">
                     <thead>
@@ -113,9 +121,10 @@
                     </tr>
                     </thead>
                     <tbody class="inactive-chat-table">
-                    <!-- 비활성 채팅방은 동적으로 추가됩니다 -->
+                    <!-- 비활성 채팅방은 동적으로 추가-->
                     </tbody>
                 </table>
+                <div id="inactive-no-rooms" class="no-rooms-message" style="display: none;">상담문의가 없습니다</div>
                 <!-- 비활성 채팅방 페이지네이션 -->
                 <div id="inactive-pagination"></div>
             </div>
@@ -126,8 +135,8 @@
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
-        <div id="userEmail"></div> <!-- 유저 이메일 표시 부분 추가 -->
-        <div id="messages"></div>
+        <div id="userEmail"></div> <!-- 유저 이메일이 출력됨-->
+        <div id="messages"></div>  <!-- 메세지가 출력되는 곳-->
         <div>
             <input type="text" id="message" placeholder="Type a message..."/>
             <button onclick="sendMessage()">Send</button>
@@ -150,7 +159,6 @@
 
     $(document).ready(async function () {
         memberEmail = adminEmail //관리자 이메일
-        console.log("로드할때의 샌더이메일 " + memberEmail)
         let stompClient = null; // 전역 변수로 선언
 
         // 옵션 객체 정의
@@ -181,18 +189,19 @@
 </script>
 
 <script>
-    var memberEmail = ''; //로그인유저 이메일
-    var currentRecipient = ''; //받는 사람이메일
-    var chatRoomTitle = ''; //카테고리
-    var chatRoomId = ''; //채팅룸번호
-    var isConnected = false; //웹소켓 연결확인
-    var stompClient = null; // STOMP 클라이언트 변수 선언
-    var typingTimeout = null; //타이핑 타이머
-    var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
-    var typingIndicatorSent = false;  // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
-    var status = null; //채팅방 상태
-    var activePage = 1; //활성화 페이징번호
-    var inactivePage = 1; //비활성화 페이징번호
+    let memberEmail = ''; //로그인유저 이메일
+    let currentRecipient = ''; //받는 사람이메일
+    let chatRoomTitle = ''; //카테고리
+    let chatRoomId = ''; //채팅룸번호
+    let status = null; //채팅방 상태
+    let isConnected = false; //웹소켓 연결확인
+    let stompClient = ``; // STOMP 클라이언트 변수 선언
+    let typingTimeout = 0; //타이핑 타이머
+    let TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
+    let typingIndicatorSent = false;  // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
+    let activePage = 1; //활성화 페이징번호
+    let inactivePage = 1; //비활성화 페이징번호
+    let entranceStatus  = ""; //입장상태
 
     // DOM 요소를 가져오는 함수
     function getElement(id) {
@@ -200,7 +209,7 @@
     }
 
     // 메시지를 표시하는 함수
-    function showMessage(message) {
+    function showMessage(message, updateTimestamp = true) {
         document.getElementById('typingIndicatorDTO').style.display = 'none';
         const messages = getElement('messages');
         const messageElement = document.createElement('p');
@@ -208,19 +217,12 @@
         messageElement.className = 'message-style'; // 메시지 스타일 클래스 추가
         messageElement.textContent = message;
         messages.appendChild(messageElement);
+    }
 
+    function updateLastReadTimestamp(chatRoomId) {
         activePage = window.chatUtils.activePage;
         inactivePage = window.chatUtils.inactivePage;
-        window.chatUtils.updateLastReadTimestamp(chatRoomId, activePage, inactivePage); // 페이징 번호 전달
-    }
-    //이전 메세지 문구
-    function addPreviousMessagesIndicator() {
-        const messages = getElement('messages');
-        const previousMessagesIndicator = document.createElement('p');
-        previousMessagesIndicator.id = 'previousMessagesIndicator';
-        previousMessagesIndicator.className = 'message-style';
-        previousMessagesIndicator.textContent = '----------- 이전 메시지입니다 -----------';
-        messages.appendChild(previousMessagesIndicator);
+        window.chatUtils.updateLastReadTimestamp(chatRoomId, activePage, inactivePage);
     }
 
     // Stomp 연결 함수
@@ -230,7 +232,6 @@
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
             subscribeToRecipient();
             sendAdminEnter();
             // 타이핑 이벤트를 감지하여 서버로 전송
@@ -243,42 +244,47 @@
     function subscribeToRecipient() {
         stompClient.subscribe('/user/queue/private/' + chatRoomId, function (message) {
 
-            console.log("Private Message: " + message.body);
             document.getElementById('message').disabled = false;
 
             var parsedMessage = JSON.parse(message.body);
             chatRoomTitle = parsedMessage.chatRoomTitle;
-            currentRecipient = parsedMessage.sender;
-
+            // currentRecipient = parsedMessage.sender;
             if (parsedMessage.typing === "typing") {  //상대방이 타이핑 중일때
                 showTypingIndicator();
             } else if (parsedMessage.typing === "not_typing") { //상대방이 타이핑 안할때
                 hideTypingIndicator();
-            } else {  //일반 메세지일때
+            } else if(parsedMessage.status === 'active'){  //일반 메세지일때
                 showMessage(parsedMessage.sender + ': ' + parsedMessage.content);
+            }else{
+                entranceStatus = parsedMessage.type
             }
         });
     }
+
     // 관리자가 채팅방에 입장했다는 알림을 전송
     function sendAdminExit() {
-        console.log("채팅방나감")
         const EnterNotification = {
+            sender: memberEmail,
             chatRoomId: chatRoomId,
             recipient: currentRecipient,
-            type: 'exit'
+            type: 'false'
         };
-        stompClient.send("/app/chat/admin/enter", {}, JSON.stringify(EnterNotification));
+        stompClient.send("/app/chat/admin/exit", {}, JSON.stringify(EnterNotification));
+        fetchChatRoomPresence(chatRoomId)
     }
 
     // 관리자가 채팅방에 입장했다는 알림을 전송
     function sendAdminEnter() {
         const EnterNotification = {
+            sender: memberEmail,
             chatRoomId: chatRoomId,
             recipient: currentRecipient,
-            type: 'enter'
+            type: 'true'
         };
         stompClient.send("/app/chat/admin/enter", {}, JSON.stringify(EnterNotification));
+        fetchChatRoomPresence(chatRoomId)
     }
+
     // 메시지 전송 함수
     function sendMessage() {
         var messageContent = getElement('message').value;
@@ -289,12 +295,12 @@
                 recipient: currentRecipient,
                 content: messageContent,
                 status: "active",
+                type: entranceStatus,
                 paging: {
                     activePage: activePage,
                     inactivePage: inactivePage
                 }
             };
-            console.log("Sending message:", message);
             stompClient.send("/app/chat/private", {}, JSON.stringify(message));
             showMessage('관리자 : ' + messageContent);
             getElement('message').value = '';
@@ -302,6 +308,9 @@
             // 메시지 전송 후 타이핑 상태 초기화
             clearTimeout(typingTimeout);
             typingIndicatorSent = false;
+
+            const timestamp = new Date().getTime();
+            localStorage.setItem(`lastReadTimestamp_${chatRoomId.toString()}`, timestamp.toString());
         }
     }
 
@@ -335,6 +344,7 @@
 
     // 타이핑 인디케이터 전송 함수
     function sendTypingIndicator(type) {
+
         var typingIndicatorDTO = {
             chatRoomId: chatRoomId,
             sender: memberEmail,
@@ -346,7 +356,6 @@
 
     // 종료 메시지 전송 함수
     function sendEndChatMessage() {
-        console.log("메세지종료 chatRoomId" + chatRoomId)
         var endUserChatMessage = {
             chatRoomId: chatRoomId,
             sender: memberEmail,
@@ -355,7 +364,6 @@
             status: "inactive"
         };
 
-        console.log("Sending end chat message:", endUserChatMessage);
         stompClient.send("/app/chat/private", {}, JSON.stringify(endUserChatMessage));
         // 연결종료
         disconnect();
@@ -364,6 +372,7 @@
         //입력필드 비활성화
         document.getElementById('message').disabled = true;
     }
+
     // 메시지 가져오기 함수
     function fetchMessages(chatRoomId) {
 
@@ -372,41 +381,56 @@
                 if (!response.ok) throw new Error('Network response was not ok ' + response.statusText);
                 return response.json();
             })
-            .then(data => {
-                console.log("Fetch response:", data);
-                data.forEach(item => {
-                    let hasUnreadMessages = false; // 안 읽은 메시지 여부를 판단하는 변수
-
-
-                    item.messages.forEach(message => {
-                        if (message.chatRoomTitle !== "endChat") {
-                            let displayMessage = message.recipient === currentRecipient ? `관리자 : ${message.content}` : `${message.sender} : ${message.content}`;
-                            showMessage(displayMessage);
-
-                            // // 안 읽은 메시지가 있으면 플래그를 설정
-                            // if (!message.read) {
-                            //     hasUnreadMessages = true;
-                            // }
-                        }
-                    });
-
-                    // 첫 번째 안 읽은 메시지 섹션을 출력
-                    // if (hasUnreadMessages) {
-                    //     showMessage('---------- 안 읽은 메시지입니다 ----------');
-                    // }
-                });
-
-
-                // 상태가 "active"일 때 입력창 활성화
-                document.getElementById('message').disabled = !data.some(item => item.type === "active");
-            })
+            .then(data => handleMessages(data, chatRoomId))
             .catch(error => console.error('Error fetching messages:', error));
+    }
+
+    // 메시지 처리 함수
+    function handleMessages(data, chatRoomId) {
+
+        // 마지막 읽은 시간 타임스탬프를 로컬스토리지에서 가져오고 없으면 0으로 초기화
+        let lastReadTimestamp = parseInt(localStorage.getItem(`lastReadTimestamp_${chatRoomId}`), 10) || 0;
+        let unreadMessageFlag = false;
+
+        data.forEach(item => {
+            item.messages.forEach(message => {
+                let displayMessage = message.recipient === currentRecipient ? `관리자 : ${message.content}` : `${message.sender} : ${message.content}`;
+                showMessage(displayMessage);
+
+                // 메시지의 생성 시간을 타임스탬프로 변환
+                let messageTimestamp = new Date(message.createAt).getTime();
+
+                // 메시지 생성 시간이 마지막 읽은 시간 이후, 플래그가 false이며, 읽은 시간이 없으면
+                if (messageTimestamp > lastReadTimestamp && !unreadMessageFlag && lastReadTimestamp !== 0) {
+                    showMessage('----------이전 메시지입니다 ----------');
+                    unreadMessageFlag = true;
+                }
+            });
+        });
+
+        //채팅중이 아니면 메세지비화설화
+        document.getElementById('message').disabled = !data.some(item => item.type === "active");
+        updateLastReadTimestamp(chatRoomId);
+    }
+
+    function fetchChatRoomPresence(chatRoomId) {
+        fetch('/chatRoomPresence?chatRoomId=' + chatRoomId)
+            .then(response => response.json())
+            .then(data => {
+                // 받아온 데이터를 처리
+                console.log('chatRoom presence:', data);
+
+                // 여기서 입장 상태를 UI에 반영하거나 필요한 작업 수행
+                // 예시: 입장 상태가 true인 경우 처리
+                entranceStatus = data[currentRecipient] || false;
+                console.log("currentRecipient의 입장 상태 " + currentRecipient + entranceStatus)
+            })
+            .catch(error => console.error('Error fetching admin presence:', error));
     }
 
     // 타이핑 인디케이터를 보여주는 함수
     function showTypingIndicator() {
         document.getElementById('typingIndicatorDTO').style.display = 'block'; // 타이핑 인디케이터 표시
-
     }
 
     // 타이핑 인디케이터를 숨기는 함수
@@ -418,6 +442,7 @@
     function openChatModal(row) {
         chatRoomId = row.getAttribute('data-room-id');  //클릭한 룸 아이디
         currentRecipient = row.querySelector('td:nth-child(4)').innerText; // 현재 수신자 업데이트
+        console.log("모달 클릭시 currentRecipient" + currentRecipient)
         getElement('messages').innerHTML = ''; // 메시지 요소 초기화
         getElement('userEmail').innerText = currentRecipient;
         fetchMessages(chatRoomId); //해당 채팅방메세지 가져오기

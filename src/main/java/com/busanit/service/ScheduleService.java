@@ -90,7 +90,7 @@ public class ScheduleService {
                     .endTime(entity.getEndTime().toString())
                     .sessionType(entity.getSessionType())
                     .totalSeats(entity.getTotalSeats())
-                    .unavailableSeats(entity.getUnavailableSeats())
+                    .availableSeats(entity.getAvailableSeats())
                     .status(entity.getStatus())
                     .build();
         });
@@ -134,8 +134,7 @@ public class ScheduleService {
 
     // 지점별, 영화별, 일자별 상영일정 찾기
     public List<ScheduleDTO> findSchedulesByConditions(String theaterName, Long movieId, LocalDate date) {
-        LocalTime currentTime = LocalTime.now();
-        List<Schedule> schedules = scheduleRepository.findSchedulesByConditions(theaterName, movieId, date, currentTime);
+        List<Schedule> schedules = scheduleRepository.findSchedulesByConditions(theaterName, movieId, date);
 
         return schedules.stream()
                 .map(entity -> {
@@ -151,7 +150,7 @@ public class ScheduleService {
                             .endTime(entity.getEndTime().toString())
                             .sessionType(entity.getSessionType())
                             .totalSeats(entity.getTotalSeats())
-                            .unavailableSeats(entity.getUnavailableSeats())
+                            .availableSeats(entity.getAvailableSeats())
                             .status(entity.getStatus())
                             .build();
                 })

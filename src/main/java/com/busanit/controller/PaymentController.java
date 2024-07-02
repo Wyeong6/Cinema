@@ -7,9 +7,18 @@ import com.busanit.entity.Point;
 import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +29,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpClient;
 import java.util.*;
 
 @Controller
@@ -68,7 +78,11 @@ public class PaymentController {
             default -> 0.03;
         };
         long currentPoints = 0;
-        currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
+        List<PointDTO> points = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent();
+        if (!points.isEmpty()) {
+            currentPoints = points.get(0).getCurrentPoints();
+        }
+
 
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
@@ -84,6 +98,18 @@ public class PaymentController {
         model.addAttribute("totalAmount", totalAmount);
 
         return "payment/payment_window"; // 뷰 이름 리턴
+    }
+
+    // 스낵 cart
+    @GetMapping("/cartList")
+    public String cartList(Model model, @PageableDefault(size = 6) Pageable pageable) {
+
+        // 스낵 추천 리스트(랜덤)
+        Page<SnackDTO> snackDTOList = null;
+        snackDTOList = snackService.getSnackListRandom(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        return "payment/cart_list";
     }
 
     @PostMapping("/request")
@@ -141,7 +167,7 @@ public class PaymentController {
             paymentDTO.setApplyNum(apply_num);
             paymentDTO.setBuyerEmail(buyer_email);
             paymentDTO.setPaymentType("CARD");
-            paymentDTO.setPaymentStatus(payment_status);
+            paymentDTO.setPaymentStatus("결제완료");
             paymentDTO.setProductIdx(product_idx);
             paymentDTO.setProductName(product_name);
             paymentDTO.setProductType(product_type);
@@ -217,24 +243,58 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/paymentFailed")
+    // 주문 취소
+    @PostMapping("/paymentCancel")
     @ResponseBody
-    public Map<String, String> paymentFailed(@RequestBody Map<String, String> request) {
-        Map<String, String> response_failed = new HashMap<>();
-        response_failed.put("response_failed", "response_failed");
+    public Map<String, String> paymentCancel(@RequestParam("merchant_uid") String merchant_uid , @RequestParam("imp_uid") String imp_uid) {
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
+        post.setHeader("Authorization", paymentService.getImportToken());
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("merchant_uid", merchant_uid));
 
-        return response_failed;
+        Map<String, String> response_complete = new HashMap<>();
+
+        String asd = "";
+        try {
+            post.setEntity(new UrlEncodedFormEntity(params));
+            HttpResponse res = client.execute(post);
+            ObjectMapper mapper = new ObjectMapper();
+            String body = EntityUtils.toString(res.getEntity());
+            JsonNode rootNode = mapper.readTree(body); asd = rootNode.get("response").asText();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response_complete.put("errorMsg", "errorMsg");
+        } if (asd.equals("null")) {
+            System.err.println("환불실패");
+            response_complete.put("errorMsg", "errorMsg");
+        } else {
+            System.err.println("환불성공"+imp_uid);
+            paymentService.updatePaymentStatus(imp_uid, memberService.findUserIdx(memberService.currentLoggedInEmail()));
+            response_complete.put("imp_uid", imp_uid);
+        }
+        return response_complete;
     }
 
-    // 스낵 cart
-    @GetMapping("/cartList")
-    public String cartList(Model model, @PageableDefault(size = 6) Pageable pageable) {
+    @GetMapping("/paymentCancelSuccessful")
+    public String paymentCancelSuccessful(@RequestParam String imp_uid, Model model) {
 
-        // 스낵 추천 리스트(랜덤)
-        Page<SnackDTO> snackDTOList = null;
-        snackDTOList = snackService.getSnackListRandom(pageable);
-        model.addAttribute("snackList", snackDTOList);
+        PaymentDTO paymentDTO = paymentService.get(imp_uid);
+        if(paymentDTO.getProductType().equals("MO")){ // 영화
+            List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(Long.valueOf(paymentDTO.getProductIdx()));
+            model.addAttribute("movieDTOs", movieDTOs);
+        } else { // 스낵
+            SnackDTO snackDTO = snackService.get(Long.valueOf(paymentDTO.getProductIdx())); // 스낵 바로 결제
+            model.addAttribute("productInfo", snackDTO);
+        }
 
-        return "payment/cart_list";
+        if(memberService.findUserIdx(memberService.currentLoggedInEmail()) == null ||
+                paymentDTO.getMember_id() == null ||
+                memberService.findUserIdx(memberService.currentLoggedInEmail()) != paymentDTO.getMember_id()) { // 비회원 혹은 다른 멤버가 요청할때
+            return "redirect:/";
+        } else { // 해당 멤버가 요청할때
+            model.addAttribute("paymentInfo", paymentDTO);
+            return "payment/payment_cancel";
+        }
     }
 }

@@ -3,8 +3,8 @@
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<body class="no-sidebar is-preload bg-black-wrapper">
+>
+<body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper" class="bg-black-wrapper">
 
@@ -29,7 +29,7 @@
                         <tbody>
                         <tr>
                             <td class="ticket-info">
-                                <img th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" />
+                                <img class="featured-img" th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" />
                                 <div class="ticket-movie-title"><img src="" alt="연령등급 이미지" /><h4 th:text="${movie.title}" id="movieTitle">영화 제목</h4></div>
                                     <table>
                                         <tr>
@@ -56,14 +56,17 @@
                                         </tr>
                                     </table>
                                     <div class="seats-info">
-                                        <span>선택 좌석</span>
+                                        <span>선택 좌석</span>&nbsp;&nbsp;
                                         <div id="selected-seats"></div>
                                     </div>
                                 </td>
                                 <td class="point-info">
-                                    <label for="point">포인트 사용</label>
-                                    <input type="number" class="point-input" id="point">
-                                    <div><span>사용가능포인트 </span><span th:text="${pointInfo}"></span></div>
+                                    <div>
+                                        <label for="point">포인트 사용</label>
+                                        <input type="number" class="point-input" id="point">
+                                        <button type="button">전체사용</button>
+                                    </div>
+                                    <div><label>사용가능포인트 </label><span th:text="${pointInfo} + 'p'"></span></div>
                                 </td>
                                 <td class="payment-info">
                                     <table>
@@ -73,19 +76,17 @@
                                         </tr>
                                         <tr>
                                             <th>할인 금액</th>
-                                            <td><span>- </span>0원</td>
+                                            <td id="minus-point" style="color: #e45649"><span>- </span>0원</td>
                                         </tr>
                                         <tr>
-                                            <td class="result-price-td" colspan="2">
-                                                <h4>최종 결제금액</h4>
-                                                <div>
-                                                    <p>총 </p><h3 id="result-price">27000원</h3>
-                                                </div>
+                                            <th><h4>최종 결제금액</h4></th>
+                                            <td>
+                                                <p>총 <span id="result-price">27000원</span></p>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>적립예정 포인트</th>
-                                            <td id="add-point">270p</td>
+                                            <td id="add-point" style="color: #5155A6">270p</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2" style="padding: 0">
@@ -119,7 +120,7 @@
         const content1 = [[${scheduleDTO.date}]]; // 상영일자
         const content2 = [[${scheduleDTO.startTime}]]; // 시간
         const content3 = [[${scheduleDTO.theaterName}]]; // 상영관
-        const content4 = [[${scheduleDTO.theaterNumber}]]; // 좌석
+        let content4 = null; // 좌석
         let productCount = null;
         let currentPrice = null;
         const orderName = document.getElementById("movieTitle").textContent; // 결제시 사용할 이름(제품명)
@@ -163,24 +164,46 @@
                 $('#selected-seats').append(seatDiv);
             });
 
+            let content4Array = [];
+            $('#selected-seats .seat-info').each(function() {
+                content4Array.push($(this).text());
+            });
+            content4 = [[${scheduleDTO.theaterNumber}]] + "관 " + content4Array.join(' ');
+
             const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
             $('#total-amount').text(totalAmount + '원');
 
             // 포인트 입력시 사용자가 보유한 포인트를 넘지 않게 제한, 포인트는 1의자리 올림
             const pointInfo = [[${pointInfo}]];
-            $('.point-input').on('input', function () {
+            let currentPrice = 0;
+            function updateValues() {
                 const totalAmount = parseInt($('#total-amount').data('total-amount'), 10);
-                let pointInput = parseInt($(this).val(), 10) || 0;
+                let pointInput = parseInt($('.point-input').val(), 10) || 0;
+
                 if (pointInput > pointInfo) {
                     alert("보유 포인트 내에서만 포인트 사용이 가능합니다.");
-                    $(this).val(pointInfo); // Reset the value to the maximum allowed
+                    $('.point-input').val(pointInfo);
+                    pointInput = pointInfo;
                 }
-                const resultPrice = totalAmount - (parseInt($(this).val(), 10) || 0);
+
+                const resultPrice = totalAmount - pointInput;
                 currentPrice = resultPrice;
                 $('#result-price').text(resultPrice + '원');
                 $('#add-point').text(Math.ceil(resultPrice * gradeInfo) + 'p');
                 plusPoint = Math.ceil(resultPrice * gradeInfo);
-                minusPoint = parseInt($("#point").val(), 10);
+                minusPoint = parseInt($("#point").val(), 10) || 0;
+                $('#minus-point').text(minusPoint + 'p');
+            }
+
+            $('.point-input').on('input', function() {
+                updateValues();
+            });
+
+            var button = $('.point-info').find('button');
+            button.on('click', function () {
+                $('.point-input').val(pointInfo);
+                $('#minus-point').text(pointInfo + 'p')
+                updateValues();
             });
 
             // 초기 실행 (포인트 입력 값이 비어있을 경우 0으로 처리)
@@ -214,9 +237,11 @@
                 }
             });
 
+            console.log("Selected Seats: ", JSON.stringify(selectedSeats)); // 좌석 정보 로그
+
             const scheduleId = $('#schedule-id').data('schedule-id');
-            const memberIdx = [[${memberInfo[1]}]];
-            const reservedBy = memberIdx; // member_id값
+            const reservedBy = [[${memberInfo[1]}]]; // member_id값
+            // const reservedBy = '${memberInfo[1]}'; // member_id값
 
             $.ajax({
                 type: 'POST',

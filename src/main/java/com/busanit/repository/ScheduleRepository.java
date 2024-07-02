@@ -19,10 +19,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             "WHERE (:theaterName IS NULL OR s.theaterNumber.theater.theaterName = :theaterName) " +
             "AND (:movieId IS NULL OR s.movie.movieId = :movieId) " +
             "AND (:date IS NULL OR s.date = :date) " +
-            "AND s.startTime > :currentTime " +
             "ORDER BY s.startTime")
     List<Schedule> findSchedulesByConditions(@Param("theaterName") String theaterName,
                                              @Param("movieId") Long movieId,
-                                             @Param("date") LocalDate date,
-                                             @Param("currentTime") LocalTime currentTime);
+                                             @Param("date") LocalDate date);
 }

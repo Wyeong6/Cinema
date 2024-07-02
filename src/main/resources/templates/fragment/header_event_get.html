@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="header">
+    <head>
+        <title>Cinemacast</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+        <meta property="og:title" content="${event.eventName}">
+        <meta property="og:description" content="${event.eventDetail}">
+        <meta property="og:url" content="http://localhost:8080/event_get/${eventId}">
+        <meta property="og:image" content="http://localhost:8080/images/event/${event.eventImage}">
+
+
+        <link href="/assets/css/main.css" rel="stylesheet"/>
+        <link href="/assets/css/custom.css" rel="stylesheet"/>
+        <link href="/assets/css/nav.css" rel="stylesheet"/>
+        <noscript>
+            <link href="/assets/css/noscript.css" rel="stylesheet"/>
+        </noscript>
+        <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    </head>
+    <body>
+    <!-- Header -->
+    <div id="header">
+        <h1 class="logo" style="top:15%"><a href="/">CINEMACAST</a></h1>
+
+        <!-- info -->
+        <div id="info" th:data-username="${#authentication.name}">
+            <ul>
+                <li sec:authorize="isAnonymous()">
+                    <a href="/member/new">회원가입</a>
+                </li>
+                <li sec:authorize="isAnonymous()">
+                    <a href="/member/login">로그인</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a href="/member/logout" id="logoutLink">로그아웃</a>
+                </li>
+                <li sec:authorize="hasRole('USER')">
+                    <a th:href="@{/mypage/}" th:text="'마이페이지'"></a>
+                </li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/adminMain}" th:text="'관리자페이지'"></a>
+                </li>
+                <li><a href="/payment/cartList">장바구니</a></li>
+                <li class="chat-alarm" sec:authorize="isAuthenticated()">
+                    <img id="chatImage" class="chat-img" src="/images/alarm.png" alt="1:1채팅 메시지" />
+                    <div id="unreadCount">
+                        0
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Nav -->
+        <nav id="nav">
+            <ul>
+                <li>
+                    <a href="#">영화</a>
+                    <ul>
+                        <li><a href="/allMovies">영화 전체보기</a></li>
+                        <li><a href="/nowMovies">현재 상영작</a></li>
+                        <li><a href="/comingMovies">상영 예정작</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/reservation/screeningSchedule">예매</a>
+                </li>
+                <li><a href="/snack/snackList">스낵 스토어</a></li>
+                <li><a href="/event/eventList">이벤트</a></li>
+                <li><a href="/notice/noticeList">공지사항</a></li>
+            </ul>
+        </nav>
+    </div>
+    <script type="module">
+        import {loadChatList, connectWebSocket, updateUnreadCount} from '/modules/chatModule.js';
+        //웹소켓 연결
+        document.addEventListener('DOMContentLoaded', function () {
+            loadChatList(1, 1, 8, true);
+            setupWebSocketConnection();
+
+            // chatImage 요소가 존재하는지 확인
+            const chatImage = document.getElementById("chatImage");
+            if (chatImage) {
+                chatImage.addEventListener("click", function() {
+                    window.location.href = "/inquiry#work";
+                });
+            }
+        });
+
+        //웹소켓 연결 후 콜백함수
+        function setupWebSocketConnection() {
+            console.log('Setting up WebSocket connection');
+            const options = {
+                subscribeCallback: handleWebSocketMessage,
+            };
+            connectWebSocket(options); // WebSocket 연결 함수 호출
+        }
+
+        function handleWebSocketMessage(message) {
+            updateUnreadCount(message);
+        }
+    </script>
+    <script th:inline="javascript">
+        // 로그아웃시 session storage값 삭제
+        $("#logoutLink").click(function (event) {
+            event.preventDefault();
+            sessionStorage.removeItem("userInfo");
+
+            window.location.href = "/member/logout";
+        });
+    </script>
+    </body>
+</th:block>
+</html>

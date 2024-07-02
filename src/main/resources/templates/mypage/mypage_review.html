@@ -24,14 +24,16 @@
                 <td><a th:href="@{'/movies/' + ${comment.movieId}}" th:text="${comment.movieTitle}"></a></td>
                 <td th:text="${comment.comment}"></td>
                 <td th:text="${comment.grade}"></td>
-                <td><img src="/images/delete.png" alt="삭제 버튼" class="delete-btn" th:data-comment-id="${comment.cno}"/></td>
+                <td><a href="javascript:void(0);" class="delete-btn" th:data-comment-id="${comment.cno}">
+                        <img src="/images/delete.png" alt="삭제 버튼"/></a>
+                </td>
             </tr>
         </table>
     </section>
 
     <!-- 관람평이 없을 때 메시지 -->
-    <section th:if="${#lists.isEmpty(comments)}">
-        <p>작성한 관람평이 없습니다.</p>
+    <section class="info-none" th:if="${#lists.isEmpty(comments)}">
+        <p>아직 작성한 관람평이 없습니다.</p><p>관람하신 영화에 대한 관람평을 작성해보세요!</p>
     </section>
 </article>
 <script>

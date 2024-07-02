@@ -34,6 +34,7 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final PointService pointService;
+    private final PaymentService paymentService;
     private final JavaMailSender mailSender;
 
     public void saveMember(Member member) {
@@ -174,9 +175,23 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
         return userEmail;
     }
 
+    // 현재 로그인한 사용자의 나이
+    public String currentLoggedInAge() {
+        String userEmail = null;
+        String userAge = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            userEmail = authentication.getName(); // 현재 로그인한 사용자의 이메일
+            userAge = memberRepository.findByAge(userEmail);
+        }
+
+        return userAge;
+    }
+
     // 현재 로그인한 사용자의 등급 확인(+저장)
     public long userGrade() {
-        long userGradeCount = pointService.getPointMovieCount(findUserIdx(currentLoggedInEmail()));
+        long userGradeCount = paymentService.getMovieCount(findUserIdx(currentLoggedInEmail()));
         long userGrade;
         if(userGradeCount >= 10) {
             userGrade = 1;
