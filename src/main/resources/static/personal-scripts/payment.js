@@ -37,7 +37,7 @@ function requestPay() {
                             "content2": content2,
                             "content3": content3,
                             "content4": content4,
-                            "product_count": currentCount,
+                            "product_count": productCount,
                             "amount": currentPrice,
                             "plusPoint": plusPoint,
                             "minusPoint": minusPoint
