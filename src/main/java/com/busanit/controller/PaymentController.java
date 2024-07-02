@@ -221,9 +221,17 @@ public class PaymentController {
         if(paymentDTO.getProductType().equals("MO")){ // 영화
             List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(Long.valueOf(paymentDTO.getProductIdx()));
             model.addAttribute("movieDTOs", movieDTOs);
-        } else { // 스낵
+        } else if(paymentDTO.getProductType().equals("SN")) { // 스낵
             SnackDTO snackDTO = snackService.get(Long.valueOf(paymentDTO.getProductIdx())); // 스낵 바로 결제
             model.addAttribute("productInfo", snackDTO);
+        } else { // 장바구니 결제
+            List<SnackDTO> snackList = new ArrayList<>();
+            String[] stringArray = paymentDTO.getProductIdx().split(",");
+            for (int i = 0; i < stringArray.length; i++ ){
+                SnackDTO snackDTO = snackService.get(Long.valueOf(stringArray[i]));
+                snackList.add(snackDTO);
+            }
+            model.addAttribute("productsInfo", snackList);
         }
 
         if(memberService.findUserIdx(memberService.currentLoggedInEmail()) == null ||
