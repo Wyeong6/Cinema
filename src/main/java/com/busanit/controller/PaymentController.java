@@ -7,9 +7,18 @@ import com.busanit.entity.Point;
 import com.busanit.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +29,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpClient;
 import java.util.*;
 
 @Controller
@@ -68,7 +78,11 @@ public class PaymentController {
             default -> 0.03;
         };
         long currentPoints = 0;
-        currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
+        List<PointDTO> points = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent();
+        if (!points.isEmpty()) {
+            currentPoints = points.get(0).getCurrentPoints();
+        }
+
 
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
@@ -84,6 +98,18 @@ public class PaymentController {
         model.addAttribute("totalAmount", totalAmount);
 
         return "payment/payment_window"; // 뷰 이름 리턴
+    }
+
+    // 스낵 cart
+    @GetMapping("/cartList")
+    public String cartList(Model model, @PageableDefault(size = 6) Pageable pageable) {
+
+        // 스낵 추천 리스트(랜덤)
+        Page<SnackDTO> snackDTOList = null;
+        snackDTOList = snackService.getSnackListRandom(pageable);
+        model.addAttribute("snackList", snackDTOList);
+
+        return "payment/cart_list";
     }
 
     @PostMapping("/request")
@@ -115,7 +141,6 @@ public class PaymentController {
                                                @RequestParam String imp_uid,
                                                @RequestParam String apply_num, // 카드 승인 번호
                                                @RequestParam String buyer_email, // 결제사에서 받아오는 메일이라 결제시 메일 주소 수정해서 보내면 로그인한 사람 메일과 다를 것 같아서 데이터 받아봄
-                                               @RequestParam String payment_status,
                                                @RequestParam String product_idx,
                                                @RequestParam String product_name,
                                                @RequestParam String product_type,
@@ -141,7 +166,7 @@ public class PaymentController {
             paymentDTO.setApplyNum(apply_num);
             paymentDTO.setBuyerEmail(buyer_email);
             paymentDTO.setPaymentType("CARD");
-            paymentDTO.setPaymentStatus(payment_status);
+            paymentDTO.setPaymentStatus("결제완료");
             paymentDTO.setProductIdx(product_idx);
             paymentDTO.setProductName(product_name);
             paymentDTO.setProductType(product_type);
@@ -185,18 +210,78 @@ public class PaymentController {
                 pointDTO.setTotalPoints(totalPoints);
                 pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
             }
-
-//            if(minusPoint == 0 && plusPoint == 0 ) {
-//
-//            }
-
-
         }
         return response_complete;
     }
 
     @GetMapping("/paymentSuccessful")
     public String paymentSuccessful(@RequestParam String imp_uid, Model model) {
+
+        PaymentDTO paymentDTO = paymentService.get(imp_uid);
+        if(paymentDTO.getProductType().equals("MO")){ // 영화
+            List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(Long.valueOf(paymentDTO.getProductIdx()));
+            model.addAttribute("movieDTOs", movieDTOs);
+        } else if(paymentDTO.getProductType().equals("SN")) { // 스낵
+            SnackDTO snackDTO = snackService.get(Long.valueOf(paymentDTO.getProductIdx())); // 스낵 바로 결제
+            model.addAttribute("productInfo", snackDTO);
+        } else { // 장바구니 결제
+            List<SnackDTO> snackList = new ArrayList<>();
+            String[] stringArray = paymentDTO.getProductIdx().split(",");
+            for (int i = 0; i < stringArray.length; i++ ){
+                SnackDTO snackDTO = snackService.get(Long.valueOf(stringArray[i]));
+                snackList.add(snackDTO);
+            }
+            model.addAttribute("productsInfo", snackList);
+        }
+
+        if(memberService.findUserIdx(memberService.currentLoggedInEmail()) == null ||
+                paymentDTO.getMember_id() == null ||
+                memberService.findUserIdx(memberService.currentLoggedInEmail()) != paymentDTO.getMember_id()) { // 비회원 혹은 다른 멤버가 요청할때
+            return "redirect:/";
+        } else { // 해당 멤버가 요청할때
+
+            model.addAttribute("paymentInfo", paymentDTO);
+            model.addAttribute("plusPoint", pointService.getPlusPoint(imp_uid));
+            model.addAttribute("minusPoint", pointService.getMinusPoint(imp_uid));
+            return "payment/payment_complete";
+        }
+    }
+
+    // 주문 취소
+    @PostMapping("/paymentCancel")
+    @ResponseBody
+    public Map<String, String> paymentCancel(@RequestParam("merchant_uid") String merchant_uid , @RequestParam("imp_uid") String imp_uid) {
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
+        post.setHeader("Authorization", paymentService.getImportToken());
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("merchant_uid", merchant_uid));
+
+        Map<String, String> response_complete = new HashMap<>();
+
+        String asd = "";
+        try {
+            post.setEntity(new UrlEncodedFormEntity(params));
+            HttpResponse res = client.execute(post);
+            ObjectMapper mapper = new ObjectMapper();
+            String body = EntityUtils.toString(res.getEntity());
+            JsonNode rootNode = mapper.readTree(body); asd = rootNode.get("response").asText();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response_complete.put("errorMsg", "errorMsg");
+        } if (asd.equals("null")) {
+            System.err.println("환불실패");
+            response_complete.put("errorMsg", "errorMsg");
+        } else {
+            System.err.println("환불성공"+imp_uid);
+            paymentService.updatePaymentStatus(imp_uid, memberService.findUserIdx(memberService.currentLoggedInEmail()));
+            response_complete.put("imp_uid", imp_uid);
+        }
+        return response_complete;
+    }
+
+    @GetMapping("/paymentCancelSuccessful")
+    public String paymentCancelSuccessful(@RequestParam String imp_uid, Model model) {
 
         PaymentDTO paymentDTO = paymentService.get(imp_uid);
         if(paymentDTO.getProductType().equals("MO")){ // 영화
@@ -213,28 +298,7 @@ public class PaymentController {
             return "redirect:/";
         } else { // 해당 멤버가 요청할때
             model.addAttribute("paymentInfo", paymentDTO);
-            return "payment/payment_complete";
+            return "payment/payment_cancel";
         }
-    }
-
-    @PostMapping("/paymentFailed")
-    @ResponseBody
-    public Map<String, String> paymentFailed(@RequestBody Map<String, String> request) {
-        Map<String, String> response_failed = new HashMap<>();
-        response_failed.put("response_failed", "response_failed");
-
-        return response_failed;
-    }
-
-    // 스낵 cart
-    @GetMapping("/cartList")
-    public String cartList(Model model, @PageableDefault(size = 6) Pageable pageable) {
-
-        // 스낵 추천 리스트(랜덤)
-        Page<SnackDTO> snackDTOList = null;
-        snackDTOList = snackService.getSnackListRandom(pageable);
-        model.addAttribute("snackList", snackDTOList);
-
-        return "payment/cart_list";
     }
 }

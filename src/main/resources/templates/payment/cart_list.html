@@ -2,8 +2,7 @@
 <html lang="en"
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:th="http://www.thymeleaf.org">
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
@@ -95,9 +94,17 @@
 
     <script th:inline="javascript">
         /* 결제 프로그램 사용시 필요한 변수 */
+        let productIdx = null;
+        let content1 = null; // 상영일자 (영화관련 변수), orderNames (장바구니 변수)
+        const content2 = null; // 시간 (영화관련 변수)
+        const content3 = null; // 상영관 (영화관련 변수)
+        const content4 = null; // 좌석 (영화관련 변수)
+        let productCount = null;
         let currentPrice = 0; // 결제시 사용할 변수
-        const orderName = "장바구니"; // 결제시 사용할 이름 /*수정예정*/
+        let orderName = null; // 결제시 사용할 이름
         const reqIDX = "CA" // 결제를 요청한 페이지 IDX
+        let plusPoint = 0;
+        let minusPoint = 0;
         /* 결제 프로그램 사용시 필요한 변수 끝 */
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -120,6 +127,11 @@
             let cartTable = document.getElementById("cartTable");
             let totalPrice2 = 0;
 
+            // 장바구니 결제 변수
+            let ids = [];
+            let names = [];
+            let productCounts = [];
+
             for(let i = 0; i < localStorage.length; i++) {
                 let key = localStorage.key(i);
                 if(key.startsWith("snackCart")) {
@@ -127,6 +139,10 @@
 
                     // data가 배열이라면 각 요소를 확인
                     item.forEach(item => {
+                        ids.push(item.id); // 장바구니 결제 변수
+                        names.push(item.name);
+                        productCounts.push(item.name+ ":" +item.count);
+
                         let row = cartTable.insertRow();
 
                         let imgCell = row.insertCell(0);
@@ -153,6 +169,16 @@
                         currentPrice = totalPrice2; // 현재 Price를을 전역 변수에 저장
                     });
                 }
+            }
+
+            // 장바구니 결제 변수
+            productIdx = ids.join(',');
+            content1 = names.join(',')
+            productCount = productCounts.join(',');
+            if(ids.length > 1) {
+                orderName = names[0] + " 외 " + (ids.length-1) + "개"
+            } else {
+                orderName = names[0];
             }
 
             // 주문 수량 count + 합계

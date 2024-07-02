@@ -5,21 +5,18 @@ import com.busanit.entity.chat.ChatRoom;
 import com.busanit.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.springframework.web.util.WebUtils.getSessionAttribute;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,6 +25,8 @@ public class ChatController {
 
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ConcurrentMap<String, ConcurrentMap<String, Boolean>> chatRoomPresenceMap = new ConcurrentHashMap<>();
+
 
     @ModelAttribute("activePage")
     public int activePage() {
@@ -41,11 +40,9 @@ public class ChatController {
 
     @MessageMapping("/chat/updatePage")
     public void updatePage(@Payload PageUpdateDTO pageUpdateDTO) {
-        // 클라이언트로부터 받은 페이징 정보 처리
-        System.out.println("Received paging data: " + pageUpdateDTO);
+
         // 다른 클라이언트에게 브로드캐스팅
         messagingTemplate.convertAndSend("/Topic/paging", pageUpdateDTO);
-        System.out.println("브로드캐스팅 완료!");
     }
 
     //로그인 여부확인 후 페이지이동
@@ -56,16 +53,47 @@ public class ChatController {
 
         return "/cs/chat";
     }
-
-    //관리자 채팅방입장 알림
-    @MessageMapping("/chat/admin/enter")
-    public void sendAdminEnter(@Payload EnterNotificationDTO enterNotificationDTO) {
-
-
-        System.out.println("채팅방나감 컨트롤");
-        messagingTemplate.convertAndSendToUser(enterNotificationDTO.getRecipient(), "/queue/private/" + enterNotificationDTO.getChatRoomId(), enterNotificationDTO);
+    //채팅방 입장상태 반환
+    @GetMapping("/chatRoomPresence")
+    public ResponseEntity<Map<String, Boolean>> getAdminPresence(@RequestParam String chatRoomId) {
+        Map<String, Boolean> userMap = chatRoomPresenceMap.getOrDefault(chatRoomId, new ConcurrentHashMap<>());
+        return ResponseEntity.ok(userMap);
     }
 
+
+    //채팅방 입장시
+    @MessageMapping("/chat/admin/enter")
+    public void sendAdminEnter(@Payload EnterNotificationDTO enterNotificationDTO) {
+        chatRoomPresenceMap
+                .computeIfAbsent(enterNotificationDTO.getChatRoomId(), k -> new ConcurrentHashMap<>())
+                .put(enterNotificationDTO.getSender(), true);
+
+        System.out.println("Admin enter - Chat Room Presence Map: " + chatRoomPresenceMap);
+
+        messagingTemplate.convertAndSendToUser(
+                enterNotificationDTO.getRecipient(),
+                "/queue/private/" + enterNotificationDTO.getChatRoomId(),
+                enterNotificationDTO
+        );
+    }
+
+    //채팅방 퇴장시
+    @MessageMapping("/chat/admin/exit")
+    public void sendAdminExit(@Payload EnterNotificationDTO enterNotificationDTO) {
+        chatRoomPresenceMap
+                .computeIfPresent(enterNotificationDTO.getChatRoomId(), (k, v) -> {
+                    v.put(enterNotificationDTO.getSender(), false);
+                    return v;
+                });
+
+        System.out.println("Admin exit - Chat Room Presence Map: " + chatRoomPresenceMap);
+
+        messagingTemplate.convertAndSendToUser(
+                enterNotificationDTO.getRecipient(),
+                "/queue/private/" + enterNotificationDTO.getChatRoomId(),
+                enterNotificationDTO
+        );
+    }
         //메세지 처리
         @MessageMapping("/chat/private")
         public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
@@ -73,24 +101,20 @@ public class ChatController {
             // 채팅 종료할 경우
             if ("inactive".equals(messageDTO.getStatus())) {
                 chatService.updateChatRoomStatus(messageDTO.getChatRoomId(), "inactive");
-            } else if ("active".equals(messageDTO.getStatus()) && "enter".equals(messageDTO.getType())) {
-                // "active" 상태이면서 "enter" 타입인 경우
-                chatService.saveMessage(messageDTO); // 메시지 저장
-            chatService.updateLastReadTimestamp(messageDTO.getChatRoomId(), messageDTO.getRecipient()); // 마지막 읽은 시간 업데이트
-                System.out.println("유저가 입장햇을때 ");
-
-            } else if ("active".equals(messageDTO.getStatus())) {
-                // "active" 상태인 경우
-                chatService.saveMessage(messageDTO); // 메시지 저장
-                System.out.println("유저가 입장안햇을때  ");
+            } else if ("active".equals(messageDTO.getStatus()) && "true".equals(messageDTO.getType())) {// "active" 상태이면서 "enter" 타입인 경우
+                System.out.println("활성화이면서 입장시 ");
+                chatService.saveMessage(messageDTO);
+                chatService.updateLastReadTimestamp(messageDTO.getChatRoomId(), messageDTO.getRecipient()); // 마지막 읽은 시간 업데이트
+            } else if ("active".equals(messageDTO.getStatus())) { // "active" 상태인 경우
+                System.out.println("입장시 ");
+                chatService.saveMessage(messageDTO);
             }
 
-            System.out.println("유저가 입장안했을때 메세지 보내기");
+            messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
+
             // 메시지 처리 후, 채팅 리스트 업데이트 요청
             PageUpdateDTO pageUpdateDTO = messageDTO.getPaging();
-            messagingTemplate.convertAndSendToUser(messageDTO.getRecipient(), "/queue/private/" + messageDTO.getChatRoomId(), messageDTO);
             updateChatList(messageDTO.getSender(), messageDTO.getRecipient(), pageUpdateDTO.getActivePage(), pageUpdateDTO.getInactivePage(), 8);
-
         }
     //카테고리 선택 시 채팅룸 생성
     @PostMapping("/chat/createChatRoom")
@@ -109,7 +133,6 @@ public class ChatController {
     @GetMapping("/chat/active/{recipient}")
     @ResponseBody
     public List<ChatRoomDTO> getActiveChat(@PathVariable String recipient) {
-        System.out.println("이전메세지가져옴");
         return chatService.findChatRoomByUserEmail(recipient);
     }
 
@@ -159,10 +182,6 @@ public class ChatController {
         Map<String, Object> combinedResponse = new HashMap<>();
         combinedResponse.putAll(activeChatResponse);
         combinedResponse.putAll(inactiveChatResponse);
-
-        // 메시지 전송 로그 추가
-        System.out.println("Sending message to user: " + recipient);
-        System.out.println("Message content: " + combinedResponse);
 
         // WebSocket 클라이언트에게 업데이트된 채팅 리스트 전송
         messagingTemplate.convertAndSendToUser(recipient, "/queue/chatList", combinedResponse);

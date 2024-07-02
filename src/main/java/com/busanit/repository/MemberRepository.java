@@ -52,4 +52,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Transactional
     @Query("UPDATE Member m SET m.grade_code = :userEditGrade WHERE m.email = :email")
     void updateGrade(long userEditGrade, String email);
+
+    @Query("SELECT m.age FROM Member m WHERE m.email = :email")
+    String findByAge(String email);
 }

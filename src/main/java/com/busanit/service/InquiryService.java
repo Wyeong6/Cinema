@@ -97,7 +97,6 @@ public class InquiryService {
         return getInquiriesByType("답변완료", page, size);
     }
 
-
     private Page<InquiryDTO> getInquiriesByType(String type, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Inquiry> inquiryPage = inquiryRepository.findByType(type, pageable);
@@ -176,9 +175,7 @@ public class InquiryService {
     //로그인한 유저의 이메일을 리턴
     public String getAuthenticatedUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication: " + authentication);
         if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getName())) {
-            System.out.println("Authenticated user email: " + authentication.getName());
             return authentication.getName();
         }
         return null;

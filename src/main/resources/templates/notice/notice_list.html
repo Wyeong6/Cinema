@@ -52,15 +52,15 @@
                                 <span th:if="${pageNum == noticeList.number}" th:text="${pageNum + 1}" class="current-page"></span>
                             </span>
                             <a href="#" th:if="${noticeList.hasNext()}"
-                                    th:href="@{/notice/noticeList?page=${noticeList.number + 1}}">
+                               th:href="@{/notice/noticeList?page=${noticeList.number + 1}}">
                                 <img class="movement-btn" src="/images/right-arrow.png" alt="다음페이지" />
                             </a>
                         </div>
                     </div>
-                    <!-- 공지사항이 없을 때 메시지 -->
-                    <div style="text-align: center" th:if="${#lists.isEmpty(noticeList.content)}">
-                        <h3>준비중 입니다.</h3>
-                    </div>
+                </div>
+                <!-- 공지사항이 없을 때 메시지 -->
+                <div style="text-align: center" th:if="${#lists.isEmpty(noticeList.content)}">
+                    <h4>준비중 입니다.</h4>
                 </div>
             </div>
         </div>
