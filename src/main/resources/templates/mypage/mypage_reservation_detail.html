@@ -3,7 +3,7 @@
     <section>
         <div class="history">
             <header>
-                <h5>스낵 주문상세 조회</h5>
+                <h5>영화 예매내역 조회</h5>
             </header>
             <hr />
             <section>
@@ -26,11 +26,11 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><img style="max-width: 100px; height: auto;" th:alt="${paymentInfo.getSnack().snack_alt}"
-                                                 th:src="@{/images/menu/{image}(image=${paymentInfo.getSnack().snack_image})}"></td>
+                                        <td><img style="max-width: 100px; height: auto;" alt="영화 포스터"
+                                                 th:src="@{'https://image.tmdb.org/t/p/w500/' + ${paymentInfo.getMovie().getPosterPath()}}"></td>
                                         <td th:text="${paymentInfo.getProductName()}">제품명</td>
                                         <td th:text="${paymentInfo.getTotalPrice()+'원'}">5000</td>
-                                        <td th:text="${paymentInfo.getProductCount()+'개'}">2</td>
+                                        <td th:text="${paymentInfo.getProductCount()}">2</td>
                                         <td th:text="${paymentInfo.getPaymentStatus()}">결제완료</td>
                                     </tr>
                                 </tbody>

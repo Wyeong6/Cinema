@@ -21,9 +21,12 @@
                             <p><span class="history-data-theater" th:text="${moviePayment.getContent3()}">상영관</span> <span class="history-data-seats" th:text="${moviePayment.getContent4()}">좌석</span></p>
                         </div>
                     </div>
-                    <div class="button_box">
-                        <button type="button" class="cancel_btn">예매취소</button>
-                        <button type="button" class="detail_btn">예매상세</button>
+                    <div class="button_box" th:if="${moviePayment.getPaymentStatus() == '결제완료'}"> <!--결제상태-->
+                        <button type="button" class="detail_btn" id="movie_detail" th:data-reservation-idx="${moviePayment.getId()}">예매상세</button>
+                        <button type="button" class="cancel_btn" id="movie_cancel" th:data-reservation-merchantUid="${moviePayment.getMerchantUid()}" th:data-reservation-impUid="${moviePayment.getImpUid()}">예매취소</button>
+                    </div>
+                    <div class="button_box" th:unless="${moviePayment.getPaymentStatus() == '결제완료'}"> <!--결제취소상태-->
+                        <button type="button" class="detail_btn" id="movie_cancel_detail" th:data-reservation-idx="${moviePayment.getId()}">예매상세</button>
                     </div>
                 </article>
                 <article th:if="${moviePaymentInfo == null or moviePaymentInfo.isEmpty()}">
@@ -84,8 +87,41 @@
             });
         }
 
-        $('.container').on('click', '.detail_btn', function() {
-            $('#content').load('/mypage/order/detail');
+        // $('.container').on('click', '.detail_btn', function() {
+        //     $('#content').load('/mypage/order/detail');
+        // });
+
+        // 예매 취소하기
+        $('#movie_cancel').click(function() {
+            const merchant_uid = $(this).data('reservation-merchantuid');
+            const imp_uid = $(this).data('reservation-impuid');
+
+            $.ajax({
+                type: 'POST',
+                url: '/payment/paymentCancel',
+                data: {
+                    merchant_uid: merchant_uid,
+                    imp_uid: imp_uid
+                },
+                success: function(response_complete) {
+                    if(response_complete.errorMsg !== "errorMsg") {
+                        let params = new URLSearchParams();
+                        params.append("imp_uid", response_complete.imp_uid);
+                        window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
+                    } else {
+                        alert("죄송합니다. 다시 시도해주세요.");
+                    }
+                },
+                error: function() {
+                    alert("서버 통신에 실패했습니다.");
+                }
+            })
+        });
+
+        // 예매내역 상세보기
+        $('#movie_detail, #movie_cancel_detail').click(function() {
+            const reservationIdx = $(this).data('reservation-idx');
+            $('#content').load('/mypage/reservation/detail?paymentId='+reservationIdx);
         });
     });
 </script>

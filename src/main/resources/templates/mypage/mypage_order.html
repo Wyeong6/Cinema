@@ -23,10 +23,12 @@
                             <p th:text="${snackPayment.getTotalPrice()}+원">36,000원 </p>
                         </div>
                     </div>
-                    <div class="button_box">
-<!--                        <button type="button" class="cancel_btn" th:onclick="'location.href=\'/payment/paymentCancel?merchant_uid=' + snackPayment.merchantUid + '\''">주문취소</button>-->
-                        <button type="button" class="cancel_btn">주문취소</button>
-                        <button type="button" class="detail_btn">구매상세</button>
+                    <div class="button_box" th:if="${snackPayment.getPaymentStatus() == '결제완료'}">
+                        <button type="button" class="detail_btn" id="snack_detail" th:data-order-idx="${snackPayment.getId()}">구매상세</button>
+                        <button type="button" class="cancel_btn" id="snack_cancel" th:data-order-merchantUid="${snackPayment.getMerchantUid()}" th:data-order-impUid="${snackPayment.getImpUid()}">주문취소</button>
+                    </div>
+                    <div class="button_box" th:unless="${snackPayment.getPaymentStatus() == '결제완료'}">
+                        <button type="button" class="detail_btn" id="snack_cancel_detail" th:data-order-idx="${snackPayment.getId()}">구매상세</button>
                     </div>
                 </article>
                 <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
@@ -84,8 +86,41 @@
                             });
                         }
 
-                        $('.container').on('click', '.order_detail_btn', function() {
-                            $('#content').load('/mypage/order/detail');
+                        // $('.container').on('click', '.order_detail_btn', function() {
+                        //     $('#content').load('/mypage/order/detail');
+                        // });
+
+                        // 주문 취소하기
+                        $('#snack_cancel').click(function() {
+                            const merchant_uid = $(this).data('order-merchantuid');
+                            const imp_uid = $(this).data('order-impuid');
+
+                            $.ajax({
+                                type: 'POST',
+                                url: '/payment/paymentCancel',
+                                data: {
+                                    merchant_uid: merchant_uid,
+                                    imp_uid: imp_uid
+                                },
+                                success: function(response_complete) {
+                                    if(response_complete.errorMsg !== "errorMsg") {
+                                        let params = new URLSearchParams();
+                                        params.append("imp_uid", response_complete.imp_uid);
+                                        window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
+                                    } else {
+                                        alert("죄송합니다. 다시 시도해주세요.");
+                                    }
+                                },
+                                error: function() {
+                                    alert("서버 통신에 실패했습니다.");
+                                }
+                            })
+                        });
+
+                        // 주문 상세보기
+                        $('#snack_detail, #snack_cancel_detail').click(function() {
+                            const orderIdx = $(this).data('order-idx');
+                            $('#content').load('/mypage/order/detail?paymentId=' + orderIdx);
                         });
                     });
                 </script>

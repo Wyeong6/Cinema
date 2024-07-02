@@ -13,6 +13,12 @@ public interface PointRepository extends JpaRepository<Point, Long> {
 
     Slice<Point> findByMember_Id(Long member_id, Pageable pageable);
 
+    @Query("SELECT p.points FROM Point p WHERE p.pointType = '-' AND p.impUid = :impUid")
+    String findMinusPoint(@Param("impUid") String imp_uid);
+
+    @Query("SELECT p.points FROM Point p WHERE p.pointType = '+' AND p.impUid = :impUid")
+    String findPlusPoint(@Param("impUid") String imp_uid);
+
 //    @Query("SELECT COUNT(p) FROM Point p WHERE p.member.id = :memberId AND p.contentType = true AND p.regDate >= :startDate AND p.regDate <= :endDate")
 //    long countByMovieMembership(
 //            @Param("memberId") Long memberId,

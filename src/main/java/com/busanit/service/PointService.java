@@ -20,6 +20,16 @@ public class PointService {
         pointRepository.save(point);
     }
 
+    // 결제 완료 마이너스 포인트 내역
+    public String getMinusPoint(String impUid) {
+        return pointRepository.findMinusPoint(impUid);
+    }
+
+    // 결제 완료 플러스 포인트 내역
+    public String getPlusPoint(String impUid) {
+        return pointRepository.findPlusPoint(impUid);
+    }
+
     // 포인트 내역(리스트)
     public Slice<PointDTO> getPointInfo(Long member_id, Pageable pageable) {
         Slice<Point> pointList = pointRepository.findByMember_Id(member_id, pageable);

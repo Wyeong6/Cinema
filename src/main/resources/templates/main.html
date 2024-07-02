@@ -9,6 +9,15 @@
     <!-- STOMP 클라이언트 라이브러리 비동기 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" async></script>
 
+    <style>
+        #movie_overview {
+            max-width: 100%;
+            white-space: pre-wrap; /* 줄바꿈을 포함하여 표시 */
+            word-wrap: break-word; /* 단어 단위로 줄바꿈 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -23,7 +32,7 @@
             <header>
                 <h2><a id="movie_title">Movie Title</a></h2>
                 <hr />
-                <p>Another fine freebie by HTML5 UP</p>
+                <p id="movie_overview">Another fine freebie by HTML5 UP</p>
             </header>
             <footer>
                 <a class="button circled reservation_btn">예매</a>
@@ -279,7 +288,7 @@
             const movieTitles = movies.map(movie => movie.title);
             const moviePosters = movies.map(movie => "https://image.tmdb.org/t/p/w1280" + movie.backdropPath);
             const movieVideos = movies.filter(movie => movie.video).map(movie => "https://www.youtube.com/embed/" + movie.video);
-
+            const movieOverview = movies.map(movie => movie.overview);
             /*]]>*/
 
             console.log(movieTitles);
@@ -297,21 +306,7 @@
                 window.location.href = url; // URL로 이동
             });
 
-            //모달 close버튼시  영상 정지
-            // $('.close').on('click', function() {
-            //     const info = document.getElementById('info');
-            //     const logo = document.getElementById('logo');
-            //     // info.style.display = 'block';
-            //     // logo.style.display = 'block';
-            //     $('#videoModal').modal('hide');
-            //     $('#videoFrame').attr('src', '');
-            //     $('#header .overlay').removeClass('modal-show');
-            // });
             $('.overlay').on('click', function() {
-                const info = document.getElementById('info');
-                const logo = document.getElementById('logo');
-                // info.style.display = 'block';
-                // logo.style.display = 'block';
                 $('#videoModal').modal('hide');
                 $('#videoFrame').attr('src', '');
                 $('#header .overlay').removeClass('modal-show');
@@ -319,10 +314,6 @@
 
             //모달이 닫히면 영상중지
             $('#videoModal').on('hidden.bs.modal', function () {
-                const info = document.getElementById('info');
-                const logo = document.getElementById('logo');
-                // info.style.display = 'block';
-                // logo.style.display = 'block';
                 $('#videoFrame').attr('src', '');
             });
 
@@ -335,22 +326,37 @@
             function changeBackgroundAndTitle(index) {
                 const header = document.getElementById('header');
                 const movieTitle = document.getElementById('movie_title');
+                const movieOverviewTag = document.getElementById('movie_overview'); // 개요를 표시할 요소
                 const buttons = document.querySelectorAll('.btn');
-                const info = document.getElementById('info');
-                const logo = document.getElementById('logo');
 
                 $('#movie_title').off('click').on('click', function () {
                     const videoUrl = movieVideos[index];
                     console.log("videoUrl" + videoUrl)
                     $('#videoFrame').attr('src', videoUrl);
-                    // info.style.display = 'none';
-                    // logo.style.display = 'none';
                     $('#videoModal').modal('show');
                     $('#header .overlay').addClass('modal-show');
                 });
 
                 header.style.backgroundImage = `url(${moviePosters[index]})`;
                 movieTitle.textContent = movieTitles[index];
+
+                // 메인화면 영화 줄거리 뜨는거 관련 (필요하면 조정하세요)
+                const maxLength = 70; // 원하는 최대 길이 (총 줄거리 70글자 제한)
+                const lineLength = 30; // 줄바꿈 기준 글자수 (30글자마다 줄바꿈)
+                let overviewText = movieOverview[index];
+
+                // 텍스트를 70글자로 제한하고 "..." 추가
+                if (overviewText.length > maxLength) {
+                    overviewText = overviewText.substring(0, maxLength) + '...';
+                }
+
+                // 줄바꿈
+                let formattedText = '';
+                for (let i = 0; i < overviewText.length; i += lineLength) {
+                    formattedText += overviewText.substring(i, i + lineLength) + '\n';
+                }
+
+                movieOverviewTag.textContent = formattedText.trim();
 
                 $('.reservation_btn').on('click', function() {
                     window.location.href = '/reservation/screeningSchedule/' + movieIds[index];
@@ -390,27 +396,6 @@
         //     window.location.href = "/inquiry#work";
         // });
     </script>
-
-<!--    <p>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;인기순 &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</p>-->
-    <!--<div th:each="movie, iterStat : ${movies}">-->
-    <!--    <div th:if="${iterStat.index < 2}">-->
-    <!--        <h2>영화 번호: <span th:text="${movie.id}">영화 번호</span></h2>-->
-    <!--        <h3>영화 이름: <span th:text="${movie.title}">영화 이름</span></h3>-->
-    <!--        <p>영화 설명: <span th:text="${movie.overview}">영화 설명</span></p>-->
-    <!--        <p>영화 장르: <span th:text="${#strings.listJoin(movie.genres, ', ')}">영화 장르</span></p>-->
-    <!--        <p>영화 평점: <span th:text="${movie.voteAverage}">영화 평점</span></p>-->
-    <!--        <p>인기도: <span th:text="${movie.popularity}">인기도</span></p>-->
-    <!--        &lt;!&ndash;        <div th:if="${movie.video}">&ndash;&gt;-->
-    <!--        &lt;!&ndash;            <p>영화 비디오:</p>&ndash;&gt;-->
-    <!--        &lt;!&ndash;            <iframe width="500" height="280" th:src="@{'https://www.youtube.com/embed/' + ${movie.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>&ndash;&gt;-->
-    <!--        &lt;!&ndash;        </div>&ndash;&gt;-->
-    <!--        <p>영화 배경사진:</p>-->
-    <!--        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.backdropPath}}" alt="배경사진" />-->
-    <!--        <p>영화 포스터:</p>-->
-    <!--        <img th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.posterPath}}" alt="포스터" />-->
-    <!--    </div>-->
-    <!--</div>-->
-
 </th:block>
 </body>
 </html>

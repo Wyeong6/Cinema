@@ -29,7 +29,6 @@ function requestPay() {
                             "imp_uid": rsp.imp_uid,
                             "apply_num": rsp.apply_num,
                             "buyer_email": rsp.buyer_email,
-                            "payment_status": rsp.payment_status,
                             "product_idx": productIdx,
                             "product_name": orderName,
                             "product_type": reqIDX,
@@ -64,24 +63,10 @@ function requestPay() {
                         cancelReservedSeats(scheduleId, seatIds);
                     }
 
-                    // $.ajax({
-                    //     type: "POST",
-                    //     url: "/payment/paymentFailed",
-                    //     data: JSON.stringify({
-                    //         err_msg: rsp.error_msg,
-                    //     }),
-                    //     contentType: 'application/json',
-                    //     success: function(response_failed) {
-                    //         alert(msg);
-                    //     },
-                    //     error: function() {
-                    //         alert('서버 통신에 실패했습니다.');
-                    //     }
-                    // });
-                    // alert(msg);
+                    alert(msg);
 
 
-                    /* 테스트용 */
+                    // /* 테스트용 */
                     // $.ajax({
                     //     type: "POST",
                     //     url: "/payment/complete",
@@ -90,7 +75,6 @@ function requestPay() {
                     //         "imp_uid": rsp.imp_uid,
                     //         "apply_num": rsp.apply_num,
                     //         "buyer_email": rsp.buyer_email,
-                    //         "payment_status": rsp.payment_status,
                     //         "product_name": orderName,
                     //         "product_idx": productIdx,
                     //         "product_type": reqIDX,
@@ -112,7 +96,7 @@ function requestPay() {
                     //         alert("서버 통신에 실패했습니다.");
                     //     }
                     // });
-                    /* 테스트용 끝*/
+                    // /* 테스트용 끝*/
 
                 }
             });

@@ -66,6 +66,54 @@ public class PaymentDTO {
                 .build();
     }
 
+    public static PaymentDTO toDTOSnack(Payment payment, SnackService snackService) {
+        SnackDTO snackDTO = snackService.findSnackById(Long.valueOf(payment.getProductIdx()));
+
+        return PaymentDTO.builder()
+                .id(payment.getId())
+                .member_id(payment.getMember().getId())
+                .productName(payment.getProductName())
+                .productIdx(payment.getProductIdx())
+                .paymentType(payment.getPaymentType())
+                .productCount(payment.getProductCount())
+                .totalPrice(payment.getTotalPrice())
+                .productType(payment.getProductType())
+                .merchantUid(payment.getMerchantUid())
+                .impUid(payment.getImpUid())
+                .applyNum(payment.getApplyNum())
+                .paymentStatus(payment.getPaymentStatus())
+                .regDate(payment.getRegDate())
+                .updateDate(payment.getUpdateDate())
+                .snack(snackDTO) // SnackDTO 설정
+                .build();
+    }
+
+    public static PaymentDTO toDTOMovie(Payment payment, MovieService movieService) {
+        MovieDTO movieDTO = movieService.findMovieById(Long.valueOf(payment.getProductIdx()));
+
+        return PaymentDTO.builder()
+                .id(payment.getId())
+                .member_id(payment.getMember().getId())
+                .productName(payment.getProductName())
+                .content1(payment.getContent1())
+                .content2(payment.getContent2())
+                .content3(payment.getContent3())
+                .content4(payment.getContent4())
+                .productIdx(payment.getProductIdx())
+                .paymentType(payment.getPaymentType())
+                .productCount(payment.getProductCount())
+                .totalPrice(payment.getTotalPrice())
+                .productType(payment.getProductType())
+                .merchantUid(payment.getMerchantUid())
+                .impUid(payment.getImpUid())
+                .applyNum(payment.getApplyNum())
+                .paymentStatus(payment.getPaymentStatus())
+                .regDate(payment.getRegDate())
+                .updateDate(payment.getUpdateDate())
+                .movie(movieDTO) // MovieDTO 설정
+                .build();
+    }
+
     // Movie Slice<Entity> -> Slice<DTO> 변환
     public static Slice<PaymentDTO> toDTOMovieSlice(Slice<Payment> paymentSlice, MovieService movieService) {
         return paymentSlice.map(entity -> {
@@ -82,6 +130,8 @@ public class PaymentDTO {
                     .productCount(entity.getProductCount())
                     .totalPrice(entity.getTotalPrice())
                     .merchantUid(entity.getMerchantUid())
+                    .impUid(entity.getImpUid())
+                    .paymentStatus(entity.getPaymentStatus())
                     .regDate(entity.getRegDate())
                     .updateDate(entity.getUpdateDate())
                     .movie(movieDTO) // MovieDTO 설정
@@ -101,6 +151,8 @@ public class PaymentDTO {
                     .productCount(entity.getProductCount())
                     .totalPrice(entity.getTotalPrice())
                     .merchantUid(entity.getMerchantUid())
+                    .impUid(entity.getImpUid())
+                    .paymentStatus(entity.getPaymentStatus())
                     .regDate(entity.getRegDate())
                     .updateDate(entity.getUpdateDate())
                     .snack(snackDTO) // SnackDTO 설정
