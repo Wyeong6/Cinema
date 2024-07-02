@@ -3,6 +3,8 @@ package com.busanit.repository;
 import com.busanit.entity.Member;
 import com.busanit.entity.movie.FavoriteMovie;
 import com.busanit.entity.movie.Movie;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,4 +18,5 @@ public interface FavoriteMovieRepository extends JpaRepository<FavoriteMovie,Lon
 
         boolean existsByMember_EmailAndMovie_MovieId(String userEmail, Long movieId);
 
+        Page<FavoriteMovie> findByMember_Email(String userEmail, PageRequest pageRequest);
 }
