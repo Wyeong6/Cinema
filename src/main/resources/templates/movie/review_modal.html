@@ -58,7 +58,8 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { SuccessAlert } from "/modules/alerts.js";
   window.onload = function() {
 
     var userEmail = /*[[${userEmail}]]*/ '[[${userEmail}]]';
@@ -88,7 +89,6 @@
         $('#reviewForm')[0].reset();
         $('#review_modal').modal('hide');
         window.close(); // 창을 닫습니다.
-
       }
     });
   });
