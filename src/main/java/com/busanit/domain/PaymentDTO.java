@@ -23,6 +23,7 @@ public class PaymentDTO {
     private Long member_id;
     private String buyerEmail;
     private String productName;
+    private Long scheduleId;
     private String productIdx;
     private String productType;
     private String content1;
@@ -48,6 +49,7 @@ public class PaymentDTO {
                 .member_id(payment.getMember().getId())
                 .buyerEmail(payment.getBuyerEmail())
                 .productName(payment.getProductName())
+                .scheduleId(payment.getScheduleId())
                 .productIdx(payment.getProductIdx())
                 .paymentType(payment.getPaymentType())
                 .content1(payment.getContent1())
@@ -95,6 +97,7 @@ public class PaymentDTO {
                 .id(payment.getId())
                 .member_id(payment.getMember().getId())
                 .productName(payment.getProductName())
+                .scheduleId(payment.getScheduleId())
                 .content1(payment.getContent1())
                 .content2(payment.getContent2())
                 .content3(payment.getContent3())
@@ -123,6 +126,7 @@ public class PaymentDTO {
                     .id(entity.getId())
                     .productIdx(entity.getProductIdx())
                     .productName(entity.getProductName())
+                    .scheduleId(entity.getScheduleId())
                     .content1(entity.getContent1())
                     .content2(entity.getContent2())
                     .content3(entity.getContent3())

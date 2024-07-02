@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -175,10 +176,12 @@ public class ReservationController {
 
     @PostMapping("/reserveSeatsCancel")
     @ResponseBody
-    public ResponseEntity<String> cancelSeatReservations(@RequestParam Long scheduleId, @RequestBody List<String> seatIds) {
+    public ResponseEntity<String> cancelSeatReservations(@RequestParam Long scheduleId,
+                                                         @RequestBody List<String> seatIds) {
         try {
             if (scheduleId != null && seatIds != null && !seatIds.isEmpty()) {
                 seatReservationService.deleteSeat(scheduleId, seatIds);
+                seatReservationService.updateAvailableSeatsUp(scheduleId, seatIds);
                 return ResponseEntity.ok("Seat reservations canceled successfully");
             } else {
                 return ResponseEntity.badRequest().body("Invalid scheduleId or seatIds");
