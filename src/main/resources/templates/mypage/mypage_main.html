@@ -49,8 +49,8 @@
                         </div>
                     </div>
                     <div class="button_box" th:if="${moviePaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}"> <!--결제상태-->
-                        <button type="button" class="cancel_btn" id="movie_cancel" th:data-reservation-merchantUid="${moviePaymentInfo.getContent().get(0).getMerchantUid()}" th:data-reservation-impUid="${moviePaymentInfo.getContent().get(0).getImpUid()}">예매취소</button>
                         <button type="button" class="detail_btn" id="movie_detail" th:data-reservation-idx="${moviePaymentInfo.getContent().get(0).getId()}">예매상세</button>
+                        <button type="button" class="cancel_btn" id="movie_cancel" th:data-reservation-merchantUid="${moviePaymentInfo.getContent().get(0).getMerchantUid()}" th:data-reservation-impUid="${moviePaymentInfo.getContent().get(0).getImpUid()}">예매취소</button>
                     </div>
                     <div class="button_box" th:unless="${moviePaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}"> <!--결제취소상태-->
                         <button type="button" class="detail_btn" id="movie_cancel_detail" th:data-reservation-idx="${moviePaymentInfo.getContent().get(0).getId()}">예매상세</button>
@@ -91,8 +91,8 @@
                         </div>
                     </div>
                     <div class="button_box" th:if="${snackPaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}">
-                        <button type="button" class="cancel_btn" id="snack_cancel" th:data-order-merchantUid="${snackPaymentInfo.getContent().get(0).getMerchantUid()}" th:data-order-impUid="${snackPaymentInfo.getContent().get(0).getImpUid()}">주문취소</button>
                         <button type="button" class="detail_btn" id="snack_detail" th:data-order-idx="${snackPaymentInfo.getContent().get(0).getId()}">구매상세</button>
+                        <button type="button" class="cancel_btn" id="snack_cancel" th:data-order-merchantUid="${snackPaymentInfo.getContent().get(0).getMerchantUid()}" th:data-order-impUid="${snackPaymentInfo.getContent().get(0).getImpUid()}">주문취소</button>
                     </div>
                     <div class="button_box" th:unless="${snackPaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}">
                         <button type="button" class="detail_btn" id="snack_cancel_detail" th:data-order-idx="${snackPaymentInfo.getContent().get(0).getId()}">구매상세</button>
