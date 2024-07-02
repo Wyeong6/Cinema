@@ -20,29 +20,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.coobird.thumbnailator.Thumbnails;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.codec.binary.Base64;
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -70,10 +60,8 @@ public class MovieService {
     private final GenreRepository genreRepository;
     private final MovieBlacklistRepository movieBlacklistRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Value("${TMDB.apiKey}")
     private String apiKey;
-
     // 캐시를 사용하기 위한 데이터 구조
     private List<MovieDTO> cachedVideoMovies = new ArrayList<>();
     private List<MovieDTO> cachedAllMovies = new ArrayList<>();

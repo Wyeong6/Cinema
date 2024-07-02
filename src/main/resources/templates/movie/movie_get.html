@@ -990,25 +990,25 @@
 
         // Kakao 공유 함수
         function shareMessage() {
-            var currentUrl = window.location.href;
-            var urlSegments = currentUrl.split('/');
-            var movieId = urlSegments[urlSegments.length - 1];
+            const currentUrl = window.location.href;
+            const urlSegments = currentUrl.split('/');
+            const movieId = urlSegments[urlSegments.length - 1];
 
-            var titleElement = document.querySelector('.movie_title');
-            var releaseDateElement = document.querySelector('.releaseDate');
-            var runtimeElement = document.querySelector('.runtime');
-            var imageElement = document.getElementById('resizedImageUrl');
-            var genresElement = document.querySelector('.genres');
-            var certificationElement = document.getElementById('certification'); // 심의 등급 요소
+            const titleElement = document.querySelector('.movie_title');
+            const releaseDateElement = document.querySelector('.releaseDate');
+            const runtimeElement = document.querySelector('.runtime');
+            const imageElement = document.getElementById('resizedImageUrl');
+            const genresElement = document.querySelector('.genres');
+            const certificationElement = document.getElementById('certification'); // 심의 등급 요소
 
             if (titleElement && releaseDateElement && runtimeElement && imageElement && genresElement) {
-                var title = titleElement.innerText.trim(); // trim()을 사용하여 좌우 공백 제거
-                var releaseDate = releaseDateElement.innerText.trim(); // 개봉 날짜
-                var runtime = runtimeElement.innerText.trim(); // 상영 시간
-                var imageUrl = imageElement.src
+                const title = titleElement.innerText.trim(); // trim()을 사용하여 좌우 공백 제거
+                const releaseDate = releaseDateElement.innerText.trim(); // 개봉 날짜
+                const runtime = runtimeElement.innerText.trim(); // 상영 시간
+                const imageUrl = imageElement.src
 
-                var genres = genresElement.innerText.trim(); // 장르 가져오기
-                var certificationValue = certificationElement.textContent;
+                const genres = genresElement.innerText.trim(); // 장르 가져오기
+                const certificationValue = certificationElement.textContent;
 
                 Kakao.Link.sendDefault({
                     objectType: 'feed',

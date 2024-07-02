@@ -28,21 +28,21 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var sender = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
+    let sender = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
     /*]]>*/
-    var chatRoomId = null;
-    var chatRoomTitle = null;
-    var recipient = null;  // 수신자 이메일을 고정
-    var stompClient = null; // STOMP 클라이언트 변수 선언
-    var typingTimeout = null; //타이핑 타이머
-    var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
-    var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
-    var status = null; //채팅방 상태
-    var entranceStatus  = ""; //관리자의 입장상태
+    let chatRoomId = null;
+    let chatRoomTitle = null;
+    let recipient = null;  // 수신자 이메일을 고정
+    let stompClient = null; // STOMP 클라이언트 변수 선언
+    let typingTimeout = null; //타이핑 타이머
+    let TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
+    let typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
+    let status = null; //채팅방 상태
+    let entranceStatus  = ""; //관리자의 입장상태
 
     // 초기 페이징 값 설정
-    var activePage = 1;
-    var inactivePage = 1;
+    let activePage = 1;
+    let inactivePage = 1;
 
     // WebSocket 연결 함수
     function connect() {

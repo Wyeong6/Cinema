@@ -15,7 +15,6 @@ export function connectWebSocket(options) {
     const {
         subscribeCallback,
         displayChatListCallback,
-        // loadInitialData = null,
         initialDataParams
     } = options;
 

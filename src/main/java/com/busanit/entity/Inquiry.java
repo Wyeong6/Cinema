@@ -39,13 +39,6 @@ public class Inquiry {
         member.getInquiries().add(this);
     }
 
-    public void removeMember(Member member) {
-        if (this.member != null && this.member.equals(member)) {
-            this.member = null;
-            member.getInquiries().remove(this);
-        }
-    }
-
     // Inquiry 타입 변경 메서드
     public void markAsAnswered() {
         this.type = "답변완료";

@@ -37,10 +37,6 @@ public class InquiryService {
     private final InquiryReplyRepository inquiryReplyRepository;
     private final JavaMailSender mailSender;
 
-    //properties 에 설정한 환경변수 값을 가져옴
-    @Value("${spring.mail.username}")
-    private String adminEmail;
-
     //문의 추가
     public void InquiryRegister(InquiryDTO inquiryDTO) throws MessagingException, jakarta.mail.MessagingException  {
 
@@ -51,13 +47,12 @@ public class InquiryService {
         if (optionalMember.isPresent()) { // 회원인 경우
             Member member = optionalMember.get();
             inquiry = Inquiry.toEntity(inquiryDTO);
-            inquiry.setMember(member);
+            member.addInquiry(inquiry);
 
         } else {   // 비회원인 경우
             inquiry = Inquiry.toEntity(inquiryDTO);
         }
         inquiryRepository.save(inquiry);
-
     }
 
     //문의답변 추가
@@ -74,29 +69,26 @@ public class InquiryService {
             InquiryReply inquiryReply = InquiryReply.toEntity(replyMessage);
             inquiryReply.setInquiry(inquiry);
             inquiryReplyRepository.save(inquiryReply);
-
         }
     }
 
-    public InquiryDTO findById(Long id) {
-        Inquiry inquiry = inquiryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid inquiry Id:" + id));
-
-        return InquiryDTO.toDTO(inquiry);
-    }
-
+    // 문의 ID로 문의 답변을 찾는 메서드
     public InquiryReplyDTO findInquiryReplyByInquiryId(Long inquiryId) {
         InquiryReply inquiryReply = inquiryReplyRepository.findByInquiryId(inquiryId);
         return InquiryReplyDTO.toDTO(inquiryReply);
     }
 
+    // 미답변 상태의 문의 목록을 페이지네이션
     public Page<InquiryDTO> getUnansweredInquiryList(int page, int size) {
         return getInquiriesByType("미답변", page, size);
     }
 
+    // 답변 완료 상태의 문의 목록을 페이지네이션
     public Page<InquiryDTO> getAnsweredInquiryList(int page, int size) {
         return getInquiriesByType("답변완료", page, size);
     }
 
+    // 특정 타입의 문의 목록을 페이지네이션하여 반환
     private Page<InquiryDTO> getInquiriesByType(String type, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Inquiry> inquiryPage = inquiryRepository.findByType(type, pageable);
@@ -165,7 +157,6 @@ public class InquiryService {
                 + "<p>감사합니다.</p>"
                 + "<p>고객 지원팀 드림</p>"
                 + "</div>";
-
 
         helper.setText(mailContent, true);
 

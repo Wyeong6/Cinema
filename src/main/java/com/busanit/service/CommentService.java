@@ -83,7 +83,6 @@ public class CommentService {
         return commentList;
     }
 
-
     //평균평점
     public Double getAverageRating(String movieId){
         return commentRepository.findAvgRatingByMovieId(Long.valueOf(movieId));
@@ -93,7 +92,6 @@ public class CommentService {
 
         Optional<Comment> comment = commentRepository.findCommentByMemberEmailAndMovieMovieId(memberEmail, movieId);
         return comment.isPresent();
-
     }
     //로그인한 유저 검사
     public boolean isAuthenticated() {
@@ -111,10 +109,6 @@ public class CommentService {
     //댓글 삭제
     public void deleteComment(Long cno) {
         commentRepository.deleteById(cno);
-    }
-
-    public Page<CommentDTO> getAllComments(Pageable pageable) {
-        return commentRepository.findAll(pageable).map(comment -> new CommentDTO(comment));
     }
 
 }

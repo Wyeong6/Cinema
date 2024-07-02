@@ -182,7 +182,7 @@ public class ChatService {
                 });
     }
 
-    // 채팅방 리스트 페이징 조회 (공통 메서드)
+    // 채팅방 리스트 페이징 조회
     public Page<ChatRoomDTO> getPagedChatRoomList(String memberEmail, Page<ChatRoom> chatRoomPage) {
         List<ChatRoomDTO> chatRoomList = chatRoomPage.getContent().stream()
                 .peek(chatRoom -> System.out.println("Processing chatRoom: " + chatRoom))

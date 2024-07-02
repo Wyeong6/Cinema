@@ -17,5 +17,4 @@ public class MessageReadStatusDTO {
     private Long memberId;
     private Long messageId;
     private LocalDateTime readTimestamp;
-
 }

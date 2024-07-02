@@ -31,7 +31,8 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { SuccessAlert } from "/modules/alerts.js";
     $(document).ready(function() {
         $('#noticeForm').on('submit', function(event) {
             event.preventDefault(); // 기본 폼 제출을 막음
@@ -41,6 +42,7 @@
                 method: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
+                    SuccessAlert("공지사항이 등록되었습니다.")
                     // 성공 시 컨테이너에 공지사항 목록 로드
                     $('.container-xxl').load('/admin/noticeList');
                 },
