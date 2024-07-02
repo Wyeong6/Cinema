@@ -45,7 +45,9 @@
         </div>
     </div>
 </div>
-<script>
+<script type="module">
+    import { SuccessAlert } from "/modules/alerts.js";
+
     var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
     document.getElementById('memberEmail').value = userInfo.email;
 
@@ -58,10 +60,17 @@
                 method: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
+                    SuccessAlert("이벤트가 등록되었습니다.")
                     $('.container-xxl').load('/admin/eventList');
                 },
                 error: function() {
-                    alert('폼 제출 중 오류가 발생했습니다.');
+                    Swal.fire({
+                        position: "center",
+                        icon: "error",
+                        title: "이벤트 등록에 실패했습니다.",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                 }
             });
         });

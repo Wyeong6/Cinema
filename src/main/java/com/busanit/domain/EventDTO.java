@@ -36,10 +36,10 @@ public class EventDTO {
                 .eventImage(event.getEventImage())
                 .eventAlt(event.getEventAlt())
                 .eventDetail(event.getEventDetail()) // 소문자로 수정
+                //뷰카운트 필요?
                 .viewCount(event.getViewCount())
                 .regDate(event.getRegDate())
                 .updateDate(event.getUpdateDate())
                 .build();
     }
-
 }

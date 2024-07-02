@@ -20,7 +20,7 @@
                                              alt="영화포스터"
                                         />
                                         <img th:if="${movie.posterPath != 'null' && movie.posterPath != '' && #strings.length(movie.id) != 10}"
-                                             class="featured-img"
+                                             class="featured-img" id="resizedImageUrl"
                                              th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}"
                                              alt="영화포스터"
                                         />
@@ -64,8 +64,8 @@
 
                                         <br>
                                         <div class="movie_detail">
-                                            <span><b th:text="${movie.releaseDate}">releasedate</b></span>
-                                            <span><b th:text="${movie.runtime} + '분'">runtime</b></span>
+                                            <span class="releaseDate"><b th:text="${movie.releaseDate}">releasedate</b></span>
+                                            <span class="runtime"><b th:text="${movie.runtime} + '분'">runtime</b></span>
                                             <img id="certification-image" src="" alt="영화심의등급 이미지">
                                             <span id="certification">
                                                 <b id="certificationB" th:text="${movie.certifications}">certification</b>
@@ -1017,25 +1017,32 @@
 
         // Kakao 공유 함수
         function shareMessage() {
-            var currentUrl = window.location.href;
-            var urlSegments = currentUrl.split('/');
-            var movieId = urlSegments[urlSegments.length - 1];
+            const currentUrl = window.location.href;
+            const urlSegments = currentUrl.split('/');
+            const movieId = urlSegments[urlSegments.length - 1];
 
-            var titleElement = document.querySelector('.movie_title');
-            var detailElement = document.querySelector('.movie_detail');
-            var imageElement = document.querySelector('.featured img');
+            const titleElement = document.querySelector('.movie_title');
+            const releaseDateElement = document.querySelector('.releaseDate');
+            const runtimeElement = document.querySelector('.runtime');
+            const imageElement = document.getElementById('resizedImageUrl');
+            const genresElement = document.querySelector('.genres');
+            const certificationElement = document.getElementById('certification'); // 심의 등급 요소
 
-            if (titleElement && detailElement && imageElement) {
-                var title = titleElement.innerText;
-                var detail = detailElement.innerText;
-                var imageUrl = imageElement.src;
+            if (titleElement && releaseDateElement && runtimeElement && imageElement && genresElement) {
+                const title = titleElement.innerText.trim(); // trim()을 사용하여 좌우 공백 제거
+                const releaseDate = releaseDateElement.innerText.trim(); // 개봉 날짜
+                const runtime = runtimeElement.innerText.trim(); // 상영 시간
+                const imageUrl = imageElement.src
+
+                const genres = genresElement.innerText.trim(); // 장르 가져오기
+                const certificationValue = certificationElement.textContent;
 
                 Kakao.Link.sendDefault({
                     objectType: 'feed',
                     content: {
-                        title: title, // 이벤트 제목
-                        description: detail, // 이벤트 상세 내용
-                        imageUrl: imageUrl, // 이벤트 이미지 URL
+                        title: title, // 제목
+                        description: `개봉 : ${releaseDate}  상영 시간: ${runtime} \n장르: ${genres} 등급: ${certificationValue}`, // 상세 내용에 정보 추가
+                        imageUrl: imageUrl, // 이미지 URL
                         link: {
                             mobileWebUrl: `http://localhost:8080/movies/${movieId}`, // 동적 이벤트 ID를 포함한 URL
                             webUrl: `http://localhost:8080/movies/${movieId}`
@@ -1046,7 +1053,6 @@
                 console.error('필요한 요소를 찾을 수 없습니다.');
             }
         }
-
 
         // 직접 등록한 영화 배우목록 화면에 띄우기
         document.addEventListener("DOMContentLoaded", function () {

@@ -3,8 +3,6 @@ package com.busanit.entity.chat;
 import com.busanit.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +17,7 @@ public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
-
     private String type;
 
     @ManyToMany
@@ -60,5 +56,4 @@ public class ChatRoom {
             chatRoomReadStatus.setChatRoom(this);
         }
     }
-
 }

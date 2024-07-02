@@ -27,7 +27,6 @@ public class MovieReaction {
     @Enumerated(EnumType.STRING)
     private ReactionType reactionType;
 
-
     public MovieReaction(Member member, Movie movie, ReactionType reactionType) {
         this.member = member;
         this.movie = movie;
