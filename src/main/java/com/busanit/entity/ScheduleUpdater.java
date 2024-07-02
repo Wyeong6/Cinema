@@ -16,7 +16,8 @@ public class ScheduleUpdater {
         this.scheduleRepository = scheduleRepository;
     }
 
-    @Scheduled(cron = "0/1 * * * * *")
+    @Scheduled(cron = "0 0 0 1 * *")
+//    @Scheduled(cron = "0/1 * * * * *")
     @Transactional
     public void updateScheduleStatus() {
         List<Schedule> schedules = scheduleRepository.findAll();
