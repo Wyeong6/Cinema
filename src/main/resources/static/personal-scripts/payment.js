@@ -31,6 +31,7 @@ function requestPay() {
                             "buyer_email": rsp.buyer_email,
                             "product_idx": productIdx,
                             "product_name": orderName,
+                            "schedule_id": scheduleId,
                             "product_type": reqIDX,
                             "content1": content1,
                             "content2": content2,
@@ -66,37 +67,38 @@ function requestPay() {
                     alert(msg);
 
 
-                    // /* 테스트용 */
-                    // $.ajax({
-                    //     type: "POST",
-                    //     url: "/payment/complete",
-                    //     data: $.param({
-                    //         "merchant_uid": rsp.merchant_uid,
-                    //         "imp_uid": rsp.imp_uid,
-                    //         "apply_num": rsp.apply_num,
-                    //         "buyer_email": rsp.buyer_email,
-                    //         "product_name": orderName,
-                    //         "product_idx": productIdx,
-                    //         "product_type": reqIDX,
-                    //         "content1": content1,
-                    //         "content2": content2,
-                    //         "content3": content3,
-                    //         "content4": content4,
-                    //         "product_count": productCount,
-                    //         "amount": currentPrice,
-                    //         "plusPoint": plusPoint,
-                    //         "minusPoint": minusPoint
-                    //     }),
-                    //     success: function(response_complete) {
-                    //         let params = new URLSearchParams();
-                    //         params.append("imp_uid", response_complete.imp_uid);
-                    //         window.location.href = '/payment/paymentSuccessful?'+ params.toString(); // 결제가 완료된 후 리디렉션할 페이지
-                    //     },
-                    //     error: function() {
-                    //         alert("서버 통신에 실패했습니다.");
-                    //     }
-                    // });
-                    // /* 테스트용 끝*/
+                    /* 테스트용 */
+                    $.ajax({
+                        type: "POST",
+                        url: "/payment/complete",
+                        data: $.param({
+                            "merchant_uid": rsp.merchant_uid,
+                            "imp_uid": rsp.imp_uid,
+                            "apply_num": rsp.apply_num,
+                            "buyer_email": rsp.buyer_email,
+                            "product_name": orderName,
+                            "product_idx": productIdx,
+                            "schedule_id": scheduleId,
+                            "product_type": reqIDX,
+                            "content1": content1,
+                            "content2": content2,
+                            "content3": content3,
+                            "content4": content4,
+                            "product_count": productCount,
+                            "amount": currentPrice,
+                            "plusPoint": plusPoint,
+                            "minusPoint": minusPoint
+                        }),
+                        success: function(response_complete) {
+                            let params = new URLSearchParams();
+                            params.append("imp_uid", response_complete.imp_uid);
+                            window.location.href = '/payment/paymentSuccessful?'+ params.toString(); // 결제가 완료된 후 리디렉션할 페이지
+                        },
+                        error: function() {
+                            alert("서버 통신에 실패했습니다.");
+                        }
+                    });
+                    /* 테스트용 끝*/
 
                 }
             });

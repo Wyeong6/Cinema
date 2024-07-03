@@ -95,6 +95,11 @@ public class Schedule {
         updateStatus();
     }
 
+    public void increaseAvailableSeats(int seatsReserved) {
+        this.availableSeats += seatsReserved;
+        updateStatus();
+    }
+
     private static String determineSessionType(LocalDate date, LocalTime startTime) {
         if (isWeekend(date)) {
             return "주말";

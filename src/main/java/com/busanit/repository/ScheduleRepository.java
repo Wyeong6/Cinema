@@ -23,4 +23,17 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findSchedulesByConditions(@Param("theaterName") String theaterName,
                                              @Param("movieId") Long movieId,
                                              @Param("date") LocalDate date);
+
+    @Transactional
+    @Query("SELECT s FROM Schedule s " +
+            "WHERE (:theaterName IS NULL OR s.theaterNumber.theater.theaterName = :theaterName) " +
+            "AND (:movieId IS NULL OR s.movie.movieId = :movieId) " +
+            "AND (:theaterNumber IS NULL OR s.theaterNumber.theaterNumber = :theaterNumber) " +
+            "AND (:date IS NULL OR s.date = :date) " +
+            "AND (:startTime IS NULL OR s.startTime = :startTime)")
+    Schedule findScheduleByConditions(@Param("theaterName") String theaterName,
+                                             @Param("movieId") Long movieId,
+                                             @Param("theaterNumber") Long theaterNumber,
+                                             @Param("date") LocalDate date,
+                                             @Param("startTime") LocalTime startTime);
 }

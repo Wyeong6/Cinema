@@ -52,7 +52,6 @@ public class Movie {
     @ManyToMany(mappedBy = "movies", cascade= CascadeType.ALL)
     private List<MovieActor> actors = new ArrayList<>();
 
-
     //댓글 관계
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment = new ArrayList<>();
@@ -108,8 +107,6 @@ public class Movie {
         this.images.add(image);
         image.setMovie(this);
     }
-
-
 }
 
 

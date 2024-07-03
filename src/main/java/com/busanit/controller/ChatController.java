@@ -27,17 +27,6 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ConcurrentMap<String, ConcurrentMap<String, Boolean>> chatRoomPresenceMap = new ConcurrentHashMap<>();
 
-
-    @ModelAttribute("activePage")
-    public int activePage() {
-        return 1; // 기본 active 페이지 번호
-    }
-
-    @ModelAttribute("inactivePage")
-    public int inactivePage() {
-        return 1; // 기본 inactive 페이지 번호
-    }
-
     @MessageMapping("/chat/updatePage")
     public void updatePage(@Payload PageUpdateDTO pageUpdateDTO) {
 
@@ -60,15 +49,12 @@ public class ChatController {
         return ResponseEntity.ok(userMap);
     }
 
-
     //채팅방 입장시
     @MessageMapping("/chat/admin/enter")
     public void sendAdminEnter(@Payload EnterNotificationDTO enterNotificationDTO) {
         chatRoomPresenceMap
                 .computeIfAbsent(enterNotificationDTO.getChatRoomId(), k -> new ConcurrentHashMap<>())
                 .put(enterNotificationDTO.getSender(), true);
-
-        System.out.println("Admin enter - Chat Room Presence Map: " + chatRoomPresenceMap);
 
         messagingTemplate.convertAndSendToUser(
                 enterNotificationDTO.getRecipient(),
@@ -86,8 +72,6 @@ public class ChatController {
                     return v;
                 });
 
-        System.out.println("Admin exit - Chat Room Presence Map: " + chatRoomPresenceMap);
-
         messagingTemplate.convertAndSendToUser(
                 enterNotificationDTO.getRecipient(),
                 "/queue/private/" + enterNotificationDTO.getChatRoomId(),
@@ -98,15 +82,13 @@ public class ChatController {
         @MessageMapping("/chat/private")
         public void sendPrivateMessage(@Payload MessageDTO messageDTO) {
 
-            // 채팅 종료할 경우
+            // inactive 상태일 때
             if ("inactive".equals(messageDTO.getStatus())) {
                 chatService.updateChatRoomStatus(messageDTO.getChatRoomId(), "inactive");
-            } else if ("active".equals(messageDTO.getStatus()) && "true".equals(messageDTO.getType())) {// "active" 상태이면서 "enter" 타입인 경우
-                System.out.println("활성화이면서 입장시 ");
+            } else if ("true".equals(messageDTO.getType())) {// 채팅방 입장한 경우
                 chatService.saveMessage(messageDTO);
                 chatService.updateLastReadTimestamp(messageDTO.getChatRoomId(), messageDTO.getRecipient()); // 마지막 읽은 시간 업데이트
-            } else if ("active".equals(messageDTO.getStatus())) { // "active" 상태인 경우
-                System.out.println("입장시 ");
+            } else { // active 상태일 때
                 chatService.saveMessage(messageDTO);
             }
 
@@ -172,6 +154,7 @@ public class ChatController {
     //메세지보낼 때 채팅리스트 업데이트
     public void updateChatList(String sender, String recipient, int activePage, int inactivePage, int size) {
 
+        //활성화 채팅방 목록 가져오기
         Page<ChatRoomDTO> activeChatRooms = chatService.getActiveChatList(activePage - 1, size, recipient);
         Map<String, Object> activeChatResponse = addPagingChatList("active", activeChatRooms, activePage, sender);
         // 비활성 채팅방 목록 가져오기

@@ -20,7 +20,7 @@
                                              alt="영화포스터"
                                         />
                                         <img th:if="${movie.posterPath != 'null' && movie.posterPath != '' && #strings.length(movie.id) != 10}"
-                                             class="featured-img"
+                                             class="featured-img" id="resizedImageUrl"
                                              th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}"
                                              alt="영화포스터"
                                         />
@@ -64,11 +64,12 @@
 
                                         <br>
                                         <div class="movie_detail">
-                                            <span><b th:text="${movie.releaseDate}">releasedate</b></span>
-                                            <span><b th:text="${movie.runtime} + '분'">runtime</b></span>
+                                            <span class="releaseDate"><b th:text="${movie.releaseDate}">releasedate</b></span>
+                                            <span class="runtime"><b th:text="${movie.runtime} + '분'">runtime</b></span>
                                             <img id="certification-image" src="" alt="영화심의등급 이미지">
                                             <span id="certification">
-                                                <b id="certificationB" th:text="${movie.certifications}">certification</b>
+                                                <b id="certificationB"
+                                                   th:text="${movie.certifications}">certification</b>
                                             </span>
                                             <span>
                                                 <b class="movie_data_averageRating"></b>
@@ -78,7 +79,9 @@
                                             ~ overview ~
                                         </p>
                                         <div class="button_box">
-                                            <button class="reservation_btn"><a th:href="@{'/reservation/screeningSchedule/' + ${movieId}}">예매하기</a></button>
+                                            <button class="reservation_btn"><a
+                                                    th:href="@{'/reservation/screeningSchedule/' + ${movieId}}">예매하기</a>
+                                            </button>
                                         </div>
                                     </div>
                                 </header>
@@ -109,7 +112,7 @@
                                 height="315"
                                 src="" frameborder="0"
                                 allowfullscreen>
-                            </iframe>
+                        </iframe>
                     </div>
                 </div>
 
@@ -545,6 +548,27 @@
             });
         }
 
+        // 부모 창에서 댓글 등록 이벤트 수신
+        window.addEventListener('commentRegistered', function (event) {
+            console.log("댓글이벤트수신")
+            if (event.detail.success) {
+                // 댓글이 성공적으로 등록되었음을 사용자에게 알림
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "댓글이 등록되었습니다.",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                // 필요한 후처리 작업 수행 (예: 댓글 목록 업데이트)
+                loadComments();
+            } else {
+                // 댓글 등록 실패 처리
+                console.error("댓글 등록에 실패했습니다.");
+                // 사용자에게 알림 등 추가적인 오류 처리 가능
+            }
+        });
+
         //            댓글리스트    --------------------------------------------------
         const loadComments = () => {
 
@@ -561,6 +585,7 @@
                 method: 'GET',
                 dataType: 'json',
                 success: (data) => {
+
                     console.log(data)
 
                     let currentCommentIndex = 0;
@@ -883,6 +908,7 @@
                 });
             });
         }
+
         // 사용자의 현재 리액션 상태를 가져오는 함수
         // 페이지 로드시 바로 발동되게 해놓음
         // 현재 리액션상태를 가져와서 새로고침하면 중복으로 누를수있던부분 해결
@@ -1001,41 +1027,70 @@
         });
 
         function deleteComment(cno) {
-            $.ajax({
-                url: `/movies/delete/${cno}`,
-                method: 'DELETE',
-                success: function (response) {
-                    alert("댓글이 삭제되었습니다.");
-                    loadComments(); // 댓글 목록 다시 로드
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 삭제 중 오류가 발생했습니다:", error);
-                    alert("댓글을 삭제하는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
+            // 먼저 SweetAlert로 삭제를 진행할 것인지 사용자에게 확인합니다.
+            Swal.fire({
+                title: "삭제 하시겠습니까?",
+                text: "삭제 하면 되돌릴 수 없습니다!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "삭제",
+                cancelButtonText: "취소"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 사용자가 삭제를 확인한 경우에만 삭제 요청을 보냅니다.
+                    $.ajax({
+                        url: `/movies/delete/${cno}`,
+                        method: 'DELETE',
+                        success: function (response) {
+                            // 삭제가 성공적으로 이루어졌음을 사용자에게 알립니다.
+                            Swal.fire({
+                                title: "삭제되었습니다",
+                                text: "정상적으로 삭제되었습니다!",
+                                icon: "success"
+                            }).then(() => {
+                                // 사용자가 확인을 클릭한 경우에만 댓글 목록을 다시 로드합니다.
+                                loadComments(); // 댓글 목록 다시 로드
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("댓글 삭제 중 오류가 발생했습니다:", error);
+                            alert("댓글을 삭제하는 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
+                        }
+                    });
                 }
             });
         }
 
         // Kakao 공유 함수
         function shareMessage() {
-            var currentUrl = window.location.href;
-            var urlSegments = currentUrl.split('/');
-            var movieId = urlSegments[urlSegments.length - 1];
+            const currentUrl = window.location.href;
+            const urlSegments = currentUrl.split('/');
+            const movieId = urlSegments[urlSegments.length - 1];
 
-            var titleElement = document.querySelector('.movie_title');
-            var detailElement = document.querySelector('.movie_detail');
-            var imageElement = document.querySelector('.featured img');
+            const titleElement = document.querySelector('.movie_title');
+            const releaseDateElement = document.querySelector('.releaseDate');
+            const runtimeElement = document.querySelector('.runtime');
+            const imageElement = document.getElementById('resizedImageUrl');
+            const genresElement = document.querySelector('.genres');
+            const certificationElement = document.getElementById('certification'); // 심의 등급 요소
 
-            if (titleElement && detailElement && imageElement) {
-                var title = titleElement.innerText;
-                var detail = detailElement.innerText;
-                var imageUrl = imageElement.src;
+            if (titleElement && releaseDateElement && runtimeElement && imageElement && genresElement) {
+                const title = titleElement.innerText.trim(); // trim()을 사용하여 좌우 공백 제거
+                const releaseDate = releaseDateElement.innerText.trim(); // 개봉 날짜
+                const runtime = runtimeElement.innerText.trim(); // 상영 시간
+                const imageUrl = imageElement.src
+
+                const genres = genresElement.innerText.trim(); // 장르 가져오기
+                const certificationValue = certificationElement.textContent;
 
                 Kakao.Link.sendDefault({
                     objectType: 'feed',
                     content: {
-                        title: title, // 이벤트 제목
-                        description: detail, // 이벤트 상세 내용
-                        imageUrl: imageUrl, // 이벤트 이미지 URL
+                        title: title, // 제목
+                        description: `개봉 : ${releaseDate}  상영 시간: ${runtime} \n장르: ${genres} 등급: ${certificationValue}`, // 상세 내용에 정보 추가
+                        imageUrl: imageUrl, // 이미지 URL
                         link: {
                             mobileWebUrl: `http://localhost:8080/movies/${movieId}`, // 동적 이벤트 ID를 포함한 URL
                             webUrl: `http://localhost:8080/movies/${movieId}`
@@ -1046,7 +1101,6 @@
                 console.error('필요한 요소를 찾을 수 없습니다.');
             }
         }
-
 
         // 직접 등록한 영화 배우목록 화면에 띄우기
         document.addEventListener("DOMContentLoaded", function () {

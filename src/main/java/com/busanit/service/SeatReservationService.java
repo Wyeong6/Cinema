@@ -53,6 +53,16 @@ public class SeatReservationService {
         scheduleRepository.save(schedule);
     }
 
+    public void updateAvailableSeatsUp(Long scheduleId, List<String> seatIds) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found for id: " + scheduleId));
+
+        int seatsReserved = seatIds.size();
+        schedule.increaseAvailableSeats(seatsReserved);
+
+        scheduleRepository.save(schedule);
+    }
+
     @Transactional
     public void deleteSeat(Long scheduleId, List<String> seatIds) {
         Schedule schedule = scheduleRepository.findById(scheduleId)

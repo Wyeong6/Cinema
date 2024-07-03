@@ -11,38 +11,48 @@
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" async></script>
 </head>
 <body>
+    <header style="margin-bottom: 3em">
+        <h2>1:1 채팅문의</h2>
+    </header>
 <div id="messages"></div> <!-- 메시지를 보여주는 부분을 버튼 위로 이동 -->
-<div id="categoryButtons">
-    <!-- 카테고리 선택 버튼 -->
-    <button onclick="selectCategory('예매')">예매</button>
-    <button onclick="selectCategory('판매')">판매</button>
-    <button onclick="selectCategory('이벤트')">이벤트</button>
-    <button onclick="selectCategory('기타')">기타</button>
-</div>
-<div>
-    <p id="hello">안녕하세요 고객님 카테고리를 선택해주세요.</p>
-    <input type="text" id="message" placeholder="카테고리 선택 후 입력"/>
-    <button onclick="sendMessage()">Send</button>
-    <div id="typingIndicatorDTO" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
+<div class="container">
+    <div>
+        <div id="categoryButtons">
+            <!-- 카테고리 선택 버튼 -->
+            <button onclick="selectCategory('예매')">예매</button>
+            <button onclick="selectCategory('판매')">판매</button>
+            <button onclick="selectCategory('이벤트')">이벤트</button>
+            <button onclick="selectCategory('기타')">기타</button>
+        </div>
+        <div class="admin-message info-welcome message">
+            <p id="hello">안녕하세요! 시네마캐스트의 1:1 문의 채팅창에 오신 것을 환영합니다.
+                원하시는 카테고리를 선택하고 문의 내용을 입력해주세요.</p>
+        </div>
+    </div>
+    <div class="input-div">
+        <input type="text" id="message" placeholder="문의 유형 선택 후 문의할 내용을 입력해주세요."/>
+        <button onclick="sendMessage()">입력</button>
+    </div>
+    <div id="typingIndicatorDTO" class="admin-status" style="display: none;">상대방이 채팅 중입니다<span id="dots"></span></div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
 </div>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var sender = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
+    let sender = /*[[${userEmail}]]*/ 'default@example.com'; // Thymeleaf를 통해 서버에서 userEmail을 전달받거나 기본값 설정
     /*]]>*/
-    var chatRoomId = null;
-    var chatRoomTitle = null;
-    var recipient = null;  // 수신자 이메일을 고정
-    var stompClient = null; // STOMP 클라이언트 변수 선언
-    var typingTimeout = null; //타이핑 타이머
-    var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
-    var typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
-    var status = null; //채팅방 상태
-    var entranceStatus  = ""; //관리자의 입장상태
+    let chatRoomId = null;
+    let chatRoomTitle = null;
+    let recipient = null;  // 수신자 이메일을 고정
+    let stompClient = null; // STOMP 클라이언트 변수 선언
+    let typingTimeout = null; //타이핑 타이머
+    let TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
+    let typingIndicatorSent = false; // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
+    let status = null; //채팅방 상태
+    let entranceStatus  = ""; //관리자의 입장상태
 
     // 초기 페이징 값 설정
-    var activePage = 1;
-    var inactivePage = 1;
+    let activePage = 1;
+    let inactivePage = 1;
 
     // WebSocket 연결 함수
     function connect() {
@@ -98,6 +108,7 @@
 
         //채팅종료 시
         if (parsedMessage.status === 'inactive') {
+            entranceStatus = parsedMessage.type;
             showMessage(parsedMessage.content);
             showMessage('다른 문의가 있으면 카테고리를 선택해주세요.');
             updateCategoryButtonsDisplay('block');
@@ -199,12 +210,29 @@
     //메세지 표현
     function showMessage(message) {
         var messages = document.getElementById('messages');
+        var messageElementDiv = document.createElement('div');
         var messageElement = document.createElement('p');
-        messageElement.appendChild(document.createTextNode(message));
-        messages.appendChild(messageElement);
+
+        // 메시지가 '관리자 :'로 시작하면 관리자 메시지로 처리
+        if (message.startsWith('관리자 :')) {
+            messageElement.textContent = message.substring(6).trim(); // '관리자 :' 부분을 제외한 실제 메시지
+            messageElementDiv.classList.add('admin-message');
+        } else if (message.startsWith('나 :')) {
+            messageElement.textContent = message.substring(4).trim(); // '나 :' 부분을 제외한 실제 메시지
+            messageElementDiv.classList.add('user-message');
+        } else if (message.startsWith('이전')) {
+            messageElement.textContent = message;
+            messageElementDiv.classList.add('info-status');
+        } else {
+            messageElement.textContent = message;
+            messageElementDiv.classList.add('admin-message');
+        }
+
+        messageElementDiv.appendChild(messageElement);
+        messageElementDiv.classList.add('message');
+
+        messages.appendChild(messageElementDiv);
         document.getElementById('typingIndicatorDTO').style.display = 'none';
-
-
     }
 
     //카테고리를 선택한 후
@@ -221,7 +249,10 @@
 
         // 카테고리 버튼 숨기기
         document.getElementById('categoryButtons').style.display = 'none';
-        document.getElementById('hello').style.display = 'none';
+        var elements = document.getElementsByClassName('info-welcome');
+        if (elements.length > 0) {
+            elements[0].style.display = 'none';
+        }
         //카테고리 별 수신자 이메일 설정
         switch (category) {
             case '예매':
@@ -240,6 +271,8 @@
                 recipient = 'admin@admin.com';
         }
         createChatRoomAndConnect(recipient, category);
+        const input = document.getElementById('message');
+        input.setAttribute('placeholder', '입력하세요.');
     }
 
     //관리자이메일과 카테고리로 채팅방 생성
@@ -271,10 +304,8 @@
         try {
             const response = await fetch('/chat/getRecipientEmail');
             const data = await response.json(); // JSON 형식으로 응답을
-            console.log("fetchRecipientEmail data" + data);
             return Array.isArray(data) ? data[0] : data || '이메일을 찾을 수 없습니다.';
         } catch (error) {
-            console.error('오류:', error);
             return '오류 발생';
         }
     }
@@ -286,7 +317,10 @@
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            document.getElementById('hello').style.display = 'none';
+            var elements = document.getElementsByClassName('info-welcome');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.display = 'none';
+            }
             const data = await response.json();
             let messageExist = false;
             let unreadMessageFlag = false;
@@ -309,7 +343,7 @@
                         let messageTimestamp = new Date(message.createAt).getTime();
 
                         if (messageTimestamp > lastReadTimestamp && !unreadMessageFlag && messageExist) {
-                            showMessage('----------이전 메시지입니다 ----------');
+                            showMessage('이전 메시지');
                             unreadMessageFlag = true;
                         }
                     });
@@ -332,17 +366,11 @@
     });
 
     function fetchChatRoomPresence(chatRoomId) {
-        console.log('fetchChatRoomPresence 실행', chatRoomId);
         fetch('/chatRoomPresence?chatRoomId=' + chatRoomId)
             .then(response => response.json())
             .then(data => {
-                // 받아온 데이터를 처리
-                console.log('chatRoom presence:', data);
 
-                // 여기서 입장 상태를 UI에 반영하거나 필요한 작업 수행
-                // 예시: 입장 상태가 true인 경우 처리
                 entranceStatus = data[recipient] || false;
-                console.log("currentRecipient의 입장 상태 " + recipient + entranceStatus)
             })
             .catch(error => console.error('Error fetching admin presence:', error));
     }
@@ -369,6 +397,36 @@
     function handleWebSocketMessage(response) {
         updateUnreadCount(response);
     }
+
+    // 점을 추가하고 제거하는 함수
+    function animateDots() {
+        var dotsContainer = document.getElementById('dots');
+        var maxDots = 3;
+        var dotInterval = 500; // 점이 나타나는 시간 간격
+        var dotLifetime = 1500; // 점이 화면에 유지되는 시간
+
+        function addDot() {
+            var dot = document.createElement('span');
+            dot.className = 'dot';
+            dotsContainer.appendChild(dot);
+
+            setTimeout(function() {
+                dotsContainer.removeChild(dot);
+            }, dotLifetime);
+        }
+
+        var dotCount = 0;
+        var dotTimer = setInterval(function() {
+            if (dotCount < maxDots) {
+                addDot();
+                dotCount++;
+            } else {
+                clearInterval(dotTimer);
+            }
+        }, dotInterval);
+    }
+
+    setInterval(animateDots, 3000); // 점 애니메이션을 반복하는 시간 간격
 </script>
 </body>
 </html>

@@ -144,6 +144,7 @@ public class PaymentController {
                                                @RequestParam String product_idx,
                                                @RequestParam String product_name,
                                                @RequestParam String product_type,
+                                               @RequestParam Long schedule_id,
                                                @RequestParam String content1,
                                                @RequestParam String content2,
                                                @RequestParam String content3,
@@ -170,6 +171,7 @@ public class PaymentController {
             paymentDTO.setProductIdx(product_idx);
             paymentDTO.setProductName(product_name);
             paymentDTO.setProductType(product_type);
+            paymentDTO.setScheduleId(schedule_id);
             paymentDTO.setContent1(content1);
             paymentDTO.setContent2(content2);
             paymentDTO.setContent3(content3);
@@ -180,35 +182,60 @@ public class PaymentController {
 
             pointDTO.setContent("["+product_name+"] 구매");
             pointDTO.setImpUid(imp_uid);
-            // 현재 포인트
-            int currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
-            // 누적 포인트
-            int totalPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getTotalPoints();
-            pointDTO.setTotalPoints(totalPoints);
-
-            if((product_type).equals("MO")) { // 영화
-                pointDTO.setContentType(true);
-            } else { // 스낵
-                pointDTO.setContentType(false);
-            }
-
-            // 포인트타입
-            if(minusPoint > 0) { // 사용
-                pointDTO.setPointType("-");
-                pointDTO.setPoints(minusPoint);
-                currentPoints -= minusPoint;
-                pointDTO.setCurrentPoints(currentPoints);
-                pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
-            }
-
-            if(plusPoint > 0) { // 적립
-                pointDTO.setPointType("+");
-                pointDTO.setPoints(plusPoint);
-                currentPoints += plusPoint;
-                pointDTO.setCurrentPoints(currentPoints);
-                totalPoints += plusPoint;
+            List<PointDTO> points = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent();
+            if (!points.isEmpty()) {
+                int currentPoints = points.get(0).getCurrentPoints();
+                int totalPoints = points.get(0).getTotalPoints();
                 pointDTO.setTotalPoints(totalPoints);
-                pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+
+                if ("MO".equals(product_type)) {
+                    pointDTO.setContentType(true);
+                } else {
+                    pointDTO.setContentType(false);
+                }
+
+                if (minusPoint > 0) {
+                    pointDTO.setPointType("-");
+                    pointDTO.setPoints(minusPoint);
+                    currentPoints -= minusPoint;
+                    pointDTO.setCurrentPoints(currentPoints);
+                    pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+                }
+
+                if (plusPoint > 0) {
+                    pointDTO.setPointType("+");
+                    pointDTO.setPoints(plusPoint);
+                    currentPoints += plusPoint;
+                    pointDTO.setCurrentPoints(currentPoints);
+                    totalPoints += plusPoint;
+                    pointDTO.setTotalPoints(totalPoints);
+                    pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+                }
+            } else {
+                // 포인트 정보가 없는 경우 초기값 설정
+                pointDTO.setTotalPoints(0);
+                pointDTO.setCurrentPoints(0);
+
+                if ("MO".equals(product_type)) {
+                    pointDTO.setContentType(true);
+                } else {
+                    pointDTO.setContentType(false);
+                }
+
+                if (minusPoint > 0) {
+                    pointDTO.setPointType("-");
+                    pointDTO.setPoints(minusPoint);
+                    pointDTO.setCurrentPoints(-minusPoint);
+                    pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+                }
+
+                if (plusPoint > 0) {
+                    pointDTO.setPointType("+");
+                    pointDTO.setPoints(plusPoint);
+                    pointDTO.setCurrentPoints(plusPoint);
+                    pointDTO.setTotalPoints(plusPoint);
+                    pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+                }
             }
         }
         return response_complete;

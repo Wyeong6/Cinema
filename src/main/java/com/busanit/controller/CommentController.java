@@ -31,7 +31,7 @@ public class CommentController {
         CommentSummaryDTO commentList = new CommentSummaryDTO(averageRating, comments);
         return new ResponseEntity<>(commentList, HttpStatus.OK);
     }
-
+    //관람평을 작성했는 지 확인
     @GetMapping("/movies/hasCommented/{movieId}")
     public ResponseEntity<Boolean> hasCommented(@PathVariable("movieId") Long movieId) {
         if (commentService.isAuthenticated()) {
@@ -39,11 +39,10 @@ public class CommentController {
             boolean hasCommented = commentService.hasCommented(userEmail, movieId);
             return new ResponseEntity<>(hasCommented, HttpStatus.OK);
         } else {
-            // 인증 정보가 없으면 UNAUTHORIZED 반환
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
-
+    //삭제
     @DeleteMapping("/movies/delete/{cno}")
     public ResponseEntity<String> deleteComment(@PathVariable Long cno){
         try{

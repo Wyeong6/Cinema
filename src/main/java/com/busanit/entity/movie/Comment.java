@@ -37,7 +37,6 @@ public class Comment{
     @JoinColumn(name = "member_id")
     private Member member;
 
-    //빌더를 사용하면 코
     public static Comment dtoToEntity(CommentDTO dto, Movie movie,Member member) {
         return Comment.builder()
                 .cno(dto.getCno())

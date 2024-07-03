@@ -13,7 +13,6 @@ import java.util.List;
 @Setter
 public class MovieStillCut {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movieStillCutId;
@@ -21,7 +20,6 @@ public class MovieStillCut {
     @Lob
     @Column(length = 1024)
     private String stillCuts;
-
 
     @ManyToMany
     @JoinTable(name = "stillCuts",
