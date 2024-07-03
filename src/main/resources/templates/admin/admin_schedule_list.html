@@ -74,7 +74,7 @@
             </tbody>
         </table>
     </div>
-    <div class="paging_btn">
+    <div class="paging_btn" th:if="${scheduleDTOList.totalElements > 0}">
         <ul style="text-align: center" th:if="${scheduleDTOList.totalElements > 0}">
             <li th:classappend="${scheduleDTOList.first} ? 'disabled'">
                 <a href="javascript:void(0);" onclick="saveUrl(0)">First</a>
@@ -142,8 +142,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            })
-                .then(response => {
+            }).then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
                     }

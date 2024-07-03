@@ -1,0 +1,31 @@
+<div class="modal-content" th:if="${seatDTOs != null}">
+    <div class="modal-body">
+        <div class="d-flex justify-content-center">
+            <div class="screen"></div>
+        </div>
+        <div>
+            <div class="seating-area">
+                <div th:each="columnEntry : ${seatsByColumn}">
+                    <div class="column-group">
+                        <div class="column-header">
+                            <h4 th:text="${columnEntry.key}"></h4>
+                        </div>
+                        <div class="seat remove" th:if="${columnEntry.value.size() < 20}"
+                             th:each="index : ${#numbers.sequence(0, (20 - columnEntry.value.size()) / 2 - 1)}"></div>
+                        <div class="seat" th:each="seat, stat : ${columnEntry.value}">
+                            <p th:text="${seat.seatRow}"></p>
+                            <input type="hidden"
+                                   th:data-seat-row="${seat.seatRow}"
+                                   th:data-seat-column="${seat.seatColumn}"
+                                   th:data-seat-id="${seat.id}"
+                                   th:data-seat-available="${seat.isAvailable()}"
+                                   th:data-seat-reserved="${seat.isReserved()}"/>
+                        </div>
+                        <div class="seat remove" th:if="${columnEntry.value.size() < 20}"
+                             th:each="index : ${#numbers.sequence(0, (20 - columnEntry.value.size()) / 2 - 1)}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

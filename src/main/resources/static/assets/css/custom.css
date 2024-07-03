@@ -27,6 +27,12 @@
 .logo a {
     font-family: 'MyCustomFont', sans-serif !important;
 }
+#movie_overview {
+    white-space: pre-wrap; /* 줄바꿈을 포함하여 표시 */
+    word-wrap: break-word; /* 단어 단위로 줄바꿈 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 #info {
     position: absolute;
     top: 0.5em;
