@@ -2210,7 +2210,7 @@ input, select, textarea {
 		}
 
 			#header header > p {
-				font-size: 1.25em;
+				font-size: 1em;
 				margin: 0;
 			}
 
@@ -2782,7 +2782,7 @@ input, select, textarea {
 			}
 
 			header > p {
-				font-size: 1.25em;
+				font-size: 0.9em;
 			}
 
 		/* Image */
@@ -3059,7 +3059,7 @@ input, select, textarea {
 				}
 
 				#header header > p {
-					font-size: 1em;
+					font-size: 0.9em;
 				}
 
 				#header h1 {
