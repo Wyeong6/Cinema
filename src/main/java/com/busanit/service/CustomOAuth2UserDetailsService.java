@@ -40,18 +40,14 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> paramMap = oAuth2User.getAttributes();
-//        paramMap.forEach((k, v) -> {
-//            log.info("-----------------");
-//            log.info(k + " : " + v);
-//        });
 
         String email = null;
         if(clientName.equals("Google")){
             email = getGoogleEmail(paramMap);
         }
-//        else if(clientName.equals("naver")){
-//            email = getNaverEmail(paramMap);
-//        }
+        else if(clientName.equals("naver")){
+            email = getNaverEmail(paramMap);
+        }
 
         return generateDTO(email, paramMap);
     }
