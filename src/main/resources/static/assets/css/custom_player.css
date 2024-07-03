@@ -329,3 +329,155 @@ div.mb-3 {
     /*margin-right: 1%;*/
     list-style-type: none;
 }
+/* admin 1:1 이메일 문의 모달 */
+#myModal .container {
+    display: flex;
+    flex-direction: column;
+}
+#myModal .modal-content {
+    max-width: 90%;
+    margin: 0 auto;
+}
+#myModal #userEmail {
+    font-size: 1.2em;
+    max-width: 95%;
+    margin: 0 auto;
+}
+#myModal #messages {
+    margin: 0 auto;
+    width: 97%;
+    padding: 3em 0 1em;
+}
+#myModal .message {
+    position: relative;
+    max-width: 45%;
+    border-radius: 30px;
+    padding: 0.5em 1em;
+    margin-bottom: 0.5em;
+    white-space: pre-line;
+    box-shadow: 5px 5px 8px #b4bdc6;
+}
+#myModal .admin-message p,
+#myModal .user-message p {
+    margin-bottom: 0;
+    color: #2C3740;
+    line-height: 1.2em;
+}
+#myModal .message.user-message {
+    background: #F2F2F2;
+    margin-right: auto;
+}
+#myModal .message.admin-message {
+    background: #D8EFF6;
+    text-align: right;
+    align-self: flex-end; /* 오른쪽으로 정렬합니다. */
+    margin-left: auto; /* 왼쪽 여백을 설정합니다. */
+}
+#myModal .admin-message::before,
+#myModal .user-message::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+}
+#myModal .user-message::before {
+    bottom: 0;
+    left: -2px; /* 삼각형 위치 조정 */
+    border-color: transparent transparent #F2F2F2 transparent;
+}
+#myModal .admin-message::before {
+    top: 0;
+    right: -2px; /* 삼각형 위치 조정 */
+    border-color: #D8EFF6 transparent transparent transparent;
+}
+#myModal .message.info-status {
+     position: relative;
+     text-align: center;
+     background: transparent;
+     padding: 0.5em;
+     margin: 0;
+     box-shadow: 0 0 0;
+     max-width: 100%;
+}
+#myModal .message.info-status::before,
+#myModal .message.info-status::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: #eaecef; /* 선의 색상 */
+}
+#myModal .message.info-status::before {
+    left: 0;
+    transform: translateY(-50%);
+}
+#myModal .message.info-status::after {
+    right: 0;
+    transform: translateY(-50%);
+}
+.message.info-status p {
+    margin: 0.8em 0;
+    font-size: 0.9em;
+    color: #d9dee3;
+}
+#myModal .input-div {
+    margin: 0 auto;
+    width: 97%;
+    margin-top: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+#myModal .input-div input {
+    width: 79%;
+    padding: 0.3em 0 0.3em 1em;
+    border-radius: 10px;
+    border: 1px solid #7794A6;
+    font-size: 1em;
+}
+#myModal .input-div input:active,
+#myModal .input-div input:focus {
+    border: 1px solid #7794A6 !important;
+}
+#myModal .input-div button {
+    width:7%;
+    font-size: 0.9em;
+    padding: 0.5em 1.2em;
+    color: #fcfdfd;
+    border-radius: 10px;
+    background: #7794A6;
+    outline: none;
+    border: 0;
+}
+#myModal .input-div button:nth-child(3) {
+    width: 13%;
+}
+#myModal .admin-status {
+    font-size: 0.8em;
+    max-width: 95%;
+    margin: 0 auto;
+    margin-left: 1em;
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+}
+#dots {
+    margin-left: 0.2em;
+}
+.dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #000;
+    margin: 0 2px;
+    animation: pulse 1s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}

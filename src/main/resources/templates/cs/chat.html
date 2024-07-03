@@ -108,19 +108,20 @@
 
         //채팅종료 시
         if (parsedMessage.status === 'inactive') {
+            entranceStatus = parsedMessage.type;
             showMessage(parsedMessage.content);
             showMessage('다른 문의가 있으면 카테고리를 선택해주세요.');
             updateCategoryButtonsDisplay('block');
             //일반 메세지
         } else if (parsedMessage.status === 'active') {
-            showAdminMessage(parsedMessage.content);
+            showMessage('관리자 : ' + parsedMessage.content);
             //타이핑 중이면
         } else if (parsedMessage.typing === "typing") {
             updateTypingIndicatorDisplay('block');
             //타이핑 안할 때
         } else if (parsedMessage.typing === "not_typing") {
             updateTypingIndicatorDisplay('none');
-        } else { //채팅방 입퇴장시
+        } else {
             entranceStatus = parsedMessage.type;
         }
     }
@@ -187,7 +188,7 @@
         };
 
         stompClient.send("/app/chat/private", {}, JSON.stringify(message)); // STOMP를 통해 서버로 메시지 전송
-        showUserMessage(messageContent); // 전송한 메시지를 화면에 표시
+        showMessage('나 : ' + messageContent); // 전송한 메시지를 화면에 표시
         document.getElementById('message').value = ''; // 입력 필드를 비움
 
         const timestamp = new Date().getTime();
@@ -206,10 +207,9 @@
         }
     });
 
-    // 메시지를 채팅창에 추가하는 공통 함수
-    function addMessageToChat(prefix, content) {
+    //메세지 표현
+    function showMessage(message) {
         var messages = document.getElementById('messages');
-
         var messageElementDiv = document.createElement('div');
         var messageElement = document.createElement('p');
 
@@ -220,6 +220,9 @@
         } else if (message.startsWith('나 :')) {
             messageElement.textContent = message.substring(4).trim(); // '나 :' 부분을 제외한 실제 메시지
             messageElementDiv.classList.add('user-message');
+        } else if (message.startsWith('이전')) {
+            messageElement.textContent = message;
+            messageElementDiv.classList.add('info-status');
         } else {
             messageElement.textContent = message;
             messageElementDiv.classList.add('admin-message');
@@ -232,20 +235,6 @@
         document.getElementById('typingIndicatorDTO').style.display = 'none';
     }
 
-    // 메시지 표현
-    function showMessage(content) {
-        addMessageToChat('', content);
-    }
-
-    // 내가 보낸 메시지 표현
-    function showUserMessage(content) {
-        addMessageToChat('나: ', content);
-    }
-
-    //관리자가 보낸 메시지 표현
-    function showAdminMessage(content) {
-        addMessageToChat('관리자: ', content);
-    }
     //카테고리를 선택한 후
     function selectCategory(category) {
 
@@ -317,7 +306,6 @@
             const data = await response.json(); // JSON 형식으로 응답을
             return Array.isArray(data) ? data[0] : data || '이메일을 찾을 수 없습니다.';
         } catch (error) {
-            console.error('오류:', error);
             return '오류 발생';
         }
     }
@@ -329,7 +317,10 @@
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            document.getElementById('hello').style.display = 'none';
+            var elements = document.getElementsByClassName('info-welcome');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.display = 'none';
+            }
             const data = await response.json();
             let messageExist = false;
             let unreadMessageFlag = false;
@@ -346,16 +337,13 @@
                         chatRoomTitle = message.chatRoomTitle;
                         document.getElementById('categoryButtons').style.display = 'none';
 
-                        if (message.sender === sender) {
-                            showUserMessage(message.content);
-                        } else {
-                            showAdminMessage(message.content);
-                        }
+                        let displayMessage = message.sender === sender ? `나 : ${message.content}` : `관리자 : ${message.content}`;
+                        showMessage(displayMessage);
 
                         let messageTimestamp = new Date(message.createAt).getTime();
 
                         if (messageTimestamp > lastReadTimestamp && !unreadMessageFlag && messageExist) {
-                            showMessage('----------이전 메시지입니다 ----------');
+                            showMessage('이전 메시지');
                             unreadMessageFlag = true;
                         }
                     });
@@ -378,17 +366,11 @@
     });
 
     function fetchChatRoomPresence(chatRoomId) {
-        console.log('fetchChatRoomPresence 실행', chatRoomId);
         fetch('/chatRoomPresence?chatRoomId=' + chatRoomId)
             .then(response => response.json())
             .then(data => {
-                // 받아온 데이터를 처리
-                console.log('chatRoom presence:', data);
 
-                // 여기서 입장 상태를 UI에 반영하거나 필요한 작업 수행
-                // 예시: 입장 상태가 true인 경우 처리
                 entranceStatus = data[recipient] || false;
-                console.log("currentRecipient의 입장 상태 " + recipient + entranceStatus)
             })
             .catch(error => console.error('Error fetching admin presence:', error));
     }
@@ -419,7 +401,7 @@
     // 점을 추가하고 제거하는 함수
     function animateDots() {
         var dotsContainer = document.getElementById('dots');
-        var maxDots = 2;
+        var maxDots = 3;
         var dotInterval = 500; // 점이 나타나는 시간 간격
         var dotLifetime = 1500; // 점이 화면에 유지되는 시간
 
@@ -445,8 +427,6 @@
     }
 
     setInterval(animateDots, 3000); // 점 애니메이션을 반복하는 시간 간격
-
-    setInterval(animateDots, 1500);
 </script>
 </body>
 </html>
