@@ -137,11 +137,13 @@
         <span class="close" onclick="closeModal()">&times;</span>
         <div id="userEmail"></div> <!-- 유저 이메일이 출력됨-->
         <div id="messages"></div>  <!-- 메세지가 출력되는 곳-->
-        <div  class="input-div">
-            <input type="text" id="message" placeholder="Type a message..."/>
-            <button onclick="sendMessage()">입력</button>
-            <button onclick="sendEndChatMessage()">대화 종료</button>
-            <div id="typingIndicatorDTO" class="admin-status" style="display: none;">상대방이 채팅 중입니다.</div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
+        <div>
+            <div class="input-div">
+                <input type="text" id="message" placeholder="Type a message..."/>
+                <button onclick="sendMessage()">입력</button>
+                <button onclick="sendEndChatMessage()">대화 종료</button>
+            </div>
+            <div id="typingIndicatorDTO" class="admin-status" style="display: none;">상대방이 채팅 중입니다<span id="dots"></span></div> <!-- 타이핑 인디케이터 표시 부분 추가 -->
         </div>
     </div>
 </div>
@@ -480,6 +482,36 @@
         }
         isConnected = false;
     }
+
+    // 점을 추가하고 제거하는 함수
+    function animateDots() {
+        var dotsContainer = document.getElementById('dots');
+        var maxDots = 3;
+        var dotInterval = 500; // 점이 나타나는 시간 간격
+        var dotLifetime = 1500; // 점이 화면에 유지되는 시간
+
+        function addDot() {
+            var dot = document.createElement('span');
+            dot.className = 'dot';
+            dotsContainer.appendChild(dot);
+
+            setTimeout(function() {
+                dotsContainer.removeChild(dot);
+            }, dotLifetime);
+        }
+
+        var dotCount = 0;
+        var dotTimer = setInterval(function() {
+            if (dotCount < maxDots) {
+                addDot();
+                dotCount++;
+            } else {
+                clearInterval(dotTimer);
+            }
+        }, dotInterval);
+    }
+
+    setInterval(animateDots, 3000); // 점 애니메이션을 반복하는 시간 간격
 </script>
 </body>
 </html>

@@ -433,7 +433,7 @@ div.mb-3 {
     align-items: center;
 }
 #myModal .input-div input {
-    width: 85%;
+    width: 79%;
     padding: 0.3em 0 0.3em 1em;
     border-radius: 10px;
     border: 1px solid #7794A6;
@@ -453,23 +453,25 @@ div.mb-3 {
     outline: none;
     border: 0;
 }
-#myModal .admin-status {
-    font-size: 0.7em;
-    color: #aaaaaa;
-    margin-left: 1em;
+#myModal .input-div button:nth-child(3) {
+    width: 13%;
 }
 #myModal .admin-status {
+    font-size: 0.8em;
+    max-width: 95%;
+    margin: 0 auto;
+    margin-left: 1em;
     display: inline-block;
     position: relative;
     white-space: nowrap;
 }
-#myModal #dots {
+#dots {
     margin-left: 0.2em;
 }
-#myModal .dot {
+.dot {
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background-color: #000;
     margin: 0 2px;

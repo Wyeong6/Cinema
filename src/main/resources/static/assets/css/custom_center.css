@@ -162,7 +162,7 @@
     align-items: center;
 }
 .input-div input {
-    width: 90%;
+    width: 88%;
     padding: 0.3em 0 0.3em 1em;
     border-radius: 10px;
     border: 1px solid #403333;
@@ -173,7 +173,7 @@
     border: 1px solid #403333 !important;
 }
 .input-div button {
-    width:8%;
+    width:10%;
     font-size: 0.7em;
     padding: 0.8em 1em;
     background: #403333;
@@ -183,8 +183,6 @@
     font-size: 0.7em;
     color: #aaaaaa;
     margin-left: 1em;
-}
-.admin-status {
     display: inline-block;
     position: relative;
     white-space: nowrap;
