@@ -28,7 +28,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             @Param("endDate") LocalDateTime endDate
     );
 
-    // 결제 상태 수정
+    // 결제 취소 시 결제 상태 수정
     @Modifying
     @Transactional
     @Query("UPDATE Payment p SET p.paymentStatus = '결제취소' WHERE p.impUid = :impUid AND p.member.id = :memberId")

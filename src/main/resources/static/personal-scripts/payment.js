@@ -49,7 +49,6 @@ function requestPay() {
                         },
                         error: function() {
                             alert("서버 통신에 실패했습니다.");
-                            console.log(scheduleId, seatIds);
                             if(reqIDX == 'MO') {
                                 cancelReservedSeats(scheduleId, seatIds);
                             }
@@ -59,7 +58,6 @@ function requestPay() {
                 } else {
                     var msg = "결제에 실패하였습니다.";
                     msg += "에러내용 : " + rsp.error_msg;
-                    console.log(scheduleId, seatIds);
                     if(reqIDX == 'MO') {
                         cancelReservedSeats(scheduleId, seatIds);
                     }
