@@ -1,5 +1,13 @@
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,300italic,400italic");
+/*@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,300italic,400italic");*/
+/*@import url("fontawesome-all.min.css");*/
+
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,400italic,600");
 @import url("fontawesome-all.min.css");
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+body {
+	font-family: 'Noto Sans KR', sans-serif;
+}
 
 /*
 	Astral by HTML5 UP
@@ -31,6 +39,7 @@ footer, header, hgroup, menu, nav, section {
 
 body {
 	line-height: 1;
+	font-family: 'Noto Sans KR', sans-serif;
 }
 
 ol, ul {
@@ -1340,7 +1349,7 @@ a:hover {
 		}
 
 	body, input, textarea, select {
-		font-family: 'Source Sans Pro', sans-serif;
+		font-family: 'Noto Sans KR', sans-serif;
 		font-weight: 300;
 		color: #777777;
 		font-size: 20pt;
@@ -1511,9 +1520,11 @@ a:hover {
 	form textarea {
 		-webkit-appearance: none;
 		border: 0;
-		background: #f4f4f4;
-		padding: 0.6em;
+		background-color: rgba(191, 154, 153, 0.5);
+		font-size: 0.8em;
+		padding: 0.6em 1em 0.6em;
 		width: 100%;
+		border-radius: 20px;
 		-moz-transition: background-color .25s ease-in-out;
 		-webkit-transition: background-color .25s ease-in-out;
 		-ms-transition: background-color .25s ease-in-out;
@@ -1525,14 +1536,13 @@ a:hover {
 		form input[type="password"]:focus,
 		form select:focus,
 		form textarea:focus {
-			background: #f8f8f8;
 		}
 
 	form input[type="text"],
 	form input[type="email"],
 	form input[type="password"],
 	form select {
-		line-height: 1em;
+		line-height: 0.8em;
 	}
 
 	form ::-webkit-input-placeholder {
@@ -1629,7 +1639,8 @@ a:hover {
 		-webkit-appearance: none;
 		display: inline-block;
 		font-size: 0.8em;
-		background-color: #1e2c3c;
+		background-color: #403333;
+		border-radius: 15px;
 		color: #ffffff;
 		border: 0;
 		cursor: pointer;

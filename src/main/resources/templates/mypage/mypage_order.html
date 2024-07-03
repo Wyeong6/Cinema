@@ -10,23 +10,25 @@
                 <article class="history_item" th:each="snackPayment : ${snackPaymentInfo}"
                          th:unless="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
                     <header>
-                        <h3 th:text="${#temporals.format(snackPayment.getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h3>
-                        <p class="order_detail_btn">상세보기 <img src="/images/right-arrow.png" alt="오른쪽 화살표"/></p>
+                        <h4 th:text="${#temporals.format(snackPayment.getRegDate(), 'yyyy-MM-dd')}">2024-05-22</h4>
                     </header>
                     <div class="history_data">
                         <img th:alt="${snackPayment.getSnack().snack_alt}"
                              th:src="@{/images/menu/{image}(image=${snackPayment.getSnack().snack_image})}">
                         <div>
-                            <h4 th:text="'주문번호 : SN'+${#temporals.format(snackPayment.getRegDate(), 'yyyyMMdd')}+${snackPayment.id}">
+                            <h4 th:text="'주문번호 : ' + ${snackPayment.getMerchantUid()}">
                                 주문번호 : </h4>
-                            <span class="snack_nm" th:text="${snackPayment.getContent()}+' '">팝콘</span><span><small
-                                style="font-size: 14px" th:text="${snackPayment.getCount()}+개">3개</small> </span>
-                            <p th:text="${snackPayment.getPrice()}+원">36,000원 </p>
+                            <span class="snack_nm" th:text="${snackPayment.getProductName()}+' '">팝콘</span><span><small
+                                style="font-size: 14px" th:text="${snackPayment.getProductCount()}+개">3개</small> </span>
+                            <p th:text="${snackPayment.getTotalPrice()}+원">36,000원 </p>
                         </div>
                     </div>
-                    <div class="button_box">
-                        <button type="button" class="cancel_btn">주문취소</button>
-                        <button type="button" class="detail_btn">구매상세</button>
+                    <div class="button_box" th:if="${snackPayment.getPaymentStatus() == '결제완료'}">
+                        <button type="button" class="detail_btn" id="snack_detail" th:data-order-idx="${snackPayment.getId()}">구매상세</button>
+                        <button type="button" class="cancel_btn" id="snack_cancel" th:data-order-merchantUid="${snackPayment.getMerchantUid()}" th:data-order-impUid="${snackPayment.getImpUid()}">주문취소</button>
+                    </div>
+                    <div class="button_box" th:unless="${snackPayment.getPaymentStatus() == '결제완료'}">
+                        <button type="button" style="width: 100%" class="detail_btn" id="snack_cancel_detail" th:data-order-idx="${snackPayment.getId()}">구매상세</button>
                     </div>
                 </article>
                 <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
@@ -37,7 +39,7 @@
                 <!-- 더보기 버튼 -->
                 <div id="moreContainer" style="text-align: center; margin-top: 15px;"
                      th:if="${snackPaymentInfo.hasNext}">
-                    <button id="moreBtn" onclick="loadMore()">더보기</button>
+                    <button id="moreBtn" onclick="loadMore()"><img src="/images/under-arrow.png" alt="더보기 버튼"></button>
                 </div>
 
                 <script th:inline="javascript">
@@ -54,22 +56,48 @@
                                     let container = $('.history'); // 주문 내역을 추가할 컨테이너
                                     data.content.forEach(snackPayment => {
                                         let formattedDate = new Date(snackPayment.regDate).toISOString().split('T')[0]; // 'yyyy-MM-dd' 포맷으로 날짜 변환
-
-                                        let item = `
-                                            <article class="history_get">
-                                                <header>
-                                                    <h3>${formattedDate}</h3>
-                                                </header>
-                                                <div class="history_data">
-                                                    <img alt="${snackPayment.snack.snack_alt}" src="/images/menu/${snackPayment.snack.snack_image}">
-                                                    <div>
-                                                        <h4>주문번호 : SN${formattedDate.replace(/-/g, '')}${snackPayment.id}</h4>
-                                                        <span class="snack_nm">${snackPayment.content} </span>
-                                                        <span><small style="font-size: 14px">${snackPayment.count}개</small></span>
-                                                        <p>${snackPayment.price}원</p>
-                                                    </div>
-                                                </div>
+                                        let item = null;
+                                        if(snackPayment.getPaymentStatus == '결제완료') {
+                                            item = `
+                                            <article class="history_item">
+                        <h4>${snackPayment.getPaymentStatus}</h4>
+                        <span>${formattedDate}</span>
+                    </header>
+                    <div class="history_data">
+                        <img alt="${snackPayment.snack.snack_alt}" src="/images/menu/${snackPayment.snack.snack_image}">
+                        <div>
+                            <h4>주문번호 : ${snackPayment.merchantUid}</h4>
+                                                        <span class="snack_nm">${snackPayment.productName} </span>
+                                                        <span><small style="font-size: 14px">${snackPayment.productCount}개</small></span>
+                                                        <p>${snackPayment.totalPrice}원</p>
+                        </div>
+                    </div>
+                    <div class="button_box">
+                        <button type="button" class="detail_btn" id="snack_detail" data-order-idx="${snackPayment.id}">구매상세</button>
+                        <button type="button" class="cancel_btn" id="snack_cancel" data-order-merchantUid="${snackPayment.merchantUid}" data-order-impUid="${snackPayment.impUid}">주문취소</button>
+                    </div>
                                             </article>`;
+                                        } else {
+                                            item = `
+                                            <article class="history_item">
+                        <h4>${snackPayment.getPaymentStatus}</h4>
+                        <span>${formattedDate}</span>
+                    </header>
+                    <div class="history_data">
+                        <img alt="${snackPayment.snack.snack_alt}" src="/images/menu/${snackPayment.snack.snack_image}">
+                        <div>
+                            <h4>주문번호 : ${snackPayment.merchantUid}</h4>
+                                                        <span class="snack_nm">${snackPayment.productName} </span>
+                                                        <span><small style="font-size: 14px">${snackPayment.productCount}개</small></span>
+                                                        <p>${snackPayment.totalPrice}원</p>
+                        </div>
+                    </div>
+                    <div class="button_box">
+                        <button type="button" style="width: 100%" class="detail_btn" id="snack_cancel_detail" data-order-idx="${snackPayment.id()}">구매상세</button>
+                    </div>
+                                            </article>`;
+                                        }
+
                                         container.append(item);
                                     });
 
@@ -84,8 +112,41 @@
                             });
                         }
 
-                        $('.container').on('click', '.order_detail_btn', function() {
-                            $('#content').load('/mypage/order/detail');
+                        // $('.container').on('click', '.order_detail_btn', function() {
+                        //     $('#content').load('/mypage/order/detail');
+                        // });
+
+                        // 주문 취소하기
+                        $('#snack_cancel').click(function() {
+                            const merchant_uid = $(this).data('order-merchantuid');
+                            const imp_uid = $(this).data('order-impuid');
+
+                            $.ajax({
+                                type: 'POST',
+                                url: '/payment/paymentCancel',
+                                data: {
+                                    merchant_uid: merchant_uid,
+                                    imp_uid: imp_uid
+                                },
+                                success: function(response_complete) {
+                                    if(response_complete.errorMsg !== "errorMsg") {
+                                        let params = new URLSearchParams();
+                                        params.append("imp_uid", response_complete.imp_uid);
+                                        window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
+                                    } else {
+                                        alert("죄송합니다. 다시 시도해주세요.");
+                                    }
+                                },
+                                error: function() {
+                                    alert("서버 통신에 실패했습니다.");
+                                }
+                            })
+                        });
+
+                        // 주문 상세보기
+                        $('#snack_detail, #snack_cancel_detail').click(function() {
+                            const orderIdx = $(this).data('order-idx');
+                            $('#content').load('/mypage/order/detail?paymentId=' + orderIdx);
                         });
                     });
                 </script>

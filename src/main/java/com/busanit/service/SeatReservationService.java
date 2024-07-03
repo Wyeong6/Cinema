@@ -7,6 +7,7 @@ import com.busanit.entity.SeatReservationId;
 import com.busanit.repository.ScheduleRepository;
 import com.busanit.repository.SeatRepository;
 import com.busanit.repository.SeatReservationRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,5 +41,39 @@ public class SeatReservationService {
 
         SeatReservation seatReservation = new SeatReservation(schedule, seat, reservedBy);
         seatReservationRepository.save(seatReservation);
+    }
+
+    public void updateAvailableSeats(Long scheduleId, List<Seat> selectedSeats) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found for id: " + scheduleId));
+
+        int seatsReserved = selectedSeats.size();
+        schedule.decreaseAvailableSeats(seatsReserved);
+
+        scheduleRepository.save(schedule);
+    }
+
+    public void updateAvailableSeatsUp(Long scheduleId, List<String> seatIds) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found for id: " + scheduleId));
+
+        int seatsReserved = seatIds.size();
+        schedule.increaseAvailableSeats(seatsReserved);
+
+        scheduleRepository.save(schedule);
+    }
+
+    @Transactional
+    public void deleteSeat(Long scheduleId, List<String> seatIds) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid schedule ID: " + scheduleId));
+
+        List<SeatReservation> reservations = seatReservationRepository.findByScheduleIdAndSeatIdIn(scheduleId, seatIds);
+
+        if (reservations.isEmpty()) {
+            throw new IllegalArgumentException("No reservations found for the given schedule ID and seat IDs");
+        }
+
+        seatReservationRepository.deleteByScheduleIdAndSeatId(scheduleId, seatIds);
     }
 }

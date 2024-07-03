@@ -1,6 +1,13 @@
+<style>
+    .delete-btn {
+        cursor: pointer;
+    }
+</style>
+
 <article id="mypage_review">
     <header>
         <h5>내가 작성한 리뷰</h5>
+
     </header>
     <!-- 댓글 목록 테이블 -->
     <section th:unless="${#lists.isEmpty(comments)}">

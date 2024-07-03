@@ -24,6 +24,7 @@ public class EventDTO {
     private String eventAlt;
     @NotNull
     private String eventDetail;
+    private int viewCount;
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
 
@@ -35,6 +36,7 @@ public class EventDTO {
                 .eventImage(event.getEventImage())
                 .eventAlt(event.getEventAlt())
                 .eventDetail(event.getEventDetail())
+                .viewCount(event.getViewCount())
                 .regDate(event.getRegDate())
                 .updateDate(event.getUpdateDate())
                 .build();

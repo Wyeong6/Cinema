@@ -1,72 +1,30 @@
 <!DOCTYPE HTML>
-<!--
-	Helios by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html lang="en"
-	  layout:decorate="~{layout/layout_total}"
+	  layout:decorate="~{layout/layout_event_get}"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  xmlns:th="http://www.thymeleaf.org">
-<head>
-	<title>Cinemacast</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-
-	<meta property="og:title" content="${event.eventName}">
-	<meta property="og:description" content="${event.eventDetail}">
-	<meta property="og:url" content="http://localhost:8080/event_get/${eventId}">
-	<meta property="og:image" content="http://localhost:8080/images/event/${event.eventImage}">
-
-
-	<link href="/assets/css/main.css" rel="stylesheet"/>
-	<link href="/assets/css/custom.css" rel="stylesheet"/>
-	<link href="/assets/css/nav.css" rel="stylesheet"/>
-	<noscript>
-		<link href="/assets/css/noscript.css" rel="stylesheet"/>
-	</noscript>
-	<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
-
-	<style>
-		.container {
-			text-align: center; /* 부모 요소의 텍스트 및 인라인 블록 요소들을 중앙 정렬 */
-		}
-		.btn_box {
-			display: flex;
-			justify-content: center; /* 플렉스 컨테이너 내의 아이템들을 중앙 정렬 */
-			gap: 10px; /* 버튼들 사이의 간격 조정 */
-			margin-top: 20px; /* 위쪽에 약간의 여백 추가 */
-		}
-		.kakao_btn {
-			margin: 0 5px; /* 버튼들 사이의 여백 추가 */
-			width: 50px;
-			height: 50px;
-		}
-		#input-file {
-			display: block; /* 이미지를 블록 요소로 변환 */
-			margin: 0 auto; /* 자동 여백을 사용하여 중앙 정렬 */
-		}
-	</style>
-</head>
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
 	<div id="page-wrapper">
-		<header data-include-path="header.html"></header>
 
-		<!-- Main -->
-
-		<div class="wrapper style1">
+		<div class="wrapper style1 event_get">
 			<div class="container">
 				<article id="main" class="special">
 					<header>
-						<h2 th:text="${event.eventName}">이벤트 제목</h2>
-<!--						<p th:text="${event.regDate}">이벤트 등록 날짜</p>-->
+						<h3 th:text="${event.eventName}">이벤트 제목</h3>
+						<p>
+							<img src="/images/views.png" alt="조회수 이미지" />
+							<span>[[${event.viewCount}]]</span></p>
+						<div class="btn_box">
+							<img onclick="shareMessage()" src="/images/share.png" alt="카카오톡 공유" id="kakao_btn" class="kakao_btn" />
+						</div>
 					</header>
 					<section>
-						<img id="input-file" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="width: 1000px; height: auto;"/>
+						<img class="event-main-img" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" style="max-width: 900px !important; height: auto;" />
 						<p class="event-detail" th:text="${event.eventDetail}" style="display: none;">
 							이벤트 상세 내용
 						</p>
+						<p>등록일: [[${#temporals.format(event.regDate, 'yyyy-MM-dd HH:mm:ss')}]]</p>
 					</section>
 					<table class="default">
 						<tr>
@@ -86,14 +44,10 @@
 					</table>
 					<div class="btn_box">
 						<button class="button" onclick="window.location.href='/event/eventList'">목록</button>
-						<div class="btn_box">
-							<img onclick="shareMessage()" src="/images/share.png" alt="카카오톡 공유" id="kakao_btn" class="kakao_btn" />
-						</div>
 					</div>
 				</article>
 			</div>
 		</div>
-		<footer data-include-path="footer.html"></footer>
 	</div>
 
 	<script>
@@ -102,6 +56,15 @@
 			// Kakao SDK 초기화
 			Kakao.init('3d074cbbda365535b831c90baead22c2');
 			console.log('Kakao SDK initialized');
+
+			var dateElement = document.getElementById("eventDate");
+			var regDate = dateElement.getAttribute("data-regdate");
+
+			if (regDate) {
+				// 날짜와 시간을 분리
+				var dateOnly = regDate.split('T')[0];
+				dateElement.textContent = dateOnly;
+			}
 		});
 
 		// Kakao 공유 함수

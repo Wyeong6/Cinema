@@ -29,6 +29,7 @@ public class Payment extends BaseTimeEntity {
 
     private String productName;
     private String productIdx;
+    private Long scheduleId;
     private String productType; // 영화 or 스낵
     private String content1; // 상영일자
     private String content2; // 시간
@@ -49,6 +50,7 @@ public class Payment extends BaseTimeEntity {
                 .buyerEmail(paymentDTO.getBuyerEmail())
                 .productName(paymentDTO.getProductName())
                 .productIdx(paymentDTO.getProductIdx())
+                .scheduleId(paymentDTO.getScheduleId())
                 .paymentType(paymentDTO.getPaymentType())
                 .content1(paymentDTO.getContent1())
                 .content2(paymentDTO.getContent2())

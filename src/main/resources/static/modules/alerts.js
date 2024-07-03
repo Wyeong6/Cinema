@@ -33,3 +33,13 @@ export function SuccessAlert(title) {
         timer: 1500
     });
 }
+
+export function infoAlert(title) {
+    Swal.fire({
+        position: "center",
+        icon: "info",
+        title: title,
+        showConfirmButton: false,
+        timer: 1500
+    });
+}

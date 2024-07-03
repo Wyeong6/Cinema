@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
-<html lang="en" layout:decorate="~{layout/layout_total}"
+<html lang="en"
+      layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <body class="no-sidebar is-preload">
@@ -20,8 +21,7 @@
                     <article class="col-3 col-12-mobile special" th:each="event : ${eventList}">
                         <input type="hidden" th:value="${event.id}"/>
                         <a th:href="@{'/event_get/' + ${event.id}}" class="image featured">
-                            <img th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지"
-                                 style="width: 300px; height: auto;"/>
+                            <img class="featured-img" th:src="@{'/images/event/' + ${event.eventImage}}" alt="이벤트 이미지" />
                         </a>
                         <header>
                             <h4>
@@ -43,7 +43,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/assets/vendor/js/bootstrap.js"></script>
     <script src="/assets/js/jquery.dropotron.min.js"></script>
@@ -55,47 +54,28 @@
     <script src="/assets/js/main.js"></script>
 </th:block>
 
-<script>
-
-    // include.js
-    window.addEventListener('load', function () {
-        var allElements = document.getElementsByTagName('*');
-        Array.prototype.forEach.call(allElements, function (el) {
-            var includePath = el.dataset.includePath;
-            if (includePath) {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        el.outerHTML = this.responseText;
+    <script>
+        $(document).ready(function () {
+            function loadPage(page) {
+                $.ajax({
+                    url: '/event/eventList?page=' + page,
+                    type: 'GET',
+                    success: function (response) {
+                        $('#page-wrapper').html(response);
+                    },
+                    error: function (error) {
+                        alert("Failed to load the page. Please try again.");
                     }
-                };
-                xhttp.open('GET', includePath, true);
-                xhttp.send();
+                });
             }
-        });
-    }); // 이 부분을 추가하여 괄호를 닫습니다.
 
-
-    $(document).ready(function () {
-        function loadPage(page) {
-            $.ajax({
-                url: '/event/eventList?page=' + page,
-                type: 'GET',
-                success: function (response) {
-                    $('#page-wrapper').html(response);
-                },
-                error: function (error) {
-                    alert("Failed to load the page. Please try again.");
-                }
+            $(document).on('click', '.paging-btn', function (e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                loadPage(page);
             });
-        }
-
-        $(document).on('click', '.paging-btn', function (e) {
-            e.preventDefault();
-            var page = $(this).data('page');
-            loadPage(page);
         });
-    });
-</script>
+    </script>
+</th:block>
 </body>
 </html>

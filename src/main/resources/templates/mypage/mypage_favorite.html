@@ -13,12 +13,8 @@
                     </div>
                     <a th:href="@{'/movies/' + ${movie.movieId}}">
                         <img class="featured-img"
-                             th:src="@{'https://image.tmdb.org/t/p/w200' + ${movie.moviePosterUrl}}" alt="포스터" />
+                             th:src="${movie.moviePosterUrl != 'null' ? 'https://image.tmdb.org/t/p/w200' + movie.moviePosterUrl : '/images/img_not_ready2.png'}" alt="poster">
                     </a>
-                    <!-- <p class="movie-title" th:text="${movie.movieTitle}"></p> -->
-<!--                    <div class="overlay">-->
-<!--                        <a href="#" class="details-button">상세보기</a>-->
-<!--                    </div>-->
                 </div>
             </div>
         </div>
@@ -39,18 +35,20 @@
             const isFavorited = button.hasClass('favorited');
 
             if (isFavorited) {
-                // 이미 "좋아요" 상태인 경우, 삭제 요청 보내기
-                $.ajax({
-                    url: '/favorites/' + userEmail + '/' + movieId,
-                    type: 'DELETE',
-                    success: function (response) {
-                        console.log("좋아요 삭제 성공");
-                        updateFavoriteButton(button, false); // 삭제 성공 시 버튼 UI 업데이트
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("좋아요 삭제 실패", error);
-                    }
-                });
+                // 이미 "좋아요" 상태인 경우, 삭제 요청 전에 확인 메시지 띄우기
+                if (confirm('찜을 취소하시겠습니까?')) {
+                    $.ajax({
+                        url: '/favorites/' + userEmail + '/' + movieId,
+                        type: 'DELETE',
+                        success: function (response) {
+                            console.log("좋아요 삭제 성공");
+                            updateFavoriteButton(button, false); // 삭제 성공 시 버튼 UI 업데이트
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("좋아요 삭제 실패", error);
+                        }
+                    });
+                }
             } else {
                 // "좋아요" 등록 요청 보내기
                 $.ajax({
