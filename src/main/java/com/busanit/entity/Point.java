@@ -24,7 +24,7 @@ public class Point extends BaseTimeEntity {
 
     private String content;
 
-    private Boolean contentType; // 멤버등급에 필요 - 영화면 true, 나머지 false
+    private Boolean contentType; // 결제취소면 false, 나머지 true
 
     private String pointType; // + or -
 
@@ -44,7 +44,7 @@ public class Point extends BaseTimeEntity {
         return Point.builder()
                 .impUid("이벤트")
                 .content("신규 가입 적립")
-                .contentType(false)
+                .contentType(true)
                 .pointType("+")
                 .points(3000)
                 .currentPoints(3000)
@@ -56,6 +56,7 @@ public class Point extends BaseTimeEntity {
     public static Point toEntity(Long memberId, PointDTO pointDTO) {
         Member member = Member.builder().id(memberId).build();
         return Point.builder()
+                .id(pointDTO.getId())
                 .impUid(pointDTO.getImpUid())
                 .content(pointDTO.getContent())
                 .contentType(pointDTO.getContentType())

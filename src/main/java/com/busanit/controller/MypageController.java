@@ -73,7 +73,7 @@ public class MypageController {
     }
 
     @GetMapping("/main")
-    public String mypageMain(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public String mypageMain(Model model, @PageableDefault(size = 5, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
         // 현재 로그인한 사용자의 이메일
         String userEmail = memberService.currentLoggedInEmail();
 
@@ -190,7 +190,7 @@ public class MypageController {
     }
 
     @GetMapping("/point")
-    public String mypagePoint(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public String mypagePoint(Model model, @PageableDefault(size = 5, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
         // 현재 로그인한 사용자의 이메일
         String userEmail = memberService.currentLoggedInEmail();
 
@@ -206,7 +206,7 @@ public class MypageController {
 
     @GetMapping("/point/more")
     @ResponseBody
-    public Slice<PointDTO> getPoints(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Slice<PointDTO> getPoints(@PageableDefault(size = 5, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = (authentication != null) ? authentication.getName() : null;
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
