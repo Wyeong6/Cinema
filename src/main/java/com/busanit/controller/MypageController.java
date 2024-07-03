@@ -45,7 +45,6 @@ public class MypageController {
     private final PasswordEncoder passwordEncoder;
     private final FavoriteMovieService favoriteMovieService;
     private final PointService pointService;
-//    private final SnackPaymentService snackPaymentService;
     private final PaymentService paymentService;
     private final ObjectMapper objectMapper;
 

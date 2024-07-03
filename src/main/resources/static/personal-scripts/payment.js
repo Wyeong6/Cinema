@@ -43,6 +43,7 @@ function requestPay() {
                             "minusPoint": minusPoint
                         }),
                         success: function(response_complete) {
+                            localStorage.clear(); // 장바구니에 담긴 물품들 삭제
                             let params = new URLSearchParams();
                             params.append("imp_uid", response_complete.imp_uid);
                             window.location.href = '/payment/paymentSuccessful?'+ params.toString(); // 결제가 완료된 후 리디렉션할 페이지
@@ -88,6 +89,7 @@ function requestPay() {
                             "minusPoint": minusPoint
                         }),
                         success: function(response_complete) {
+                            localStorage.clear(); // 결제 완료 시 장바구니에 담긴 물품들 삭제
                             let params = new URLSearchParams();
                             params.append("imp_uid", response_complete.imp_uid);
                             window.location.href = '/payment/paymentSuccessful?'+ params.toString(); // 결제가 완료된 후 리디렉션할 페이지
