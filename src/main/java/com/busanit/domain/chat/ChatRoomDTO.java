@@ -1,15 +1,10 @@
 package com.busanit.domain.chat;
 
 import com.busanit.entity.chat.ChatRoom;
-import com.busanit.entity.chat.Message;
 import lombok.*;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import com.busanit.entity.chat.ChatRoomReadStatus;
-
 
 @Getter
 @Setter
@@ -24,9 +19,7 @@ public class ChatRoomDTO {
     private String adminEmail;
     private String chatRoomTitle;
     List<MessageDTO> messages;
-    //메세지 조회한 시간
     private LocalDateTime lastReadTimestamp;
-    //읽지 않은 메세지 갯수
     private int unreadMessageCount;
     private String type;
 
@@ -50,8 +43,4 @@ public class ChatRoomDTO {
                 .type(chatRoom.getType())
                 .build();
     }
-
-
-
-
 }

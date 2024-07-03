@@ -21,6 +21,7 @@ public class Notice extends BaseTimeEntity{
     private Long noticeId;
     private String memberEmail;
     private String noticeTitle;
+    @Column(length = 1024)
     private String noticeContent;
     private int viewCount;
 

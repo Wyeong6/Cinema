@@ -7,5 +7,4 @@ import lombok.*;
 public class PageUpdateDTO {
     private int activePage;
     private int inactivePage;
-
 }

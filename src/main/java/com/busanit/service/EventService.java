@@ -64,8 +64,8 @@ public class EventService {
         Event event = eventRepository.findById(eventDTO.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + eventDTO.getId()));
 
-        event.update(eventDTO); // Event 엔티티의 update 메소드를 호출하여 업데이트
-        eventRepository.save(event); // 변경 감지를 통한 업데이트
+        event.update(eventDTO);
+        eventRepository.save(event);
     }
 
     //삭제

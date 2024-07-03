@@ -46,7 +46,10 @@ public class InquiryController {
 
         int updatedCount = inquiryService.getUnansweredInquiryCount();
         messagingTemplate.convertAndSend("/Topic/unansweredCount", updatedCount);
-        return "redirect:/inquiry"; // 폼 제출 후 보여줄 페이지로 리다이렉트
+
+
+        // 성공 여부를 URL 매개변수로 전달
+        return "redirect:/inquiry?success=true";
     }
 
     //문의 답변하기 전송, 저장

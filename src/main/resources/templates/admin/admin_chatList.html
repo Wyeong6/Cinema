@@ -377,7 +377,8 @@
             sender: memberEmail,
             recipient: currentRecipient,
             content: '상담이 완료되었습니다.',
-            status: "inactive"
+            status: "inactive",
+            type: "false"
         };
 
         stompClient.send("/app/chat/private", {}, JSON.stringify(endUserChatMessage));

@@ -87,14 +87,6 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Inquiry> inquiries = new ArrayList<>();
 
-    //보낸메세지 연관관계
-    public void addSentMessage(Message message) {
-        this.sentMessages.add(message);
-        if (message.getSender() != this) {
-            message.setSender(this);
-        }
-    }
-
     // 포인트
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     List<Point> pointList;
@@ -103,15 +95,22 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     List<SnackPayment> snackPaymentList;
 
+    //멤버와 이벤트게시글 연관관계
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    private List<Event> events;
+
     //문의 연관관계
     public void addInquiry(Inquiry inquiry) {
         inquiries.add(inquiry);
         inquiry.setMember(this);
     }
 
-    public void removeInquiry(Inquiry inquiry) {
-        inquiries.remove(inquiry);
-        inquiry.setMember(null);
+    //보낸메세지 연관관계
+    public void addSentMessage(Message message) {
+        this.sentMessages.add(message);
+        if (message.getSender() != this) {
+            message.setSender(this);
+        }
     }
 
     public void addReceivedMessage(Message message) {
@@ -142,14 +141,10 @@ public class Member extends BaseTimeEntity {
         }
     }
     // 리액션 연관관계 및 그외 메서드 끝
-
     public void addComment(Comment comment){
         this.comment.add(comment);
         comment.setMember(this);
     }
-    //멤버와 이벤트게시글 연관관계
-    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
-    private List<Event> events;
 
     // 찜하기 연관관계 메서드
     public void addFavoriteMovie(FavoriteMovie favoriteMovie) {

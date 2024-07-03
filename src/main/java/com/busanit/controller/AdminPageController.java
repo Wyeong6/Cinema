@@ -515,14 +515,11 @@ public class AdminPageController {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body("유효성 검사 오류가 발생했습니다.");
         }
-
-        // 중복 체크 로직 추가
+        // 중복 체크 로직
         if (eventService.isDuplicate(eventDTO.getEventDetail(), eventDTO.getEventName())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 이벤트입니다.");
         }
-
         eventService.saveEvent(eventDTO);
-
         return ResponseEntity.ok("이벤트가 성공적으로 등록되었습니다.");
     }
 
@@ -541,7 +538,6 @@ public class AdminPageController {
         model.addAttribute("endPage", endPage);
 
         return "admin/admin_event_list";
-
     }
 
     //이벤트 수정 페이지
@@ -592,13 +588,12 @@ public class AdminPageController {
             return ResponseEntity.badRequest().body("유효성 검사 오류가 발생했습니다.");
         }
 
-        // 중복 체크 로직 추가
+        // 중복 체크 로직
         if (noticeService.isDuplicate(noticeDTO.getNoticeTitle(), noticeDTO.getNoticeContent())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 공지사항입니다.");
         }
 
         noticeService.saveNotice(noticeDTO);
-
         return ResponseEntity.ok("공지사항이 성공적으로 등록되었습니다.");
     }
 
@@ -741,7 +736,7 @@ public class AdminPageController {
         return ResponseEntity.ok(inquiryReply);
     }
 
-    // 미답변 문의의 갯수를 조회하여 ResponseEntity로 반환
+    // 미답변 문의의 갯수를 조회
     @GetMapping("/unansweredInquiryCount")
     @ResponseBody
     public ResponseEntity<Integer> getUnansweredInquiryCount() {

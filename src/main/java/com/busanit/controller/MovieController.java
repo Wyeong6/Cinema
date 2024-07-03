@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Controller
 @RequiredArgsConstructor
 public class MovieController {
@@ -126,10 +127,12 @@ public class MovieController {
 
     // 리뷰작성 모달
     @RequestMapping("/review/{movieId}")
-    public String reviewPopup(@PathVariable("movieId") String movieId, Model model) {
+    public String reviewPopup(@PathVariable("movieId") Long movieId, Model model) {
+        List<MovieDTO> movieInfos = movieService.getMovieDetailInfo(movieId);
         String userEmail = movieService.getUserEmail();
         model.addAttribute("userEmail", userEmail);
         model.addAttribute("movieId", movieId);
+        model.addAttribute("movieInfos", movieInfos);
         return "movie/review_modal";
     }
 

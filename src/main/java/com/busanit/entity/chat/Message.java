@@ -45,5 +45,4 @@ public class Message extends BaseTimeEntity {
         message.setChatRoom(chatRoom);
         return message;
     }
-
 }

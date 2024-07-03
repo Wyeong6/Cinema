@@ -46,8 +46,8 @@
         </div>
     </div>
 </div>
-<script>
-    $(document).ready(function() {
+<script type="module">
+    import { SuccessAlert } from "/modules/alerts.js";
         $('form').on('submit', function(e) {
             e.preventDefault();
 
@@ -60,6 +60,7 @@
                 url: "/admin/eventUpdate",
                 data: formData,
                 success: function(response) {
+                    SuccessAlert("수정이 완료되었습니다.")
                     $('.container-xxl').html(response);
                     sessionStorage.removeItem('pageNumber');
                 },
@@ -68,7 +69,6 @@
                 }
             });
         });
-    });
 </script>
 </body>
 </html>
