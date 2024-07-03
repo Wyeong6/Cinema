@@ -24,6 +24,7 @@ export function deleteConfirm() {
     });
 }
 
+
 export function SuccessAlert(title) {
     Swal.fire({
         position: "center",
@@ -34,6 +35,7 @@ export function SuccessAlert(title) {
     });
 }
 
+
 export function errorAlert(title) {
     Swal.fire({
         position: "center",
@@ -43,7 +45,6 @@ export function errorAlert(title) {
         timer: 1500
     });
 }
-
 export function warningAlert(title) {
     Swal.fire({
         position: "center",
@@ -53,3 +54,12 @@ export function warningAlert(title) {
         timer: 1500
     });
 }
+
+
+// 기존 script에서 사용하기위해 전역변수로 등록
+// 하지만 이러면 module화를 하는 의미가 퇴색됨,
+// admin_movie_register에 사용하기위해 어쩔수없이 전역화 함.
+window.SuccessAlert = SuccessAlert;
+window.deleteConfirm = deleteConfirm;
+window.errorAlert = errorAlert;
+window.warningAlert = warningAlert;

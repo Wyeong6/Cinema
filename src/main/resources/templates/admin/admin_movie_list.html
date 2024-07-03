@@ -52,11 +52,11 @@
                     </li>
                     <li class="page-item" th:each="page : ${#numbers.sequence(0, totalPages - 1)}"
                         th:classappend="${currentPage == page} ? 'active'">
-                        <a class="page-link" href="#" th:onclick="loadMovieList([[${page}]]); return false;"
+                        <a class="page-link" href="#" th:onclick="loadMovieList([[${page}]]);"
                            th:text="${page + 1}"></a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == (totalPages - 1)} ? 'disabled'">
-                        <a class="page-link" href="#" th:onclick="loadMovieList([[${currentPage + 1}]]); return false;"
+                        <a class="page-link" href="#" th:onclick="loadMovieList([[${currentPage + 1}]]);"
                            aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
@@ -119,6 +119,30 @@
         height: 100%;
     }
 </style>
+<!--스윗얼럿 모듈-->
+<script type="module" src="/modules/alerts.js"></script>
+<script th:inline="javascript">
+    //영화 목록 로드 함수
+
+    var currentScrollPosition = $(window).scrollTop();
+    function loadMovieList(page) {
+        $.ajax({
+            url: '/admin/movieList',
+            type: 'POST',
+            data: { page: page },
+            success: function(data) {
+                // 컨테이너에 결과 HTML 넣기
+                $('.movie-edit-container').remove();
+                $('#movie-list-container').html(data);
+
+                $(window).scrollTop(currentScrollPosition);
+            },
+            error: function() {
+                window.errorAlert('영화 목록 로드 중 오류가 발생했습니다.');
+            }
+        });
+    }
+</script>
 
 <script type="module">
     import { errorAlert } from "/modules/alerts.js";
@@ -205,21 +229,5 @@
         });
     });
 
-    //영화 목록 로드 함수
-        function loadMovieList(page) {
-            $.ajax({
-                url: '/admin/movieList',
-                type: 'POST',
-                data: { page: page },
-                success: function(data) {
-                    // 컨테이너에 결과 HTML 넣기
-                    $('.movie-edit-container').remove();
-                    $('#movie-list-container').html(data);
-                },
-                error: function() {
-                    alert('영화 목록 로드 중 오류가 발생했습니다.');
-                }
-            });
-        }
 </script>
 
