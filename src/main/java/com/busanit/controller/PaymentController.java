@@ -155,7 +155,8 @@ public class PaymentController {
                                                @RequestParam Integer minusPoint,
                                                @PageableDefault(size = 1, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable,
                                                PaymentDTO paymentDTO,
-                                               PointDTO pointDTO) {
+                                               PointDTO pointDTO,
+                                               SnackDTO snackDTO) {
 
         Map<String, String> response_complete = new HashMap<>();
 
@@ -207,6 +208,22 @@ public class PaymentController {
                 pointDTO.setTotalPoints(totalPoints);
                 pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
             }
+
+            // 스낵 수량 업데이트
+            if(product_type.equals("SN")) {
+                snackDTO.setId(Long.valueOf(product_idx));
+                snackDTO.setSnack_stock((snackService.get(Long.valueOf(product_idx)).getSnack_stock())-(Long.parseLong(product_count)));
+                snackService.updateSnackCount(snackDTO);
+            }
+            if(product_type.equals("SC")) {
+                String[] productIdxArray = content1.split(",");
+                String[] productCountArray = content3.split(",");
+                for (int i = 0; i < productIdxArray.length; i++ ){
+                    snackDTO.setId(Long.valueOf(productIdxArray[i]));
+                    snackDTO.setSnack_stock((snackService.get(Long.valueOf(productIdxArray[i])).getSnack_stock())-(Long.parseLong(productCountArray[i])));
+                    snackService.updateSnackCount(snackDTO);
+                }
+            }
         }
         return response_complete;
     }
@@ -223,7 +240,7 @@ public class PaymentController {
             model.addAttribute("productInfo", snackDTO);
         } else { // 장바구니 결제
             List<SnackDTO> snackList = new ArrayList<>();
-            String[] stringArray = paymentDTO.getContent2().split(",");
+            String[] stringArray = paymentDTO.getContent1().split(",");
             for (int i = 0; i < stringArray.length; i++ ){
                 SnackDTO snackDTO = snackService.get(Long.valueOf(stringArray[i]));
                 snackList.add(snackDTO);
@@ -329,7 +346,7 @@ public class PaymentController {
             model.addAttribute("productInfo", snackDTO);
         } else { // 장바구니 결제
             List<SnackDTO> snackList = new ArrayList<>();
-            String[] stringArray = paymentDTO.getContent2().split(",");
+            String[] stringArray = paymentDTO.getContent1().split(",");
             for (int i = 0; i < stringArray.length; i++ ){
                 SnackDTO snackDTO = snackService.get(Long.valueOf(stringArray[i]));
                 snackList.add(snackDTO);
