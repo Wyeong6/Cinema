@@ -41,12 +41,6 @@ public class PaymentService {
     @Value("${imp_rest_api_secret}")
     private String imp_rest_api_secret;
 
-//    public Payment orderComplete(PaymentDTO dto, int id){
-//        User user = memberRepository.findUserById(id);
-//        dto.setUser(user);
-//        return paymentRepository.save(mapper.map(dto, Point.class))
-//    }
-
     // 결제 DB 저장
     public void savePayment(Payment payment) {
         paymentRepository.save(payment);

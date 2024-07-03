@@ -209,7 +209,7 @@ public class PaymentController {
                 pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
             }
 
-            // 스낵 수량 업데이트
+            // 스낵 수량(재고) 업데이트
             if(product_type.equals("SN")) {
                 snackDTO.setId(Long.valueOf(product_idx));
                 snackDTO.setSnack_stock((snackService.get(Long.valueOf(product_idx)).getSnack_stock())-(Long.parseLong(product_count)));
@@ -271,30 +271,31 @@ public class PaymentController {
     public Map<String, String> paymentCancel(@RequestParam("merchant_uid") String merchant_uid,
                                              @RequestParam("imp_uid") String imp_uid,
                                              PointDTO pointDTO,
+                                             SnackDTO snackDTO,
                                              @PageableDefault(size = 1, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
-        post.setHeader("Authorization", paymentService.getImportToken());
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("merchant_uid", merchant_uid));
-
+//        CloseableHttpClient client = HttpClientBuilder.create().build();
+//        HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
+//        post.setHeader("Authorization", paymentService.getImportToken());
+//        List<NameValuePair> params = new ArrayList<>();
+//        params.add(new BasicNameValuePair("merchant_uid", merchant_uid));
+//
         Map<String, String> response_complete = new HashMap<>();
-
-        String asd = "";
-        try {
-            post.setEntity(new UrlEncodedFormEntity(params));
-            HttpResponse res = client.execute(post);
-            ObjectMapper mapper = new ObjectMapper();
-            String body = EntityUtils.toString(res.getEntity());
-            JsonNode rootNode = mapper.readTree(body);
-            asd = rootNode.get("response").asText();
-        } catch (Exception e) {
-            e.printStackTrace();
-            response_complete.put("errorMsg", "errorMsg");
-        }
-        if (asd.equals("null")) {
-            response_complete.put("errorMsg", "errorMsg");
-        } else {
+//
+//        String asd = "";
+//        try {
+//            post.setEntity(new UrlEncodedFormEntity(params));
+//            HttpResponse res = client.execute(post);
+//            ObjectMapper mapper = new ObjectMapper();
+//            String body = EntityUtils.toString(res.getEntity());
+//            JsonNode rootNode = mapper.readTree(body);
+//            asd = rootNode.get("response").asText();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            response_complete.put("errorMsg", "errorMsg");
+//        }
+//        if (asd.equals("null")) { // 환불 실패
+//            response_complete.put("errorMsg", "errorMsg");
+//        } else { // 환불 성공
             // 제공했던 포인트 회수
             // 현재 포인트
             int currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
@@ -328,9 +329,26 @@ public class PaymentController {
                 pointService.savePoint(Point.toEntity(point.getMember().getId(), pointDTO));
             }
 
+            // 스낵 재고 업데이트
+            PaymentDTO paymentDTO = paymentService.get(imp_uid);
+            if(paymentDTO.getProductType().equals("SN")) {
+                snackDTO.setId(Long.valueOf(paymentDTO.getProductIdx()));
+                snackDTO.setSnack_stock((snackService.get(Long.valueOf(paymentDTO.getProductIdx())).getSnack_stock())+(Long.parseLong(paymentDTO.getProductCount())));
+                snackService.updateSnackCount(snackDTO);
+            }
+            if(paymentDTO.getProductType().equals("SC")) {
+                String[] productIdxArray = paymentDTO.getContent1().split(",");
+                String[] productCountArray = paymentDTO.getContent3().split(",");
+                for (int i = 0; i < productIdxArray.length; i++ ){
+                    snackDTO.setId(Long.valueOf(productIdxArray[i]));
+                    snackDTO.setSnack_stock((snackService.get(Long.valueOf(productIdxArray[i])).getSnack_stock())+(Long.parseLong(productCountArray[i])));
+                    snackService.updateSnackCount(snackDTO);
+                }
+            }
+
             paymentService.updatePaymentStatus(imp_uid, memberService.findUserIdx(memberService.currentLoggedInEmail()));
             response_complete.put("imp_uid", imp_uid);
-        }
+//        }
         return response_complete;
     }
 
