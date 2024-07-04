@@ -49,7 +49,7 @@ function requestPay() {
                             window.location.href = '/payment/paymentSuccessful?'+ params.toString(); // 결제가 완료된 후 리디렉션할 페이지
                         },
                         error: function() {
-                            alert("서버 통신에 실패했습니다.");
+                            swtAlertOne("서버 통신에 실패했습니다.");
                             if(reqIDX == 'MO') {
                                 cancelReservedSeats(scheduleId, seatIds);
                             }
@@ -63,7 +63,7 @@ function requestPay() {
                         cancelReservedSeats(scheduleId, seatIds);
                     }
 
-                    alert(msg);
+                    swtAlertOne(msg);
 
 
                     /* 테스트용 */
@@ -95,7 +95,7 @@ function requestPay() {
                     //         window.location.href = '/payment/paymentSuccessful?'+ params.toString(); // 결제가 완료된 후 리디렉션할 페이지
                     //     },
                     //     error: function() {
-                    //         alert("서버 통신에 실패했습니다.");
+                    //         swtAlertOne("서버 통신에 실패했습니다.");
                     //     }
                     // });
                     /* 테스트용 끝*/
@@ -104,7 +104,7 @@ function requestPay() {
             });
         },
         error: function() {
-            alert('오류가 발생했습니다.');
+            swtAlertOne('오류가 발생했습니다.');
             if(reqIDX == 'MO') {
                 cancelReservedSeats(scheduleId, seatIds);
             }
@@ -122,7 +122,7 @@ function cancelReservedSeats(scheduleId, seatIds) {
             console.log('Seats canceled successfully:', response);
         },
         error: function(error) {
-            alert('Error canceling seats: ' + JSON.stringify(error));
+            swtAlertOne('Error canceling seats: ' + JSON.stringify(error));
         }
     });
 }
