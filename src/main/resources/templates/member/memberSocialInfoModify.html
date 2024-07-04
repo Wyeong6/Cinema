@@ -69,6 +69,11 @@
     </p>
 </footer>
 
+<!--sweetalert 사용 -->
+<script src="/personal-scripts/util.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 <script>
     $(document).ready(function () {
         $("[type=submit]").on("click", function (e) {
@@ -79,25 +84,25 @@
             const age = $("#age");
 
             if (password1.val().length < 1) {
-                alert("비밀번호를 입력해주세요.");
+                swtAlertOne("비밀번호를 입력해주세요.");
                 password1.focus();
                 return false;
             }
 
             if (password1.val() !== password2.val()) {
-                alert("비밀번호가 서로 다릅니다. 확인해주세요.");
+                swtAlertOne("비밀번호가 서로 다릅니다. 확인해주세요.");
                 password2.select();
                 return false;
             }
 
             if (age.val().length < 1) {
-                alert("생년월일을 입력해주세요.");
+                swtAlertOne("생년월일을 입력해주세요.");
                 age.focus();
                 return false;
             }
 
             if (!(age.val().length === 6)) {
-                alert("생년월일을 다시 확인해주세요. ex) 240101");
+                swtAlertOne("생년월일을 다시 확인해주세요. ex) 240101");
                 age.focus();
                 return false;
             }
