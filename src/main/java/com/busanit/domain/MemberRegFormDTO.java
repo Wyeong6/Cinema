@@ -25,8 +25,6 @@ public class MemberRegFormDTO {
     @Length(min=8, max=16, message = "비밀번호는 8자 이상, 16자 이하로 입력해주세요.")
     private String password;
 
-//    @Min(6)
-//    @Max(6)
     @NotEmpty(message = "필수 입력 값입니다.")
     @Pattern(regexp = "\\d{6}", message = "생년월일을 입력하세요. ex) 240101")
     private String age;

@@ -103,12 +103,6 @@ public class PaymentService {
         params.add(new BasicNameValuePair("imp_key", imp_rest_api_key));
         params.add(new BasicNameValuePair("imp_secret", imp_rest_api_secret));
 
-//        // 맵 변환 방법
-//        Map<String,String> m =new HashMap<String,String>();
-//        m.put("imp_key", imp_rest_api_key);
-//        m.put("imp_secret", imp_rest_api_secret);
-//        try { post.setEntity(new UrlEncodedFormEntity(convertParameter(m)));
-
         try { post.setEntity(new UrlEncodedFormEntity(params));
             HttpResponse res = client.execute(post);
             ObjectMapper mapper = new ObjectMapper();

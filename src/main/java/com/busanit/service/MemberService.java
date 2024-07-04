@@ -99,9 +99,6 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
     public List<String> findUserEmails(String name, String age) {
         return memberRepository.findUserEmails(name, age);
     }
-//    public String findUserEmail(String name, String age) {
-//        return memberRepository.findUserEmail(name, age);
-//    }
 
     // 비밀번호 찾기
     public boolean findUserPassword(String name, String age, String email) {
@@ -133,9 +130,7 @@ public class MemberService implements UserDetailsService { /* UserDetailsService
 
     // mypage 회원탈퇴
     public void memberDelete(Long memberId) {
-
         memberRepository.deleteById(memberId);
-
     }
 
     // 개인정보(이메일(단수)) masking
