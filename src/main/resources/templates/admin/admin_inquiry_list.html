@@ -63,7 +63,7 @@
                         th:data-id="${inquiry.id}"
                         data-target="#inquiryModal" th:data-type="${inquiry.type}"
                         th:data-original-subject="${inquiry.subject}" th:data-original-message="${inquiry.message}">
-                    <td th:text="${inquiry.id}"></td>
+                        <td th:text="${inquiry.id}"></td>
                         <td th:text="${inquiry.name}"></td>
                         <td>
                             <span th:text="${#strings.length(inquiry.subject) > 5 ? #strings.substring(inquiry.subject, 0, 5) + '..' : inquiry.subject}"></span>
@@ -116,7 +116,7 @@
                         th:data-id="${inquiry.id}"
                         data-target="#answeredInquiryModal" th:data-type="${inquiry.type}"
                         th:data-original-subject="${inquiry.subject}" th:data-original-message="${inquiry.message}">
-                    <td th:text="${inquiry.id}"></td>
+                        <td th:text="${inquiry.id}"></td>
                         <td th:text="${inquiry.name}"></td>
                         <td>
                             <span th:text="${#strings.length(inquiry.subject) > 5 ? #strings.substring(inquiry.subject, 0, 5) + '..' : inquiry.subject}"></span>
@@ -250,6 +250,7 @@
 
 <script type="module">
     import {updateTimeSinceCreated} from '/modules/timeSinceCreated.js'; //시간 경과 모듈
+    import { SuccessAlert, errorAlert } from '/modules/alerts.js'
 
 
     $(document).ready(function () {
@@ -324,7 +325,7 @@
                         $('#modal-answered-inquiry-reply').text(response.replyMessage);
                     },
                     error: function () {
-                        alert('답변 데이터를 가져오는 데 실패했습니다.');
+                        errorAlert('답변 데이터를 가져오는 데 실패했습니다.');
                     }
                 });
                 //답변입력폼 숨기기
@@ -342,13 +343,13 @@
             sendRequest('POST', '/admin/sendReply', formData, function (response) {
                 if (response.trim() === 'success') {
                     $('#inquiryModal').modal('hide');
-                    alert('답변이 성공적으로 전송되었습니다.');
+                    SuccessAlert('답변이 성공적으로 전송되었습니다.');
                 } else {
-                    alert('답변 전송 중 오류가 발생했습니다.');
+                    errorAlert('답변 전송 중 오류가 발생했습니다.');
                 }
             }, function (xhr, status, error) {
                 console.error('Error occurred: ', error);
-                alert('답변 전송 중 오류가 발생했습니다.');
+                errorAlert('답변 전송 중 오류가 발생했습니다.');
             });
         });
 

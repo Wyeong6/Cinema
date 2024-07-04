@@ -102,7 +102,7 @@
                     $('#page-wrapper').html(response);
                 },
                 error: function (error) {
-                    alert("Failed to load the page. Please try again.");
+                    window.errorAlert("Failed to load the page. Please try again.");
                 }
             });
         }

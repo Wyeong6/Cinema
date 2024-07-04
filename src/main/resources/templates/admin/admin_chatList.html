@@ -191,19 +191,20 @@
 </script>
 
 <script>
-    let memberEmail = ''; //로그인유저 이메일
-    let currentRecipient = ''; //받는 사람이메일
-    let chatRoomTitle = ''; //카테고리
-    let chatRoomId = ''; //채팅룸번호
-    let status = null; //채팅방 상태
-    let isConnected = false; //웹소켓 연결확인
-    let stompClient = ``; // STOMP 클라이언트 변수 선언
-    let typingTimeout = 0; //타이핑 타이머
-    let TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
-    let typingIndicatorSent = false;  // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
-    let activePage = 1; //활성화 페이징번호
-    let inactivePage = 1; //비활성화 페이징번호
-    let entranceStatus  = ""; //입장상태
+    var memberEmail = ''; //로그인유저 이메일
+    var currentRecipient = ''; //받는 사람이메일
+    var chatRoomTitle = ''; //카테고리
+    var chatRoomId = ''; //채팅룸번호
+    var status = null; //채팅방 상태
+    var isConnected = false; //웹소켓 연결확인
+    var stompClient = ``; // STOMP 클라이언트 변수 선언
+    var typingTimeout = 0; //타이핑 타이머
+    var TYPING_DELAY = 3000; // 타이핑 상태 업데이트를 위한 딜레이 시간 (3초)
+    var typingIndicatorSent = false;  // 타이핑 상태가 이미 전송되었는지 여부를 저장하는 변수
+    var activePage = 1; //활성화 페이징번호
+    var inactivePage = 1; //비활성화 페이징번호
+    var entranceStatus  = ""; //입장상태
+    let dotTimer = null;  //점 애니메이션 타이머
 
     // DOM 요소를 가져오는 함수
     function getElement(id) {
@@ -464,6 +465,7 @@
         getElement('userEmail').innerText = currentRecipient;
         fetchMessages(chatRoomId); //해당 채팅방메세지 가져오기
         connect(); //웹소켓 연결
+        startDotAnimation(); // 점 애니메이션 시작
         getElement('myModal').style.display = 'block';
     }
 
@@ -474,6 +476,7 @@
         disconnect(); //웹소켓 연결 해제
         currentRecipient = '';
         window.chatUtils.loadChatList(activePage, inactivePage, 8, false);
+        clearDotAnimation(); // 점 애니메이션 정지
     }
 
     // 연결 해제 함수
@@ -482,6 +485,22 @@
             stompClient.disconnect();
         }
         isConnected = false;
+    }
+
+    // 점 애니메이션 시작 함수
+    function startDotAnimation() {
+        clearDotAnimation(); // 기존 애니메이션 정지
+        animateDots(); // 새로운 애니메이션 시작
+    }
+
+    // 점 애니메이션 정지 함수
+    function clearDotAnimation() {
+        if (dotTimer) {
+            clearInterval(dotTimer); // 점 애니메이션 인터벌 해제
+            dotTimer = null; // dotTimer 초기화
+        }
+        var dotsContainer = getElement('dots');
+        dotsContainer.innerHTML = ''; // 점 요소 초기화
     }
 
     // 점을 추가하고 제거하는 함수
@@ -497,22 +516,24 @@
             dotsContainer.appendChild(dot);
 
             setTimeout(function() {
-                dotsContainer.removeChild(dot);
+                if (dot.parentNode === dotsContainer) {
+                    dotsContainer.removeChild(dot);
+                }
             }, dotLifetime);
         }
 
         var dotCount = 0;
-        var dotTimer = setInterval(function() {
+        dotTimer = setInterval(function() {
             if (dotCount < maxDots) {
                 addDot();
                 dotCount++;
             } else {
-                clearInterval(dotTimer);
+                dotCount = 0; // 점 카운트 리셋
             }
         }, dotInterval);
     }
 
-    setInterval(animateDots, 3000); // 점 애니메이션을 반복하는 시간 간격
+    // 점 애니메이션을 모달이 열릴 때부터 시작
 </script>
 </body>
 </html>
