@@ -54,8 +54,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AdminPageController {
 
-    // 병합시점에서 log 사용자가 없고 @Slf4j 와 log 가 중복된거라 log 부분을 주석처리 했습니다.
-//    private static final Logger log = LoggerFactory.getLogger(AdminPageController.class);
     private final TheaterService theaterService;
     private final TheaterNumberService theaterNumberService;
     private final SeatService seatService;

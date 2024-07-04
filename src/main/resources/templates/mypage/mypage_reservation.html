@@ -46,6 +46,12 @@
         </div>
     </section>
 </article>
+
+<!--sweetalert 사용 -->
+<script src="/personal-scripts/util.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 <script th:inline="javascript">
     $(document).ready(function () {
         let currentPage = 0; // 현재 페이지 번호
@@ -154,11 +160,11 @@
                         cancelReservedSeats(scheduleId, seatsIdArray);
                         window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
                     } else {
-                        alert("죄송합니다. 다시 시도해주세요.");
+                        swtAlertOne("죄송합니다. 다시 시도해주세요.");
                     }
                 },
                 error: function() {
-                    alert("서버 통신에 실패했습니다.");
+                    swtAlertOne("서버 통신에 실패했습니다.");
                 }
             })
         });

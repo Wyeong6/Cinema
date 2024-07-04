@@ -71,6 +71,11 @@
     </section>
 </article>
 
+<!--sweetalert 사용 -->
+<script src="/personal-scripts/util.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 <script th:inline="javascript">
     $(document).ready(function() {
         const memberJson = [[${memberJsonModel}]];
@@ -100,7 +105,7 @@
                     }
                 },
                 error: function() {
-                    alert('이메일 확인 중 오류가 발생했습니다.');
+                    swtAlertOne('이메일 확인 중 오류가 발생했습니다.');
                 }
             });
         });
@@ -130,7 +135,7 @@
             birth_date = birth_date.replace(/\D/g, '');
 
             if(birth_date.length < 6) {
-                alert("생년월일을 다시 확인해주세요.");
+                swtAlertOne("생년월일을 다시 확인해주세요.");
             } else {
                 if(checkEmailButton === 1) {
                     $.ajax({
@@ -156,7 +161,7 @@
                         }
                     })
                 } else {
-                    alert("이메일 중복 확인을 해주세요.");
+                    swtAlertOne("이메일 중복 확인을 해주세요.");
                 }
             }
         });
