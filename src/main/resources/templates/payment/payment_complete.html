@@ -29,7 +29,7 @@
                             <header>
                                 <h4>결제완료</h4>
                             </header>
-                            <div class="order-info-section" th:if="${paymentInfo.getProductType() == 'CA'}" th:each="productInfo : ${productsInfo}"> <!-- 복수 품목 -->
+                            <div class="order-info-section" th:if="${paymentInfo.getProductType() == 'SC'}" th:each="productInfo : ${productsInfo}"> <!-- 복수 품목 -->
                                 <img style="max-width: 100px; height: auto;" th:src="@{/images/menu/{image}(image=${productInfo.snack_image})}" th:alt="${productInfo.snack_alt}"/>
                                 <div>
                                     <span th:text="${paymentInfo.getProductName()}">제품명</span>
@@ -38,7 +38,7 @@
                                     <p th:text="${paymentInfo.getTotalPrice()}+'원'">총 금액</p>
                                 </div>
                             </div>
-                            <div class="order-info-section" th:unless="${paymentInfo.getProductType() == 'CA'}"> <!-- 단일 품목 -->
+                            <div class="order-info-section" th:unless="${paymentInfo.getProductType() == 'SC'}"> <!-- 단일 품목 -->
                                 <div th:each="movie, iterStat : ${movieDTOs}">
                                     <img  style="max-width: 100px; height: auto;" th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" th:if="${paymentInfo.getProductType() == 'MO'}" />
                                 </div>

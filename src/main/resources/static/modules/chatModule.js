@@ -270,12 +270,9 @@ function updatePagination(response, type) {
 
             loadChatList(activePage, inactivePage, 8, false)
                 .then(response => {
-                    // 성공적으로 데이터를 받아온 경우 처리할 로직
                     console.log('Chat list loaded successfully:', response);
-                    // 추가적으로 할 작업들...
                 })
                 .catch(error => {
-                    // 에러가 발생한 경우 처리할 로직
                     console.error('Error loading chat list:', error);
                 });
         });

@@ -35,8 +35,7 @@ public class EventDTO {
                 .memberEmail(event.getMemberEmail())
                 .eventImage(event.getEventImage())
                 .eventAlt(event.getEventAlt())
-                .eventDetail(event.getEventDetail()) // 소문자로 수정
-                //뷰카운트 필요?
+                .eventDetail(event.getEventDetail())
                 .viewCount(event.getViewCount())
                 .regDate(event.getRegDate())
                 .updateDate(event.getUpdateDate())

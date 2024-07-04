@@ -26,8 +26,6 @@ public class Event {
     private String eventImage;
     private String eventAlt;
     private int viewCount;
-
-
     private String eventDetail;
     @Column(updatable = false)
     @CreationTimestamp

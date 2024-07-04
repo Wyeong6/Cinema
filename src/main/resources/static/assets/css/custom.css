@@ -27,6 +27,12 @@
 .logo a {
     font-family: 'MyCustomFont', sans-serif !important;
 }
+#movie_overview {
+    white-space: pre-wrap; /* 줄바꿈을 포함하여 표시 */
+    word-wrap: break-word; /* 단어 단위로 줄바꿈 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 #info {
     position: absolute;
     top: 0.5em;
@@ -1255,6 +1261,10 @@ article#pay > button {
     background: #f9fafb;
     box-shadow: 4px 4px 4px #dadee3;
 }
+.history_none p {
+    margin-bottom: 0;
+    text-align: center !important;
+}
 .history_data img {
     width: 5em;
     margin-right: 1em;
@@ -1271,10 +1281,20 @@ article#pay > button {
 .history_item .cancel_btn,
 .history_item .detail_btn {
     width: 49%;
+    /*width: 100%;*/
     padding: 0.5em;
     font-size: 0.9em;
     background: #f2f2f2;
     color: #1e2c3c;
+}
+#moreContainer {
+    text-align: center;
+}
+#moreContainer button {
+    background: transparent;
+}
+#moreContainer button img {
+    width: 1.5em;
 }
 #mypage_main > section {
     margin-top: 5em;

@@ -54,7 +54,7 @@
                               </div>
                               <div class="row mb-3">
                                   <label class="col-sm-3 col-form-label" for="theaterNumber">상영관 번호</label>
-                                  <input type="hidden" class="theater-id" th:value="${theaterDTO.theaterNumbers[index].id}">
+                                  <input type="hidden" class="theaterNumber-id" th:value="${theaterDTO.theaterNumbers[index].id}">
                                   <div class="col-sm-9">
                                       <div class="input-group input-group-merge">
                               <span id="basic-icon-default-company2" class="input-group-text" style="background: #eceef1;"
@@ -119,24 +119,6 @@
                               <div class="col-lg-4 col-md-6">
                                   <div class="modal fade" id="exLargeModal" tabindex="-1" aria-hidden="true">
                                       <div class="modal-dialog modal-xl seats-arrangement" role="document">
-                                          <div class="modal-content">
-                                              <div class="modal-header">
-                                                  <h4 class="modal-title" id="exampleModalLabel4">Modal title</h4>
-                                              </div>
-                                              <div class="modal-body">
-                                                  <div class="d-flex justify-content-center">
-                                                      <div class="screen"></div>
-                                                  </div>
-                                                  <div>
-                                                      <div class="seating-area"></div>
-                                                  </div>
-                                              </div>
-                                              <div class="modal-footer">
-                                                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                                                      닫기
-                                                  </button>
-                                              </div>
-                                          </div>
                                       </div>
                                   </div>
                               </div>
@@ -154,11 +136,65 @@
  <script>
      $(document).ready(function () {
          $('.delete_form_btn').on('click', function() {
-             const theaterId = $('.theater-id').val();
-             console.log(theaterId);
-             removeTheaterNumber(theaterId);
+             const theaterNumberId = $(this).closest('.card').find('.theaterNumber-id').val();
+             console.log(theaterNumberId);
+             removeTheaterNumber(theaterNumberId);
+         });
+
+
+         $('.seats-column-btn').on('click', function () {
+             const theaterNumberId = $(this).closest('.card').find('.theaterNumber-id').val();
+             console.log(theaterNumberId);
+             fetchSeatsForTheater(theaterNumberId);
+         });
+
+         $('#exLargeModal').on('hidden.bs.modal', function () {
+             $('.seats-arrangement').empty();
          });
      });
+
+     function fetchSeatsForTheater(theaterNumberId) {
+         $.ajax({
+             type: 'GET',
+             url: '/admin/seatsByTheater',
+             data: { theaterNumberId: theaterNumberId },
+             success: function (response) {
+                 var tempDiv = $('<div>').html(response);
+                 if (tempDiv.find('.seating-area').children().length === 0) {
+                     $(this).removeAttr('data-bs-toggle');
+                     $(this).removeAttr('data-bs-target');
+                     Swal.fire({
+                         title: "해당 상영관의 좌석을 등록하지 않았습니다.",
+                         text: "해당 상영관 좌석 등록 페이지로 이동하시겠습니까?",
+                         icon: "warning",
+                         showCancelButton: true,
+                         confirmButtonColor: "#3085d6",
+                         cancelButtonColor: "#d33",
+                         confirmButtonText: "확인",
+                         cancelButtonText: "취소"
+                     }).then((result) => {
+                         if (result.isConfirmed) {
+                             // 사용자가 확인을 클릭한 경우
+                             Swal.fire({
+                                 title: "Deleted!",
+                                 text: "Your file has been deleted.",
+                                 icon: "success"
+                             });
+                         }
+                     });
+                 } else {
+                     // 좌석 정보가 있을 때 모달 열기
+                     $(this).attr('data-bs-toggle', 'modal');
+                     $(this).attr('data-bs-target', '#exLargeModal');
+                     $('.seats-arrangement').empty().append(tempDiv.children());
+                     $('#exLargeModal').modal('show');
+                 }
+             },
+             error: function (xhr, status, error) {
+                 console.error('Error fetching seats:', error);
+             }
+         });
+     }
 
      function removeTheaterNumber(theaterNumberId) {
          console.log(theaterNumberId);

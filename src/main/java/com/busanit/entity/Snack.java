@@ -44,4 +44,17 @@ public class Snack extends BaseTimeEntity {
                 .snack_detail(snackDTO.getSnack_detail())
                 .build();
     }
+
+    public static Snack updateCount(Snack snack, SnackDTO snackDTO) {
+        return Snack.builder()
+                .id(snack.getId())
+                .snack_nm(snack.getSnack_nm())
+                .snack_image(snack.getSnack_image())
+                .snack_alt(snack.getSnack_alt())
+                .snack_price(snack.getSnack_price())
+                .snack_stock(snackDTO.getSnack_stock()) // 업데이트 하고 싶은 부분
+                .snack_set(snack.getSnack_set())
+                .snack_detail(snack.getSnack_detail())
+                .build();
+    }
 }

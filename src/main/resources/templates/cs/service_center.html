@@ -228,29 +228,35 @@
 <script src="/assets/centerjs/util.js"></script>
 <script src="/assets/centerjs/main.js"></script>
 
-<script>
+<!-- 스윗 얼럿 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<script type="module">
+    import { SuccessAlert, infoAlert } from "/modules/alerts.js";
 
     document.addEventListener('DOMContentLoaded', function () {
         // 페이지 로드 시 채팅방반환
         loadChatContent()
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true') {
+            SuccessAlert("문의가 성공적으로 접수되었습니다.")
+        }
     });
 
     //채팅방반환
     function loadChatContent() {
-        console.log("로그인 상태면 채팅방반환")
         $.ajax({
             url: '/chatUser',
             type: 'GET',
             dataType: 'html',
             success: function (response) {
-                console.log("로그인 상태면 채팅방반환 성공")
                 $('#work').html(response);
 
                 //관리자 이메일을 가져와서 해당 메세지내역 가져오기
                 async function afterChatLoaded() {
                     recipient = await fetchRecipientEmail();
-                    console.log("로드된 recipient" + recipient);
-                    console.log("로드시 로그인된 이메일" + sender);
 
                     if (recipient) {
                         await fetchMessages(recipient);
@@ -260,7 +266,6 @@
                         }
                     }
                 }
-
                 afterChatLoaded();
             },
             error: function (error) {
@@ -282,7 +287,7 @@
                     console.log("로그인 상태에서 메세지클릭함")
 
                 } else { //비로그인 상태
-                    alert('로그인 후 이용 가능합니다.');
+                    infoAlert('로그인 후 이용 가능합니다.');
                     // 클릭 이벤트 발생 전 주소로 되돌아감
                     history.back();
 
@@ -294,6 +299,8 @@
             }
         });
     }
+
+    window.checkLoginStatus = checkLoginStatus;
 </script>
 </body>
 </html>

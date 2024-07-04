@@ -45,6 +45,17 @@ export function errorAlert(title) {
         timer: 1500
     });
 }
+
+
+export function infoAlert(title) {
+    Swal.fire({
+        position: "center",
+        icon: "info",
+        title: title,
+        showConfirmButton: false,
+        timer: 1500
+    });
+}
 export function warningAlert(title) {
     Swal.fire({
         position: "center",
@@ -63,3 +74,4 @@ window.SuccessAlert = SuccessAlert;
 window.deleteConfirm = deleteConfirm;
 window.errorAlert = errorAlert;
 window.warningAlert = warningAlert;
+

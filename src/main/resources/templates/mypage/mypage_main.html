@@ -43,6 +43,7 @@
                         <img class="featured-img" alt="영화 포스터" th:src="@{'https://image.tmdb.org/t/p/w500/' + ${moviePaymentInfo.getContent().get(0).getMovie().getPosterPath()}}">
                         <div>
                             <p th:text="'예매번호 : ' + ${moviePaymentInfo.getContent().get(0).getMerchantUid()}">예매번호</p>
+                            <input type="hidden" th:value="${moviePaymentInfo.getContent().get(0).getScheduleId()}" class="schedule-id" />
                             <p th:text="${moviePaymentInfo.getContent().get(0).getProductName()}">범죄도시 4</p>
                             <p><span class="history-data-date" th:text="${moviePaymentInfo.getContent().get(0).getContent1()}">상영일자</span> <span class="history-data-time" th:text="${moviePaymentInfo.getContent().get(0).getContent2()}">시간</span></p>
                             <p><span class="history-data-theater" th:text="${moviePaymentInfo.getContent().get(0).getContent3()}">상영관</span> <span class="history-data-seats" th:text="${moviePaymentInfo.getContent().get(0).getContent4()}">좌석</span></p>
@@ -53,7 +54,7 @@
                         <button type="button" class="cancel_btn" id="movie_cancel" th:data-reservation-merchantUid="${moviePaymentInfo.getContent().get(0).getMerchantUid()}" th:data-reservation-impUid="${moviePaymentInfo.getContent().get(0).getImpUid()}">예매취소</button>
                     </div>
                     <div class="button_box" th:unless="${moviePaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}"> <!--결제취소상태-->
-                        <button type="button" class="detail_btn" id="movie_cancel_detail" th:data-reservation-idx="${moviePaymentInfo.getContent().get(0).getId()}">예매상세</button>
+                        <button type="button" style="width: 100%" class="detail_btn" id="movie_cancel_detail" th:data-reservation-idx="${moviePaymentInfo.getContent().get(0).getId()}">예매상세</button>
                     </div>
                 </article>
                 <article th:if="${moviePaymentInfo == null or moviePaymentInfo.isEmpty()}">
@@ -95,7 +96,7 @@
                         <button type="button" class="cancel_btn" id="snack_cancel" th:data-order-merchantUid="${snackPaymentInfo.getContent().get(0).getMerchantUid()}" th:data-order-impUid="${snackPaymentInfo.getContent().get(0).getImpUid()}">주문취소</button>
                     </div>
                     <div class="button_box" th:unless="${snackPaymentInfo.getContent().get(0).getPaymentStatus() == '결제완료'}">
-                        <button type="button" class="detail_btn" id="snack_cancel_detail" th:data-order-idx="${snackPaymentInfo.getContent().get(0).getId()}">구매상세</button>
+                        <button type="button" style="width: 100%" class="detail_btn" id="snack_cancel_detail" th:data-order-idx="${snackPaymentInfo.getContent().get(0).getId()}">구매상세</button>
                     </div>
                 </article>
                 <article th:if="${snackPaymentInfo == null or snackPaymentInfo.isEmpty()}">
@@ -133,6 +134,19 @@
         $('#movie_cancel').click(function() {
             const merchant_uid = $(this).data('reservation-merchantuid');
             const imp_uid = $(this).data('reservation-impuid');
+            const scheduleId = $('.schedule-id').val();
+            const seatsIdArray = [];
+
+            var seatsContent = $(this).closest('.history_item').find('.history-data-seats').text().trim();
+            var seats = seatsContent.split(/\s+/);
+            var firstToken = seats[0];
+            var regex = /^\d+관$/;
+
+            if (regex.test(firstToken)) {
+                seats.splice(0, 1); // 첫 번째 요소(관 정보) 제거
+            }
+
+            seatsIdArray.push(scheduleId + seats);
 
             $.ajax({
                 type: 'POST',
@@ -146,6 +160,7 @@
                         let params = new URLSearchParams();
                         params.append("imp_uid", response_complete.imp_uid);
                         window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
+                        cancelReservedSeats(scheduleId, seatsIdArray);
                     } else {
                         alert("죄송합니다. 다시 시도해주세요.");
                     }
@@ -200,4 +215,19 @@
             $('#content').load('/mypage/order/detail?paymentId='+orderIdx);
         });
     });
+
+    function cancelReservedSeats(scheduleId, seatIds) {
+        $.ajax({
+            type: 'POST',
+            url: '/reservation/reserveSeatsCancel?scheduleId=' + scheduleId,
+            contentType: 'application/json',
+            data: JSON.stringify(seatIds),
+            success: function(response) {
+                console.log('Seats canceled successfully:', response);
+            },
+            error: function(error) {
+                console.log('Error canceling seats: ' + JSON.stringify(error));
+            }
+        });
+    }
 </script>

@@ -1,0 +1,43 @@
+<nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar" style="margin-bottom: 10px;">
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <h4>회원 관리</h4>
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+<!-- / Navbar -->
+
+<!-- Basic Layout -->
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-body schedule_reg">
+                <form id="theater-form" method="post" action="/admin/theaterRegister">
+                    <div class="mb-3">
+                        <label class="form-label" for="theater_name">회원 id or 이메일</label>
+                        <input class="form-control" id="theater_name" name="theaterName" placeholder="회원의 member_id나 이메일을 입력하세요." required type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">카테고리</label>
+                        <div id="button-group">
+                            <button class="button btn" type="button" value="Seo">member</button>
+                            <button class="button btn" type="button" value="Inc">payment</button>
+                            <button class="button btn" type="button" value="Gan">point</button>
+                        </div>
+                        <input type="hidden" value="" name="region" id="region_value" required />
+                    </div>
+<!--                    <div class="mb-3">-->
+<!--                        <label class="form-label" for="theater_name_eng">상영관 지점명(ENG)</label>-->
+<!--                        <input class="form-control" id="theater_name_eng" name="theaterNameEng" placeholder="상영관 지점명을 영어로 입력해주세요." required type="text"/>-->
+<!--                    </div>-->
+                    <button class="btn btn-primary" type="submit">조회하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

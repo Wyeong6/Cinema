@@ -21,13 +21,13 @@ public class PointService {
     }
 
     // 결제 완료 마이너스 포인트 내역
-    public String getMinusPoint(String impUid) {
-        return pointRepository.findMinusPoint(impUid);
+    public Point getMinusPoint(String impUid, Boolean contentType) {
+        return pointRepository.findMinusPoint(impUid, contentType);
     }
 
     // 결제 완료 플러스 포인트 내역
-    public String getPlusPoint(String impUid) {
-        return pointRepository.findPlusPoint(impUid);
+    public Point getPlusPoint(String impUid, Boolean contentType) {
+        return pointRepository.findPlusPoint(impUid, contentType);
     }
 
     // 포인트 내역(리스트)
