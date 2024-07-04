@@ -48,7 +48,7 @@ export function errorAlert(title) {
 export function warningAlert(title) {
     Swal.fire({
         position: "center",
-        icon: "error",
+        icon: "warning",
         title: title,
         showConfirmButton: false,
         timer: 1500

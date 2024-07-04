@@ -118,11 +118,15 @@
             <article th:each="movie, iterStat : ${allMovies}"
                      th:if="${iterStat.index < 10}">
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:if="${movie.posterPath != null}"
+                    <img th:if="${#strings.length(movie.id) == 10}"
+                         th:src="@{|/${movie.posterPath}|}"
+                         alt="배경 사진" width="150" height="300"
+                         style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
+                    <img th:if="${movie.posterPath != null && #strings.length(movie.id) != 10}"
                          th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}"
                          alt="배경 사진" width="150" height="300"
                          style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
-                    <img th:if="${movie.posterPath == null || movie.posterPath == 'null' || movie.posterPath == ''}"
+                    <img th:if="${movie.posterPath == 'null' && #strings.length(movie.id) != 10}"
                          th:src="@{/images/img_not_ready.png}"
                     alt="이미지 준비 중" width="150" height="300"
                     style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
@@ -156,11 +160,15 @@
         <div class="reel">
             <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 10}">
                 <a th:href="@{'/upcoming/' + ${movie.id}}"  class="image featured">
-                    <img th:if="${movie.posterPath != 'null'}"
+                    <img th:if="${#strings.length(movie.id) == 10}"
+                         th:src="@{|/${movie.posterPath}|}"
+                         alt="배경 사진" width="150" height="300"
+                         style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
+                    <img th:if="${movie.posterPath != 'null' && #strings.length(movie.id) != 10}"
                          th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}"
                          alt="배경 사진" width="150" height="300"
                          style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
-                    <img th:if="${movie.posterPath == 'null'}"
+                    <img th:if="${movie.posterPath == 'null' && #strings.length(movie.id) != 10}"
                          th:src="@{/images/img_not_ready.png}"
                          alt="이미지 준비 중" width="150" height="300"
                          style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
