@@ -57,7 +57,6 @@ public class MemberController {
     }
 
     @PostMapping("/new")
-//    public String register(@Valid MemberRegFormDTO regFormDTO, TermsAgreeDTO termsAgreeDTO, BindingResult bindingResult, Model model){
     public String register(@Valid MemberRegFormDTO regFormDTO, BindingResult bindingResult, Model model) {
         // 에러가 있으면 회원 가입 페이지로 이동
         if(bindingResult.hasErrors()) {
@@ -65,7 +64,6 @@ public class MemberController {
         }
         try {
             memberService.saveMember(Member.createMember(regFormDTO, passwordEncoder));
-//            termsService.saveTerms(termsService.createTermsAgree(regFormDTO, termsAgreeDTO));
             // 회원가입으로 member 생성 후 해당 멤버 id를 FK로 point란 생성
             pointService.savePoint(Point.createPoint(memberService.findUserIdx(regFormDTO.getEmail())));
 

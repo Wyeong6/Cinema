@@ -19,11 +19,6 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-
-//        // 사용자 인증 후 세션에 userId 저장
-//        String userEmail = authentication.getName();
-//        request.getSession().setAttribute("userEmail", userEmail);
-
         OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) authentication.getPrincipal();
 
         // 암호화된 패스워드 값
@@ -31,12 +26,9 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
 
         // 소셜 로그인이고 회원의 패스워드가 1111 이거나 나이가 1이면 비밀번호, 나이 변경 처리
         if(oAuth2MemberDTO.isSocial() && (passwordEncoder.matches("1111",encodePassword) || oAuth2MemberDTO.getAge().equals("1"))){
-
             response.sendRedirect("/member/modifySocialInfo");
-            return;
         } else { // 패스워드가 1111이 아닐때
             response.sendRedirect("/");
         }
-
     }
 }

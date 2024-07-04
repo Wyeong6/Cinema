@@ -358,8 +358,6 @@ public class MypageController {
         // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
         if(principal instanceof OAuth2MemberDTO) {
             OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
-//            // socialMemberDTO를 사용하여 처리
-//            memberService.updatePassword(passwordEncoder.encode(password), oAuth2MemberDTO.getEmail());
             return "redirect:/";
         } else if(principal instanceof FormMemberDTO) {
             FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
