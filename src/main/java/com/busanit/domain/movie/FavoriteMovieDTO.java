@@ -35,7 +35,5 @@ public class FavoriteMovieDTO {
                 this.movieTitle = favoriteMovieDTO.getMovieTitle();
                 this.moviePosterUrl = favoriteMovieDTO.getMoviePosterUrl();
                 this.favoritedAt = favoriteMovieDTO.getFavoritedAt();
-                System.out.println("movieTitle===" + movieTitle);
-                System.out.println("moviePosterUrl===" + moviePosterUrl);
         }
 }

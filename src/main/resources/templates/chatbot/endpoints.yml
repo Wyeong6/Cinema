@@ -1,0 +1,14 @@
+action_endpoint:
+    url: "http://localhost:5055/webhook"
+#    cors:
+#      allow_origins:
+#      - "http://localhost:5004"
+    
+#nlg:
+#    url: http://localhost:5056/nlg
+
+core_endpoint:
+    url: "http://localhost:5005"
+#    cors:
+#      allow_origins:
+#      - "http://localhost:5004"

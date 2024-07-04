@@ -29,7 +29,16 @@
                             <header>
                                 <h4>취소완료</h4>
                             </header>
-                            <div class="order-info-section">
+                            <div class="order-info-section" th:if="${paymentInfo.getProductType() == 'SC'}" th:each="productInfo : ${productsInfo}"> <!-- 복수 품목 -->
+                                <img style="max-width: 100px; height: auto;" th:src="@{/images/menu/{image}(image=${productInfo.snack_image})}" th:alt="${productInfo.snack_alt}"/>
+                                <div>
+                                    <span th:text="${paymentInfo.getProductName()}">제품명</span>
+                                    <p th:text="${paymentInfo.getProductCount()}" th:if="${paymentInfo.getProductType() == 'MO'}">수량</p>
+                                    <p th:text="${paymentInfo.getProductCount()}+'개'" th:unless="${paymentInfo.getProductType() == 'MO'}">수량</p>
+                                    <p th:text="${paymentInfo.getTotalPrice()}+'원'">총 금액</p>
+                                </div>
+                            </div>
+                            <div class="order-info-section" th:unless="${paymentInfo.getProductType() == 'SC'}"> <!-- 단일 품목 -->
                                 <div th:each="movie, iterStat : ${movieDTOs}">
                                     <img  style="max-width: 100px; height: auto;" th:src="@{'https://image.tmdb.org/t/p/w500/' + ${movie.posterPath}}" alt="영화 포스터" th:if="${paymentInfo.getProductType() == 'MO'}" />
                                 </div>
@@ -48,8 +57,10 @@
                                 <p class="big-span"><span>총 금액</span><span th:text="${paymentInfo.getTotalPrice()}+'원'">11,000원</span></p>
                                 <p class="light-span"><span>상품금액</span><span th:text="${paymentInfo.getTotalPrice()}+'원'">11,000원</span></p>
                             </header>
-                            <p><span>시네마캐스트 포인트 사용</span><span>1000p</span></p>
-                            <p><span>시네마캐스트 포인트 적립</span><span>50p</span></p>
+                            <p th:unless="${minusPoint} == null"><span>시네마캐스트 포인트 차감</span><span th:text="${minusPoint}+'p'">1000p</span></p>
+                            <p th:if="${minusPoint} == null"><span>시네마캐스트 포인트 차감</span><span th:text="0p">1000p</span></p>
+                            <p th:unless="${plusPoint} == null"><span>시네마캐스트 포인트 재적립</span><span th:text="${plusPoint}+'p'">50p</span></p>
+                            <p th:if="${plusPoint} == null"><span>시네마캐스트 포인트 재적립</span><span th:text="0p">50p</span></p>
                         </div>
                     </section>
                 </article>

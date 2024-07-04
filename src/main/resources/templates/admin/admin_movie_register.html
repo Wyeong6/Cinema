@@ -87,7 +87,7 @@
         <div class="navbar-nav align-items-center">
             <div class="nav-item d-flex align-items-center">
                 <i class="bx bx-search fs-4 lh-0"></i>
-                <h4>영화 등록하기</h4>
+                <h4 id="formTitle">영화 등록하기</h4>
             </div>
         </div>
         <!-- /Search -->
@@ -283,7 +283,10 @@
     </div>
 </div>
 
-<script th:inline="javascript">
+
+<!--스윗얼럿 모듈-->
+<script type="module" src="/modules/alerts.js"></script>
+<script>
 
 
     // 취소 버튼 (뒤로가기)
@@ -321,7 +324,7 @@
 
 
         window.isEditMode = true;
-        formTitle.textContent = ('영화 수정');
+        formTitle.textContent = ('영화 수정하기');
         formSubmit.textContent = ('수정')
         idInput.value = movieId;
         idInput.disabled = true; // 수정 모드에서는 ID 필드를 비활성화합니다.
@@ -380,7 +383,6 @@
         const id = idInput.value.trim();
         const idError = document.getElementById('id-error');
 
-
         let resetForm = false;
 
         console.log("영화 ID:", id);
@@ -388,60 +390,42 @@
         if (!window.isEditMode) { // 수정 모드가 아닐 때만 ID 유효성 검사를 합니다.
             console.log("영화 ID:", id);
             if (!/^\d{10}$/.test(id)) {
-                alert('영화 ID는 10자리를 입력해주세요');
-                setTimeout(() => {
+                window.warningAlert('영화 ID는 10자리를 입력해주세요');
                     idInput.focus();
-                }, 0);
                 return false;
             }
         }
 
 
             if (titleInput.value.trim() === '') {
-                alert('영화 제목을 입력해주세요.');
-                setTimeout(() => {
-                    titleInput.focus();
-                }, 0);
+                window.warningAlert('영화 제목을 입력해주세요.');
                 return false;
             }
 
         if (overviewInput.value.trim() === '') {
-            alert('영화 줄거리를 입력해주세요.');
-            setTimeout(() => {
-                overviewInput.focus();
-            }, 0);
+            window.warningAlert('영화 줄거리를 입력해주세요.');
             return false;
         }
 
         const runtime = runtimeInput.value.trim();
         if (runtime === '') {
-            alert('상영시간을 입력해주세요.');
-            setTimeout(() => {
-                runtimeInput.focus();
-            }, 0);
+            window.warningAlert('상영시간을 입력해주세요.');
             return false;
         } else if (isNaN(runtime)) {
-            alert('상영시간을 숫자로 입력해주세요.')
-            setTimeout(() => {
-                runtimeInput.focus();
-            }, 0);
+            window.warningAlert('상영시간을 숫자로 입력해주세요.')
             return false
         }
 
         const selectedCertification = Array.from(certificationInputs).find(input => input.checked);
         if (!selectedCertification) {
-            alert('관람 등급을 선택해주세요.');
-            certificationInputs[0].focus();
+            window.warningAlert('관람 등급을 선택해주세요.');
             return false;
         }
 
 
         const releaseDate = releaseDateInput.value;
         if (releaseDate === '') {
-            alert('개봉 일자를 입력해주세요.');
-            setTimeout(() => {
-                releaseDateInput.focus();
-            }, 0);
+            window.warningAlert('개봉 일자를 입력해주세요.');
             return false;
         }
 
@@ -449,37 +433,25 @@
         if (!window.isEditMode) {
             const posterPath = posterPathInput.value.trim();
             if (posterPath === '') {
-                alert('포스터 이미지명을 입력해주세요.');
-                setTimeout(() => {
-                    posterPathInput.focus();
-                }, 0);
+                window.warningAlert('포스터 이미지를 등록해주세요.');
                 return false;
             }
 
             const backdropPath = backdropPathInput.value.trim();
             if (backdropPath === '') {
-                alert('배경 이미지를 입력해주세요.');
-                setTimeout(() => {
-                    backdropPathInput.focus();
-                }, 0);
+                window.warningAlert('배경 이미지를 등록해주세요.');
                 return false;
             }
 
             const stillCutPaths = stillCutPathsInput.value.trim();
             if (stillCutPaths === '') {
-                alert('스틸컷 이미지를 등록해주세요.');
-                setTimeout(() => {
-                    stillCutPathsInput.focus();
-                }, 0);
+                window.warningAlert('스틸컷 이미지를 등록해주세요.');
                 return false;
             }
 
             const video = videoInput.value.trim();
             if (video === '') {
-                alert('트레일러 키를 입력해주세요.');
-                setTimeout(() => {
-                    videoInput.focus();
-                }, 0);
+                window.warningAlert('트레일러 키를 입력해주세요.');
                 return false;
             }
         }
@@ -494,7 +466,7 @@
         });
 
         if (!isGenreSelected) {
-            alert('장르를 선택해 주세요.');
+            window.warningAlert('장르를 선택해 주세요.');
             return false;
         }
 
@@ -508,7 +480,7 @@
         });
 
         if (!isActorSelected && !window.isEditMode) {
-            alert('배우를 선택해 주세요.');
+            window.warningAlert('배우를 선택해 주세요.');
             return false;
         }
 
@@ -559,9 +531,9 @@
             .then(data => {
                 console.log('Form submitted successfully:', data);
                 if(isEditMode) {
-                    alert('수정되었습니다.')
+                    window.SuccessAlert('수정되었습니다.')
                 } else {
-                    alert('영화가 성공적으로 등록되었습니다.');
+                    window.SuccessAlert('영화가 성공적으로 등록되었습니다.');
                 }
                 console.log("formData 체크 === " + formData)
                 console.log("data 체크 === " + data)
@@ -574,9 +546,9 @@
                 }
                 console.error('Error submitting form:', error);
                 if (error.message.includes('이미 존재하는 영화 ID입니다.')) {
-                    alert('이미 존재하는 영화 ID입니다.');
+                    window.errorAlert('이미 존재하는 영화 ID입니다.');
                 } else {
-                    alert('폼 제출 중 오류가 발생했습니다: ' + error.message);
+                    window.errorAlert('폼 제출 중 오류가 발생했습니다: ' + error.message);
                 }
             })
             .finally(() => {

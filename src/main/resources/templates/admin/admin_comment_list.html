@@ -62,17 +62,14 @@
 </div>
 
 <script type="module">
-    import { deleteConfirm, errorAlert } from "/modules/alerts.js";
+
+    import { deleteConfirm } from "/modules/alerts.js";
+    import { errorAlert } from "/modules/alerts.js";
+
 
     $(document).ready(function() {
         $(document).on('click', '.delete-movie-btn', function() {
             const cno = $(this).data('cno-id');
-            console.log('cno:', cno);  // 클릭된 버튼의 cno 값 확인
-
-            if (!cno) {
-                console.error('cno 값이 유효하지 않습니다.');
-                return;
-            }
 
             deleteConfirm().then((confirmed) => {
                 if (confirmed) {

@@ -54,8 +54,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AdminPageController {
 
-    // 병합시점에서 log 사용자가 없고 @Slf4j 와 log 가 중복된거라 log 부분을 주석처리 했습니다.
-//    private static final Logger log = LoggerFactory.getLogger(AdminPageController.class);
     private final TheaterService theaterService;
     private final TheaterNumberService theaterNumberService;
     private final SeatService seatService;
@@ -246,6 +244,24 @@ public class AdminPageController {
         return "admin/admin_theater_edit";
     }
 
+    @GetMapping("/seatsByTheater")
+    public String getSeatsByTheater(@RequestParam("theaterNumberId") long theaterNumberId, Model model) {
+        TheaterNumberDTO theaterNumberDTO = theaterNumberService.getTheaterNumberById(theaterNumberId);
+
+        // 좌석 정보 가져오기
+        List<SeatDTO> seatDTOs = theaterNumberDTO.getSeats();
+
+        // 좌석을 열과 행으로 그룹화하여 Map에 저장
+        Map<String, List<SeatDTO>> seatsByColumn = seatDTOs.stream()
+                .sorted(Comparator.comparingLong(SeatDTO::getSeatRow))
+                .collect(Collectors.groupingBy(SeatDTO::getSeatColumn));
+
+        model.addAttribute("seatDTOs", seatDTOs);
+        model.addAttribute("seatsByColumn", seatsByColumn);
+
+        return "admin/seats_modal_content";
+    }
+
     @PostMapping("/theaterDelete")
     public String theaterDelete(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "theaterId") long theaterId,
                                 Model model, @PageableDefault(size = 15) Pageable pageable, TheaterDTO theaterDTO) {
@@ -299,7 +315,6 @@ public class AdminPageController {
         try {
             List<MovieDTO> allMovies = movieService.getAll();
             model.addAttribute("movies", allMovies);
-            System.out.println("Movies: " + allMovies);
         } catch (Exception e) {
             model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
         }

@@ -109,7 +109,6 @@
                 $('.container-xxl').html(response);
             },
             error: function(xhr, status, error) {
-                console.error('Error saving url:', error);
             }
         });
     }
@@ -125,7 +124,6 @@
                 $('.container-xxl').html(response);
             },
             error: function(xhr, status, error) {
-                console.error('Error admin-snackList snackEdit button :', error);
             }
         })
 
@@ -146,11 +144,9 @@
                     $('.container-xxl').html(response);
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error remove snackItem:', error);
                 }
             })
         } else { // 취소
-            console.log("삭제를 취소함.");
         }
     }
 </script>

@@ -91,10 +91,6 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     List<Point> pointList;
 
-    // 스낵 구매
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    List<SnackPayment> snackPaymentList;
-
     //멤버와 이벤트게시글 연관관계
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Event> events;

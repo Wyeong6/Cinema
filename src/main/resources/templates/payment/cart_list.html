@@ -2,7 +2,8 @@
 <html lang="en"
       layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body class="no-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper">
@@ -84,25 +85,30 @@
     <script src="/assets/js/util.js"></script>
     <script src="/assets/js/main.js"></script>
 
+    <!--sweetalert 사용 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="/personal-scripts/util.js"></script>
+
     <!--결제 프로그램 관련 script 시작-->
     <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
     <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js" type="text/javascript"></script>
     <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
     <script src="/personal-scripts/payment.js"></script>
-    <script src="/personal-scripts/util.js"></script>
     <!--결제 프로그램 관련 script 끝-->
 
     <script th:inline="javascript">
         /* 결제 프로그램 사용시 필요한 변수 */
         let productIdx = null;
-        let content1 = null; // 상영일자 (영화관련 변수), orderNames (장바구니 변수)
-        const content2 = null; // 시간 (영화관련 변수)
-        const content3 = null; // 상영관 (영화관련 변수)
+        const scheduleId = 0;
+        let content1 = null; // 상영일자 (영화관련 변수), orderIdx (장바구니 변수)
+        let content2 = null; // 시간 (영화관련 변수), orderNames (장바구니 변수)
+        let content3 = null; // 상영관 (영화관련 변수), orderCounts (장바구니 변수)
         const content4 = null; // 좌석 (영화관련 변수)
         let productCount = null;
         let currentPrice = 0; // 결제시 사용할 변수
         let orderName = null; // 결제시 사용할 이름
-        const reqIDX = "CA" // 결제를 요청한 페이지 IDX
+        const reqIDX = "SC" // 결제를 요청한 페이지 IDX
         let plusPoint = 0;
         let minusPoint = 0;
         /* 결제 프로그램 사용시 필요한 변수 끝 */
@@ -131,6 +137,7 @@
             let ids = [];
             let names = [];
             let productCounts = [];
+            let productCounts2 = [];
 
             for(let i = 0; i < localStorage.length; i++) {
                 let key = localStorage.key(i);
@@ -142,6 +149,7 @@
                         ids.push(item.id); // 장바구니 결제 변수
                         names.push(item.name);
                         productCounts.push(item.name+ ":" +item.count);
+                        productCounts2.push(item.count);
 
                         let row = cartTable.insertRow();
 
@@ -172,8 +180,10 @@
             }
 
             // 장바구니 결제 변수
-            productIdx = ids.join(',');
-            content1 = names.join(',')
+            productIdx = ids[0];
+            content1 = ids.join(',');
+            content2 = names.join(',')
+            content3 = productCounts2.join(',');
             productCount = productCounts.join(',');
             if(ids.length > 1) {
                 orderName = names[0] + " 외 " + (ids.length-1) + "개"

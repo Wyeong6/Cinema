@@ -1,0 +1,236 @@
+version: "3.1"
+stories:
+#인사 / 작별 인사
+- story: greet_path
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- story: goodbye_path
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+      
+- story: goodbye_path2
+  steps:
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: get_link_good_path
+  steps:
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+
+- story: get_link_bad_path
+  steps:
+  - intent: get_link_bad
+  - action: utter_get_link_bad
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+
+#스낵
+- story: snack_info
+  steps:
+  - intent: greeting_snack
+  - action: utter_snacks_info
+      
+- story: else_snack_info
+  steps:
+  - intent: ask_else_reply_snack
+  - action: utter_snacks_info
+
+#고객센터
+- story: theater_info
+  steps:
+  - intent: greeting_info
+  - action: utter_theater_info
+      
+- story: else_theater_info
+  steps:
+  - intent: ask_else_reply_info
+  - action: utter_theater_info
+
+- story: consultation_info
+  steps:
+  - intent: greeting_consultation
+  - action: utter_consultation_info
+
+- story: else_consultation_info
+  steps:
+  - intent: ask_else_reply_consultation
+  - action: utter_consultation_info
+
+## fallback처리
+#- story: fallback story
+#  steps:
+#    - intent: nlu_fallback
+#    - action: action_default_fallback
+
+#bot training
+- story: interactive_story_1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: greeting_snack
+  - action: utter_snacks_info
+
+- story: interactive_story_2
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- story: interactive_story_5
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_good
+  - action: utter_snack_reply_good
+
+- story: interactive_story_9
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_bad
+  - action: utter_snack_reply_bad
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: interactive_story_10
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_good
+  - action: utter_snack_reply_good
+
+- story: interactive_story_11
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: snack_reply_good
+  - action: utter_snack_reply_good
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: interactive_story_12
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_good
+  - action: utter_snack_reply_good
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: interactive_story_13
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_bad
+  - action: utter_snack_reply_bad
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: interactive_story_14
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_good
+  - action: utter_snack_reply_good
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: interactive_story_15
+  steps:
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_good
+  - action: utter_snack_reply_good
+
+- story: interactive_story_16
+  steps:
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_good
+  - action: utter_snack_reply_good
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: interactive_story_17
+  steps:
+  - intent: greeting_info
+  - action: utter_theater_info
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: interactive_story_18
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: greeting_info
+  - action: utter_theater_info
+
+- story: interactive_story_19
+  steps:
+  - intent: greeting_info
+  - action: utter_theater_info
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot
+
+- story: interactive_story_20
+  steps:
+  - intent: greeting_consultation
+  - action: utter_consultation_info
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+
+- story: interactive_story_21
+  steps:
+  - intent: greeting_consultation
+  - action: utter_consultation_info
+
+- story: interactive_story_22
+  steps:
+  - intent: greeting_snack
+  - action: utter_snacks_info
+  - intent: snack_reply_good
+  - action: utter_snack_reply_good
+  - intent: get_link_good
+  - action: utter_ask_anything_else
+  - intent: ask_else_reply_nothing
+  - action: utter_goodbye
+  - action: action_completion_restarted_bot

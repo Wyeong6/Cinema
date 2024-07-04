@@ -62,7 +62,7 @@
             <img src="/images/google-logo.png" alt="구글 로고" />
             구글 로그인
         </button>
-        <button class="naver_btn" onclick="location.href='/oauth2/authorization/google'">
+        <button class="naver_btn" onclick="location.href='/oauth2/authorization/naver'">
             <img src="/images/naver-logo.png" alt="네이버 로고" />
             네이버 로그인
         </button>
@@ -89,10 +89,10 @@
         </div>
     </div>
 
-    <!-- 관리자 회원가입 (삭제예정) css 불필요 -->
-    <button class="admin_btn" onclick="location.href='/member/new2'">
-        관리자 회원가입(삭제예정)
-    </button>
+<!--    &lt;!&ndash; 관리자 회원가입 (삭제예정) css 불필요 &ndash;&gt;-->
+<!--    <button class="admin_btn" onclick="location.href='/member/new2'">-->
+<!--        관리자 회원가입(삭제예정)-->
+<!--    </button>-->
 </div>
 
 <footer>
@@ -141,10 +141,6 @@
 
         // 세션 스토리지에 사용자 정보 저장
         sessionStorage.setItem("userInfo", JSON.stringify(responseData));
-
-        // // 다른 곳에서 세션 스토리지 사용자 정보 가져오기 예시
-        // var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-        // console.log(userInfo.email);    // "test@test.com"
 
         // 아이디 기억하기 쿠키 기능 구현(유효기간 7일로 설정해둠)
         if(checkIdBox.checked) {

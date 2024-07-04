@@ -411,10 +411,8 @@
         const socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
-            console.log('문의리스트 갯수 소켓 ' + frame);
             stompClient.subscribe("/Topic/unansweredCount", function (message) {
                 const count = JSON.parse(message.body); // 메시지 body에서 카운트 추출
-                console.log('Received count:', count);
                 updateUnansweredCount(count); // UI 업데이트 함수 호출
             });
         });
@@ -434,10 +432,8 @@
             type: "GET",
             url: "/admin/unansweredInquiryCount",
             success: function(response) {
-                console.log("Response received:", response);
-                const count = response; // 서버에서 받은 미답변 문의 갯수
-                console.log("count:", count);
-                updateUnansweredCount(count); // 미답변 문의 갯수 업데이트 함수 호출
+                 // 서버에서 받은 미답변 문의 갯수
+                updateUnansweredCount(response); // 미답변 문의 갯수 업데이트 함수 호출
             },
             error: function(xhr, status, error) {
                 console.error("AJAX 요청 실패:", error);

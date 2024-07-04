@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    Slice<Payment> findByMember_IdAndProductType(Long member_id, String ProductType, Pageable pageable);
+    Slice<Payment> findByMember_IdAndProductTypeContaining(Long member_id, String ProductType, Pageable pageable);
 
     // 결제 완료 내역 - imp_uid 로 id값 찾기
     @Query("SELECT p.id FROM Payment  p WHERE p.impUid = :impUid")
@@ -28,7 +28,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             @Param("endDate") LocalDateTime endDate
     );
 
-    // 결제 상태 수정
+    // 결제 취소 시 결제 상태 수정
     @Modifying
     @Transactional
     @Query("UPDATE Payment p SET p.paymentStatus = '결제취소' WHERE p.impUid = :impUid AND p.member.id = :memberId")

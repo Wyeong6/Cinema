@@ -21,13 +21,13 @@ public class PointService {
     }
 
     // 결제 완료 마이너스 포인트 내역
-    public String getMinusPoint(String impUid) {
-        return pointRepository.findMinusPoint(impUid);
+    public Point getMinusPoint(String impUid, Boolean contentType) {
+        return pointRepository.findMinusPoint(impUid, contentType);
     }
 
     // 결제 완료 플러스 포인트 내역
-    public String getPlusPoint(String impUid) {
-        return pointRepository.findPlusPoint(impUid);
+    public Point getPlusPoint(String impUid, Boolean contentType) {
+        return pointRepository.findPlusPoint(impUid, contentType);
     }
 
     // 포인트 내역(리스트)
@@ -36,21 +36,4 @@ public class PointService {
 
         return PointDTO.toDTOList(pointList);
     }
-
-//    // 최근 3개월간 영화관람 count
-//    public long getPointMovieCount(Long memberId) {
-//        LocalDateTime endDate = LocalDateTime.now();
-//        LocalDateTime startDate = endDate.minusMonths(3);
-//        return pointRepository.countByMovieMembership(memberId, startDate, endDate);
-//    }
-
-//    // 결제시 사용 가능 포인트
-//    public long getCurrentPoints(Long memberId) {
-//        return pointRepository.currentPoints(memberId);
-//    }
-
-//    // 누적 포인트
-//    public long getTotalPoints(Long memberId) {
-//        return pointRepository.totalPoints(memberId);
-//    }
 }

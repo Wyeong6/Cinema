@@ -513,7 +513,6 @@
                 method: 'GET',
                 dataType: 'json',
                 success: function (hasCommented, textStatus, xhr) {
-                    console.log("hasCommented 값:", hasCommented);
 
                     if (hasCommented) {
                         Swal.fire({
@@ -551,7 +550,6 @@
 
         // 부모 창에서 댓글 등록 이벤트 수신
         window.addEventListener('commentRegistered', function (event) {
-            console.log("댓글이벤트수신")
             if (event.detail.success) {
                 // 댓글이 성공적으로 등록되었음을 사용자에게 알림
                 Swal.fire({
@@ -586,8 +584,6 @@
                 method: 'GET',
                 dataType: 'json',
                 success: (data) => {
-
-                    console.log(data)
 
                     let currentCommentIndex = 0;
                     const maxCommentDisplay = 3;
@@ -993,8 +989,6 @@
             // Kakao SDK 초기화
             Kakao.init('3d074cbbda365535b831c90baead22c2'); // 여기에 실제 Kakao 앱 키를 입력하세요.
 
-            console.log("movieId = " + movieId);
-
             var likeCountSpans = document.querySelectorAll('.like-count');
             var dislikeCountSpans = document.querySelectorAll('.dislike-count');
             var sadCountSpans = document.querySelectorAll('.sad-count');
@@ -1023,7 +1017,6 @@
 
         $(document).on('click', '.delete-btn', function () {
             const cno = $(this).data('comment-id');
-            console.log(cno);
             deleteComment(cno);
         });
 

@@ -22,14 +22,12 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpClient;
 import java.util.*;
 
 @Controller
@@ -58,7 +56,7 @@ public class PaymentController {
             @RequestParam int teenagerCount,
             @RequestParam int grandCount,
             @RequestParam double totalAmount,
-            @PageableDefault(size = 1, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = 1, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
         ScheduleDTO scheduleDTO = scheduleService.getScheduleById(scheduleId);
         List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(scheduleDTO.getMovieId());
@@ -87,7 +85,6 @@ public class PaymentController {
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
         model.addAttribute("pointInfo", currentPoints); // 사용자 보유 포인트
-//        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
 
         model.addAttribute("scheduleDTO", scheduleDTO);
         model.addAttribute("movieDTOs", movieDTOs);
@@ -124,11 +121,8 @@ public class PaymentController {
         response.put("reqIDX", request.get("reqIDX")); // 결제를 요청한 페이지 IDX
 
         // 현재 로그인한 사용자의 정보 (이메일, idx)
-//        List<String> memberInfo = new ArrayList<>();
         String userEmail = memberService.currentLoggedInEmail();
-//        memberInfo.add(userEmail);
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-//        memberInfo.add(memberRegFormDTO.getId().toString());
         response.put("memberEmail", userEmail);
         response.put("memberName", memberRegFormDTO.getName());
 
@@ -153,9 +147,10 @@ public class PaymentController {
                                                @RequestParam Integer amount,
                                                @RequestParam Integer plusPoint,
                                                @RequestParam Integer minusPoint,
-                                               @PageableDefault(size = 1, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                               @PageableDefault(size = 1, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable,
                                                PaymentDTO paymentDTO,
-                                               PointDTO pointDTO) {
+                                               PointDTO pointDTO,
+                                               SnackDTO snackDTO) {
 
         Map<String, String> response_complete = new HashMap<>();
 
@@ -182,59 +177,45 @@ public class PaymentController {
 
             pointDTO.setContent("["+product_name+"] 구매");
             pointDTO.setImpUid(imp_uid);
-            List<PointDTO> points = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent();
-            if (!points.isEmpty()) {
-                int currentPoints = points.get(0).getCurrentPoints();
-                int totalPoints = points.get(0).getTotalPoints();
+            pointDTO.setContentType(true); // 결제 완료 상태
+            // 현재 포인트
+            int currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
+            // 누적 포인트
+            int totalPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getTotalPoints();
+            pointDTO.setTotalPoints(totalPoints);
+
+            // 포인트타입
+            if (minusPoint > 0) { // 사용
+                pointDTO.setPointType("-");
+                pointDTO.setPoints(minusPoint);
+                currentPoints -= minusPoint;
+                pointDTO.setCurrentPoints(currentPoints);
+                pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+            }
+
+            if (plusPoint > 0) { // 적립
+                pointDTO.setPointType("+");
+                pointDTO.setPoints(plusPoint);
+                currentPoints += plusPoint;
+                pointDTO.setCurrentPoints(currentPoints);
+                totalPoints += plusPoint;
                 pointDTO.setTotalPoints(totalPoints);
+                pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+            }
 
-                if ("MO".equals(product_type)) {
-                    pointDTO.setContentType(true);
-                } else {
-                    pointDTO.setContentType(false);
-                }
-
-                if (minusPoint > 0) {
-                    pointDTO.setPointType("-");
-                    pointDTO.setPoints(minusPoint);
-                    currentPoints -= minusPoint;
-                    pointDTO.setCurrentPoints(currentPoints);
-                    pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
-                }
-
-                if (plusPoint > 0) {
-                    pointDTO.setPointType("+");
-                    pointDTO.setPoints(plusPoint);
-                    currentPoints += plusPoint;
-                    pointDTO.setCurrentPoints(currentPoints);
-                    totalPoints += plusPoint;
-                    pointDTO.setTotalPoints(totalPoints);
-                    pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
-                }
-            } else {
-                // 포인트 정보가 없는 경우 초기값 설정
-                pointDTO.setTotalPoints(0);
-                pointDTO.setCurrentPoints(0);
-
-                if ("MO".equals(product_type)) {
-                    pointDTO.setContentType(true);
-                } else {
-                    pointDTO.setContentType(false);
-                }
-
-                if (minusPoint > 0) {
-                    pointDTO.setPointType("-");
-                    pointDTO.setPoints(minusPoint);
-                    pointDTO.setCurrentPoints(-minusPoint);
-                    pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
-                }
-
-                if (plusPoint > 0) {
-                    pointDTO.setPointType("+");
-                    pointDTO.setPoints(plusPoint);
-                    pointDTO.setCurrentPoints(plusPoint);
-                    pointDTO.setTotalPoints(plusPoint);
-                    pointService.savePoint(Point.toEntity(memberService.findUserIdx(memberService.currentLoggedInEmail()), pointDTO));
+            // 스낵 수량(재고) 업데이트
+            if(product_type.equals("SN")) {
+                snackDTO.setId(Long.valueOf(product_idx));
+                snackDTO.setSnack_stock((snackService.get(Long.valueOf(product_idx)).getSnack_stock())-(Long.parseLong(product_count)));
+                snackService.updateSnackCount(snackDTO);
+            }
+            if(product_type.equals("SC")) {
+                String[] productIdxArray = content1.split(",");
+                String[] productCountArray = content3.split(",");
+                for (int i = 0; i < productIdxArray.length; i++ ){
+                    snackDTO.setId(Long.valueOf(productIdxArray[i]));
+                    snackDTO.setSnack_stock((snackService.get(Long.valueOf(productIdxArray[i])).getSnack_stock())-(Long.parseLong(productCountArray[i])));
+                    snackService.updateSnackCount(snackDTO);
                 }
             }
         }
@@ -253,7 +234,7 @@ public class PaymentController {
             model.addAttribute("productInfo", snackDTO);
         } else { // 장바구니 결제
             List<SnackDTO> snackList = new ArrayList<>();
-            String[] stringArray = paymentDTO.getProductIdx().split(",");
+            String[] stringArray = paymentDTO.getContent1().split(",");
             for (int i = 0; i < stringArray.length; i++ ){
                 SnackDTO snackDTO = snackService.get(Long.valueOf(stringArray[i]));
                 snackList.add(snackDTO);
@@ -267,9 +248,13 @@ public class PaymentController {
             return "redirect:/";
         } else { // 해당 멤버가 요청할때
 
+            // optional을 이용한 null값 처리
+            Optional<Point> plusPointOpt = Optional.ofNullable(pointService.getPlusPoint(imp_uid, true));
+            Optional<Point> minusPointOpt = Optional.ofNullable(pointService.getMinusPoint(imp_uid, true));
+            model.addAttribute("plusPoint", plusPointOpt.map(Point::getPoints).orElse(0));
+            model.addAttribute("minusPoint", minusPointOpt.map(Point::getPoints).orElse(0));
+
             model.addAttribute("paymentInfo", paymentDTO);
-            model.addAttribute("plusPoint", pointService.getPlusPoint(imp_uid));
-            model.addAttribute("minusPoint", pointService.getMinusPoint(imp_uid));
             return "payment/payment_complete";
         }
     }
@@ -277,7 +262,11 @@ public class PaymentController {
     // 주문 취소
     @PostMapping("/paymentCancel")
     @ResponseBody
-    public Map<String, String> paymentCancel(@RequestParam("merchant_uid") String merchant_uid , @RequestParam("imp_uid") String imp_uid) {
+    public Map<String, String> paymentCancel(@RequestParam("merchant_uid") String merchant_uid,
+                                             @RequestParam("imp_uid") String imp_uid,
+                                             PointDTO pointDTO,
+                                             SnackDTO snackDTO,
+                                             @PageableDefault(size = 1, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
         CloseableHttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
         post.setHeader("Authorization", paymentService.getImportToken());
@@ -292,15 +281,65 @@ public class PaymentController {
             HttpResponse res = client.execute(post);
             ObjectMapper mapper = new ObjectMapper();
             String body = EntityUtils.toString(res.getEntity());
-            JsonNode rootNode = mapper.readTree(body); asd = rootNode.get("response").asText();
+            JsonNode rootNode = mapper.readTree(body);
+            asd = rootNode.get("response").asText();
         } catch (Exception e) {
             e.printStackTrace();
             response_complete.put("errorMsg", "errorMsg");
-        } if (asd.equals("null")) {
-            System.err.println("환불실패");
+        }
+        if (asd.equals("null")) { // 환불 실패
             response_complete.put("errorMsg", "errorMsg");
-        } else {
-            System.err.println("환불성공"+imp_uid);
+        } else { // 환불 성공
+            // 제공했던 포인트 회수
+            // 현재 포인트
+            int currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
+            // 누적 포인트
+            int totalPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getTotalPoints();
+
+            if (pointService.getPlusPoint(imp_uid, true) != null) {
+                Point point = pointService.getPlusPoint(imp_uid, true);
+                currentPoints -= point.getPoints();
+                pointDTO.setId(point.getId());
+                pointDTO.setImpUid(imp_uid);
+                pointDTO.setContent(point.getContent() + " 취소");
+                pointDTO.setContentType(false);
+                pointDTO.setPointType("-");
+                pointDTO.setPoints(point.getPoints());
+                pointDTO.setCurrentPoints(currentPoints);
+                pointDTO.setTotalPoints(totalPoints);
+                pointService.savePoint(Point.toEntity(point.getMember().getId(), pointDTO));
+            }
+
+            if (pointService.getMinusPoint(imp_uid, true) != null) {
+                Point point = pointService.getMinusPoint(imp_uid, true);
+                pointDTO.setId(point.getId());
+                pointDTO.setImpUid(imp_uid);
+                pointDTO.setContent(point.getContent() + " 취소");
+                pointDTO.setContentType(false);
+                pointDTO.setPointType("+");
+                pointDTO.setPoints(point.getPoints());
+                pointDTO.setCurrentPoints(currentPoints + point.getPoints());
+                pointDTO.setTotalPoints(totalPoints + point.getPoints());
+                pointService.savePoint(Point.toEntity(point.getMember().getId(), pointDTO));
+            }
+
+            // 스낵 재고 업데이트
+            PaymentDTO paymentDTO = paymentService.get(imp_uid);
+            if(paymentDTO.getProductType().equals("SN")) {
+                snackDTO.setId(Long.valueOf(paymentDTO.getProductIdx()));
+                snackDTO.setSnack_stock((snackService.get(Long.valueOf(paymentDTO.getProductIdx())).getSnack_stock())+(Long.parseLong(paymentDTO.getProductCount())));
+                snackService.updateSnackCount(snackDTO);
+            }
+            if(paymentDTO.getProductType().equals("SC")) {
+                String[] productIdxArray = paymentDTO.getContent1().split(",");
+                String[] productCountArray = paymentDTO.getContent3().split(",");
+                for (int i = 0; i < productIdxArray.length; i++ ){
+                    snackDTO.setId(Long.valueOf(productIdxArray[i]));
+                    snackDTO.setSnack_stock((snackService.get(Long.valueOf(productIdxArray[i])).getSnack_stock())+(Long.parseLong(productCountArray[i])));
+                    snackService.updateSnackCount(snackDTO);
+                }
+            }
+
             paymentService.updatePaymentStatus(imp_uid, memberService.findUserIdx(memberService.currentLoggedInEmail()));
             response_complete.put("imp_uid", imp_uid);
         }
@@ -314,9 +353,17 @@ public class PaymentController {
         if(paymentDTO.getProductType().equals("MO")){ // 영화
             List<MovieDTO> movieDTOs = movieService.getMovieDetailInfo(Long.valueOf(paymentDTO.getProductIdx()));
             model.addAttribute("movieDTOs", movieDTOs);
-        } else { // 스낵
+        } else if(paymentDTO.getProductType().equals("SN")) { // 스낵
             SnackDTO snackDTO = snackService.get(Long.valueOf(paymentDTO.getProductIdx())); // 스낵 바로 결제
             model.addAttribute("productInfo", snackDTO);
+        } else { // 장바구니 결제
+            List<SnackDTO> snackList = new ArrayList<>();
+            String[] stringArray = paymentDTO.getContent1().split(",");
+            for (int i = 0; i < stringArray.length; i++ ){
+                SnackDTO snackDTO = snackService.get(Long.valueOf(stringArray[i]));
+                snackList.add(snackDTO);
+            }
+            model.addAttribute("productsInfo", snackList);
         }
 
         if(memberService.findUserIdx(memberService.currentLoggedInEmail()) == null ||
@@ -324,6 +371,13 @@ public class PaymentController {
                 memberService.findUserIdx(memberService.currentLoggedInEmail()) != paymentDTO.getMember_id()) { // 비회원 혹은 다른 멤버가 요청할때
             return "redirect:/";
         } else { // 해당 멤버가 요청할때
+
+            // optional을 이용한 null값 처리
+            Optional<Point> plusPointOpt = Optional.ofNullable(pointService.getPlusPoint(imp_uid, false));
+            Optional<Point> minusPointOpt = Optional.ofNullable(pointService.getMinusPoint(imp_uid, false));
+            model.addAttribute("plusPoint", plusPointOpt.map(Point::getPoints).orElse(0));
+            model.addAttribute("minusPoint", minusPointOpt.map(Point::getPoints).orElse(0));
+
             model.addAttribute("paymentInfo", paymentDTO);
             return "payment/payment_cancel";
         }

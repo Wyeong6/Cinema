@@ -14,7 +14,7 @@
                         </header>
                         <hr />
                         <section>
-                            <b>주문상품(1)</b>
+                            <b>주문상품</b>
                             <table>
                                 <thead>
                                     <tr>
@@ -36,7 +36,7 @@
                                 </tbody>
                             </table>
                             <div class="price-calc">
-                                <span>주문 상품금액 </span><span>10000</span><span> - </span><span>총 할인금액 </span><span>1000</span>
+                                <span>주문 상품금액 </span><span th:text="${paymentInfo.getTotalPrice()+'원'}">10000</span><span> - </span><span>총 할인금액 </span><span th:text="0원">1000</span>
                                 <span> = </span><span>결제금액 </span><span class="total_price" th:text="${paymentInfo.getTotalPrice()+'원'}">9000</span>
                             </div>
                             <b>결제정보</b>
@@ -47,7 +47,7 @@
                                 </tr>
                                 <tr>
                                     <th>결제금액</th>
-                                    <td th:text="${paymentInfo.getTotalPrice()}">9000원</td>
+                                    <td th:text="${paymentInfo.getTotalPrice()} + '원'">9000원</td>
                                 </tr>
                                 <tr>
                                     <th>결제일시</th>
