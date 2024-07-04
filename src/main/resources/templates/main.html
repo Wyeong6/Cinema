@@ -77,11 +77,11 @@
         </nav>
 
         <div id="img_btn">
-            <button class="btn clicked" onclick="changeBackgroundAndTitle(0)">01</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(1)">02</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(2)">03</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(3)">04</button>
-            <button class="btn" onclick="changeBackgroundAndTitle(4)">05</button>
+            <button class="btn clicked">01</button>
+            <button class="btn">02</button>
+            <button class="btn">03</button>
+            <button class="btn">04</button>
+            <button class="btn">05</button>
         </div>
 
     </div>
@@ -312,8 +312,13 @@
                     $('#header .overlay').addClass('modal-show');
                 });
 
-                header.style.backgroundImage = `url(${moviePosters[index]})`;
-                movieTitle.textContent = movieTitles[index];
+                if(moviePosters) {
+                    header.style.backgroundImage = `url(${moviePosters[index]})`;
+                }
+                if(movieTitle) {
+                    movieTitle.textContent = movieTitles[index];
+                    console.log(index + '번째 무비 타이틀 인덱스 : ' + movieTitle[index])
+                }
 
                 // 메인화면 영화 줄거리 뜨는거 관련 (필요하면 조정하세요)
                 const maxLength = 70; // 원하는 최대 길이 (총 줄거리 70글자 제한)
@@ -321,14 +326,18 @@
                 let overviewText = movieOverview[index];
 
                 // 텍스트를 70글자로 제한하고 "..." 추가
-                if (overviewText.length > maxLength) {
+                if (overviewText && overviewText.length > maxLength) {
                     overviewText = overviewText.substring(0, maxLength) + '...';
                 }
 
                 // 줄바꿈
                 let formattedText = '';
-                for (let i = 0; i < overviewText.length; i += lineLength) {
-                    formattedText += overviewText.substring(i, i + lineLength) + '\n';
+                if (overviewText) {
+                    for (let i = 0; i < overviewText.length; i += lineLength) {
+                        formattedText += overviewText.substring(i, i + lineLength) + '\n';
+                    }
+                } else {
+                    console.error('overviewText is undefined or null');
                 }
 
                 movieOverviewTag.textContent = formattedText.trim();

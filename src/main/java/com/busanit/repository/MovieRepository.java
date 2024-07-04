@@ -19,12 +19,27 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("SELECT m FROM Movie m JOIN m.movieDetail md ORDER BY md.popularity DESC")
     List<Movie> findAllByOrderByMovieDetailPopularityDesc();
 
+//    @Query("SELECT m FROM Movie m " +
+//            "JOIN m.movieDetail md " +
+//            "JOIN m.images mi " +
+//            "WHERE md.video IS NOT NULL AND md.video <> '' " +
+//            "AND mi.backdropPath <> 'null' ")
+//@Query("SELECT m FROM Movie m JOIN m.movieDetail md WHERE md.video IS NOT NULL AND md.video <> '' ORDER BY md.popularity DESC")
+//    @Query("SELECT m FROM Movie m " +
+//        "JOIN m.movieDetail md " +
+//        "JOIN m.images mi " +
+//        "WHERE md.video IS NOT NULL AND md.video <> '' " +
+//        "AND mi.backdropPath <> 'null' " +
+//        "ORDER BY md.popularity DESC")
+
+//    @Query("SELECT m FROM Movie m JOIN m.movieDetail md WHERE md.video IS NOT NULL AND md.video <> '' ORDER BY md.popularity DESC")
+
     @Query("SELECT m FROM Movie m " +
-            "JOIN m.movieDetail md " +
-            "JOIN m.images mi " +
+            "LEFT JOIN m.movieDetail md " +
+            "LEFT JOIN m.images mi " +
             "WHERE md.video IS NOT NULL AND md.video <> '' " +
-            "AND mi.backdropPath IS NOT NULL AND mi.backdropPath <> '' " +
-            "AND mi.backdropPath <> 'null' " +
+            "AND mi.backdropPath IS NOT NULL AND mi.backdropPath <> '' AND mi.backdropPath <> 'null' " +
+            "GROUP BY m.movieId " +
             "ORDER BY md.popularity DESC")
     List<Movie> findByVideoTrueAndBackdropPathNotNullOrderByPopularityDesc(Pageable pageable);
 

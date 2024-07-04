@@ -531,6 +531,7 @@ public class MovieService {
     public List<MovieDTO> getVideoMovies() {
         Pageable topFive = PageRequest.of(0, 5);
         List<Movie> movieList = movieRepository.findByVideoTrueAndBackdropPathNotNullOrderByPopularityDesc(topFive);
+
         return movieList.stream().map(MovieDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
