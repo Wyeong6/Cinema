@@ -6,6 +6,7 @@ import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.domain.movie.FavoriteMovieDTO;
+import com.busanit.entity.Point;
 import com.busanit.service.CommentService;
 import com.busanit.service.MemberService;
 import com.busanit.domain.*;
@@ -33,6 +34,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/mypage")
@@ -139,6 +141,14 @@ public class MypageController {
     public String mypageReservationDetail(@RequestParam String paymentId, Model model) {
         PaymentDTO paymentDTO = paymentService.getMoviePaymentDetail(paymentId);
         model.addAttribute("paymentInfo", paymentDTO);
+
+        Optional<Point> PointOpt;
+        if(paymentDTO.getPaymentStatus().equals("결제완료")) { // 결제 완료 상태
+            PointOpt = Optional.ofNullable(pointService.getMinusPoint(paymentDTO.getImpUid(), true));
+        } else { // 결제 취소 상태
+            PointOpt = Optional.ofNullable(pointService.getPlusPoint(paymentDTO.getImpUid(), false));
+        }
+        model.addAttribute("pointInfo", PointOpt.map(Point::getPoints).orElse(0));
 
         return "/mypage/mypage_reservation_detail";
     }
