@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{layout/layout_total}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body class="right-sidebar is-preload">
 <th:block layout:fragment="content">
     <div id="page-wrapper" class="bg-black-wrapper">
@@ -98,13 +99,19 @@
                         <div>
                             <h4>총 금액 </h4><h4 id="total-price">0</h4><h4>원</h4>
                         </div>
-                        <button class="pay-btn" type="button" onclick="moveToPaymentPage()">결제하기</button>
+                        <button class="pay-btn" type="button" onclick="moveToPaymentPage()" sec:authorize="isAuthenticated()">결제하기</button>
+                        <button class="pay-btn" type="button" onclick="requestLogin()" sec:authorize="isAnonymous()">결제하기</button>
                     </div>
                 </article>
             </div>
 
         </div>
     </div>
+
+    <!--sweetalert 사용 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="/personal-scripts/util.js"></script>
 
     <script>
         $(document).ready(function () {
