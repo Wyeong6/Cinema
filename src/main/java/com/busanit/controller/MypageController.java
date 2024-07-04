@@ -6,6 +6,7 @@ import com.busanit.domain.FormMemberDTO;
 import com.busanit.domain.MemberRegFormDTO;
 import com.busanit.domain.OAuth2MemberDTO;
 import com.busanit.domain.movie.FavoriteMovieDTO;
+import com.busanit.entity.Point;
 import com.busanit.service.CommentService;
 import com.busanit.service.MemberService;
 import com.busanit.domain.*;
@@ -33,6 +34,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/mypage")
@@ -50,58 +52,65 @@ public class MypageController {
 
     @GetMapping("/")
     public String mypage(@AuthenticationPrincipal Object principal, Model model) {
-        // 현재 로그인한 사용자의 이메일
-        String userEmail = memberService.currentLoggedInEmail();
+        try {
+            // 현재 로그인한 사용자의 이메일
+            String userEmail = memberService.currentLoggedInEmail();
 
-        // 사용자의 등급 확인+저장
-        long userGrade = memberService.userGrade();
+            // 사용자의 등급 확인+저장
+            long userGrade = memberService.userGrade();
 
-        // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
-        if(principal instanceof OAuth2MemberDTO) {
-            OAuth2MemberDTO oAuth2MemberDTO = (OAuth2MemberDTO) principal;
-            model.addAttribute("socialUser", "socialUser");
-        } else if(principal instanceof FormMemberDTO) {
-            FormMemberDTO formMemberDTO = (FormMemberDTO) principal;
-            model.addAttribute("formUser", "formUser");
+            // social이 true이면 SocialMemberDTO를 사용, false이면 FormMemberDTO를 사용하는 조건문
+            if(principal instanceof OAuth2MemberDTO oAuth2MemberDTO) {
+                model.addAttribute("socialUser", "socialUser");
+            } else if(principal instanceof FormMemberDTO formMemberDTO) {
+                model.addAttribute("formUser", "formUser");
+            }
+
+            // 사용자의 Id
+            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+            model.addAttribute("memberId", memberRegFormDTO.getId());
+        } catch (NullPointerException e) {
+            return "redirect:/";
         }
 
-        // 사용자의 Id
-        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-        model.addAttribute("memberId", memberRegFormDTO.getId());
         return "/layout/layout_mypage";
     }
 
     @GetMapping("/main")
     public String mypageMain(Model model, @PageableDefault(size = 5, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        // 현재 로그인한 사용자의 이메일
-        String userEmail = memberService.currentLoggedInEmail();
+        try {
+            // 현재 로그인한 사용자의 이메일
+            String userEmail = memberService.currentLoggedInEmail();
 
-        // 사용자의 정보 + 포인트 정보
-        MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-        model.addAttribute("myPageMemberInfo", memberRegFormDTO);
-        Slice<PointDTO> pointDTOList = null;
-        pointDTOList = pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
-        model.addAttribute("pointInfo", pointDTOList);
+            // 사용자의 정보 + 포인트 정보
+            MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
+            model.addAttribute("myPageMemberInfo", memberRegFormDTO);
+            Slice<PointDTO> pointDTOList = null;
+            pointDTOList = pointService.getPointInfo(memberRegFormDTO.getId(), pageable);
+            model.addAttribute("pointInfo", pointDTOList);
 
-        // 사용자의 등급 변환
-        Integer userGradeInt = memberRegFormDTO.getGrade_code();
-        String gradeString = switch (userGradeInt) {
-            case 1 -> "BLACK";
-            case 2 -> "RED";
-            case 3 -> "BLUE";
-            default -> "GREEN";
-        };
-        model.addAttribute("myPageGrade", gradeString);
+            // 사용자의 등급 변환
+            Integer userGradeInt = memberRegFormDTO.getGrade_code();
+            String gradeString = switch (userGradeInt) {
+                case 1 -> "BLACK";
+                case 2 -> "RED";
+                case 3 -> "BLUE";
+                default -> "GREEN";
+            };
+            model.addAttribute("myPageGrade", gradeString);
 
-        // 최근 예매 내역
-        Slice<PaymentDTO> moviePaymentDTOList = null;
-        moviePaymentDTOList = paymentService.getMoviePaymentInfo(memberService.findUserIdx(userEmail), pageable);
-        model.addAttribute("moviePaymentInfo", moviePaymentDTOList);
+            // 최근 예매 내역
+            Slice<PaymentDTO> moviePaymentDTOList = null;
+            moviePaymentDTOList = paymentService.getMoviePaymentInfo(memberService.findUserIdx(userEmail), pageable);
+            model.addAttribute("moviePaymentInfo", moviePaymentDTOList);
 
-        // 최근 스낵 주문 내역
-        Slice<PaymentDTO> snackPaymentDTOList = null;
-        snackPaymentDTOList = paymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
-        model.addAttribute("snackPaymentInfo", snackPaymentDTOList);
+            // 최근 스낵 주문 내역
+            Slice<PaymentDTO> snackPaymentDTOList = null;
+            snackPaymentDTOList = paymentService.getSnackPaymentInfo(memberService.findUserIdx(userEmail), pageable);
+            model.addAttribute("snackPaymentInfo", snackPaymentDTOList);
+        } catch (NullPointerException e) {
+            return "redirect:/";
+        }
 
         return "/mypage/mypage_main";
     }
@@ -132,6 +141,14 @@ public class MypageController {
     public String mypageReservationDetail(@RequestParam String paymentId, Model model) {
         PaymentDTO paymentDTO = paymentService.getMoviePaymentDetail(paymentId);
         model.addAttribute("paymentInfo", paymentDTO);
+
+        Optional<Point> PointOpt;
+        if(paymentDTO.getPaymentStatus().equals("결제완료")) { // 결제 완료 상태
+            PointOpt = Optional.ofNullable(pointService.getMinusPoint(paymentDTO.getImpUid(), true));
+        } else { // 결제 취소 상태
+            PointOpt = Optional.ofNullable(pointService.getPlusPoint(paymentDTO.getImpUid(), false));
+        }
+        model.addAttribute("pointInfo", PointOpt.map(Point::getPoints).orElse(0));
 
         return "/mypage/mypage_reservation_detail";
     }
