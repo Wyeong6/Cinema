@@ -426,7 +426,6 @@ public class MovieService {
                 }
             }
         }
-        koreanActors.forEach(System.out::println);
     }
 
     private boolean isKoreanName(String name) {

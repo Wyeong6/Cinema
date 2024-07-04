@@ -317,7 +317,6 @@ public class AdminPageController {
         try {
             List<MovieDTO> allMovies = movieService.getAll();
             model.addAttribute("movies", allMovies);
-            System.out.println("Movies: " + allMovies);
         } catch (Exception e) {
             model.addAttribute("error", "Failed to retrieve movie list: " + e.getMessage());
         }

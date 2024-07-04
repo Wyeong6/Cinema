@@ -228,7 +228,6 @@ public class MypageController {
 
         model.addAttribute("favoriteMovies", favoriteMovies);
         model.addAttribute("hasFavorites", !favoriteMovies.isEmpty());
-        System.out.println("favoriteMovies === " + favoriteMovies.size());
         return "/mypage/mypage_favorite";
     }
 

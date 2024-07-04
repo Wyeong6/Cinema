@@ -74,4 +74,3 @@ window.SuccessAlert = SuccessAlert;
 window.deleteConfirm = deleteConfirm;
 window.errorAlert = errorAlert;
 window.warningAlert = warningAlert;
-

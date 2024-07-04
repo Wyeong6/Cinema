@@ -24,6 +24,11 @@
         <a href="/allMovies"><p>아직 찜한 영화가 없습니다.<br/> 마음에 드는 영화를 찾아 찜해보세요!</p></a>
     </section>
 </article>
+<!-- 스윗 얼럿 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script type="module" src="/modules/alerts.js"></script>
+
 <script th:inline="javascript">
     $(document).ready(function () {
         const userEmail = /*[[${#authentication.name}]]*/ 'defaultEmail@example.com';
@@ -36,32 +41,34 @@
 
             if (isFavorited) {
                 // 이미 "좋아요" 상태인 경우, 삭제 요청 전에 확인 메시지 띄우기
-                if (confirm('찜을 취소하시겠습니까?')) {
-                    $.ajax({
-                        url: '/favorites/' + userEmail + '/' + movieId,
-                        type: 'DELETE',
-                        success: function (response) {
-                            console.log("좋아요 삭제 성공");
-                            updateFavoriteButton(button, false); // 삭제 성공 시 버튼 UI 업데이트
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("좋아요 삭제 실패", error);
-                        }
-                    });
-                }
-            } else {
-                // "좋아요" 등록 요청 보내기
-                $.ajax({
-                    url: '/favorites/' + userEmail + '/' + movieId,
-                    type: 'POST',
-                    success: function (response) {
-                        console.log("좋아요 등록 성공");
-                        updateFavoriteButton(button, true); // 등록 성공 시 버튼 UI 업데이트
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("좋아요 등록 실패", error);
+                deleteConfirm().then((confirmed) => {
+                    if (confirmed) {
+                        $.ajax({
+                            url: '/favorites/' + userEmail + '/' + movieId,
+                            type: 'DELETE',
+                            success: function (response) {
+                                console.log("좋아요 삭제 성공");
+                                updateFavoriteButton(button, false); // 삭제 성공 시 버튼 UI 업데이트
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("좋아요 삭제 실패", error);
+                            }
+                        });
+                    } else {
+                        // "좋아요" 등록 요청 보내기
+                        $.ajax({
+                            url: '/favorites/' + userEmail + '/' + movieId,
+                            type: 'POST',
+                            success: function (response) {
+                                console.log("좋아요 등록 성공");
+                                updateFavoriteButton(button, true); // 등록 성공 시 버튼 UI 업데이트
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("좋아요 등록 실패", error);
+                            }
+                        });
                     }
-                });
+                })
             }
         });
 
