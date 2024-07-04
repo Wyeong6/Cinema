@@ -1,5 +1,28 @@
+<nav
+        class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+        id="layout-navbar" style="margin-bottom: 10px;"
+        xmlns:th="http://www.thymeleaf.org">
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item d-flex align-items-center">
+                <i class="bx bx-search fs-4 lh-0"></i>
+                <input
+                        aria-label="Search..."
+                        class="form-control border-0 shadow-none"
+                        placeholder="Search..."
+                        type="text"
+                />
+            </div>
+        </div>
+        <!-- /Search -->
+    </div>
+</nav>
+
 <div class="card">
     <h5 class="card-header">Members List</h5>
+
     <div class="table-responsive text-nowrap">
         <table class="table table-hover">
             <thead>
@@ -12,8 +35,10 @@
             </thead>
             <tbody class="table-border-bottom-0">
             <tr th:each="member : ${memberList}">
-                <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${member.id}">회원번호</strong></td>
-                <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${member.name}">회원이름</strong></td>
+                <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${member.id}">회원번호</strong>
+                </td>
+                <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong th:text="${member.name}">회원이름</strong>
+                </td>
                 <td th:text="${member.email}">회원아이디(이메일)</td>
                 <td><span class="badge bg-label-primary me-1">Vip</span></td>
                 <td>

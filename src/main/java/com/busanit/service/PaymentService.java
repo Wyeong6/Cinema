@@ -41,12 +41,6 @@ public class PaymentService {
     @Value("${imp_rest_api_secret}")
     private String imp_rest_api_secret;
 
-//    public Payment orderComplete(PaymentDTO dto, int id){
-//        User user = memberRepository.findUserById(id);
-//        dto.setUser(user);
-//        return paymentRepository.save(mapper.map(dto, Point.class))
-//    }
-
     // 결제 DB 저장
     public void savePayment(Payment payment) {
         paymentRepository.save(payment);
@@ -68,14 +62,14 @@ public class PaymentService {
 
     // 영화 결제 내역
     public Slice<PaymentDTO> getMoviePaymentInfo(Long member_id, Pageable pageable) {
-        Slice<Payment> paymentSlice = paymentRepository.findByMember_IdAndProductType(member_id, "MO", pageable);
+        Slice<Payment> paymentSlice = paymentRepository.findByMember_IdAndProductTypeContaining(member_id, "MO", pageable);
 
         return PaymentDTO.toDTOMovieSlice(paymentSlice, movieService);
     }
 
-    // 스낵 결제 내역
+    // 스낵, 장바구니 결제 내역
     public Slice<PaymentDTO> getSnackPaymentInfo(Long member_id, Pageable pageable) {
-        Slice<Payment> paymentSlice = paymentRepository.findByMember_IdAndProductType(member_id, "SN", pageable);
+        Slice<Payment> paymentSlice = paymentRepository.findByMember_IdAndProductTypeContaining(member_id, "S", pageable);
 
         return PaymentDTO.toDTOSnackSlice(paymentSlice, snackService);
     }

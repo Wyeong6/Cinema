@@ -79,6 +79,12 @@ public class SnackService {
                 .build();
     }
 
+    // 스낵 수량 업데이트 (snackId 필요)
+    public void updateSnackCount(SnackDTO snackDTO) {
+        Snack snack = snackRepository.findById(snackDTO.getId()).orElseThrow(() -> new NullPointerException("snack null"));
+        snackRepository.save(Snack.updateCount(snack, snackDTO));
+    }
+
     // 스낵 저장(관리자 페이지)
     public void saveSnack(Snack snack) {
         snackRepository.save(snack);
