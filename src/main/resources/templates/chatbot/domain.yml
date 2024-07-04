@@ -1,0 +1,68 @@
+version: '3.1'
+intents:
+- ask_else_reply_consultation
+- ask_else_reply_info
+- ask_else_reply_nothing
+- ask_else_reply_snack
+- get_link_bad
+- get_link_good
+- goodbye
+- greet
+- greeting_consultation
+- greeting_info
+- greeting_snack
+- info_reply_bad
+- info_reply_good
+- snack_reply_bad
+- snack_reply_good
+entities:
+- snack_type
+slots:
+  snack_type:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: snack_type
+responses:
+  utter_greet:
+  - text: Hello! How can I help you?
+  utter_goodbye:
+  - text: Goodbye! Have a great day!
+  utter_snacks_info:
+  - text: |
+      Here are the snacks available at the cinema:
+      - Popcorn
+      - Hamburger
+      - Drinks
+      Is there anything you want out of these?
+  utter_snack_reply_good:
+  - text: If you go to this [snack-link](http://localhost:8080/snack/snackList), you'll get what you want.
+  utter_snack_reply_bad:
+  - text: Unfortunately, we only sell this. Is there anything else I can help you with?
+  utter_theater_info:
+  - text: This [info-link](http://localhost:8080/inquiry) will help you.
+  utter_consultation_info:
+  - text: Here's the link if you want a one-on-one consultation. [link](http://localhost:8080/inquiry#work)
+  utter_ask_anything_else:
+  - text: Is there anything else I can help you with?
+  utter_get_link_bad:
+  - text: I'm sorry. For more information, please use the customer center.
+forms:
+  snack_form:
+    required_slots:
+    - snack_type
+actions:
+- utter_ask_anything_else
+- utter_goodbye
+- utter_snacks_info
+- utter_snack_reply_good
+- utter_consultation_info
+- utter_theater_info
+- utter_greet
+- utter_snack_reply_bad
+- action_default_fallback
+- utter_get_link_bad
+- action_completion_restarted_bot
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
