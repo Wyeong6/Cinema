@@ -23,8 +23,20 @@
                 <div class="row">
 
                     <article class="col-3 col-12-mobile special" th:each="movie, iterStat : ${moviePage}">
-                        <a th:href="@{'/movies/' + ${movie.id}}" class="image featured"><img
-                                class="featured-img fixed-height-image" th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"/></a>
+                        <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
+                            <img th:if="${#strings.length(movie.id) == 10}"
+                                 class="featured-img fixed-height-image"
+                                 th:src="@{|/${movie.posterPath}|}" alt="배경사진"
+                            />
+                            <img th:if="${movie.posterPath != 'null' && #strings.length(movie.id) != 10}"
+                                 class="featured-img fixed-height-image"
+                                 th:src="@{'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}}" alt="배경 사진"
+                            />
+                            <img th:if="${movie.posterPath == 'null' && #strings.length(movie.id) != 10}"
+                                 class="featured-img fixed-height-image"
+                                 th:src="@{/images/img_not_ready.png}" alt="배경 사진"
+                            />
+                        </a>
                         <header>
                             <h4><a th:href="@{'/movies/' + ${movie.id}}"><span th:text="${movie.title}">영화 이름</span></a>
                             </h4>

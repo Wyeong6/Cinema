@@ -108,11 +108,15 @@
             <article th:each="movie, iterStat : ${allMovies}"
                      th:if="${iterStat.index < 10}">
                 <a th:href="@{'/movies/' + ${movie.id}}" class="image featured">
-                    <img th:if="${movie.posterPath != null}"
+                    <img th:if="${#strings.length(movie.id) == 10}"
+                         th:src="@{|/${movie.posterPath}|}"
+                         alt="배경 사진" width="150" height="300"
+                         style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
+                    <img th:if="${movie.posterPath != null && #strings.length(movie.id) != 10}"
                          th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}"
                          alt="배경 사진" width="150" height="300"
                          style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
-                    <img th:if="${movie.posterPath == null || movie.posterPath == 'null' || movie.posterPath == ''}"
+                    <img th:if="${movie.posterPath == 'null' && #strings.length(movie.id) != 10}"
                          th:src="@{/images/img_not_ready.png}"
                     alt="이미지 준비 중" width="150" height="300"
                     style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
@@ -130,7 +134,7 @@
                 </header>
                 <div class="button_box">
                     <button class="reservation_btn button"><a th:href="@{'/reservation/screeningSchedule/' + ${movie.id}}">예매하기</a></button>
-                    <button class="get_btn button"><a th:href="@{'/movies/' + ${movie.id}}" class="movie-detail-link">상세보기</a></button>
+                    <button class="get_btn button"><a th:href="@{'/movies/' + ${movie.id}}">상세보기</a></button>
                 </div>
             </article>
         </div>
@@ -145,19 +149,16 @@
         </div>
         <div class="reel">
             <article th:each="movie, iterStat : ${upcomingMovies}" th:if="${iterStat.index < 10}">
-<!--                <form name="detailForm" th:action="@{'/upcoming/' + ${movie.id}}" method="post">-->
-<!--                    <input type="hidden" th:name="movieId" th:value="${movie.id}"/>-->
-<!--                    <input type="hidden" th:name="title" th:value="${movie.title}"/>-->
-<!--                    <input type="hidden" th:name="releaseDate" th:value="${movie.releaseDate}"/>-->
-<!--                    <input type="hidden" th:name="posterPath" th:value="${movie.posterPath}"/>-->
-<!--                    <input type="hidden" th:name="genres" th:value="${movie.genres}"/>-->
-<!--                    <input type="hidden" th:name="overview" th:value="${movie.overview}"/>-->
                 <a th:href="@{'/upcoming/' + ${movie.id}}"  class="image featured">
-                    <img th:if="${movie.posterPath != 'null'}"
+                    <img th:if="${#strings.length(movie.id) == 10}"
+                         th:src="@{|/${movie.posterPath}|}"
+                         alt="배경 사진" width="150" height="300"
+                         style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
+                    <img th:if="${movie.posterPath != 'null' && #strings.length(movie.id) != 10}"
                          th:src="@{'https://image.tmdb.org/t/p/w780' + ${movie.posterPath}}"
                          alt="배경 사진" width="150" height="300"
                          style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
-                    <img th:if="${movie.posterPath == 'null'}"
+                    <img th:if="${movie.posterPath == 'null' && #strings.length(movie.id) != 10}"
                          th:src="@{/images/img_not_ready.png}"
                          alt="이미지 준비 중" width="150" height="300"
                          style="border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
@@ -174,7 +175,6 @@
                     <button class="reservation_btn button"><a th:href="@{'/reservation/screeningSchedule/' + ${movie.id}}">예매하기</a></button>
                     <button class="get_btn button"><a th:href="@{'/movies/' + ${movie.id}}">상세보기</a></button>
                 </div>
-<!--                </form>-->
             </article>
         </div>
     </section>

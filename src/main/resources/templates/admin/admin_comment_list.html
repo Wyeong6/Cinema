@@ -61,25 +61,38 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { deleteConfirm } from "/modules/alerts.js";
+    import { errorAlert } from "/modules/alerts.js";
+
     $(document).ready(function() {
-        $('.delete-movie-btn').on('click', function() {
-            const cno = $(this).attr('data-cno-id');
-            if (confirm('정말 삭제하시겠습니까?')) {
-                $.ajax({
-                    url: '/movies/delete/' + cno,
-                    type: 'DELETE',
-                    success: function(result) {
-                        alert('리뷰가 삭제되었습니다.');
-                        location.reload();
-                    },
-                    error: function(err) {
-                        alert('삭제 중 오류가 발생했습니다.');
-                    }
-                });
+        $(document).on('click', '.delete-movie-btn', function() {
+            const cno = $(this).data('cno-id');
+            console.log('cno:', cno);  // 클릭된 버튼의 cno 값 확인
+
+            if (!cno) {
+                console.error('cno 값이 유효하지 않습니다.');
+                return;
             }
+
+            deleteConfirm().then((confirmed) => {
+                if (confirmed) {
+                    $.ajax({
+                        url: '/movies/delete/' + cno,
+                        type: 'DELETE',
+                        success: function(result) {
+                            // 해결필요
+                            // location.reload();
+                        },
+                        error: function(err) {
+                            errorAlert('삭제 중 오류가 발생했습니다.');
+                        }
+                    });
+                }
+            });
         });
     });
+
 
     function loadCommentList(page) {
         $.ajax({
