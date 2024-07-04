@@ -22,14 +22,12 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpClient;
 import java.util.*;
 
 @Controller
@@ -87,7 +85,6 @@ public class PaymentController {
         model.addAttribute("memberInfo", memberInfo); // 사용자 정보 리스트(이메일, idx)
         model.addAttribute("gradeInfo", gradeRate); // 사용자 등급 적립율
         model.addAttribute("pointInfo", currentPoints); // 사용자 보유 포인트
-//        model.addAttribute("html5InicisKey", html5InicisKey); // 결제키
 
         model.addAttribute("scheduleDTO", scheduleDTO);
         model.addAttribute("movieDTOs", movieDTOs);
@@ -124,11 +121,8 @@ public class PaymentController {
         response.put("reqIDX", request.get("reqIDX")); // 결제를 요청한 페이지 IDX
 
         // 현재 로그인한 사용자의 정보 (이메일, idx)
-//        List<String> memberInfo = new ArrayList<>();
         String userEmail = memberService.currentLoggedInEmail();
-//        memberInfo.add(userEmail);
         MemberRegFormDTO memberRegFormDTO = memberService.getFormMemberInfo(userEmail);
-//        memberInfo.add(memberRegFormDTO.getId().toString());
         response.put("memberEmail", userEmail);
         response.put("memberName", memberRegFormDTO.getName());
 
@@ -273,29 +267,29 @@ public class PaymentController {
                                              PointDTO pointDTO,
                                              SnackDTO snackDTO,
                                              @PageableDefault(size = 1, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
-//        CloseableHttpClient client = HttpClientBuilder.create().build();
-//        HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
-//        post.setHeader("Authorization", paymentService.getImportToken());
-//        List<NameValuePair> params = new ArrayList<>();
-//        params.add(new BasicNameValuePair("merchant_uid", merchant_uid));
-//
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("https://api.iamport.kr/payments/cancel");
+        post.setHeader("Authorization", paymentService.getImportToken());
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("merchant_uid", merchant_uid));
+
         Map<String, String> response_complete = new HashMap<>();
-//
-//        String asd = "";
-//        try {
-//            post.setEntity(new UrlEncodedFormEntity(params));
-//            HttpResponse res = client.execute(post);
-//            ObjectMapper mapper = new ObjectMapper();
-//            String body = EntityUtils.toString(res.getEntity());
-//            JsonNode rootNode = mapper.readTree(body);
-//            asd = rootNode.get("response").asText();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            response_complete.put("errorMsg", "errorMsg");
-//        }
-//        if (asd.equals("null")) { // 환불 실패
-//            response_complete.put("errorMsg", "errorMsg");
-//        } else { // 환불 성공
+
+        String asd = "";
+        try {
+            post.setEntity(new UrlEncodedFormEntity(params));
+            HttpResponse res = client.execute(post);
+            ObjectMapper mapper = new ObjectMapper();
+            String body = EntityUtils.toString(res.getEntity());
+            JsonNode rootNode = mapper.readTree(body);
+            asd = rootNode.get("response").asText();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response_complete.put("errorMsg", "errorMsg");
+        }
+        if (asd.equals("null")) { // 환불 실패
+            response_complete.put("errorMsg", "errorMsg");
+        } else { // 환불 성공
             // 제공했던 포인트 회수
             // 현재 포인트
             int currentPoints = pointService.getPointInfo(memberService.findUserIdx(memberService.currentLoggedInEmail()), pageable).getContent().get(0).getCurrentPoints();
@@ -348,7 +342,7 @@ public class PaymentController {
 
             paymentService.updatePaymentStatus(imp_uid, memberService.findUserIdx(memberService.currentLoggedInEmail()));
             response_complete.put("imp_uid", imp_uid);
-//        }
+        }
         return response_complete;
     }
 

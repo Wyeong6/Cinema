@@ -46,6 +46,12 @@
         </div>
     </section>
 </article>
+
+<!--sweetalert 사용 -->
+<script src="/personal-scripts/util.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 <script th:inline="javascript">
     $(document).ready(function () {
         let currentPage = 0; // 현재 페이지 번호
@@ -62,31 +68,28 @@
                     let container = $('.history'); // 주문 내역을 추가할 컨테이너
                     data.content.forEach(moviePayment => {
                         let item = null;
-                        if(moviePayment.getPaymentStatus == '결제완료') {
+                        if(moviePayment.paymentStatus == '결제완료') {
                             item = `
-                                            <article class="history_item">
-                                                <header>
-                                                    <h4>결제완료</h4>
-                                                </header>
-                                                <header>
-                        <h4 class="reservation-status">결제완료</h4>
-                    </header>
-                    <div class="history_data">
-                        <input type="hidden" th:value="${moviePayment.getMovie().id}" class="movieId"/>
-                        <img class="featured-img" alt="영화 포스터" src="https://image.tmdb.org/t/p/w500/${moviePayment.movie.poster_path}">
-                        <div>
-                            <p>예매번호 : ${moviePayment.merchantUid}</p>
-                            <input type="hidden" value="${moviePayment.scheduleId}" class="schedule-id">
-                            <p>${moviePayment.productName}</p>
-                            <p><span class="history-data-date">${moviePayment.content1}</span> <span class="history-data-time">${moviePayment.content2}</span></p>
-                            <p><span class="history-data-theater">${moviePayment.content3}</span> <span class="history-data-seats">${moviePayment.content4}</span></p>
-                        </div>
-                    </div>
-                    <div class="button_box"> <!--결제상태-->
-                        <button type="button" class="detail_btn" id="movie_detail" data-reservation-idx="${moviePayment.id}">예매상세</button>
-                        <button type="button" class="cancel_btn" id="movie_cancel" data-reservation-merchantUid="${moviePayment.merchantUid}" data-reservation-impUid="${moviePayment.impUid}">예매취소</button>
-                    </div>
-                                            </article>`;
+                                        <article class="history_item">
+                                        <header>
+                                            <h4 class="reservation-status">결제완료</h4>
+                                        </header>
+                                        <div class="history_data">
+                                            <input type="hidden" value="${moviePayment.movie.id}" class="movieId"/>
+                                            <img class="featured-img" alt="영화 포스터" src="https://image.tmdb.org/t/p/w500/${moviePayment.movie.poster_path}">
+                                            <div>
+                                                <p>예매번호 : ${moviePayment.merchantUid}</p>
+                                                <input type="hidden" value="${moviePayment.scheduleId}" class="schedule-id">
+                                                <p>${moviePayment.productName}</p>
+                                                <p><span class="history-data-date">${moviePayment.content1}</span> <span class="history-data-time">${moviePayment.content2}</span></p>
+                                                <p><span class="history-data-theater">${moviePayment.content3}</span> <span class="history-data-seats">${moviePayment.content4}</span></p>
+                                            </div>
+                                        </div>
+                                        <div class="button_box"> <!--결제상태-->
+                                            <button type="button" class="detail_btn" id="movie_detail" data-reservation-idx="${moviePayment.id}">예매상세</button>
+                                            <button type="button" class="cancel_btn" id="movie_cancel" data-reservation-merchantUid="${moviePayment.merchantUid}" data-reservation-impUid="${moviePayment.impUid}">예매취소</button>
+                                        </div>
+                                        </article>`;
                         } else {
                             item = `
                                             <article class="history_item">
@@ -127,12 +130,8 @@
             });
         }
 
-        // $('.container').on('click', '.detail_btn', function() {
-        //     $('#content').load('/mypage/order/detail');
-        // });
-
-        // 예매 취소하기
-        $('#movie_cancel').click(function() {
+        // Using event delegation to handle dynamically added buttons
+        $(document).on('click', '#movie_cancel', function() {
             const merchant_uid = $(this).data('reservation-merchantuid');
             const imp_uid = $(this).data('reservation-impuid');
 
@@ -161,22 +160,21 @@
                         cancelReservedSeats(scheduleId, seatsIdArray);
                         window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
                     } else {
-                        alert("죄송합니다. 다시 시도해주세요.");
+                        swtAlertOne("죄송합니다. 다시 시도해주세요.");
                     }
                 },
                 error: function() {
-                    alert("서버 통신에 실패했습니다.");
+                    swtAlertOne("서버 통신에 실패했습니다.");
                 }
             })
         });
 
-        // 예매내역 상세보기
-        $('#movie_detail, #movie_cancel_detail').click(function() {
+        // Using event delegation to handle dynamically added buttons for detail view
+        $(document).on('click', '#movie_detail, #movie_cancel_detail', function() {
             const reservationIdx = $(this).data('reservation-idx');
-            $('#content').load('/mypage/reservation/detail?paymentId='+reservationIdx);
+            $('#content').load('/mypage/reservation/detail?paymentId=' + reservationIdx);
         });
     });
-
 
     function cancelReservedSeats(scheduleId, seatIds) {
         $.ajax({

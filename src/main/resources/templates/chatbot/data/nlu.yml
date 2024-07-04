@@ -1,0 +1,119 @@
+version: "3.1"
+nlu:
+- intent: greet
+  examples: |
+    - hello
+    - hi
+    - hey there
+    - hi there
+    - hey
+    - good morning
+    - good evening
+    - hello there
+    - hey, how are you?
+    - hi cinemabot
+    - hello cinemabot
+    - hi bot
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you later
+    - Have a good day
+    - see you
+    - bye bye
+    - see you soon
+    - take care
+- intent: ask_else_reply_nothing
+  examples: |
+    - No, I don't need it. Take care
+    - nothing
+    - no
+    - I don't
+    - That's enough
+    - I don't need it
+    - it's done
+    - no problem
+- intent: greeting_snack
+  examples: |
+    - Can I get some snacks like drinks or popcorn at the movie theater?
+    - Can I get some snacks?
+    - What snacks are available at the cinema?
+    - Are there any snacks for sale at the movies?
+    - Do you sell snacks?
+    - What kind of snacks can I buy?
+    - Do you have popcorn?
+    - I'd like some snacks.
+    - What snacks do you have?
+    - Can I buy drinks here?
+    - Are there any snacks in the theater?
+    - I want some snacks
+    - I want something to drink
+    - I'm looking for something to eat
+    - I want to buy some snacks
+    - Where can I buy snacks?
+    - I'm looking for something to drink
+    - I want to buy something to drink
+    - i wanna some snacks
+    - snack
+    - drink
+- intent: greeting_info
+  examples: |
+    - What is the opening time of the theater?
+    - Can you tell me the show timings for today?
+    - Are there any special events happening today?
+    - I have a question
+    - I need movie theater information
+    - Where can I check the notice?
+    - Where can I make a 1:1 inquiry?
+    - Where's the Q&A?
+    - I want to talk to you
+    - How do I pay
+    - I lost something
+    - Where's the customer center
+    - info
+- intent: greeting_consultation
+  examples: |
+    - I want to connect with a counselor
+    - counselor
+    - customer service agent
+    - I want to have a one-on-one chat
+    - 1:1 counselor
+    - one-on-one chat
+    - one-on-one consultation
+    - consultation
+    - 1:1 chat
+- intent: snack_reply_good
+  examples: |
+    - I want popcorn
+    - popcorn please
+    - I'd like to buy a drink
+    - Can I have some popcorn?
+    - Yeah, I want to buy something to drink
+    - Yeah, there's something I want
+    - Yeah, I want them
+    - Oh, there's something I want
+    - yes
+    - I want a hamburger
+    - popcorn
+    - hamburger
+    - beer
+- intent: snack_reply_bad
+  examples: |
+    - Well, I don't want anything
+    - No, there's nothing I want
+    - There's nothing to eat
+- intent: get_link_good
+  examples: |
+    - Thx
+    - Thank you.
+    - thx
+    - thank you
+    - okay
+    - perfect
+- intent: get_link_bad
+  examples: |
+    - That's not the answer I wanted
+    - The link is wrong
+    - This is not the link
+    - It's not a proper link
