@@ -146,27 +146,40 @@
 
             seatsIdArray.push(scheduleId + seats);
 
-            $.ajax({
-                type: 'POST',
-                url: '/payment/paymentCancel',
-                data: {
-                    merchant_uid: merchant_uid,
-                    imp_uid: imp_uid
-                },
-                success: function(response_complete) {
-                    if(response_complete.errorMsg !== "errorMsg") {
-                        let params = new URLSearchParams();
-                        params.append("imp_uid", response_complete.imp_uid);
-                        cancelReservedSeats(scheduleId, seatsIdArray);
-                        window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
-                    } else {
-                        swtAlertOne("죄송합니다. 다시 시도해주세요.");
-                    }
-                },
-                error: function() {
-                    swtAlertOne("서버 통신에 실패했습니다.");
+            Swal.fire({
+                title: "결제취소",
+                text: "결제를 취소하시겠습니까?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "취소하기",
+                cancelButtonText: "아니오"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/payment/paymentCancel',
+                        data: {
+                            merchant_uid: merchant_uid,
+                            imp_uid: imp_uid
+                        },
+                        success: function(response_complete) {
+                            if (response_complete.errorMsg !== "errorMsg") {
+                                let params = new URLSearchParams();
+                                params.append("imp_uid", response_complete.imp_uid);
+                                cancelReservedSeats(scheduleId, seatsIdArray);
+                                window.location.href = '/payment/paymentCancelSuccessful?' + params.toString(); // 결제가 완료된 후 리디렉션할 페이지
+                            } else {
+                                swtAlertOne("죄송합니다. 다시 시도해주세요.");
+                            }
+                        },
+                        error: function() {
+                            swtAlertOne("서버 통신에 실패했습니다.");
+                        }
+                    });
                 }
-            })
+            });
         });
 
         // Using event delegation to handle dynamically added buttons for detail view
